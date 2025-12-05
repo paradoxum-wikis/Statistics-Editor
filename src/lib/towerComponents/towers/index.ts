@@ -1,0 +1,1 @@
+export const towerNames = ["Accelerator"];

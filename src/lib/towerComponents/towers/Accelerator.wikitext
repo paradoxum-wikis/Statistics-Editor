@@ -1,0 +1,188 @@
+<variable>
+$DPS$ = "Overcharge / (Charge-Up + Cooldown + (Overcharge / Damage * Tick))"
+
+$0Lead$ = true
+$0Hidden$ = false
+$0Flying$ = false
+
+$1Hidden$ = true
+$1Upgrade$ = "Extra Juice"
+$1UpgradeI$ = 11821094308
+
+$2Upgrade$ = "Second Energy Canister"
+$2UpgradeI$ = 11821094198
+
+$3Upgrade$ = "Powerhouse Armor"
+$3UpgradeI$ = 11821093989
+
+$4Upgrade$ = "Supercharger"
+$4UpgradeI$ = 11821093828
+
+$5Upgrade$ = "Vessel Of Infinite Destruction"
+$5UpgradeI$ = 11821093672
+</variable>
+<div class="mobile-tabber"><tabber>
+|-|Regular =
+<div class="overflow-box">
+{| class="wikitable stats-table" style="width:850px;"
+!Level
+!Total Price
+!Damage
+!Tick
+!Charge-Up<ref name="charge">The Charge-Up happens when the '''Accelerator''' first starts attacking or its cooldown ends. This is indicated by an animation where the '''Accelerator''' charges up its plasma gun.</ref>
+!Cooldown<ref name="cooldown">The Cooldown happens when the Overcharge occurs. This is indicated by an animation where the '''Accelerator''' waves its hand.</ref>
+!Overcharge
+!Range
+!DPS<ref name="dps">DPS is calculated as Overcharge ÷ (Charge-Up + Cooldown + [Overcharge ÷ Damage x Tick]).</ref>
+!Cost Efficiency
+|-
+|0
+|{{Money|4,500}}
+|10
+|0.2
+|2.5
+|2.5
+|300
+|18
+|$DPS$
+|{{Money|168.6}}
+|-
+|1
+|{{Money|5,500}}
+|15
+|0.2
+|2.5
+|2.5
+|300
+|18
+|$DPS$
+|{{Money|167.94}}
+|-
+|2
+|{{Money|8,000}}
+|15
+|0.2
+|2.5
+|2.5
+|600
+|20
+|$DPS$
+|{{Money|177.58}}
+|-
+|3
+|{{Money|12,750}}
+|40
+|0.2
+|2.5
+|2.5
+|600
+|20
+|$DPS$
+|{{Money|172.55}}
+|-
+|4
+|{{Money|24,000}}
+|40
+|0.15
+|1.5
+|2.5
+|1,280
+|22.5
+|$DPS$
+|{{Money|169.8}}
+|-
+|5
+|{{Money|60,000}}
+|100
+|0.1
+|1.5
+|2.5
+|2,400
+|25
+|$DPS$
+|{{Money|164.8}}
+|}
+</div>
+|-|PVP =
+<div class="overflow-box">
+{| class="wikitable stats-table" style="width:850px;"
+!Level
+!Total Price
+!Damage
+!Tick
+!Charge-Up<ref name="charge"/>
+!Cooldown<ref name="cooldown"/>
+!Overcharge
+!Range
+!DPS<ref name="dps"/>
+!Cost Efficiency
+|-
+|0
+|{{Money|4,250}}
+|12
+|0.2
+|2.5
+|2
+|300
+|18
+|30.93
+|{{Money|137.41}}
+|-
+|1
+|{{Money|5,000}}
+|15
+|0.2
+|2.5
+|2
+|300
+|18
+|34.64
+|{{Money|144.34}}
+|-
+|2
+|{{Money|7,000}}
+|15
+|0.2
+|2.5
+|2
+|600
+|18
+|46.8
+|{{Money|149.57}}
+|-
+|3
+|{{Money|11,500}}
+|35
+|0.15
+|2.5
+|2
+|600
+|20
+|83.23
+|{{Money|138.17}}
+|-
+|4
+|{{Money|23,500}}
+|35
+|0.1
+|1.5
+|2
+|1,280
+|20
+|171.82
+|{{Money|136.77}}
+|-
+|5
+|{{Money|52,000}}
+|90
+|0.1
+|1.5
+|2
+|2,400
+|23
+|376.18
+|{{Money|138.23}}
+|}
+</center>
+</div>
+</tabber></div>
