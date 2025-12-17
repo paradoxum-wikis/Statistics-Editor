@@ -10,6 +10,7 @@
     import { Combobox, DropdownMenu, Popover, AlertDialog } from "bits-ui";
     import { towerStore } from "$lib/stores/tower.svelte";
     import { profileStore } from "$lib/stores/profile.svelte";
+    import { settingsStore } from "$lib/stores/settings.svelte";
     import { imageLoader } from "$lib/services/imageLoader";
 
     let isClient = $state(false);
@@ -36,6 +37,8 @@
     );
 
     $effect(() => {
+        imageLoader.setDebugMode(settingsStore.debugMode);
+
         const tower = towerStore.selectedData;
         if (!tower) {
             untrack(() => {
@@ -267,7 +270,7 @@
                                 </DropdownMenu.GroupHeading>
                                 {#each profileStore.list as profile}
                                     <DropdownMenu.Item
-                                        class="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground"
+                                        class="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-highlighted:bg-accent data-highlighted:text-accent-foreground"
                                         onSelect={() =>
                                             handleProfileChange(profile)}
                                     >
@@ -282,14 +285,14 @@
                                 class="-mx-1 my-1 h-px bg-muted"
                             />
                             <DropdownMenu.Item
-                                class="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground"
+                                class="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-highlighted:bg-accent data-highlighted:text-accent-foreground"
                                 onSelect={handleCreateProfile}
                             >
                                 + Create New Profile
                             </DropdownMenu.Item>
                             {#if profileStore.current !== "Default"}
                                 <DropdownMenu.Item
-                                    class="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none text-red-500 data-[highlighted]:bg-red-100 data-[highlighted]:text-red-600"
+                                    class="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none text-red-500 data-highlighted:bg-red-100 data-highlighted:text-red-600"
                                     onSelect={() =>
                                         openDeleteProfileDialog(
                                             profileStore.current,
