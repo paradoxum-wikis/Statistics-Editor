@@ -4,6 +4,7 @@
     import type Tower from "$lib/towerComponents/tower";
     import type SkinData from "$lib/towerComponents/skinData";
     import { settingsStore } from "$lib/stores/settings.svelte";
+    import { fade } from "svelte/transition";
 
     let {
         tower = null,
@@ -85,7 +86,20 @@
             );
         }
 
-        skinData.setDetection(levelIndex, detectionType, checked);
+        if (checked) {
+            const totalLevels = skinData.levels.levels.length;
+            for (let i = levelIndex; i < totalLevels; i++) {
+                skinData.setDetection(
+                    i,
+                    detectionType,
+                    true,
+                    i === totalLevels - 1,
+                );
+            }
+        } else {
+            skinData.setDetection(levelIndex, detectionType, false);
+        }
+
         updateTrigger++;
         onSave?.();
     }
@@ -119,7 +133,10 @@
                                   : []}
                         {@const upgrades = skinData?.upgrades ?? []}
                         {#if skinData}
-                            <div class="table-container">
+                            <div
+                                class="table-container"
+                                in:fade={{ duration: 200 }}
+                            >
                                 <table class="table">
                                     <thead class="table-head">
                                         <tr>

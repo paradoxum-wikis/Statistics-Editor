@@ -1,5 +1,6 @@
 <script lang="ts">
     import { Tabs } from "bits-ui";
+    import { fade } from "svelte/transition";
 
     let {
         upgradeImages,
@@ -30,30 +31,32 @@
     </Tabs.List>
     {#each Array(numUpgrades) as _, index}
         <Tabs.Content value={index.toString()}>
-            {#if loadingImages.get(index)}
-                <div
-                    class="w-full h-32 bg-muted rounded flex items-center justify-center text-muted-foreground"
-                >
-                    Loading...
-                </div>
-            {:else if upgradeImages[index]}
-                <img
-                    src={upgradeImages[index]}
-                    alt={`Upgrade ${index + 1}`}
-                    class="w-full rounded"
-                />
-            {:else}
-                <div
-                    class="w-full h-32 bg-muted rounded flex items-center justify-center text-muted-foreground"
-                >
-                    No image available
-                </div>
-            {/if}
-            {#if upgradeNames[index]}
-                <div class="mt-2 text-center text-sm font-medium">
-                    {upgradeNames[index]}
-                </div>
-            {/if}
+            <div in:fade={{ duration: 200 }}>
+                {#if loadingImages.get(index)}
+                    <div
+                        class="w-full h-32 bg-muted rounded flex items-center justify-center text-muted-foreground"
+                    >
+                        Loading...
+                    </div>
+                {:else if upgradeImages[index]}
+                    <img
+                        src={upgradeImages[index]}
+                        alt={`Upgrade ${index + 1}`}
+                        class="w-full rounded"
+                    />
+                {:else}
+                    <div
+                        class="w-full h-32 bg-muted rounded flex items-center justify-center text-muted-foreground"
+                    >
+                        No image available
+                    </div>
+                {/if}
+                {#if upgradeNames[index]}
+                    <div class="mt-2 text-center text-sm font-medium">
+                        {upgradeNames[index]}
+                    </div>
+                {/if}
+            </div>
         </Tabs.Content>
     {/each}
 </Tabs.Root>
