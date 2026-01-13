@@ -4,7 +4,7 @@ import { parseWikitext } from "$lib/wikitext/parser";
 import { evaluateFormula } from "$lib/wikitext/evaluator";
 import { settingsStore } from "$lib/stores/settings.svelte";
 
-const wikitextFiles = import.meta.glob("./towers/*.wikitext", {
+const wikitextFiles = import.meta.glob("./towers/*.wiki", {
   query: "?raw",
   import: "default",
 });
@@ -156,8 +156,7 @@ class TowerManager {
       }
     }
 
-    const wikitextName = name.replace(/ /g, "_");
-    const wikitextPath = `./towers/${wikitextName}.wikitext`;
+    const wikitextPath = `./towers/${name}.wiki`;
     const wikitextLoader = wikitextFiles[wikitextPath];
 
     if (wikitextLoader) {
