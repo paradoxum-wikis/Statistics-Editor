@@ -1,0 +1,126 @@
+<variable>
+$DPS$ = "(Damage * Burst Count) / (Cooldown + (Firerate * Burst Count)) + (Poison Damage / Tick)"
+$DPS2$ = "Damage / Firerate + Poison Damage / Tick"
+
+$0Lead$ = true
+$0Hidden$ = false
+$0Flying$ = false
+
+$1Upgrade$ = "Faster Reloading"
+$1UpgradeI$ = 11821094308
+
+$2Upgrade$ = "Poisonous Bullets"
+$2UpgradeI$ = 11821094198
+
+$3Flying$ = true
+$3Upgrade$ = "Sinister Gear"
+$3UpgradeI$ = 11821093989
+
+$4Upgrade$ = "Going Nuclear!"
+$4UpgradeI$ = 11821093828
+</variable>
+<div class="overflow-box">
+{| class="wikitable stats-table" style="width:1650px;"
+!Level
+!Total Price
+!Damage
+!Poison Damage
+!Burst Count
+!Firerate<ref>Firerate only applies to the burst and is not the time between bursts.</ref>
+!Tick
+!Cooldown
+!Range
+!Poison Time
+!Defense Dropping
+!Max Defense Dropping
+!Total Elapsed Damage<ref>Total Elapsed Damage is calculated as Poison Damage × (Poison Time ÷ Tick)</ref>
+!Slowdown
+!DPS<ref>DPS is calculated as (Damage × Burst Count) ÷ (Cooldown + (Firerate × Burst Count)) + (Poison Damage ÷ Tick).<br/>When the '''Toxic Gunner''' stops firing in bursts, it is calculated as Damage ÷ Firerate + Poison Damage ÷ Tick<br/>DPS assumes all shots poison the same enemy.</ref>
+!Cost Efficiency
+|-
+|0
+|{{Money|525}}
+|1
+|1
+|4
+|0.108
+|1
+|1.2
+|10
+|6
+|N/A
+|N/A
+|6
+|10%
+|$DPS$<ref>2.45 Gun DPS + 1 Poison DPS</ref>
+|{{Money|152.17}}
+|-
+|1
+|{{Money|725}}
+|1
+|1
+|4
+|0.108
+|1
+|0.6
+|10
+|6
+|N/A
+|N/A
+|6
+|10%
+|$DPS$<ref>3.88 Gun DPS + 1 Poison DPS</ref>
+|{{Money|148.57}}
+|-
+|2
+|{{Money|1,525}}
+|1
+|4
+|8
+|0.108
+|1
+|0.6
+|14
+|6
+|N/A
+|N/A
+|24
+|20%
+|$DPS$<ref>5.46 Gun DPS + 4 Poison DPS</ref>
+|{{Money|161.21}}
+|-
+|3
+|{{Money|5,025}}
+|4
+|4
+|20
+|0.108
+|1
+|0.6
+|14
+|6
+|3%
+|50%
+|24
+|20%
+|$DPS$<ref>28.99 Gun DPS + 4 Poison DPS</ref>
+|{{Money|152.32}}
+|-
+|4
+|{{Money|19,025}}
+|11
+|10
+|N/A
+|0.143
+|1
+|0
+|18
+|10
+|3%
+|50%
+|100
+|30%
+|$DPS2$<ref>76.92 Gun DPS + 10 Poison DPS</ref>
+|{{Money|218.88}}
+|}
+</div>
