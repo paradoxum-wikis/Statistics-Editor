@@ -100,14 +100,19 @@ class SkinData {
     }
   }
 
-  setDetection(level: number, name: string, value: boolean) {
+  setDetection(
+    level: number,
+    name: string,
+    value: boolean,
+    rebuild: boolean = true,
+  ) {
     if (level === 0) {
       this.defaults.setDetection(name, value);
     } else {
       this.upgrades[level - 1].setDetection(name, value);
     }
 
-    this.createData();
+    if (rebuild) this.createData();
   }
 }
 export default SkinData;

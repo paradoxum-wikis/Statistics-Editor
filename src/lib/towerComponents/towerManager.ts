@@ -191,6 +191,12 @@ class TowerManager {
           const upgrades: any[] = [];
           const readOnlyAttributes: string[] = [];
 
+          const currentDetections: { [key: string]: boolean } = {
+            Lead: false,
+            Hidden: false,
+            Flying: false,
+          };
+
           const rows = tableData.rows.sort(
             (a, b) => Number(a["Level"]) - Number(b["Level"]),
           );
@@ -227,7 +233,11 @@ class TowerManager {
                   console.log(
                     `[TowerManager] Found detection var ${varName}: ${parsed.variables[varName]}`,
                   );
-                detections[type] = parsed.variables[varName] === "true";
+                currentDetections[type] = parsed.variables[varName] === "true";
+              }
+
+              if (currentDetections[type]) {
+                detections[type] = true;
               }
             }
             if (settingsStore.debugMode)
