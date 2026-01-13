@@ -22,7 +22,9 @@ export function evaluateFormula(
 
   let expression = formula;
 
-  const keys = Object.keys(numericContext).sort((a, b) => b.length - a.length);
+  const keys = Object.keys(numericContext)
+    .filter((k) => k.trim() !== "")
+    .sort((a, b) => b.length - a.length);
 
   for (const key of keys) {
     const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");

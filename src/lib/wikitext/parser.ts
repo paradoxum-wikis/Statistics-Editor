@@ -9,6 +9,18 @@ export interface ParsedWikitext {
 }
 
 /**
+ * Strip garbage wiki only reference markup.
+ *
+ * Currently, it only removes ref tags.
+ * This prevents header/value contamination like:
+ *   DPS<ref>...</ref>  ->  DPS
+ */
+const stripRefs = (s: string): string =>
+  s
+    .replace(/<ref\b[^>]*>[\s\S]*?<\/ref>/gi, "") // remove paired refs
+    .replace(/<ref\b[^>]*\/>/gi, ""); // remove self-closing refs
+
+/**
  * Parses wikitext content into variables and tabbed tables.
  */
 export function parseWikitext(content: string): ParsedWikitext {
@@ -35,6 +47,9 @@ export function parseWikitext(content: string): ParsedWikitext {
       ) {
         value = value.substring(1, value.length - 1);
       }
+
+      value = stripRefs(value).trim();
+
       variables[key] = value;
     }
   }
@@ -90,7 +105,7 @@ function parseTable(content: string): TableData | null {
 
   const cleanCell = (val: string): string | number => {
     val = val.trim();
-    val = val.replace(/<ref[\s\S]*?(\/>|<\/ref>)/g, "");
+    val = stripRefs(val);
     const moneyMatch = val.match(/{{Money\|([0-9,.]+)}}/);
     if (moneyMatch) {
       val = moneyMatch[1];
