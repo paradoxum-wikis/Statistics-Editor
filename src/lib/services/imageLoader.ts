@@ -6,6 +6,10 @@
  * 2) Persistent Cache API for Roblox asset IDs (survives reloads)
  * This was ported from the old Statistics Editor
  */
+import { mwWikiFileUrl, mwSetBaseUrl } from "mediawiki-file-url";
+
+mwSetBaseUrl("https://static.wikia.nocookie.net/tower-defense-sim/images");
+
 type ImageCache = Map<string, { [key: number]: string }>;
 type LoadingState = Map<number, boolean>;
 type FailedRequests = Set<string>;
@@ -71,6 +75,25 @@ class ImageLoaderService {
 
   private isRobloxAssetId(imageIdStr: string): boolean {
     return !imageIdStr.startsWith("http") && /^\d+$/.test(imageIdStr);
+  }
+
+  private isWikiSyntaxFileRef(imageIdStr: string): boolean {
+    const s = imageIdStr.trim();
+    return /^((File|Image)\s*:)/i.test(s);
+  }
+
+  private resolveWikiFileUrl(imageIdStr: string): string | null {
+    const s = imageIdStr.trim();
+    if (!s) return null;
+
+    if (!this.isWikiSyntaxFileRef(s)) return null;
+
+    try {
+      return mwWikiFileUrl(s);
+    } catch (err) {
+      this.warn("Failed to resolve MediaWiki file URL for:", s, err);
+      return null;
+    }
   }
 
   private cacheKeyForAssetId(assetId: string): string {
@@ -234,11 +257,12 @@ class ImageLoaderService {
   }
 
   /**
-   * Loads an image either from a direct URL or via Roblox asset delivery.
+   * Loads an image either from a direct URL, a MediaWiki filename, or via Roblox asset delivery.
    * Uses Cache API for Roblox asset IDs by fetching the resolved location and storing the image response.
    *
    * 1) For http(s) URLs we return the URL directly (browser/http cache will handle it).
-   * 2) For Roblox IDs we return a blob URL so the image is displayable without CORS issues.
+   * 2) For MediaWiki File: syntax we return the computed hashed upload URL.
+   * 3) For Roblox IDs we return a blob URL.
    */
   async loadImage(
     towerName: string,
@@ -267,6 +291,17 @@ class ImageLoaderService {
         existing[index] = imageId;
         this.cache.set(towerName, existing);
         return imageId;
+      }
+
+      // MediaWiki filename
+      if (typeof imageId === "string") {
+        const mwUrl = this.resolveWikiFileUrl(imageIdStr);
+        if (mwUrl) {
+          const existing = this.cache.get(towerName) || {};
+          existing[index] = mwUrl;
+          this.cache.set(towerName, existing);
+          return mwUrl;
+        }
       }
 
       // Roblox asset ID

@@ -7,17 +7,17 @@ $0Hidden$ = false
 $0Flying$ = false
 
 $1Upgrade$ = "Faster Reloading"
-$1UpgradeI$ = 11821094308
+$1UpgradeI$ = File:ToxicGunnerLevel1Icon.png
 
 $2Upgrade$ = "Poisonous Bullets"
-$2UpgradeI$ = 11821094198
+$2UpgradeI$ = File:ToxicGunnerLevel2Icon.png
 
 $3Flying$ = true
 $3Upgrade$ = "Sinister Gear"
-$3UpgradeI$ = 11821093989
+$3UpgradeI$ = File:ToxicGunnerLevel3Icon.png
 
 $4Upgrade$ = "Going Nuclear!"
-$4UpgradeI$ = 11821093828
+$4UpgradeI$ = File:ToxicGunnerLevel4Icon.png
 </variable>
 <div class="overflow-box">
 {| class="wikitable stats-table" style="width:1650px;"
