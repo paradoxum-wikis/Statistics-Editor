@@ -19,7 +19,6 @@
         FileJson,
         Trash2,
         Check,
-        Plus,
         ChevronsUpDown,
     } from "@lucide/svelte";
 
@@ -51,9 +50,11 @@
     );
 
     let filteredTowers = $derived(
-        items.filter((item) =>
-            item.label.toLowerCase().includes(searchValue.toLowerCase()),
-        ),
+        searchValue === towerStore.selectedName
+            ? items
+            : items.filter((item) =>
+                  item.label.toLowerCase().includes(searchValue.toLowerCase()),
+              ),
     );
 
     // Initialization
@@ -95,6 +96,7 @@
     async function handleProfileChange(newProfile: string) {
         if (profileStore.switch(newProfile)) {
             await towerStore.switchProfile(newProfile);
+            searchValue = towerStore.selectedName;
         }
     }
 
@@ -298,15 +300,19 @@
                         <Combobox.Root
                             type="single"
                             items={filteredTowers}
-                            bind:inputValue={searchValue}
+                            value={towerStore.selectedName}
                             bind:open={comboboxOpen}
                             onValueChange={(v) => handleSelect(v)}
                         >
                             <div class="relative">
                                 <Combobox.Input
+                                    value={searchValue}
                                     placeholder="Select a tower..."
                                     class="h-10 w-[250px] rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                    onclick={() => (comboboxOpen = true)}
+                                    oninput={(e) => {
+                                        searchValue = e.currentTarget.value;
+                                        comboboxOpen = true;
+                                    }}
                                 />
                                 <ChevronsUpDown
                                     class="absolute right-3 top-3 h-4 w-4 opacity-50 pointer-events-none"
@@ -317,21 +323,29 @@
                                 <Combobox.Content
                                     class="z-50 min-w-[250px] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
                                 >
-                                    <Combobox.Viewport class="p-1">
+                                    <Combobox.Viewport
+                                        class="p-1 max-h-[300px] overflow-y-auto"
+                                    >
                                         {#each filteredTowers as item, i (i + item.value)}
                                             <Combobox.Item
                                                 class="relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none data-disabled:pointer-events-none data-highlighted:bg-accent data-highlighted:text-accent-foreground data-disabled:opacity-50"
                                                 value={item.value}
                                                 label={item.label}
                                             >
-                                                {item.label}
-                                                {#if searchValue === item.value}
-                                                    <span
-                                                        class="absolute right-2 flex h-3.5 w-3.5 items-center justify-center"
-                                                    >
-                                                        ✓
-                                                    </span>
-                                                {/if}
+                                                {#snippet children({
+                                                    selected,
+                                                })}
+                                                    {item.label}
+                                                    {#if selected}
+                                                        <span
+                                                            class="absolute right-2 flex h-3.5 w-3.5 items-center justify-center"
+                                                        >
+                                                            <Check
+                                                                class="h-4 w-4"
+                                                            />
+                                                        </span>
+                                                    {/if}
+                                                {/snippet}
                                             </Combobox.Item>
                                         {:else}
                                             <span
