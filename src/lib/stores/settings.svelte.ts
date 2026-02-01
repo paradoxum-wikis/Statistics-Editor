@@ -1,33 +1,51 @@
-/**
- * Handles app settings, such as debug mode.
- */
+type SettingBoolean = {
+  key: string;
+  default: boolean;
+};
+
+const SETTINGS: {
+  debugMode: SettingBoolean;
+  seeValueDifference: SettingBoolean;
+} = {
+  debugMode: {
+    key: "tds_editor_debug",
+    default: false,
+  },
+  seeValueDifference: {
+    key: "tds_editor_see_value_difference",
+    default: false,
+  },
+};
+
+function readBooleanSetting(def: SettingBoolean): boolean {
+  if (typeof localStorage === "undefined") return def.default;
+  const raw = localStorage.getItem(def.key);
+  if (raw == null) return def.default;
+  return raw === "true";
+}
+
+function writeBooleanSetting(def: SettingBoolean, value: boolean): void {
+  if (typeof localStorage === "undefined") return;
+  localStorage.setItem(def.key, String(value));
+}
+
 class SettingsStore {
-  debugMode = $state(false);
+  debugMode = $state(SETTINGS.debugMode.default);
+  seeValueDifference = $state(SETTINGS.seeValueDifference.default);
 
-  /**
-   * Loads debug mode from localStorage on startup.
-   */
   constructor() {
-    if (typeof localStorage !== "undefined") {
-      const storedDebug = localStorage.getItem("tds_editor_debug");
-      this.debugMode = storedDebug === "true";
-    }
-  }
-
-  toggleDebug() {
-    this.debugMode = !this.debugMode;
-    this.save();
+    this.debugMode = readBooleanSetting(SETTINGS.debugMode);
+    this.seeValueDifference = readBooleanSetting(SETTINGS.seeValueDifference);
   }
 
   setDebug(value: boolean) {
     this.debugMode = value;
-    this.save();
+    writeBooleanSetting(SETTINGS.debugMode, value);
   }
 
-  save() {
-    if (typeof localStorage !== "undefined") {
-      localStorage.setItem("tds_editor_debug", String(this.debugMode));
-    }
+  setSeeValueDifference(value: boolean) {
+    this.seeValueDifference = value;
+    writeBooleanSetting(SETTINGS.seeValueDifference, value);
   }
 }
 

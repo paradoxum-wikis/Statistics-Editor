@@ -14,6 +14,21 @@ class TowerStore {
   #lastLoadedName = $state<string | null>(null);
 
   /**
+   * Canonical source of truth for what the UI should be editing/viewing.
+   *
+   * - This is the *effective* wikitext used to build `selectedData`
+   *   (either the base file or a profile override).
+   * - Wiki mode should bind to/edit this, and after saving, we can reload/parse
+   *   it back into `selectedData`.
+   */
+  effectiveWikitext = $state<string>("");
+
+  /**
+   * Where the effective wikitext came from.
+   */
+  effectiveWikitextSource = $state<"override" | "base" | "">("");
+
+  /**
    * Sets up the tower manager with a profile and loads tower names.
    */
   async init(profile: string): Promise<void> {
@@ -28,6 +43,8 @@ class TowerStore {
     this.manager = new TowerManager(profile);
     this.#lastLoadedName = null;
     this.selectedData = null;
+    this.effectiveWikitext = "";
+    this.effectiveWikitextSource = "";
     const previousSelection = this.selectedName;
     this.selectedName = "";
     this.isLoading = true;
@@ -46,6 +63,8 @@ class TowerStore {
   async load(name: string): Promise<boolean> {
     if (!this.manager || !name) {
       this.selectedData = null;
+      this.effectiveWikitext = "";
+      this.effectiveWikitextSource = "";
       return false;
     }
 
@@ -63,12 +82,24 @@ class TowerStore {
         this.selectedData = tower;
         this.selectedName = name;
         this.#lastLoadedName = name;
+
+        // Best-effort: if TowerManager attached the resolved source text, use it.
+        // (This is intended to be wired up as we move to "wikitext is canonical".)
+        const anyTower = tower as unknown as {
+          sourceWikitext?: string;
+          wikitextSource?: "override" | "base";
+        };
+        this.effectiveWikitext = anyTower.sourceWikitext ?? "";
+        this.effectiveWikitextSource = anyTower.wikitextSource ?? "";
+
         if (settingsStore.debugMode)
           console.log(`Loaded tower data for ${name}`);
         return true;
       } else {
         console.error(`Failed to load tower: ${name}`);
         this.selectedData = null;
+        this.effectiveWikitext = "";
+        this.effectiveWikitextSource = "";
         return false;
       }
     } finally {
@@ -87,7 +118,11 @@ class TowerStore {
 
   save(): void {
     if (this.manager && this.selectedData) {
-      this.manager.saveTower(this.selectedData);
+      const newText = this.manager.saveTower(this.selectedData);
+      if (newText) {
+        this.effectiveWikitext = newText;
+        this.effectiveWikitextSource = "override";
+      }
     }
   }
 
@@ -110,6 +145,9 @@ class TowerStore {
   async forceReload(): Promise<boolean> {
     this.#lastLoadedName = null;
     if (this.selectedName) {
+      if (this.manager) {
+        this.manager.clearCache(this.selectedName);
+      }
       return await this.load(this.selectedName);
     }
     return false;

@@ -1,0 +1,179 @@
+import type Tower from "$lib/towerComponents/tower";
+import { serializeTable, serializeVariables } from "./serializer";
+
+/**
+ * Updates the given source wikitext with data from the Tower instance.
+ * Replaces <variable> blocks and specific skin tables while preserving other content.
+ *
+ * @param sourceWikitext The original wiki text.
+ * @param tower The current tower state.
+ */
+export function patchWikitext(sourceWikitext: string, tower: Tower): string {
+  let text = sourceWikitext;
+
+  const newVariables = buildVariablesMap(tower);
+  text = patchVariableBlock(text, newVariables);
+
+  for (const skinName of tower.skinNames) {
+    const skin = tower.getSkin(skinName);
+    if (!skin) continue;
+
+    const tableMarkup = serializeTable({
+      Headers: skin.headers,
+      RawRows: skin.rawRows,
+    });
+
+    text = patchSkinTable(text, skinName, tableMarkup, tower.skinNames);
+  }
+
+  return text;
+}
+
+/**
+ * Reconstructs the variables map from:
+ * - Existing formula tokens (preserved from original parse)
+ * - Current detection states (derived from tower data)
+ * - Upgrade titles/images (derived from tower data)
+ */
+function buildVariablesMap(tower: Tower): Record<string, string> {
+  const variables: Record<string, string> = {};
+
+  for (const skinName of tower.skinNames) {
+    const skin = tower.getSkin(skinName);
+    if (!skin) continue;
+
+    if (skin.formulaTokens) {
+      Object.assign(variables, skin.formulaTokens);
+    }
+
+    const skinJson = tower.json[skinName];
+    if (!skinJson) continue;
+
+    const detectionTypes = ["Lead", "Hidden", "Flying"];
+
+    const setDetection = (level: number, type: string) => {
+      variables[`$${level}${type}$`] = "true";
+    };
+
+    // Level 0 (Defaults)
+    if (skinJson.Defaults?.Detections) {
+      for (const type of detectionTypes) {
+        if (skinJson.Defaults.Detections[type]) {
+          setDetection(0, type);
+        }
+      }
+    }
+
+    // Upgrades (Level 1+)
+    if (skinJson.Upgrades) {
+      skinJson.Upgrades.forEach((up: any, idx: number) => {
+        const level = idx + 1;
+
+        if (up.Stats?.Detections) {
+          for (const type of detectionTypes) {
+            if (up.Stats.Detections[type]) {
+              setDetection(level, type);
+            }
+          }
+        }
+
+        if (up.Title) {
+          variables[`$${level}Upgrade$`] = `"${up.Title}"`;
+        }
+
+        if (up.Image) {
+          variables[`$${level}UpgradeI$`] = `"${up.Image}"`;
+        }
+      });
+    }
+  }
+
+  return variables;
+}
+
+function patchVariableBlock(
+  text: string,
+  variables: Record<string, string>,
+): string {
+  const startTag = "<variable>";
+  const endTag = "</variable>";
+  const startIndex = text.indexOf(startTag);
+  const endIndex = text.indexOf(endTag);
+
+  if (startIndex === -1 || endIndex === -1) {
+    return serializeVariables(variables) + "\n\n" + text;
+  }
+
+  const newBlock = serializeVariables(variables);
+  return (
+    text.substring(0, startIndex) +
+    newBlock +
+    text.substring(endIndex + endTag.length)
+  );
+}
+
+/**
+ * Replaces the table for a specific skin, handling both <tabber> sections and single files.
+ */
+function patchSkinTable(
+  text: string,
+  skinName: string,
+  newTableMarkup: string,
+  allSkinNames: string[],
+): string {
+  const tabberStart = text.indexOf("<tabber>");
+  const tabberEnd = text.indexOf("</tabber>");
+  const isTabbed = tabberStart !== -1 && tabberEnd !== -1;
+
+  if (!isTabbed) {
+    const tableStart = text.indexOf("{|");
+    const tableEnd = text.indexOf("|}", tableStart);
+
+    if (tableStart !== -1 && tableEnd !== -1) {
+      return (
+        text.substring(0, tableStart) +
+        newTableMarkup.trim() +
+        text.substring(tableEnd + 2)
+      );
+    }
+    return text + "\n" + newTableMarkup;
+  }
+
+  // <tabber> mode
+  const tabberContent = text.substring(tabberStart + 8, tabberEnd);
+  const escapedSkinName = escapeRegExp(skinName);
+  const tabHeaderRegex = new RegExp(
+    `(^|\\|\\-\\|)\\s*${escapedSkinName}\\s*=\\s*`,
+  );
+  const match = tabberContent.match(tabHeaderRegex);
+
+  if (!match) {
+    console.warn(`[Patcher] Could not find tab for skin: ${skinName}`);
+    return text;
+  }
+
+  const matchIndexInContent = match.index! + match[0].length;
+  const restOfContent = tabberContent.substring(matchIndexInContent);
+  const nextDelimiterIndex = restOfContent.indexOf("|-|");
+
+  const endOfTabContentIndex =
+    nextDelimiterIndex === -1
+      ? tabberContent.length
+      : matchIndexInContent + nextDelimiterIndex;
+
+  const newTabContent = "\n" + newTableMarkup + "\n";
+  const newTabberContent =
+    tabberContent.substring(0, matchIndexInContent) +
+    newTabContent +
+    tabberContent.substring(endOfTabContentIndex);
+
+  return (
+    text.substring(0, tabberStart + 8) +
+    newTabberContent +
+    text.substring(tabberEnd)
+  );
+}
+
+function escapeRegExp(string: string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}

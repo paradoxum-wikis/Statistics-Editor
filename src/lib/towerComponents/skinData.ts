@@ -2,8 +2,12 @@ import Tower from "./tower";
 import Defaults from "./defaults";
 import Upgrade from "./upgrade";
 import Levels from "./levels";
-// import BaseStats from "./baseStats";
 import Locator from "./locator";
+import { evaluateFormula } from "$lib/wikitext/evaluator";
+
+type FormulaToken = string; // e.g. "$DPS$", "$DPS2$"
+type FormulaTokenMap = Record<string, string>; // token -> expression
+type CellFormulaTokenMap = Record<string, Record<string, FormulaToken>>; // level -> column -> token
 
 class SkinData {
   tower: Tower;
@@ -18,12 +22,17 @@ class SkinData {
   readOnlyAttributes: string[] = [];
 
   /**
-   *
-   * @param {Tower} tower
-   * @param {{
-   * 	Defaults: {any},
-   * 	Upgrades: [any]}} data
+   * Token -> formula expression.
+   * Example: { "$DPS$": "...", "$DPS2$": "..." }
    */
+  formulaTokens: FormulaTokenMap = {};
+
+  /**
+   * Level -> column -> token.
+   * Example: { "4": { "DPS": "$DPS2$" } }
+   */
+  cellFormulaTokens: CellFormulaTokenMap = {};
+
   constructor(tower: Tower, name: string, data: any) {
     this.tower = tower;
     this.name = name;
@@ -67,7 +76,71 @@ class SkinData {
       this.readOnlyAttributes = this.data.ReadOnly;
     }
 
+    if (
+      this.data.FormulaTokens &&
+      typeof this.data.FormulaTokens === "object"
+    ) {
+      this.formulaTokens = this.data.FormulaTokens as FormulaTokenMap;
+    }
+
+    if (
+      this.data.CellFormulaTokens &&
+      typeof this.data.CellFormulaTokens === "object"
+    ) {
+      this.cellFormulaTokens = this.data
+        .CellFormulaTokens as CellFormulaTokenMap;
+    }
+
     this.createData();
+  }
+
+  private setDerivedValueAtLevel(level: number, column: string, value: number) {
+    if (level === 0) {
+      if (this.data?.Defaults) this.data.Defaults[column] = value;
+    } else {
+      const upgrade = this.data?.Upgrades?.[level - 1];
+      if (upgrade?.Stats) upgrade.Stats[column] = value;
+    }
+  }
+
+  /**
+   * Recompute calculated columns (like DPS) for the current skin using:
+   * - `formulaTokens` (token -> expression)
+   * - `cellFormulaTokens` (level -> column -> token)
+   *
+   * This updates:
+   * - `this.rawRows` (so persistence keeps numeric recomputed results)
+   * - `this.data.Defaults` / `this.data.Upgrades[*].Stats` to match recomputed values
+   */
+  recomputeCalculatedColumns(): void {
+    if (!this.rawRows || !Array.isArray(this.rawRows)) return;
+    if (!this.formulaTokens || Object.keys(this.formulaTokens).length === 0)
+      return;
+    if (
+      !this.cellFormulaTokens ||
+      Object.keys(this.cellFormulaTokens).length === 0
+    )
+      return;
+
+    for (let level = 0; level < this.rawRows.length; level++) {
+      const row = this.rawRows[level];
+      if (!row || typeof row !== "object") continue;
+
+      const levelKey = String(level);
+      const perLevel = this.cellFormulaTokens[levelKey];
+      if (!perLevel) continue;
+
+      for (const [col, token] of Object.entries(perLevel)) {
+        const formula = this.formulaTokens[token];
+        if (!formula) continue;
+
+        const result = evaluateFormula(formula, row as Record<string, any>);
+        if (typeof result === "number" && Number.isFinite(result)) {
+          row[col] = result;
+          this.setDerivedValueAtLevel(level, col, result);
+        }
+      }
+    }
   }
 
   createData() {
@@ -89,6 +162,17 @@ class SkinData {
       this.upgrades[level - 1].set(attribute, newValue);
     }
 
+    // Update `rawRows` + recompute any calculated columns before rebuilding Levels.
+    // This ensures cells like DPS update immediately when inputs change.
+    if (this.rawRows && Array.isArray(this.rawRows)) {
+      const targetRowIndex = level;
+      const targetRow = this.rawRows[targetRowIndex];
+      if (targetRow && typeof targetRow === "object") {
+        targetRow[attribute] = newValue;
+      }
+    }
+
+    this.recomputeCalculatedColumns();
     this.createData();
   }
 

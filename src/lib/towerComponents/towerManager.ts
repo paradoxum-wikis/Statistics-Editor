@@ -1,30 +1,27 @@
 import Tower from "./tower";
 import { towerNames } from "./towers";
-import { parseWikitext } from "$lib/wikitext/parser";
 import { evaluateFormula } from "$lib/wikitext/evaluator";
 import { settingsStore } from "$lib/stores/settings.svelte";
+import { parseWikitext, type TableData } from "$lib/wikitext/parser";
+import { patchWikitext } from "$lib/wikitext/patcher";
+import {
+  clearWikiOverride,
+  loadEffectiveWikitext,
+  setWikiOverride,
+} from "$lib/wiki/wikiSource";
 
 const wikitextFiles = import.meta.glob("./towers/*.wiki", {
   query: "?raw",
   import: "default",
 });
 
-interface TowerManagerOptions {}
-
-interface TowerData {
-  [towerName: string]: any;
-}
-
-/**
- * Manages loading, saving, and caching of tower data.
- */
-class TowerManager {
+export default class TowerManager {
   dataKey: string | null;
-  towerData: TowerData | null;
+  towerData: Record<string, any> | null;
   towerNames: string[];
   towers: { [name: string]: Tower };
 
-  constructor(dataKey: string | null, options: TowerManagerOptions = {}) {
+  constructor(dataKey: string | null) {
     this.dataKey = dataKey;
     this.towerData = null;
     this.towerNames = [];
@@ -58,11 +55,11 @@ class TowerManager {
     }
   }
 
-  /**
-   * Updates a specific tower in the local data and saves everything.
-   */
-  saveTower(tower: Tower): void {
-    if (!this.dataKey) return;
+  saveTower(tower: Tower): string | null {
+    if (settingsStore.debugMode) {
+      console.log(`[TowerManager] saveTower called for ${tower.name}`);
+    }
+    if (!this.dataKey) return null;
 
     if (!this.towerData) {
       const localData = localStorage.getItem(this.dataKey);
@@ -80,11 +77,44 @@ class TowerManager {
       );
       this.save();
     }
+
+    const profileName = this.dataKey ?? "Default";
+
+    const sourceWikitext = (tower as unknown as { sourceWikitext?: string })
+      .sourceWikitext;
+
+    if (sourceWikitext) {
+      if (settingsStore.debugMode) {
+        console.log(
+          `[TowerManager] Patching wikitext from source length ${sourceWikitext.length}`,
+        );
+      }
+      try {
+        const patched = patchWikitext(sourceWikitext, tower);
+        if (settingsStore.debugMode) {
+          console.log(
+            `[TowerManager] Patched wikitext length: ${patched.length}`,
+          );
+        }
+        setWikiOverride(profileName, tower.name, patched);
+
+        (tower as unknown as { sourceWikitext?: string }).sourceWikitext =
+          patched;
+        (
+          tower as unknown as { wikitextSource?: "override" | "base" }
+        ).wikitextSource = "override";
+
+        return patched;
+      } catch (err) {
+        console.error(
+          `[TowerManager] Failed to patch wikitext for ${tower.name}:`,
+          err,
+        );
+      }
+    }
+    return null;
   }
 
-  /**
-   * Persists the current tower data to local storage, stripping out proxies.
-   */
   save(): void {
     if (!this.dataKey) return;
 
@@ -104,14 +134,14 @@ class TowerManager {
   }
 
   clearCache(name: string): void {
+    if (settingsStore.debugMode) {
+      console.log(`[TowerManager] clearing cache for ${name}`);
+    }
     if (this.towers[name]) {
       delete this.towers[name];
     }
   }
 
-  /**
-   * Removes any local overrides for a tower, reverting it to the default Wikitext version.
-   */
   resetTower(name: string): void {
     if (!this.dataKey) return;
 
@@ -129,182 +159,209 @@ class TowerManager {
       delete this.towerData[name];
       this.save();
     }
+
+    const profileName = this.dataKey ?? "Default";
+    clearWikiOverride(profileName, name);
+
     this.clearCache(name);
   }
 
-  /**
-   * Loads a tower's data. Checks for local overrides first, then falls back to fetching and parsing the Wikitext definition.
-   */
   async getTower(name: string): Promise<Tower | null> {
-    if (this.towers[name]) return this.towers[name];
-
-    if (this.dataKey) {
-      if (!this.towerData) {
-        const localData = localStorage.getItem(this.dataKey);
-        if (settingsStore.debugMode) {
-          console.log(
-            `[TowerManager] getTower: Initializing towerData from storage for key: ${this.dataKey}`,
-          );
-        }
-        this.towerData = localData ? JSON.parse(localData) : {};
+    if (this.towers[name]) {
+      if (settingsStore.debugMode) {
+        console.log(`[TowerManager] Returning cached tower for ${name}`);
       }
+      return this.towers[name];
+    }
 
-      if (this.towerData && this.towerData[name]) {
-        const towerData = new Tower(name, this.towerData[name]);
-        this.towers[name] = towerData;
-        return towerData;
-      }
+    if (settingsStore.debugMode) {
+      console.log(`[TowerManager] Loading tower ${name} (no cache)`);
     }
 
     const wikitextPath = `./towers/${name}.wiki`;
     const wikitextLoader = wikitextFiles[wikitextPath];
 
-    if (wikitextLoader) {
-      try {
-        let content: string;
+    if (!wikitextLoader) return null;
+
+    try {
+      const profileName = this.dataKey ?? "Default";
+
+      const loadBase = async (): Promise<string> => {
         try {
           const url = new URL(wikitextPath, import.meta.url).href;
           if (settingsStore.debugMode)
             console.log(`[TowerManager] Fetching wikitext from: ${url}`);
           const res = await fetch(`${url}?t=${Date.now()}`);
           if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
-          content = await res.text();
+          const text = await res.text();
           if (settingsStore.debugMode)
             console.log("[TowerManager] Fetch successful");
+          return text;
         } catch (e) {
           console.warn(
             "[TowerManager] Fetch failed, falling back to loader:",
             e,
           );
-          content = (await wikitextLoader()) as string;
+          return (await wikitextLoader()) as string;
         }
+      };
 
-        const parsed = parseWikitext(content);
-        if (settingsStore.debugMode)
-          console.log("[TowerManager] Parsed Variables:", parsed.variables);
-        const towerJson: any = {};
+      const { source, text } = await loadEffectiveWikitext(
+        profileName,
+        name,
+        loadBase,
+      );
 
-        for (const [tabName, tableData] of Object.entries(parsed.tabs)) {
-          const skinName = tabName;
-          const defaults: any = {};
-          const upgrades: any[] = [];
-          const readOnlyAttributes: string[] = [];
+      if (settingsStore.debugMode) {
+        console.log(
+          `[TowerManager] Loaded effective wikitext from ${source}, length: ${text.length}`,
+        );
+      }
 
-          const currentDetections: { [key: string]: boolean } = {
-            Lead: false,
-            Hidden: false,
-            Flying: false,
-          };
+      const parsed = parseWikitext(text) as {
+        variables: Record<string, string>;
+        tabs: Record<string, TableData>;
+      };
 
-          const rows = tableData.rows.sort(
-            (a, b) => Number(a["Level"]) - Number(b["Level"]),
-          );
+      if (settingsStore.debugMode) {
+        console.log(`[TowerManager] Using wikitext source: ${source}`);
+        console.log("[TowerManager] Parsed Variables:", parsed.variables);
+      }
 
-          let previousTotalPrice = 0;
+      const towerJson: any = {};
 
-          for (const row of rows) {
-            const level = Number(row["Level"]);
+      for (const [tabName, tableDataUnknown] of Object.entries(parsed.tabs)) {
+        const tableData = tableDataUnknown as TableData;
 
-            for (const [key, val] of Object.entries(row)) {
-              if (
-                typeof val === "string" &&
-                val.startsWith("$") &&
-                parsed.variables[val]
-              ) {
-                if (!readOnlyAttributes.includes(key)) {
-                  readOnlyAttributes.push(key);
-                }
-                row[key] = evaluateFormula(parsed.variables[val], row);
-              }
-            }
+        const skinName = tabName;
+        const defaults: any = {};
+        const upgrades: any[] = [];
+        const readOnlyAttributes: string[] = [];
 
-            const totalPrice =
-              typeof row["Total Price"] === "string"
-                ? Number(String(row["Total Price"]).replace(/[^0-9.-]+/g, ""))
-                : Number(row["Total Price"]);
+        const currentDetections: { [key: string]: boolean } = {
+          Lead: false,
+          Hidden: false,
+          Flying: false,
+        };
 
-            const detections: any = {};
-            const detectionTypes = ["Lead", "Hidden", "Flying"];
-            for (const type of detectionTypes) {
-              const varName = `$${level}${type}$`;
-              if (parsed.variables[varName]) {
-                if (settingsStore.debugMode)
-                  console.log(
-                    `[TowerManager] Found detection var ${varName}: ${parsed.variables[varName]}`,
-                  );
-                currentDetections[type] = parsed.variables[varName] === "true";
-              }
+        const rows = tableData.rows.sort(
+          (
+            a: Record<string, string | number>,
+            b: Record<string, string | number>,
+          ) => Number(a["Level"]) - Number(b["Level"]),
+        );
 
-              if (currentDetections[type]) {
-                detections[type] = true;
-              }
-            }
-            if (settingsStore.debugMode)
-              console.log(
-                `[TowerManager] Level ${level} Detections:`,
-                detections,
-              );
+        const formulaTokens: Record<string, string> = parsed.variables;
+        const cellFormulaTokens: Record<string, Record<string, string>> = {};
 
-            if (level === 0) {
-              Object.assign(defaults, row);
-              defaults.Price = totalPrice;
-              if (Object.keys(detections).length > 0) {
-                defaults.Detections = detections;
-              }
-              previousTotalPrice = totalPrice;
-            } else {
-              const cost = totalPrice - previousTotalPrice;
-              previousTotalPrice = totalPrice;
+        let previousTotalPrice = 0;
 
-              const upgrade: any = {
-                Cost: cost,
-                Stats: row,
-              };
+        for (const row of rows) {
+          const level = Number(row["Level"]);
+          const levelKey = String(level);
+          if (!cellFormulaTokens[levelKey]) cellFormulaTokens[levelKey] = {};
 
-              if (Object.keys(detections).length > 0) {
-                upgrade.Stats.Detections = detections;
+          for (const [key, val] of Object.entries(row)) {
+            if (
+              typeof val === "string" &&
+              val.startsWith("$") &&
+              formulaTokens[val]
+            ) {
+              if (!readOnlyAttributes.includes(key)) {
+                readOnlyAttributes.push(key);
               }
 
-              const titleKey = `$${level}Upgrade$`;
-              if (parsed.variables[titleKey]) {
-                upgrade.Title = parsed.variables[titleKey];
-              }
-
-              const imageKey = `$${level}UpgradeI$`;
-              if (parsed.variables[imageKey]) {
-                upgrade.Image = parsed.variables[imageKey];
-              }
-
-              upgrades.push(upgrade);
+              cellFormulaTokens[levelKey][key] = val;
+              row[key] = evaluateFormula(formulaTokens[val], row);
             }
           }
 
-          towerJson[skinName] = {
-            Defaults: defaults,
-            Upgrades: upgrades,
-            Headers: tableData.headers,
-            RawRows: rows,
-            ReadOnly: readOnlyAttributes,
-          };
+          const totalPrice =
+            typeof row["Total Price"] === "string"
+              ? Number(String(row["Total Price"]).replace(/[^0-9.-]+/g, ""))
+              : Number(row["Total Price"]);
+
+          const detections: any = {};
+          const detectionTypes = ["Lead", "Hidden", "Flying"];
+          for (const type of detectionTypes) {
+            const varName = `$${level}${type}$`;
+            if (parsed.variables[varName]) {
+              if (settingsStore.debugMode)
+                console.log(
+                  `[TowerManager] Found detection var ${varName}: ${parsed.variables[varName]}`,
+                );
+              currentDetections[type] = parsed.variables[varName] === "true";
+            }
+
+            if (currentDetections[type]) {
+              detections[type] = true;
+            }
+          }
+
+          if (level === 0) {
+            Object.assign(defaults, row);
+            defaults.Price = totalPrice;
+            if (Object.keys(detections).length > 0) {
+              defaults.Detections = detections;
+            }
+            previousTotalPrice = totalPrice;
+          } else {
+            const cost = totalPrice - previousTotalPrice;
+            previousTotalPrice = totalPrice;
+
+            const upgrade: any = {
+              Cost: cost,
+              Stats: row,
+            };
+
+            if (Object.keys(detections).length > 0) {
+              upgrade.Stats.Detections = detections;
+            }
+
+            const titleKey = `$${level}Upgrade$`;
+            if (parsed.variables[titleKey]) {
+              upgrade.Title = parsed.variables[titleKey];
+            }
+
+            const imageKey = `$${level}UpgradeI$`;
+            if (parsed.variables[imageKey]) {
+              upgrade.Image = parsed.variables[imageKey];
+            }
+
+            upgrades.push(upgrade);
+          }
         }
 
-        const towerData = new Tower(name, towerJson);
-        this.towers[name] = towerData;
-        return towerData;
-      } catch (err) {
-        console.error("Failed to load wikitext for", name, ":", err);
+        towerJson[skinName] = {
+          Defaults: defaults,
+          Upgrades: upgrades,
+          Headers: tableData.headers,
+          RawRows: rows,
+          ReadOnly: readOnlyAttributes,
+          FormulaTokens: formulaTokens,
+          CellFormulaTokens: cellFormulaTokens,
+        };
       }
-    }
 
-    return null;
+      const towerData = new Tower(name, towerJson);
+
+      (towerData as unknown as { sourceWikitext?: string }).sourceWikitext =
+        text;
+      (
+        towerData as unknown as { wikitextSource?: "override" | "base" }
+      ).wikitextSource = source;
+
+      this.towers[name] = towerData;
+      return towerData;
+    } catch (err) {
+      console.error("Failed to load wikitext for", name, ":", err);
+      return null;
+    }
   }
 
   async getTowerNames(): Promise<string[]> {
     if (this.towerNames && this.towerNames.length) return this.towerNames;
-
     this.towerNames = towerNames.slice();
     return this.towerNames;
   }
 }
-
-export default TowerManager;

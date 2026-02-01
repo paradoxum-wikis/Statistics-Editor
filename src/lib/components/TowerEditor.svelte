@@ -20,6 +20,97 @@
     let availableSkins = $derived(tower ? tower.skinNames : []);
     let updateTrigger = $state(0);
 
+    let baseline = $state<Record<string, unknown>>({});
+
+    function cellKey(skinName: string, levelIndex: number, header: string) {
+        return `${skinName}:${levelIndex}:${header}`;
+    }
+
+    function toNumberOrNull(v: unknown): number | null {
+        if (typeof v === "number" && Number.isFinite(v)) return v;
+        if (typeof v === "string") {
+            const s = v.trim();
+            if (!s) return null;
+            const n = Number(s);
+            return Number.isFinite(n) ? n : null;
+        }
+        return null;
+    }
+
+    const INVERSE_STATS = new Set(["cooldown", "cost", "price"]);
+
+    function isInverseStat(header: string): boolean {
+        return INVERSE_STATS.has(header.trim().toLowerCase());
+    }
+
+    function formatNumberForDisplay(n: number): string {
+        return String(Number(n.toFixed(2)));
+    }
+
+    function formatDelta(delta: number): string {
+        const sign = delta > 0 ? "+" : "";
+        return `${sign}${formatNumberForDisplay(delta)}`;
+    }
+
+    function computeDeltaClass(header: string, delta: number): string {
+        if (delta === 0) return "";
+
+        if (isInverseStat(header)) {
+            return delta < 0 ? "text-green-500" : "text-red-500";
+        }
+
+        return delta > 0 ? "text-green-500" : "text-red-500";
+    }
+
+    function getBaselineValue(
+        skinName: string,
+        levelIndex: number,
+        header: string,
+    ): unknown {
+        return baseline[cellKey(skinName, levelIndex, header)];
+    }
+
+    function getDeltaForCell(
+        skinData: SkinData,
+        skinName: string,
+        levelIndex: number,
+        header: string,
+    ): { delta: number | null; className: string } {
+        const base = getBaselineValue(skinName, levelIndex, header);
+        const current = skinData.levels.getCell(levelIndex, header);
+
+        const baseN = toNumberOrNull(base);
+        const currentN = toNumberOrNull(current);
+
+        if (baseN == null || currentN == null) {
+            return { delta: null, className: "" };
+        }
+
+        const delta = currentN - baseN;
+
+        const normalized = Math.abs(delta) < 1e-12 ? 0 : delta;
+
+        return {
+            delta: normalized,
+            className: computeDeltaClass(header, normalized),
+        };
+    }
+
+    function getDisplayValueForCell(
+        skinData: SkinData,
+        header: string,
+        value: unknown,
+    ): string {
+        if (value !== undefined && value !== null) {
+            if (typeof value === "number") {
+                return formatNumberForDisplay(value);
+            }
+            return String(value);
+        }
+
+        return "-";
+    }
+
     $effect(() => {
         if (
             tower &&
@@ -29,6 +120,43 @@
                 ? "Regular"
                 : availableSkins[0] || "";
         }
+    });
+
+    $effect(() => {
+        const t = tower;
+        const skinName = selectedSkinName;
+
+        if (!t || !skinName) {
+            baseline = {};
+            return;
+        }
+
+        const skinData = t.getSkin(skinName);
+        if (!skinData) {
+            baseline = {};
+            return;
+        }
+
+        const headers =
+            skinData && skinData.headers.length > 0
+                ? skinData.headers
+                : skinData
+                  ? skinData.levels.attributes
+                  : [];
+        const levels = skinData.levels.levels;
+
+        const next: Record<string, unknown> = {};
+        for (let i = 0; i < levels.length; i++) {
+            for (const header of headers) {
+                // Baseline should reflect what the user initially sees in the table
+                const value =
+                    header === "Level" ? i : skinData.levels.getCell(i, header);
+
+                next[cellKey(skinName, i, header)] = value;
+            }
+        }
+
+        baseline = next;
     });
 
     function isEditableForSkin(skinData: SkinData, attr: string) {
@@ -165,6 +293,36 @@
                                                     {:else}
                                                         <td class="table-data">
                                                             {#if isEditableForSkin(skinData, header)}
+                                                                {@const baseValue =
+                                                                    getBaselineValue(
+                                                                        skinName,
+                                                                        index,
+                                                                        header,
+                                                                    )}
+                                                                {@const currentValue =
+                                                                    skinData.levels.getCell(
+                                                                        index,
+                                                                        header,
+                                                                    )}
+                                                                {@const displayValue =
+                                                                    getDisplayValueForCell(
+                                                                        skinData,
+                                                                        header,
+                                                                        currentValue,
+                                                                    )}
+                                                                {@const deltaInfo =
+                                                                    settingsStore.seeValueDifference
+                                                                        ? getDeltaForCell(
+                                                                              skinData,
+                                                                              skinName,
+                                                                              index,
+                                                                              header,
+                                                                          )
+                                                                        : {
+                                                                              delta: null,
+                                                                              className:
+                                                                                  "",
+                                                                          }}
                                                                 <input
                                                                     type="text"
                                                                     class="table-input"
@@ -184,32 +342,26 @@
                                                                                 .value,
                                                                         )}
                                                                 />
+                                                                {#if settingsStore.seeValueDifference && deltaInfo.delta !== null && deltaInfo.delta !== 0}
+                                                                    <span
+                                                                        class={`ml-2 text-xs ${deltaInfo.className}`}
+                                                                    >
+                                                                        ({formatDelta(
+                                                                            deltaInfo.delta,
+                                                                        )})
+                                                                    </span>
+                                                                {/if}
                                                             {:else}
                                                                 <div
                                                                     class="table-cell-readonly"
                                                                 >
-                                                                    {level[
-                                                                        header
-                                                                    ] !==
-                                                                        undefined &&
-                                                                    level[
-                                                                        header
-                                                                    ] !== null
-                                                                        ? typeof level[
-                                                                              header
-                                                                          ] ===
-                                                                          "number"
-                                                                            ? Number(
-                                                                                  level[
-                                                                                      header
-                                                                                  ].toFixed(
-                                                                                      2,
-                                                                                  ),
-                                                                              )
-                                                                            : level[
-                                                                                  header
-                                                                              ]
-                                                                        : "-"}
+                                                                    {getDisplayValueForCell(
+                                                                        skinData,
+                                                                        header,
+                                                                        level[
+                                                                            header
+                                                                        ],
+                                                                    )}
                                                                 </div>
                                                             {/if}
                                                         </td>
