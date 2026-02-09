@@ -3,13 +3,17 @@
   "private": true,
   "version": "2.0.0",
   "type": "module",
+  "engines": {
+    "bun": ">=1.0.0"
+  },
   "scripts": {
-    "dev": "vite dev",
-    "build": "vite build",
-    "preview": "vite preview",
-    "prepare": "svelte-kit sync || echo ''",
-    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
+    "dev": "bunx vite dev",
+    "build": "bunx vite build",
+    "preview": "bunx vite preview",
+    "prepare": "bunx svelte-kit sync || true",
+    "check": "bunx svelte-kit sync && bunx svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "bunx svelte-kit sync && bunx svelte-check --tsconfig ./tsconfig.json --watch",
+    "format": "bunx prettier --write ."
   },
   "devDependencies": {
     "@internationalized/date": "^3.10.1",
@@ -18,6 +22,7 @@
     "@sveltejs/vite-plugin-svelte": "^6.2.4",
     "@tailwindcss/vite": "^4.1.18",
     "bits-ui": "^2.15.4",
+    "prettier": "^3.8.1",
     "svelte": "^5.46.4",
     "svelte-check": "^4.3.5",
     "tailwindcss": "^4.1.18",
