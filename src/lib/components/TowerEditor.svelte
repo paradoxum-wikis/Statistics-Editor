@@ -344,7 +344,7 @@
                                                                 />
                                                                 {#if settingsStore.seeValueDifference && deltaInfo.delta !== null && deltaInfo.delta !== 0}
                                                                     <span
-                                                                        class={`ml-2 text-xs ${deltaInfo.className}`}
+                                                                        class={`delta-text ${deltaInfo.className}`}
                                                                     >
                                                                         ({formatDelta(
                                                                             deltaInfo.delta,

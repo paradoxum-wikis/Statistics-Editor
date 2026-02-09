@@ -115,9 +115,7 @@
     });
 </script>
 
-<aside
-    class="bg-card border-r border-border p-4 overflow-y-auto h-full flex flex-col {className}"
->
+<aside class="sidebar-container {className}">
     <div class="flex-1">
         <UpgradeViewer
             {upgradeImages}

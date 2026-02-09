@@ -16,7 +16,7 @@
 	import {
 		Settings,
 		Table,
-		FileJson,
+		FileBraces,
 		Trash2,
 		Check,
 		ChevronsUpDown,
@@ -138,23 +138,18 @@
 
 	<!-- Main Content -->
 	<div class="ml-[15%] flex flex-col h-full">
-		<header
-			class="border-b bg-card p-4 flex items-center justify-between sticky top-0 z-10"
-		>
+		<header class="header-bar">
 			<h1 class="text-heading text-xl font-bold ml-4">
 				TDS Statistics Editor
 			</h1>
 			<div class="flex items-center space-x-4">
 				{#if isClient}
 					<!-- Editor Mode Toggle -->
-					<div
-						class="flex bg-muted rounded-md p-1 border border-border mr-2"
-					>
+					<div class="mode-toggle-group">
 						<button
-							class="px-3 py-1 text-sm rounded-sm transition-colors {editorMode ===
-							'cells'
-								? 'bg-background text-foreground shadow-sm'
-								: 'text-muted-foreground hover:text-foreground'}"
+							class="mode-toggle-btn {editorMode === 'cells'
+								? 'active'
+								: 'inactive'}"
 							onclick={backToCells}
 						>
 							<div class="flex items-center gap-2">
@@ -163,21 +158,20 @@
 							</div>
 						</button>
 						<button
-							class="px-3 py-1 text-sm rounded-sm transition-colors {editorMode ===
-							'wiki'
-								? 'bg-background text-foreground shadow-sm'
-								: 'text-muted-foreground hover:text-foreground'}"
+							class="mode-toggle-btn {editorMode === 'wiki'
+								? 'active'
+								: 'inactive'}"
 							onclick={openWikiEditor}
 						>
 							<div class="flex items-center gap-2">
-								<FileJson size={16} />
+								<FileBraces size={16} />
 								<span>Wiki</span>
 							</div>
 						</button>
 					</div>
 
 					<button
-						class="p-2 hover:bg-muted rounded-md transition-colors"
+						class="icon-btn"
 						onclick={() => (settingsOpen = true)}
 						title="Settings"
 					>
@@ -186,18 +180,13 @@
 
 					<!-- Profile Selector -->
 					<DropdownMenu.Root>
-						<DropdownMenu.Trigger
-							class="flex items-center gap-2 px-3 py-2 text-sm font-medium border rounded-md hover:bg-muted transition-colors"
-						>
+						<DropdownMenu.Trigger class="profile-trigger">
 							<span>{profileStore.current}</span>
 							<span class="text-xs text-muted-foreground"
 								>(Profile)</span
 							>
 						</DropdownMenu.Trigger>
-						<DropdownMenu.Content
-							align="end"
-							class="z-50 min-w-45 rounded-md border bg-popover p-1 text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
-						>
+						<DropdownMenu.Content align="end" class="dropdown-content">
 							<DropdownMenu.Group>
 								<DropdownMenu.GroupHeading
 									class="px-2 py-1.5 text-sm font-semibold"
@@ -208,14 +197,14 @@
 									<DropdownMenu.Item
 										onclick={() =>
 											handleProfileChange(profile)}
-										class="flex justify-between items-center group cursor-pointer px-2 py-1.5 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground"
+										class="dropdown-item"
 									>
 										<span>{profile}</span>
 										{#if profile === profileStore.current}
 											<span class="ml-auto">✓</span>
 										{:else if profile !== "Default"}
 											<button
-												class="ml-2 text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
+												class="ml-2 text-muted-foreground hover:text-destructive opacity-0 transition-opacity"
 												onclick={(e) =>
 													openDeleteProfileDialog(
 														profile,
@@ -233,13 +222,13 @@
 							/>
 							<DropdownMenu.Item
 								onclick={handleCreateProfile}
-								class="cursor-pointer px-2 py-1.5 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground"
+								class="dropdown-item"
 							>
 								<span>+ Create Profile</span>
 							</DropdownMenu.Item>
 							{#if profileStore.current !== "Default"}
 								<DropdownMenu.Item
-									class="text-destructive focus:text-destructive cursor-pointer px-2 py-1.5 text-sm rounded-sm hover:bg-red-100"
+									class="dropdown-item text-destructive focus:text-destructive hover:bg-red-100"
 									onclick={(e) =>
 										openDeleteProfileDialog(
 											profileStore.current,
@@ -261,9 +250,7 @@
 						>
 							Reset Tower
 						</Popover.Trigger>
-						<Popover.Content
-							class="w-80 z-50 rounded-md border bg-popover p-4 text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
-						>
+						<Popover.Content class="popover-content">
 							<div class="space-y-2">
 								<h4 class="font-medium leading-none">
 									Confirm Reset
@@ -303,14 +290,14 @@
 							type="single"
 							items={filteredTowers}
 							value={towerStore.selectedName}
+							inputValue={searchValue}
 							bind:open={comboboxOpen}
 							onValueChange={(v) => handleSelect(v)}
 						>
 							<div class="relative">
 								<Combobox.Input
-									value={searchValue}
 									placeholder="Select a tower..."
-									class="h-10 w-62.5 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+									class="combobox-input"
 									oninput={(e) => {
 										searchValue = e.currentTarget.value;
 										comboboxOpen = true;
@@ -322,15 +309,13 @@
 							</div>
 
 							<Combobox.Portal>
-								<Combobox.Content
-									class="z-50 min-w-62.5 overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
-								>
+								<Combobox.Content class="combobox-content">
 									<Combobox.Viewport
 										class="p-1 max-h-75 overflow-y-auto"
 									>
 										{#each filteredTowers as item, i (i + item.value)}
 											<Combobox.Item
-												class="relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none data-disabled:pointer-events-none data-highlighted:bg-accent data-highlighted:text-accent-foreground data-disabled:opacity-50"
+												class="combobox-item"
 												value={item.value}
 												label={item.label}
 											>
@@ -400,12 +385,8 @@
 <!-- Delete Profile Confirmation -->
 <AlertDialog.Root bind:open={deleteProfileOpen}>
 	<AlertDialog.Portal>
-		<AlertDialog.Overlay
-			class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm"
-		/>
-		<AlertDialog.Content
-			class="fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg sm:rounded-lg"
-		>
+		<AlertDialog.Overlay class="alert-overlay" />
+		<AlertDialog.Content class="alert-content">
 			<div class="flex flex-col space-y-2 text-center sm:text-left">
 				<AlertDialog.Title class="text-lg font-semibold">
 					Are you absolutely sure?

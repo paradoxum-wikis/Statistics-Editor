@@ -120,10 +120,10 @@
 </script>
 
 {#if open}
-	<div class="card p-6 space-y-4">
-		<div class="flex items-start justify-between gap-4">
-			<div class="space-y-1">
-				<p class="text-sm text-muted-foreground">
+	<div class="wiki-editor-card">
+		<div class="wiki-header-row">
+			<div class="wiki-info-group">
+				<p class="wiki-info-text">
 					Editing:
 					<span class="font-medium text-foreground">
 						{towerName}
@@ -136,7 +136,7 @@
 				</p>
 			</div>
 
-			<div class="flex items-center gap-2">
+			<div class="wiki-actions-group">
 				<button
 					class="btn-secondary text-sm px-3 py-1"
 					onclick={discardChanges}
@@ -160,17 +160,17 @@
 		</div>
 
 		{#if errorMessage}
-			<div class="rounded-md border border-red-500/30 bg-red-500/10 p-3">
-				<div class="text-sm font-medium text-red-600">Error</div>
-				<div class="text-xs text-red-600/90 wrap-break-word mt-1">
+			<div class="wiki-error-box">
+				<div class="wiki-error-title">Error</div>
+				<div class="wiki-error-body">
 					{errorMessage}
 				</div>
 			</div>
 		{/if}
 
 		<div class="space-y-2">
-			<div class="flex items-center justify-between">
-				<div class="text-xs text-muted-foreground">
+			<div class="wiki-status-row">
+				<div class="wiki-status-text">
 					{#if status === "loading"}
 						Loading...
 					{:else if status === "saving"}
@@ -185,14 +185,14 @@
 				</div>
 
 				{#if settingsStore.debugMode}
-					<div class="text-xs text-muted-foreground">
+					<div class="wiki-status-text">
 						Length: {text.length}
 					</div>
 				{/if}
 			</div>
 
 			<textarea
-				class="input w-full font-mono text-xs leading-5 min-h-105"
+				class="wiki-textarea"
 				value={text}
 				oninput={onInput}
 				spellcheck="false"
@@ -200,7 +200,7 @@
 				autocomplete="off"
 			></textarea>
 
-			<p class="text-xs text-muted-foreground">
+			<p class="wiki-notes-text">
 				Notes:
 				<br />
 				• Saving writes a profile-specific override to localStorage and forces

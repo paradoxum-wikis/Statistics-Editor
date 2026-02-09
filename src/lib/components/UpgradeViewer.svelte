@@ -17,13 +17,13 @@
     } = $props();
 </script>
 
-<h2 class="text-sm font-semibold mb-4 text-foreground">Upgrades</h2>
+<h2 class="upgrade-heading">Upgrades</h2>
 <Tabs.Root bind:value={selectedUpgrade}>
-    <Tabs.List class="flex space-x-1 mb-4">
+    <Tabs.List class="upgrade-tabs-list">
         {#each Array(numUpgrades) as _, index}
             <Tabs.Trigger
                 value={index.toString()}
-                class="px-2 py-1 text-xs bg-muted rounded"
+                class="upgrade-tab-trigger"
             >
                 {index + 1}
             </Tabs.Trigger>
@@ -33,26 +33,22 @@
         <Tabs.Content value={index.toString()}>
             <div in:fade={{ duration: 200 }}>
                 {#if loadingImages.get(index)}
-                    <div
-                        class="w-full h-32 bg-muted rounded flex items-center justify-center text-muted-foreground"
-                    >
+                    <div class="upgrade-image-container">
                         Loading...
                     </div>
                 {:else if upgradeImages[index]}
                     <img
                         src={upgradeImages[index]}
                         alt={`Upgrade ${index + 1}`}
-                        class="w-full rounded"
+                        class="upgrade-image"
                     />
                 {:else}
-                    <div
-                        class="w-full h-32 bg-muted rounded flex items-center justify-center text-muted-foreground"
-                    >
+                    <div class="upgrade-image-container">
                         No image available
                     </div>
                 {/if}
                 {#if upgradeNames[index]}
-                    <div class="mt-2 text-center text-sm font-medium">
+                    <div class="upgrade-name">
                         {upgradeNames[index]}
                     </div>
                 {/if}
