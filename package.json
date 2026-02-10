@@ -7,8 +7,8 @@
     "bun": ">=1.0.0"
   },
   "scripts": {
-    "dev": "bunx vite dev",
-    "build": "bunx vite build",
+    "dev": "bunx --bun vite dev",
+    "build": "bunx --bun vite build",
     "preview": "bunx vite preview",
     "prepare": "bunx svelte-kit sync || true",
     "check": "bunx svelte-kit sync && bunx svelte-check --tsconfig ./tsconfig.json",
