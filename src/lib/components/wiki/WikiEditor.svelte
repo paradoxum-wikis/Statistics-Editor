@@ -138,7 +138,7 @@
 
 			<div class="wiki-actions-group">
 				<button
-					class="btn-secondary text-sm px-3 py-1"
+					class="btn btn-secondary btn-sm"
 					onclick={discardChanges}
 					disabled={!dirty || status === "saving"}
 					title="Discard unsaved changes (revert to last loaded effective wiki)"
@@ -147,7 +147,7 @@
 				</button>
 
 				<button
-					class="btn-secondary text-sm px-3 py-1"
+					class="btn btn-secondary btn-sm"
 					onclick={saveOverride}
 					disabled={!canSave ||
 						status === "loading" ||

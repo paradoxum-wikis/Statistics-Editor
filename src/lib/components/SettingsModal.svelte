@@ -64,7 +64,7 @@
             </div>
 
             <div class="settings-footer">
-                <Dialog.Close class="btn-secondary text-sm px-4 py-2">
+                <Dialog.Close class="btn btn-secondary text-sm px-4 py-2">
                     Close
                 </Dialog.Close>
             </div>

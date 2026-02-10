@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --radius: 25px;
+  --radius: 1.5625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.129 0.042 264.695);
   --card: oklch(1 0 0);
@@ -125,7 +125,7 @@
 }
 
 .card {
-  border-radius: 25px 0;
+  border-radius: var(--radius) 0;
   border: 1px solid var(--border);
   background: var(--card);
   padding: 1.5rem 2rem;
@@ -140,7 +140,7 @@
   width: 100%;
   align-items: center;
   justify-content: space-between;
-  border-radius: 25px 0;
+  border-radius: var(--radius) 0;
   border: 1px solid var(--input);
   background: var(--background);
   padding: 0.5rem 1rem;
@@ -170,8 +170,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 25px 0;
-  padding: 0.5rem 1rem;
+  border-radius: var(--radius) 0;
+  padding: 0.35rem 1rem;
   font-size: 0.875rem;
   font-weight: 500;
   outline: none;
@@ -185,6 +185,12 @@
     pointer-events: none;
     opacity: 0.5;
   }
+}
+
+.btn-sm {
+  height: 2rem;
+  padding: 0 1rem;
+  font-size: 0.75rem;
 }
 
 .btn-primary {
@@ -202,6 +208,43 @@
 
   &:hover {
     background: oklch(from var(--secondary) calc(l + 0.1) c h);
+  }
+}
+
+.btn-destructive {
+  background: transparent;
+  border: 1px solid oklch(from var(--destructive) l c h / 0.5);
+  color: var(--destructive);
+
+  &:hover {
+    background: oklch(from var(--destructive) l c h / 0.1);
+  }
+}
+
+.btn-destructive-fill {
+  background: var(--destructive);
+
+  &:hover {
+    background: oklch(from var(--destructive) l c h / 0.9);
+  }
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--foreground);
+
+  &:hover {
+    background: var(--accent);
+  }
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--foreground);
+
+  &:hover {
+    background: var(--accent);
   }
 }
 
@@ -226,7 +269,7 @@
   gap: 0.5rem;
   margin-bottom: 1rem;
   background: var(--muted);
-  border-radius: 25px 0;
+  border-radius: var(--radius) 0;
   padding: 0.25rem 0.5rem;
 }
 
@@ -235,7 +278,7 @@
   background: var(--card);
   color: var(--foreground);
   border: 1px solid var(--input);
-  border-radius: 25px 0;
+  border-radius: calc(var(--radius) - 0.25rem) 0;
   font-size: 0.875rem;
   font-weight: 500;
   transition: background-color 0.2s;
@@ -323,7 +366,7 @@
   display: flex;
   align-items: center;
   width: 100%;
-  border-radius: 25px 0;
+  border-radius: var(--radius) 0;
   border: 1px solid var(--input);
   background: transparent;
   padding: 0.25rem 0.75rem;
@@ -358,7 +401,7 @@
   color: var(--muted-foreground);
   font-style: italic;
   background: var(--muted);
-  border-radius: 25px 0;
+  border-radius: var(--radius) 0;
 }
 
 .overflow-x-auto {
@@ -418,16 +461,31 @@
   }
 }
 
+.detection-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.25rem;
+  border-radius: calc(var(--radius) - 0.25rem) 0;
+  border: 1px solid var(--border);
+  @apply bg-secondary/10;
+}
+
 .header-bar {
   @apply border-b bg-card p-4 flex items-center justify-between sticky top-0 z-10;
 }
 
 .mode-toggle-group {
-  @apply flex bg-muted rounded-md p-1 border border-border mr-2;
+  border-radius: var(--radius) 0;
+  @apply flex bg-muted p-1 border border-border mr-2;
 }
 
 .mode-toggle-btn {
-  @apply px-3 py-1 text-sm rounded-sm transition-colors;
+  border-radius: calc(var(--radius) - 0.25rem) 0;
+
+  div {
+    @apply px-4 py-1 text-sm transition-colors;
+  }
 }
 
 .mode-toggle-btn.active {
@@ -439,20 +497,43 @@
 }
 
 .icon-btn {
-  @apply p-2 hover:bg-muted rounded-md transition-colors;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius) 0;
+  padding: 0.5rem;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: var(--muted);
+  }
 }
 
 .profile-trigger {
-  @apply flex items-center gap-2 px-3 py-2 text-sm font-medium border rounded-md hover:bg-muted transition-colors;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: var(--radius) 0;
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: var(--muted);
+  }
 }
 
 .dropdown-content {
-  @apply z-50 min-w-45 rounded-md border bg-popover p-1 text-popover-foreground shadow-md;
+  border-radius: var(--radius) 0;
+  @apply z-50 min-w-45 border bg-popover p-1 text-popover-foreground shadow-md;
   @apply data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2;
 }
 
 .dropdown-item {
-  @apply flex justify-between items-center cursor-pointer px-2 py-1.5 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground;
+  border-radius: calc(var(--radius) - 0.25rem) 0;
+  @apply flex justify-between items-center cursor-pointer px-4 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground;
 }
 
 .dropdown-item:hover button {
@@ -460,21 +541,25 @@
 }
 
 .popover-content {
-  @apply w-80 z-50 rounded-md border bg-popover p-4 text-popover-foreground shadow-md;
+  border-radius: var(--radius) 0;
+  @apply w-80 z-50 border bg-popover p-4 text-popover-foreground shadow-md;
   @apply data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2;
 }
 
 .combobox-input {
-  @apply h-10 w-62.5 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+  border-radius: var(--radius) 0;
+  @apply h-10 w-62.5 border border-input bg-background px-4 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
 }
 
 .combobox-content {
-  @apply z-50 min-w-62.5 overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md;
+  border-radius: var(--radius) 0;
+  @apply z-50 min-w-62.5 overflow-hidden border bg-popover text-popover-foreground shadow-md;
   @apply data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2;
 }
 
 .combobox-item {
-  @apply relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none;
+  border-radius: calc(var(--radius) - 0.25rem) 0;
+  @apply relative flex w-full cursor-default select-none items-center py-1.5 pl-4 pr-8 text-sm outline-none;
 }
 
 .combobox-item[data-disabled] {
@@ -490,7 +575,8 @@
 }
 
 .alert-content {
-  @apply fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg sm:rounded-lg;
+  border-radius: var(--radius) 0;
+  @apply fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg;
 }
 
 .sidebar-container {
@@ -522,7 +608,7 @@
 }
 
 .intro-container {
-  border-radius: 25px 0;
+  border-radius: var(--radius) 0;
   @apply border bg-card shadow p-8 max-w-3xl mx-auto space-y-6;
 }
 
@@ -547,7 +633,8 @@
 }
 
 .intro-card {
-  @apply p-4 rounded-lg border border-border bg-secondary/10;
+  border-radius: var(--radius) 0;
+  @apply p-4 border border-border bg-secondary/10;
 }
 
 .intro-card-title {
@@ -574,7 +661,7 @@
 }
 
 .wiki-editor-card {
-  border-radius: 25px 0;
+  border-radius: var(--radius) 0;
   @apply border bg-card shadow p-6 space-y-4;
 }
 
@@ -595,7 +682,8 @@
 }
 
 .wiki-error-box {
-  @apply rounded-md border border-red-500/30 bg-red-500/10 p-3;
+  border-radius: var(--radius) 0;
+  @apply border border-red-500/30 bg-red-500/10 p-3;
 }
 
 .wiki-error-title {
@@ -615,7 +703,7 @@
 }
 
 .wiki-textarea {
-  border-radius: 25px 0;
+  border-radius: var(--radius) 0;
   border: 1px solid var(--input);
   background: var(--background);
   padding: 0.5rem 1rem;
@@ -642,8 +730,9 @@
 }
 
 .settings-content {
+  border-radius: var(--radius) 0;
   @apply fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border border-border bg-background p-6 shadow-lg duration-200;
-  @apply data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 sm:rounded-lg;
+  @apply data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95;
 }
 
 .settings-header {
@@ -663,7 +752,8 @@
 }
 
 .settings-item {
-  @apply flex items-center justify-between space-x-2 p-4 rounded-lg border border-border bg-secondary/10;
+  border-radius: var(--radius) 0;
+  @apply flex items-center justify-between space-x-2 p-4 border border-border bg-secondary/10;
 }
 
 .settings-label-group {
@@ -699,7 +789,7 @@
   height: 2rem;
   align-items: center;
   justify-content: space-between;
-  border-radius: 25px 0;
+  border-radius: var(--radius) 0;
   border: 1px solid var(--input);
   background: var(--background);
   padding: 0 1rem;
@@ -722,7 +812,7 @@
   z-index: 50;
   min-width: 8rem;
   overflow: hidden;
-  border-radius: 25px 0;
+  border-radius: var(--radius) 0;
   border: 1px solid var(--border);
   background: var(--popover);
   color: var(--popover-foreground);
@@ -732,19 +822,13 @@
   @apply data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2;
 }
 
-.select-viewport {
-  padding: 0.25rem;
-}
-
 .select-item {
   position: relative;
   display: flex;
   width: 100%;
   user-select: none;
   align-items: center;
-  border-radius: 12px 0;
-  padding: 0.375rem 2rem 0.375rem 0.5rem;
-  font-size: 0.875rem;
+  border-radius: calc(var(--radius) - 0.25rem) 0;
   outline: none;
 }
 .select-item[data-highlighted] {

@@ -12,7 +12,7 @@
     let levels = $derived(skinData?.levels.levels ?? []);
 
     let levelOptions = $derived([
-        { value: "none", label: "None" },
+        { value: "none", label: "∅" },
         ...levels.map((_, i) => ({ value: i.toString(), label: `Lvl ${i}` })),
     ]);
 
@@ -58,9 +58,7 @@
     {#if skinData}
         <div class="grid gap-2">
             {#each detectionTypes as detection}
-                <div
-                    class="flex items-center justify-between p-2 rounded-md bg-secondary/10 border border-border h-10"
-                >
+                <div class="detection-row">
                     <div class="flex items-center gap-3">
                         <img
                             src={detection.icon}
@@ -81,9 +79,7 @@
                                 val === "none" ? null : parseInt(val),
                             )}
                     >
-                        <Select.Trigger
-                            class="select-trigger w-22.5 h-7 bg-background border-input"
-                        >
+                        <Select.Trigger class="select-trigger w-22.5 h-7">
                             {@const val =
                                 getDetectionStartLevel(detection.type)?.toString() ??
                                 "none"}
@@ -94,13 +90,13 @@
                         </Select.Trigger>
                         <Select.Portal>
                             <Select.Content
-                                class="select-content max-h-50"
+                                class="select-content max-h-55"
                                 sideOffset={5}
                             >
-                                <Select.Viewport class="select-viewport p-1">
+                                <Select.Viewport class="p-1">
                                     {#each levelOptions as option (option.value)}
                                         <Select.Item
-                                            class="select-item py-1 px-2 text-xs"
+                                            class="select-item p-1 px-3 my-1 text-sm"
                                             value={option.value}
                                             label={option.label}
                                         >

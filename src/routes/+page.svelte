@@ -246,7 +246,7 @@
 				{#if towerStore.selectedData}
 					<Popover.Root>
 						<Popover.Trigger
-							class="px-3 py-2 text-sm font-medium text-destructive border border-destructive/50 rounded-md hover:bg-destructive/10 transition-colors"
+							class="btn btn-destructive text-white"
 						>
 							Reset Tower
 						</Popover.Trigger>
@@ -268,12 +268,12 @@
 							</div>
 							<div class="flex justify-end mt-4 gap-2">
 								<Popover.Close
-									class="px-3 py-1 text-sm border rounded-md hover:bg-accent"
+									class="btn btn-outline"
 								>
 									Cancel
 								</Popover.Close>
 								<Popover.Close
-									class="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-md text-sm px-3 py-1 text-white"
+									class="btn btn-destructive-fill text-white"
 									onclick={confirmReset}
 								>
 									Confirm
@@ -311,7 +311,7 @@
 							<Combobox.Portal>
 								<Combobox.Content class="combobox-content">
 									<Combobox.Viewport
-										class="p-1 max-h-75 overflow-y-auto"
+										class="p-2 max-h-75 overflow-y-auto"
 									>
 										{#each filteredTowers as item, i (i + item.value)}
 											<Combobox.Item
@@ -404,12 +404,12 @@
 				class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2"
 			>
 				<AlertDialog.Cancel
-					class="mt-2 sm:mt-0 px-4 py-2 border rounded-md hover:bg-accent"
+					class="btn btn-outline mt-2 sm:mt-0"
 				>
 					Cancel
 				</AlertDialog.Cancel>
 				<AlertDialog.Action
-					class="bg-destructive text-destructive-foreground hover:bg-destructive/90 px-4 py-2 rounded-md"
+					class="btn btn-destructive-fill text-white"
 					onclick={confirmDeleteProfile}
 				>
 					Delete
