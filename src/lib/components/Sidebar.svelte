@@ -1,5 +1,6 @@
 <script lang="ts">
     import UpgradeViewer from "./UpgradeViewer.svelte";
+    import DetectionEditor from "./DetectionEditor.svelte";
     import { towerStore } from "$lib/stores/tower.svelte";
     import { imageLoader } from "$lib/services/imageLoader";
     import { untrack } from "svelte";
@@ -125,4 +126,5 @@
             {numUpgrades}
         />
     </div>
+    <DetectionEditor />
 </aside>

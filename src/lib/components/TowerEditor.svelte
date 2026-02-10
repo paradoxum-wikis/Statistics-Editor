@@ -191,46 +191,7 @@
         onSave?.();
     }
 
-    function getDetection(
-        skinData: SkinData,
-        levelIndex: number,
-        detectionType: "Hidden" | "Flying" | "Lead",
-    ): boolean {
-        if (!skinData) return false;
-        return Boolean(skinData.levels.getCell(levelIndex, detectionType));
-    }
 
-    function updateDetection(
-        skinData: SkinData,
-        levelIndex: number,
-        detectionType: "Hidden" | "Flying" | "Lead",
-        checked: boolean,
-    ) {
-        if (!skinData || disabled) return;
-
-        if (settingsStore.debugMode) {
-            console.log(
-                `[TowerEditor] updateDetection: Level ${levelIndex}, ${detectionType} = ${checked}`,
-            );
-        }
-
-        if (checked) {
-            const totalLevels = skinData.levels.levels.length;
-            for (let i = levelIndex; i < totalLevels; i++) {
-                skinData.setDetection(
-                    i,
-                    detectionType,
-                    true,
-                    i === totalLevels - 1,
-                );
-            }
-        } else {
-            skinData.setDetection(levelIndex, detectionType, false);
-        }
-
-        updateTrigger++;
-        onSave?.();
-    }
 </script>
 
 <div class="space-y-4">
@@ -323,34 +284,72 @@
                                                                               className:
                                                                                   "",
                                                                           }}
-                                                                <input
-                                                                    type="text"
-                                                                    class="table-input"
-                                                                    value={level[
-                                                                        header
-                                                                    ] ?? ""}
-                                                                    {disabled}
-                                                                    onchange={(
-                                                                        e,
-                                                                    ) =>
-                                                                        updateStatForSkin(
-                                                                            skinData,
-                                                                            index,
-                                                                            header,
-                                                                            e
-                                                                                .currentTarget
-                                                                                .value,
-                                                                        )}
-                                                                />
-                                                                {#if settingsStore.seeValueDifference && deltaInfo.delta !== null && deltaInfo.delta !== 0}
-                                                                    <span
-                                                                        class={`delta-text ${deltaInfo.className}`}
-                                                                    >
-                                                                        ({formatDelta(
-                                                                            deltaInfo.delta,
-                                                                        )})
-                                                                    </span>
-                                                                {/if}
+                                                                <div
+                                                                    class="cell-wrapper"
+                                                                >
+                                                                    <input
+                                                                        type="text"
+                                                                        class="table-input"
+                                                                        value={level[
+                                                                            header
+                                                                        ] ??
+                                                                            ""}
+                                                                        {disabled}
+                                                                        onfocus={(
+                                                                            e,
+                                                                        ) => {
+                                                                            e.currentTarget.dataset.original =
+                                                                                e.currentTarget.value;
+                                                                            e.currentTarget.value =
+                                                                                "";
+                                                                        }}
+                                                                        onblur={(
+                                                                            e,
+                                                                        ) => {
+                                                                            if (
+                                                                                e
+                                                                                    .currentTarget
+                                                                                    .value ===
+                                                                                ""
+                                                                            ) {
+                                                                                e.currentTarget.value =
+                                                                                    e
+                                                                                        .currentTarget
+                                                                                        .dataset
+                                                                                        .original ??
+                                                                                    "";
+                                                                            } else {
+                                                                                updateStatForSkin(
+                                                                                    skinData,
+                                                                                    index,
+                                                                                    header,
+                                                                                    e
+                                                                                        .currentTarget
+                                                                                        .value,
+                                                                                );
+                                                                            }
+                                                                        }}
+                                                                        onkeydown={(
+                                                                            e,
+                                                                        ) => {
+                                                                            if (
+                                                                                e.key ===
+                                                                                "Enter"
+                                                                            ) {
+                                                                                e.currentTarget.blur();
+                                                                            }
+                                                                        }}
+                                                                    />
+                                                                    {#if settingsStore.seeValueDifference && deltaInfo.delta !== null && deltaInfo.delta !== 0}
+                                                                        <span
+                                                                            class={`delta-text ${deltaInfo.className}`}
+                                                                        >
+                                                                            ({formatDelta(
+                                                                                deltaInfo.delta,
+                                                                            )})
+                                                                        </span>
+                                                                    {/if}
+                                                                </div>
                                                             {:else}
                                                                 <div
                                                                     class="table-cell-readonly"
@@ -373,126 +372,7 @@
                                 </table>
                             </div>
 
-                            <!-- Detections Table -->
-                            <div class="table-container mt-8">
-                                <h3 class="text-lg font-bold mb-2 px-4 pt-4">
-                                    Detections
-                                </h3>
-                                <table class="table">
-                                    <thead class="table-head">
-                                        <tr>
-                                            <th
-                                                scope="col"
-                                                class="table-header-sticky"
-                                            >
-                                                Level
-                                            </th>
-                                            <th
-                                                scope="col"
-                                                class="table-header text-center"
-                                            >
-                                                Hidden
-                                            </th>
-                                            <th
-                                                scope="col"
-                                                class="table-header text-center"
-                                            >
-                                                Flying
-                                            </th>
-                                            <th
-                                                scope="col"
-                                                class="table-header text-center"
-                                            >
-                                                Lead
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="table-body">
-                                        {#each levels as _, index (index)}
-                                            <tr class="table-row">
-                                                <td class="table-cell-sticky">
-                                                    {index}
-                                                </td>
-                                                <td
-                                                    class="table-data text-center"
-                                                >
-                                                    <input
-                                                        type="checkbox"
-                                                        class="detection-checkbox"
-                                                        checked={getDetection(
-                                                            skinData,
-                                                            index,
-                                                            "Hidden",
-                                                        )}
-                                                        {disabled}
-                                                        onchange={(e) =>
-                                                            updateDetection(
-                                                                skinData,
-                                                                index,
-                                                                "Hidden",
-                                                                e.currentTarget
-                                                                    .checked,
-                                                            )}
-                                                    />
-                                                </td>
-                                                <td
-                                                    class="table-data text-center"
-                                                >
-                                                    <input
-                                                        type="checkbox"
-                                                        class="detection-checkbox"
-                                                        checked={getDetection(
-                                                            skinData,
-                                                            index,
-                                                            "Flying",
-                                                        )}
-                                                        {disabled}
-                                                        onchange={(e) =>
-                                                            updateDetection(
-                                                                skinData,
-                                                                index,
-                                                                "Flying",
-                                                                e.currentTarget
-                                                                    .checked,
-                                                            )}
-                                                    />
-                                                </td>
-                                                <td
-                                                    class="table-data text-center"
-                                                >
-                                                    <input
-                                                        type="checkbox"
-                                                        class="detection-checkbox"
-                                                        checked={getDetection(
-                                                            skinData,
-                                                            index,
-                                                            "Lead",
-                                                        )}
-                                                        {disabled}
-                                                        onchange={(e) =>
-                                                            updateDetection(
-                                                                skinData,
-                                                                index,
-                                                                "Lead",
-                                                                e.currentTarget
-                                                                    .checked,
-                                                            )}
-                                                    />
-                                                </td>
-                                            </tr>
-                                        {:else}
-                                            <tr>
-                                                <td
-                                                    colspan="4"
-                                                    class="table-data text-center text-muted-foreground"
-                                                >
-                                                    No levels found
-                                                </td>
-                                            </tr>
-                                        {/each}
-                                    </tbody>
-                                </table>
-                            </div>
+
 
                             <div class="text-xs text-body mt-2 px-4 pb-4">
                                 * Gray cells are calculated or inherited values
