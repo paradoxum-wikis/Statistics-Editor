@@ -486,14 +486,14 @@
   div {
     @apply px-4 py-1 text-sm transition-colors;
   }
-}
 
-.mode-toggle-btn.active {
-  @apply bg-background text-foreground shadow-sm;
-}
+  &.active {
+    @apply bg-background text-foreground shadow-sm;
+  }
 
-.mode-toggle-btn.inactive {
-  @apply text-muted-foreground hover:text-foreground;
+  &.inactive {
+    @apply text-muted-foreground hover:text-foreground;
+  }
 }
 
 .icon-btn {
@@ -534,10 +534,10 @@
 .dropdown-item {
   border-radius: calc(var(--radius) - 0.25rem) 0;
   @apply flex justify-between items-center cursor-pointer px-4 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground;
-}
 
-.dropdown-item:hover button {
-  @apply opacity-100;
+  &:hover button {
+    @apply opacity-100;
+  }
 }
 
 .popover-content {
@@ -560,14 +560,14 @@
 .combobox-item {
   border-radius: calc(var(--radius) - 0.25rem) 0;
   @apply relative flex w-full cursor-default select-none items-center py-1.5 pl-4 pr-8 text-sm outline-none;
-}
 
-.combobox-item[data-disabled] {
-  @apply pointer-events-none opacity-50;
-}
+  &[data-disabled] {
+    @apply pointer-events-none opacity-50;
+  }
 
-.combobox-item[data-highlighted] {
-  @apply bg-accent text-accent-foreground;
+  &[data-highlighted] {
+    @apply bg-accent text-accent-foreground;
+  }
 }
 
 .alert-overlay {
@@ -712,12 +712,12 @@
     box-shadow 0.2s,
     border-color 0.2s;
   @apply w-full font-mono text-xs leading-5 min-h-104;
-}
 
-.wiki-textarea:focus {
-  box-shadow:
-    0 0 0 2px var(--ring),
-    0 0 0 2px var(--ring);
+  &:focus {
+    box-shadow:
+      0 0 0 2px var(--ring),
+      0 0 0 2px var(--ring);
+  }
 }
 
 .wiki-notes-text {
@@ -795,17 +795,20 @@
   padding: 0 1rem;
   font-size: 0.875rem;
   transition: colors 0.2s;
-}
-.select-trigger:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--ring);
-}
-.select-trigger[data-placeholder] {
-  color: var(--muted-foreground);
-}
-.select-trigger:disabled {
-  cursor: not-allowed;
-  opacity: 0.5;
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--ring);
+  }
+
+  &[data-placeholder] {
+    color: var(--muted-foreground);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
 }
 
 .select-content {
@@ -830,12 +833,14 @@
   align-items: center;
   border-radius: calc(var(--radius) - 0.25rem) 0;
   outline: none;
-}
-.select-item[data-highlighted] {
-  background-color: var(--accent);
-  color: var(--accent-foreground);
-}
-.select-item[data-disabled] {
-  pointer-events: none;
-  opacity: 0.5;
+
+  &[data-highlighted] {
+    background-color: var(--accent);
+    color: var(--accent-foreground);
+  }
+
+  &[data-disabled] {
+    pointer-events: none;
+    opacity: 0.5;
+  }
 }
