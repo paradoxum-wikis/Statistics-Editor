@@ -55,6 +55,28 @@ export default class TowerManager {
     }
   }
 
+  /**
+   * Generates the wikitext for the given tower without saving it
+   * to storage or updating the source overrider.
+   * Useful for "unsaved changes" previews.
+   */
+  generateWikitext(tower: Tower): string | null {
+    const sourceWikitext = (tower as unknown as { sourceWikitext?: string })
+      .sourceWikitext;
+
+    if (!sourceWikitext) return null;
+
+    try {
+      return patchWikitext(sourceWikitext, tower);
+    } catch (err) {
+      console.error(
+        `[TowerManager] Failed to generate wikitext for ${tower.name}:`,
+        err,
+      );
+      return null;
+    }
+  }
+
   saveTower(tower: Tower): string | null {
     if (settingsStore.debugMode) {
       console.log(`[TowerManager] saveTower called for ${tower.name}`);
@@ -80,37 +102,23 @@ export default class TowerManager {
 
     const profileName = this.dataKey ?? "Default";
 
-    const sourceWikitext = (tower as unknown as { sourceWikitext?: string })
-      .sourceWikitext;
+    const patched = this.generateWikitext(tower);
 
-    if (sourceWikitext) {
+    if (patched) {
       if (settingsStore.debugMode) {
         console.log(
-          `[TowerManager] Patching wikitext from source length ${sourceWikitext.length}`,
+          `[TowerManager] Patched wikitext length: ${patched.length}`,
         );
       }
-      try {
-        const patched = patchWikitext(sourceWikitext, tower);
-        if (settingsStore.debugMode) {
-          console.log(
-            `[TowerManager] Patched wikitext length: ${patched.length}`,
-          );
-        }
-        setWikiOverride(profileName, tower.name, patched);
+      setWikiOverride(profileName, tower.name, patched);
 
-        (tower as unknown as { sourceWikitext?: string }).sourceWikitext =
-          patched;
-        (
-          tower as unknown as { wikitextSource?: "override" | "base" }
-        ).wikitextSource = "override";
+      (tower as unknown as { sourceWikitext?: string }).sourceWikitext =
+        patched;
+      (
+        tower as unknown as { wikitextSource?: "override" | "base" }
+      ).wikitextSource = "override";
 
-        return patched;
-      } catch (err) {
-        console.error(
-          `[TowerManager] Failed to patch wikitext for ${tower.name}:`,
-          err,
-        );
-      }
+      return patched;
     }
     return null;
   }

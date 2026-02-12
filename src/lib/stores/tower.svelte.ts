@@ -11,15 +11,16 @@ class TowerStore {
   selectedName = $state("");
   selectedData = $state<Tower | null>(null);
   isLoading = $state(false);
+  isDirty = $state(false);
   #lastLoadedName = $state<string | null>(null);
 
   /**
    * Canonical source of truth for what the UI should be editing/viewing.
    *
-   * - This is the *effective* wikitext used to build `selectedData`
+   * - This is the effective wikitext used to build `selectedData`
    *   (either the base file or a profile override).
-   * - Wiki mode should bind to/edit this, and after saving, we can reload/parse
-   *   it back into `selectedData`.
+   * - Wiki mode should bind to this, and after saving,
+   *	 we can reload or parse it back into `selectedData`.
    */
   effectiveWikitext = $state<string>("");
 
@@ -27,6 +28,11 @@ class TowerStore {
    * Where the effective wikitext came from.
    */
   effectiveWikitextSource = $state<"override" | "base" | "">("");
+
+  /**
+   * Original wikitext before any unsaved changes.
+   */
+  originalWikitext = $state<string>("");
 
   /**
    * Sets up the tower manager with a profile and loads tower names.
@@ -45,6 +51,8 @@ class TowerStore {
     this.selectedData = null;
     this.effectiveWikitext = "";
     this.effectiveWikitextSource = "";
+    this.originalWikitext = "";
+    this.isDirty = false;
     const previousSelection = this.selectedName;
     this.selectedName = "";
     this.isLoading = true;
@@ -65,6 +73,8 @@ class TowerStore {
       this.selectedData = null;
       this.effectiveWikitext = "";
       this.effectiveWikitextSource = "";
+      this.originalWikitext = "";
+      this.isDirty = false;
       return false;
     }
 
@@ -83,14 +93,14 @@ class TowerStore {
         this.selectedName = name;
         this.#lastLoadedName = name;
 
-        // Best-effort: if TowerManager attached the resolved source text, use it.
-        // (This is intended to be wired up as we move to "wikitext is canonical".)
         const anyTower = tower as unknown as {
           sourceWikitext?: string;
           wikitextSource?: "override" | "base";
         };
         this.effectiveWikitext = anyTower.sourceWikitext ?? "";
         this.effectiveWikitextSource = anyTower.wikitextSource ?? "";
+        this.originalWikitext = this.effectiveWikitext;
+        this.isDirty = false;
 
         if (settingsStore.debugMode)
           console.log(`Loaded tower data for ${name}`);
@@ -100,6 +110,8 @@ class TowerStore {
         this.selectedData = null;
         this.effectiveWikitext = "";
         this.effectiveWikitextSource = "";
+        this.originalWikitext = "";
+        this.isDirty = false;
         return false;
       }
     } finally {
@@ -116,14 +128,38 @@ class TowerStore {
     return false;
   }
 
+  /**
+   * Updates the effective wikitext based on current object state (unsaved).
+   */
+  syncWikitext(): void {
+    if (this.manager && this.selectedData) {
+      const generated = this.manager.generateWikitext(this.selectedData);
+      if (generated) {
+        this.effectiveWikitext = generated;
+        this.isDirty = true;
+      }
+    }
+  }
+
+  /**
+   * Persists changes to storage.
+   */
   save(): void {
     if (this.manager && this.selectedData) {
       const newText = this.manager.saveTower(this.selectedData);
       if (newText) {
         this.effectiveWikitext = newText;
+        this.originalWikitext = newText;
         this.effectiveWikitextSource = "override";
+        this.isDirty = false;
       }
     }
+  }
+
+  discardChanges(): void {
+    this.effectiveWikitext = this.originalWikitext;
+    this.isDirty = false;
+    void this.forceReload();
   }
 
   /**
@@ -143,6 +179,11 @@ class TowerStore {
    * Forces a reload of the current tower.
    */
   async forceReload(): Promise<boolean> {
+    // If there are any in-memory unsaved changes,
+    // please don't blow them away by reloading
+    // from base/override sources PLEASE.
+    if (this.isDirty) return true;
+
     this.#lastLoadedName = null;
     if (this.selectedName) {
       if (this.manager) {

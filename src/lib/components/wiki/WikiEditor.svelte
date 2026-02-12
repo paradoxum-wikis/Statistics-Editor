@@ -15,8 +15,7 @@
 
 	let isClient = $state(false);
 
-	let text = $state("");
-	let dirty = $state(false);
+	let text = $state(towerStore.effectiveWikitext);
 	let status = $state<
 		"idle" | "loading" | "ready" | "saving" | "saved" | "error"
 	>("idle");
@@ -32,7 +31,6 @@
 
 	function onInput(e: Event) {
 		text = (e.currentTarget as HTMLTextAreaElement).value;
-		dirty = true;
 		status = "ready";
 		if (settingsStore.debugMode) {
 			console.log(
@@ -41,6 +39,7 @@
 			);
 		}
 		towerStore.effectiveWikitext = text;
+		towerStore.isDirty = true;
 	}
 
 	function saveOverride() {
@@ -58,19 +57,22 @@
 					towerStore.effectiveWikitext.length,
 				);
 			}
+
 			setWikiOverride(
 				profileName,
 				towerName,
 				towerStore.effectiveWikitext,
 			);
+
 			if (settingsStore.debugMode)
 				console.log("[WikiEditor] setWikiOverride returned");
 
-			dirty = false;
+			towerStore.isDirty = false;
 			status = "saved";
 
 			if (settingsStore.debugMode)
 				console.log("[WikiEditor] calling forceReload");
+
 			void towerStore.forceReload().then(() => {
 				if (settingsStore.debugMode)
 					console.log("[WikiEditor] forceReload resolved");
@@ -83,16 +85,11 @@
 	}
 
 	function discardChanges() {
-		if (!dirty) return;
+		if (!towerStore.isDirty) return;
 
-		const tower = towerStore.selectedData as unknown as {
-			sourceWikitext?: string;
-		};
-		const original = tower?.sourceWikitext ?? "";
-
-		text = original;
-		towerStore.effectiveWikitext = original;
-		dirty = false;
+		text = towerStore.originalWikitext;
+		towerStore.effectiveWikitext = towerStore.originalWikitext;
+		towerStore.isDirty = false;
 		status = "ready";
 		errorMessage = null;
 	}
@@ -103,7 +100,9 @@
 
 	$effect(() => {
 		if (!isClient) return;
-		if (dirty) return;
+		if (text !== towerStore.effectiveWikitext) {
+			text = towerStore.effectiveWikitext;
+		}
 
 		if (settingsStore.debugMode) {
 			console.log(
@@ -111,7 +110,6 @@
 				towerStore.effectiveWikitext.length,
 			);
 		}
-		text = towerStore.effectiveWikitext;
 		status = "ready";
 		errorMessage = null;
 	});
@@ -140,7 +138,7 @@
 				<button
 					class="btn btn-secondary btn-sm"
 					onclick={discardChanges}
-					disabled={!dirty || status === "saving"}
+					disabled={!towerStore.isDirty || status === "saving"}
 					title="Discard unsaved changes (revert to last loaded effective wiki)"
 				>
 					Discard
@@ -150,6 +148,7 @@
 					class="btn btn-secondary btn-sm"
 					onclick={saveOverride}
 					disabled={!canSave ||
+						!towerStore.isDirty ||
 						status === "loading" ||
 						status === "saving"}
 					title="Save as profile-specific override and reload tower"
@@ -177,7 +176,7 @@
 						Saving...
 					{:else if status === "saved"}
 						Saved override.
-					{:else if dirty}
+					{:else if towerStore.isDirty}
 						Unsaved changes
 					{:else}
 						Ready

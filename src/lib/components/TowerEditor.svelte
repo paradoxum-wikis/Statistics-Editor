@@ -4,6 +4,7 @@
     import type Tower from "$lib/towerComponents/tower";
     import type SkinData from "$lib/towerComponents/skinData";
     import { settingsStore } from "$lib/stores/settings.svelte";
+    import { towerStore } from "$lib/stores/tower.svelte";
     import { fade } from "svelte/transition";
 
     let {
@@ -188,7 +189,16 @@
 
         skinData.set(levelIndex, attribute, parsedValue);
         updateTrigger++;
-        onSave?.();
+        towerStore.syncWikitext();
+    }
+
+    function handleDiscard() {
+        towerStore.discardChanges();
+        updateTrigger++;
+    }
+
+    function handleSave() {
+        towerStore.save();
     }
 
 
@@ -371,13 +381,6 @@
                                     </tbody>
                                 </table>
                             </div>
-
-
-
-                            <div class="text-xs text-body mt-2 px-4 pb-4">
-                                * Gray cells are calculated or inherited values
-                                that cannot be edited directly.
-                            </div>
                         {:else}
                             <div class="text-center py-4 text-muted-foreground">
                                 No skin data available for {skinName}
@@ -387,6 +390,23 @@
                 {/each}
             </Tabs.Root>
         {/key}
+
+        <div class="flex justify-end gap-2 mt-4 border-t pt-4">
+            <button
+                class="btn btn-secondary"
+                onclick={handleDiscard}
+                disabled={!towerStore.isDirty}
+            >
+                Clear Changes
+            </button>
+            <button
+                class="btn btn-primary"
+                onclick={handleSave}
+                disabled={!towerStore.isDirty}
+            >
+                Save Changes
+            </button>
+        </div>
     {:else}
         <div class="text-center py-8 text-body">
             Select a tower to edit its skins.

@@ -356,12 +356,10 @@
 						onSave={() => towerStore.save()}
 					/>
 				{:else}
-					<div class="space-y-3">
-						<WikiEditor
-							towerName={towerStore.selectedName}
-							open={true}
-						/>
-					</div>
+					<WikiEditor
+						towerName={towerStore.selectedName}
+						open={true}
+					/>
 				{/if}
 			{:else if towerStore.isLoading}
 				<div class="card p-8 text-center">
