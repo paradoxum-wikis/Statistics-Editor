@@ -319,38 +319,21 @@
                                                             {index}
                                                         </td>
                                                     {:else}
+                                                        {@const deltaInfo =
+                                                            settingsStore.seeValueDifference
+                                                                ? getDeltaForCell(
+                                                                      skinData,
+                                                                      skinName,
+                                                                      index,
+                                                                      header,
+                                                                  )
+                                                                : {
+                                                                      delta: null,
+                                                                      className:
+                                                                          "",
+                                                                  }}
                                                         <td class="table-data">
                                                             {#if isEditableForSkin(skinData, header)}
-                                                                {@const baseValue =
-                                                                    getBaselineValue(
-                                                                        skinName,
-                                                                        index,
-                                                                        header,
-                                                                    )}
-                                                                {@const currentValue =
-                                                                    skinData.levels.getCell(
-                                                                        index,
-                                                                        header,
-                                                                    )}
-                                                                {@const displayValue =
-                                                                    getDisplayValueForCell(
-                                                                        skinData,
-                                                                        header,
-                                                                        currentValue,
-                                                                    )}
-                                                                {@const deltaInfo =
-                                                                    settingsStore.seeValueDifference
-                                                                        ? getDeltaForCell(
-                                                                              skinData,
-                                                                              skinName,
-                                                                              index,
-                                                                              header,
-                                                                          )
-                                                                        : {
-                                                                              delta: null,
-                                                                              className:
-                                                                                  "",
-                                                                          }}
                                                                 <div
                                                                     class="cell-wrapper"
                                                                 >
@@ -419,15 +402,26 @@
                                                                 </div>
                                                             {:else}
                                                                 <div
-                                                                    class="table-cell-readonly"
+                                                                    class="table-cell-readonly flex items-center justify-between gap-2"
                                                                 >
-                                                                    {getDisplayValueForCell(
-                                                                        skinData,
-                                                                        header,
-                                                                        level[
-                                                                            header
-                                                                        ],
-                                                                    )}
+                                                                    <span>
+                                                                        {getDisplayValueForCell(
+                                                                            skinData,
+                                                                            header,
+                                                                            level[
+                                                                                header
+                                                                            ],
+                                                                        )}
+                                                                    </span>
+                                                                    {#if settingsStore.seeValueDifference && deltaInfo.delta !== null && deltaInfo.delta !== 0}
+                                                                        <span
+                                                                            class={`delta-text text-xs ${deltaInfo.className}`}
+                                                                        >
+                                                                            ({formatDelta(
+                                                                                deltaInfo.delta,
+                                                                            )})
+                                                                        </span>
+                                                                    {/if}
                                                                 </div>
                                                             {/if}
                                                         </td>

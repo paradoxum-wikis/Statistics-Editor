@@ -18,9 +18,23 @@ export function patchWikitext(sourceWikitext: string, tower: Tower): string {
     const skin = tower.getSkin(skinName);
     if (!skin) continue;
 
+    const rowsForSerialization = skin.rawRows.map((row) => ({ ...row }));
+
+    if (skin.cellFormulaTokens) {
+      for (const row of rowsForSerialization) {
+        const level = String(row["Level"]);
+        const formulas = skin.cellFormulaTokens[level];
+        if (formulas) {
+          for (const [col, token] of Object.entries(formulas)) {
+            row[col] = token;
+          }
+        }
+      }
+    }
+
     const tableMarkup = serializeTable({
       Headers: skin.headers,
-      RawRows: skin.rawRows,
+      RawRows: rowsForSerialization,
     });
 
     text = patchSkinTable(text, skinName, tableMarkup, tower.skinNames);
