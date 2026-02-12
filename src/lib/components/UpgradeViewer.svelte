@@ -40,7 +40,7 @@
                     <img
                         src={upgradeImages[index]}
                         alt={`Upgrade ${index + 1}`}
-                        class="upgrade-image"
+                        class="w-full aspect-square object-contain"
                     />
                 {:else}
                     <div class="upgrade-image-container">
