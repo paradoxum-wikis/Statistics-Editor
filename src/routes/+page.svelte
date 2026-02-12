@@ -24,7 +24,6 @@
 	type EditorMode = "cells" | "wiki";
 
 	let isClient = $state(false);
-	let isReady = $state(false);
 	let settingsOpen = $state(false);
 
 	let editorMode = $state<EditorMode>("cells");
@@ -58,20 +57,15 @@
 				),
 	);
 
-	$effect(() => {
-		if (isClient && !isReady) {
-			const towerParam = page.url.searchParams.get("tower");
-			if (towerParam && towerStore.names.includes(towerParam)) {
-				towerStore.load(towerParam);
-			}
-			isReady = true;
-		}
-	});
-
 	onMount(async () => {
 		isClient = true;
 		profileStore.init();
 		await towerStore.init(profileStore.current);
+
+		const towerParam = page.url.searchParams.get("tower");
+		if (towerParam && towerStore.names.includes(towerParam)) {
+			await towerStore.load(towerParam);
+		}
 	});
 
 	async function handleSelect(itemValue: string | undefined) {
