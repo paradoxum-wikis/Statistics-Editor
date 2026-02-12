@@ -57,39 +57,49 @@ function buildVariablesMap(tower: Tower): Record<string, string> {
     if (!skin) continue;
 
     if (skin.formulaTokens) {
-      Object.assign(variables, skin.formulaTokens);
-    }
-
-    const skinJson = tower.json[skinName];
-    if (!skinJson) continue;
-
-    const detectionTypes = ["Lead", "Hidden", "Flying"];
-
-    const setDetection = (level: number, type: string) => {
-      variables[`$${level}${type}$`] = "true";
-    };
-
-    // Level 0 (Defaults)
-    if (skinJson.Defaults?.Detections) {
-      for (const type of detectionTypes) {
-        if (skinJson.Defaults.Detections[type]) {
-          setDetection(0, type);
+      for (const [key, val] of Object.entries(skin.formulaTokens)) {
+        if (
+          /^\$\d+(?:Lead|Hidden|Flying)\$$/.test(key) ||
+          /^\$\d+UpgradeI?\$$/.test(key)
+        ) {
+          continue;
         }
+        variables[key] = val;
       }
     }
 
-    // Upgrades (Level 1+)
+    const skinJson = tower.json[tower.name]?.[skinName];
+    if (!skinJson) continue;
+
+    const detectionTypes = ["Lead", "Hidden", "Flying"];
+    const currentDetections: Record<string, boolean> = {
+      Lead: false,
+      Hidden: false,
+      Flying: false,
+    };
+
+    const processLevelDetections = (level: number, detections: any) => {
+      if (!detections) return;
+      for (const type of detectionTypes) {
+        if (!(type in detections)) continue;
+        const isEnabled = detections[type] === true;
+
+        if (isEnabled !== currentDetections[type]) {
+          variables[`$${level}${type}$`] = String(isEnabled);
+          currentDetections[type] = isEnabled;
+        }
+      }
+    };
+
+    // Level 0
+    processLevelDetections(0, skinJson.Defaults?.Detections);
+
+    // Level 1+
     if (skinJson.Upgrades) {
       skinJson.Upgrades.forEach((up: any, idx: number) => {
         const level = idx + 1;
 
-        if (up.Stats?.Detections) {
-          for (const type of detectionTypes) {
-            if (up.Stats.Detections[type]) {
-              setDetection(level, type);
-            }
-          }
-        }
+        processLevelDetections(level, up.Stats?.Detections);
 
         if (up.Title) {
           variables[`$${level}Upgrade$`] = `"${up.Title}"`;

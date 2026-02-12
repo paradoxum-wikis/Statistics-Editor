@@ -22,6 +22,23 @@
         { type: "Lead" as const, icon: LeadIcon },
     ];
 
+    let selectedDetectionStart = $state<Record<
+        "Hidden" | "Flying" | "Lead",
+        string
+    >>({
+        Hidden: "none",
+        Flying: "none",
+        Lead: "none",
+    });
+
+    $effect(() => {
+        selectedDetectionStart = {
+            Hidden: getDetectionStartLevel("Hidden")?.toString() ?? "none",
+            Flying: getDetectionStartLevel("Flying")?.toString() ?? "none",
+            Lead: getDetectionStartLevel("Lead")?.toString() ?? "none",
+        };
+    });
+
     function getDetectionStartLevel(type: "Hidden" | "Flying" | "Lead"): number | null {
         if (!levels.length) return null;
         for (let i = 0; i < levels.length; i++) {
@@ -33,20 +50,22 @@
     }
 
     function updateDetectionStart(type: "Hidden" | "Flying" | "Lead", startLevel: number | null) {
-        if (!skinData) return;
+        selectedDetectionStart[type] = startLevel === null ? "none" : startLevel.toString();
 
-        const totalLevels = levels.length;
-        if (startLevel === null) {
-             for (let i = 0; i < totalLevels; i++) {
-                skinData.setDetection(i, type, false);
+        const tower = towerStore.selectedData;
+        if (!tower) return;
+
+        // Detection variables are global across all skins, so update every skin
+        for (const skinName of tower.skinNames) {
+            const skin = tower.getSkin(skinName);
+            if (!skin) continue;
+
+            const totalLevels = skin.levels.levels.length;
+            for (let i = 0; i < totalLevels; i++) {
+                const shouldHave = startLevel !== null && i >= startLevel;
+                skin.setDetection(i, type, shouldHave, false);
             }
-            towerStore.save();
-            return;
-        }
-
-        for (let i = 0; i < totalLevels; i++) {
-            const shouldHave = i >= startLevel;
-            skinData.setDetection(i, type, shouldHave, i === totalLevels - 1);
+            skin.createData();
         }
         towerStore.save();
     }
@@ -71,8 +90,7 @@
                     <Select.Root
                         type="single"
                         items={levelOptions}
-                        value={getDetectionStartLevel(detection.type)?.toString() ??
-                            "none"}
+                        value={selectedDetectionStart[detection.type]}
                         onValueChange={(val) =>
                             updateDetectionStart(
                                 detection.type,
@@ -80,11 +98,8 @@
                             )}
                     >
                         <Select.Trigger class="select-trigger w-22.5 h-7">
-                            {@const val =
-                                getDetectionStartLevel(detection.type)?.toString() ??
-                                "none"}
                             <span class="truncate">
-                                {levelOptions.find((o) => o.value === val)?.label}
+                                {levelOptions.find((o) => o.value === selectedDetectionStart[detection.type])?.label}
                             </span>
                             <ChevronDown class="w-3 h-3 opacity-50 ml-1" />
                         </Select.Trigger>
