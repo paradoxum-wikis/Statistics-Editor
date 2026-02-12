@@ -126,6 +126,11 @@
     }
 
     function rebuildBaselineForSkin(t: Tower, skinName: string) {
+        if (settingsStore.debugMode) {
+            console.log(
+                `[TowerEditor] Rebuilding baseline for ${t.name} (skin: ${skinName})`,
+            );
+        }
         const skinData = t.getSkin(skinName);
         if (!skinData) return;
 
@@ -220,8 +225,24 @@
         towerStore.syncWikitext();
     }
 
-    function handleDiscard() {
-        towerStore.discardChanges();
+    async function handleDiscard() {
+        if (settingsStore.debugMode) {
+            console.log(
+                `[TowerEditor] Discard requested (tower=${tower?.name ?? "null"}, skin=${selectedSkinName})`,
+            );
+        }
+
+        if (settingsStore.debugMode) {
+            console.log(`[TowerEditor] Discard: awaiting store reload...`);
+        }
+
+        await towerStore.discardChanges();
+
+        if (settingsStore.debugMode) {
+            console.log(
+                `[TowerEditor] Discard: reload complete (tower=${tower?.name ?? "null"}, skin=${selectedSkinName}); rebuilding baseline...`,
+            );
+        }
 
         if (tower && selectedSkinName) {
             rebuildBaselineForSkin(tower, selectedSkinName);

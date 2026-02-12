@@ -110,6 +110,10 @@ class TowerStore {
         this.isDirty = false;
 
         if (this.baselineTowerId !== name) {
+          if (settingsStore.debugMode)
+            console.log(
+              `[TowerStore] Clearing baseline (new tower loaded: ${name}, old: ${this.baselineTowerId})`,
+            );
           this.baseline = {};
           this.baselineTowerId = null;
           this.baselineSkinName = null;
@@ -169,10 +173,10 @@ class TowerStore {
     }
   }
 
-  discardChanges(): void {
+  async discardChanges(): Promise<boolean> {
     this.effectiveWikitext = this.originalWikitext;
     this.isDirty = false;
-    void this.forceReload();
+    return await this.forceReload();
   }
 
   /**
@@ -181,10 +185,25 @@ class TowerStore {
   async reset(): Promise<boolean> {
     if (!this.manager || !this.selectedData) return false;
 
+    const name = this.selectedData.name;
+
+    if (settingsStore.debugMode)
+      console.log(`[TowerStore] Resetting tower: ${name}`);
+
     this.isLoading = true;
-    this.manager.resetTower(this.selectedData.name);
+    this.selectedData = null;
+
+    this.manager.resetTower(name);
     this.#lastLoadedName = null;
-    const result = await this.load(this.selectedData.name);
+
+    this.baseline = {};
+    this.baselineTowerId = null;
+    this.baselineSkinName = null;
+
+    if (settingsStore.debugMode)
+      console.log(`[TowerStore] Baseline cleared for reset.`);
+
+    const result = await this.load(name);
     return result;
   }
 

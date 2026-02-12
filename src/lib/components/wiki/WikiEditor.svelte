@@ -144,7 +144,7 @@
 				</button>
 
 				<button
-					class="btn btn-secondary btn-sm"
+					class="btn btn-primary btn-sm"
 					onclick={saveOverride}
 					disabled={!canSave ||
 						!towerStore.isDirty ||
