@@ -159,7 +159,7 @@
 						>
 							<div class="flex items-center gap-2">
 								<Table size={16} />
-								<span>Table</span>
+								<span>Visual</span>
 							</div>
 						</button>
 						<button
@@ -170,7 +170,7 @@
 						>
 							<div class="flex items-center gap-2">
 								<FileBraces size={16} />
-								<span>Wiki</span>
+								<span>Source</span>
 							</div>
 						</button>
 					</div>
