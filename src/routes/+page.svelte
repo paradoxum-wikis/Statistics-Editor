@@ -138,13 +138,13 @@
 
 
 
-<div class="h-screen bg-background font-sans relative">
+<div class="h-screen bg-background relative">
 	<Sidebar class="absolute left-0 top-0 h-full w-[15%]" bind:settingsOpen />
 
 	<!-- Main Content -->
 	<div class="ml-[15%] flex flex-col h-full">
 		<header class="header-bar">
-			<h1 class="text-heading text-xl font-bold ml-4">
+			<h1 class="text-heading text-xl font-bold">
 				{towerStore.selectedName || "TDS Statistics Editor"}
 			</h1>
 			<div class="flex items-center space-x-4">
