@@ -14,6 +14,10 @@ class TowerStore {
   isDirty = $state(false);
   #lastLoadedName = $state<string | null>(null);
 
+  baseline = $state<Record<string, unknown>>({});
+  baselineTowerId = $state<string | null>(null);
+  baselineSkinName = $state<string | null>(null);
+
   /**
    * Canonical source of truth for what the UI should be editing/viewing.
    *
@@ -53,6 +57,9 @@ class TowerStore {
     this.effectiveWikitextSource = "";
     this.originalWikitext = "";
     this.isDirty = false;
+    this.baseline = {};
+    this.baselineTowerId = null;
+    this.baselineSkinName = null;
     const previousSelection = this.selectedName;
     this.selectedName = "";
     this.isLoading = true;
@@ -101,6 +108,12 @@ class TowerStore {
         this.effectiveWikitextSource = anyTower.wikitextSource ?? "";
         this.originalWikitext = this.effectiveWikitext;
         this.isDirty = false;
+
+        if (this.baselineTowerId !== name) {
+          this.baseline = {};
+          this.baselineTowerId = null;
+          this.baselineSkinName = null;
+        }
 
         if (settingsStore.debugMode)
           console.log(`Loaded tower data for ${name}`);

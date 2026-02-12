@@ -21,8 +21,6 @@
     let availableSkins = $derived(tower ? tower.skinNames : []);
     let updateTrigger = $state(0);
 
-    let baseline = $state<Record<string, unknown>>({});
-
     function cellKey(skinName: string, levelIndex: number, header: string) {
         return `${skinName}:${levelIndex}:${header}`;
     }
@@ -68,7 +66,7 @@
         levelIndex: number,
         header: string,
     ): unknown {
-        return baseline[cellKey(skinName, levelIndex, header)];
+        return towerStore.baseline[cellKey(skinName, levelIndex, header)];
     }
 
     function getDeltaForCell(
@@ -123,20 +121,13 @@
         }
     });
 
-    $effect(() => {
-        const t = tower;
-        const skinName = selectedSkinName;
+    function getTowerBaselineId(t: Tower): string {
+        return (t as any)?.name ?? String(t);
+    }
 
-        if (!t || !skinName) {
-            baseline = {};
-            return;
-        }
-
+    function rebuildBaselineForSkin(t: Tower, skinName: string) {
         const skinData = t.getSkin(skinName);
-        if (!skinData) {
-            baseline = {};
-            return;
-        }
+        if (!skinData) return;
 
         const headers =
             skinData && skinData.headers.length > 0
@@ -149,7 +140,6 @@
         const next: Record<string, unknown> = {};
         for (let i = 0; i < levels.length; i++) {
             for (const header of headers) {
-                // Baseline should reflect what the user initially sees in the table
                 const value =
                     header === "Level" ? i : skinData.levels.getCell(i, header);
 
@@ -157,7 +147,45 @@
             }
         }
 
-        baseline = next;
+        towerStore.baseline = next;
+        towerStore.baselineTowerId = getTowerBaselineId(t);
+        towerStore.baselineSkinName = skinName;
+    }
+
+    $effect(() => {
+        const t = tower;
+        if (!t) {
+            towerStore.baseline = {};
+            towerStore.baselineTowerId = null;
+            towerStore.baselineSkinName = null;
+            return;
+        }
+
+        const currentTowerId = getTowerBaselineId(t);
+        if (towerStore.baselineTowerId !== currentTowerId) {
+            const initial =
+                availableSkins.includes("Regular")
+                    ? "Regular"
+                    : availableSkins[0] || "";
+            if (initial) rebuildBaselineForSkin(t, initial);
+        }
+    });
+
+    $effect(() => {
+        const t = tower;
+        const skinName = selectedSkinName;
+        if (!t || !skinName) return;
+
+        const currentTowerId = getTowerBaselineId(t);
+        if (
+            towerStore.baselineTowerId == null ||
+            towerStore.baselineTowerId !== currentTowerId
+        )
+            return;
+
+        if (towerStore.baselineSkinName == null) {
+            rebuildBaselineForSkin(t, skinName);
+        }
     });
 
     function isEditableForSkin(skinData: SkinData, attr: string) {
@@ -194,11 +222,20 @@
 
     function handleDiscard() {
         towerStore.discardChanges();
+
+        if (tower && selectedSkinName) {
+            rebuildBaselineForSkin(tower, selectedSkinName);
+        }
+
         updateTrigger++;
     }
 
     function handleSave() {
         towerStore.save();
+
+        if (tower && selectedSkinName) {
+            rebuildBaselineForSkin(tower, selectedSkinName);
+        }
     }
 
 
@@ -242,7 +279,7 @@
                                                 <th
                                                     scope="col"
                                                     class={header === "Level"
-                                                        ? "table-header-sticky"
+                                                        ? "table-header-sticky px-2"
                                                         : "table-header whitespace-nowrap"}
                                                 >
                                                     {header}
