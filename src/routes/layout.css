@@ -660,11 +660,6 @@
   white-space: nowrap;
 }
 
-.wiki-editor-card {
-  border-radius: var(--radius) 0;
-  @apply border bg-card shadow p-6 space-y-4;
-}
-
 .wiki-header-row {
   @apply flex items-start justify-between gap-4;
 }

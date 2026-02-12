@@ -118,7 +118,6 @@
 </script>
 
 {#if open}
-	<div class="wiki-editor-card">
 		<div class="wiki-header-row">
 			<div class="wiki-info-group">
 				<p class="wiki-info-text">
@@ -209,5 +208,4 @@
 				result in missing/incorrect stats.
 			</p>
 		</div>
-	</div>
 {/if}

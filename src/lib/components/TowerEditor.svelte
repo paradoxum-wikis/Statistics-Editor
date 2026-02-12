@@ -210,7 +210,6 @@
             <Tabs.Root
                 value={selectedSkinName}
                 onValueChange={(v) => (selectedSkinName = v)}
-                class="card"
             >
                 <Tabs.List class="tabs-list">
                     {#each availableSkins as skinName}
