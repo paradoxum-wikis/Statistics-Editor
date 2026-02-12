@@ -592,7 +592,7 @@
 }
 
 .upgrade-tab-trigger {
-  @apply px-2 py-1 text-xs bg-muted rounded;
+  @apply px-2 py-1 text-xs bg-muted rounded w-100;
 }
 
 .upgrade-image-container {
