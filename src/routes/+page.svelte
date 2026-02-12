@@ -1,9 +1,8 @@
 <script lang="ts">
 	import { onMount } from "svelte";
 	import { goto } from "$app/navigation";
-	import { page } from "$app/stores";
+	import { page } from "$app/state";
 	import { towerStore } from "$lib/stores/tower.svelte";
-	import { settingsStore } from "$lib/stores/settings.svelte";
 	import { profileStore } from "$lib/stores/profile.svelte";
 
 	import TowerEditor from "$lib/components/TowerEditor.svelte";
@@ -50,7 +49,7 @@
 	);
 
 	let filteredTowers = $derived(
-		searchValue === towerStore.selectedName
+		searchValue === ""
 			? items
 			: items.filter((item) =>
 					item.label
@@ -59,13 +58,11 @@
 				),
 	);
 
-	// Initialization
 	$effect(() => {
 		if (isClient && !isReady) {
-			const towerParam = $page.url.searchParams.get("tower");
+			const towerParam = page.url.searchParams.get("tower");
 			if (towerParam && towerStore.names.includes(towerParam)) {
 				towerStore.load(towerParam);
-				searchValue = towerParam;
 			}
 			isReady = true;
 		}
@@ -81,10 +78,10 @@
 		if (!itemValue) return;
 		const success = await towerStore.load(itemValue);
 		if (success) {
-			searchValue = itemValue;
-			const url = new URL(window.location.href);
+			searchValue = "";
+			const url = new URL(page.url);
 			url.searchParams.set("tower", itemValue);
-			await goto(url.toString(), { keepFocus: true, noScroll: true });
+			await goto(url, { keepFocus: true, noScroll: true });
 			comboboxOpen = false;
 		}
 	}
@@ -98,7 +95,7 @@
 	async function handleProfileChange(newProfile: string) {
 		if (profileStore.switch(newProfile)) {
 			await towerStore.switchProfile(newProfile);
-			searchValue = towerStore.selectedName;
+			searchValue = "";
 		}
 	}
 
@@ -288,11 +285,13 @@
 					<div class="flex items-center space-x-2">
 						<Combobox.Root
 							type="single"
-							items={filteredTowers}
+							items={items}
 							value={towerStore.selectedName}
-							inputValue={searchValue}
 							bind:open={comboboxOpen}
 							onValueChange={(v) => handleSelect(v)}
+							onOpenChange={(open) => {
+								if (!open) searchValue = "";
+							}}
 						>
 							<div class="relative">
 								<Combobox.Input
@@ -302,10 +301,11 @@
 										searchValue = e.currentTarget.value;
 										comboboxOpen = true;
 									}}
+									onclick={() => (comboboxOpen = true)}
 								/>
-								<ChevronsUpDown
-									class="absolute right-3 top-3 h-4 w-4 opacity-50 pointer-events-none"
-								/>
+								<Combobox.Trigger class="absolute right-3 top-3">
+									<ChevronsUpDown class="h-4 w-4 opacity-50" />
+								</Combobox.Trigger>
 							</div>
 
 							<Combobox.Portal>
@@ -313,7 +313,7 @@
 									<Combobox.Viewport
 										class="p-2 max-h-75 overflow-y-auto"
 									>
-										{#each filteredTowers as item, i (i + item.value)}
+										{#each filteredTowers as item (item.value)}
 											<Combobox.Item
 												class="combobox-item"
 												value={item.value}
