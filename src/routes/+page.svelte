@@ -4,6 +4,8 @@
 	import { page } from "$app/state";
 	import { towerStore } from "$lib/stores/tower.svelte";
 	import { profileStore } from "$lib/stores/profile.svelte";
+	import { cubicOut } from "svelte/easing";
+	import { fly } from "svelte/transition";
 
 	import TowerEditor from "$lib/components/TowerEditor.svelte";
 	import WikiEditor from "$lib/components/wiki/WikiEditor.svelte";
@@ -55,6 +57,16 @@
 						.toLowerCase()
 						.includes(searchValue.toLowerCase()),
 				),
+	);
+
+	const mainKey = $derived(
+		!isClient
+			? "init"
+			: towerStore.isLoading
+				? "loading"
+				: towerStore.selectedData
+					? `tower:${towerStore.selectedName}:${editorMode}`
+					: "intro",
 	);
 
 	onMount(async () => {
@@ -123,6 +135,8 @@
 		deleteProfileOpen = false;
 	}
 </script>
+
+
 
 <div class="h-screen bg-background font-sans relative">
 	<Sidebar class="absolute left-0 top-0 h-full w-[15%]" bind:settingsOpen />
@@ -345,29 +359,43 @@
 		</header>
 
 		<main class="flex-1 p-8 overflow-x-auto">
-			{#if !isClient}
-				<div class="card p-8 text-center">
-					<p class="animate-pulse text-body">Initializing...</p>
+			{#key `${isClient}-${towerStore.isLoading}-${towerStore.selectedName ?? ""}-${editorMode}`}
+				<div
+					in:fly={{
+						y: 8,
+						duration: 160,
+						easing: cubicOut,
+					}}
+				>
+					{#if !isClient}
+						<div class="card p-8 text-center">
+							<p class="animate-pulse text-body">
+								Initializing...
+							</p>
+						</div>
+					{:else if towerStore.selectedData}
+						{#if editorMode === "cells"}
+							<TowerEditor
+								tower={towerStore.selectedData}
+								onSave={() => towerStore.save()}
+							/>
+						{:else}
+							<WikiEditor
+								towerName={towerStore.selectedName}
+								open={true}
+							/>
+						{/if}
+					{:else if towerStore.isLoading}
+						<div class="card p-8 text-center">
+							<p class="animate-pulse text-body">
+								Loading tower data...
+							</p>
+						</div>
+					{:else}
+						<Introduction />
+					{/if}
 				</div>
-			{:else if towerStore.selectedData}
-				{#if editorMode === "cells"}
-					<TowerEditor
-						tower={towerStore.selectedData}
-						onSave={() => towerStore.save()}
-					/>
-				{:else}
-					<WikiEditor
-						towerName={towerStore.selectedName}
-						open={true}
-					/>
-				{/if}
-			{:else if towerStore.isLoading}
-				<div class="card p-8 text-center">
-					<p class="animate-pulse text-body">Loading tower data...</p>
-				</div>
-			{:else}
-				<Introduction />
-			{/if}
+			{/key}
 		</main>
 	</div>
 </div>
