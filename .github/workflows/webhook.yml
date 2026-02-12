@@ -11,7 +11,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -27,7 +27,7 @@ jobs:
             const commits = context.payload?.commits;
             if (!commits || commits.length === 0) core.setFailed('No commits found in this push event');
 
-            const fields = commits.map(commit => {
+            for (const commit of commits) {
               const sha = commit.id || '(unknown)';
               const shortSha = sha.slice(0, 7);
               const msg = commit.message?.split('\n')[0] || '(no message)';
@@ -35,45 +35,40 @@ jobs:
               const author = commit.author?.name || commit.author?.username || '(unknown)';
               const commitUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/commit/${sha}`;
 
-              const commitFields = [
+              const fields = [
                 { name: `Commit ${shortSha}`, value: msg, inline: false }
               ];
-              if (body.trim() !== '') commitFields.push({ name: 'Details', value: body, inline: false });
-              commitFields.push(
+              if (body.trim() !== '') fields.push({ name: 'Details', value: body, inline: false });
+              fields.push(
                 { name: 'By', value: author, inline: true },
                 { name: 'Link', value: `[View on GitHub](${commitUrl})`, inline: true }
               );
 
-              return commitFields;
-            }).flat();
+              const embed = {
+                title: 'TDS Statistics Editor Update (NEXT)',
+                description: `Push contains ${commits.length} commit(s)`,
+                color: 5763719,
+                fields,
+                footer: { text: 'Thank you for using the Statistics Editor!' },
+                timestamp: new Date().toISOString()
+              };
 
-            const embed = {
-              title: 'TDS Statistics Editor Update (NEXT)',
-              description: `Push contains ${commits.length} commit(s)`,
-              color: 5763719,
-              fields,
-              footer: { text: 'Thank you for using the Statistics Editor!' },
-              timestamp: new Date().toISOString()
-            };
+              try {
+                const response = await fetch(webhookUrl, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'User-Agent': 'github-actions/discord-notify'
+                  },
+                  body: JSON.stringify({ embeds: [embed] })
+                });
 
-            const payload = { embeds: [embed] };
-            const data = JSON.stringify(payload);
-
-            try {
-              const response = await fetch(webhookUrl, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'User-Agent': 'github-actions/discord-notify'
-                },
-                body: data
-              });
-
-              if (!response.ok) {
-                core.setFailed(`Failed to post to Discord: HTTP ${response.status} ${response.statusText}`);
-              } else {
-                core.info('Discord webhook posted successfully');
+                if (!response.ok) {
+                  core.setFailed(`Failed to post commit ${shortSha} to Discord: HTTP ${response.status} ${response.statusText}`);
+                } else {
+                  core.info(`Posted commit ${shortSha} successfully`);
+                }
+              } catch (error) {
+                core.setFailed(`Failed to post commit ${shortSha} to Discord: ${error.message}`);
               }
-            } catch (error) {
-              core.setFailed(`Failed to post to Discord: ${error.message}`);
             }
