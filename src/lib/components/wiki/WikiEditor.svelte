@@ -17,8 +17,8 @@
 
 	let text = $state(towerStore.effectiveWikitext);
 	let status = $state<
-		"idle" | "loading" | "ready" | "saving" | "saved" | "error"
-	>("idle");
+		"ready" | "saving" | "saved" | "error"
+	>("ready");
 	let errorMessage = $state<string | null>(null);
 
 	let profileName = $derived(profileStore.current);
@@ -148,7 +148,6 @@
 					onclick={saveOverride}
 					disabled={!canSave ||
 						!towerStore.isDirty ||
-						status === "loading" ||
 						status === "saving"}
 					title="Save as profile-specific override and reload tower"
 				>
@@ -169,9 +168,7 @@
 		<div class="space-y-2">
 			<div class="wiki-status-row">
 				<div class="wiki-status-text">
-					{#if status === "loading"}
-						Loading...
-					{:else if status === "saving"}
+					{#if status === "saving"}
 						Saving...
 					{:else if status === "saved"}
 						Saved override.

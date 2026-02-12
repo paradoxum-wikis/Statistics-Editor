@@ -1,6 +1,3 @@
-<script lang="ts">
-</script>
-
 <div class="intro-container">
     <div class="intro-header">
         <h2 class="intro-title">

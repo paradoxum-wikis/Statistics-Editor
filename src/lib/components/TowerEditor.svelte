@@ -9,11 +9,9 @@
 
     let {
         tower = null,
-        onSave = undefined,
         disabled = false,
     }: {
         tower: Tower | null;
-        onSave?: () => void;
         disabled?: boolean;
     } = $props();
 

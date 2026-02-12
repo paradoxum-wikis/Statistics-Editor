@@ -370,14 +370,13 @@
 					{#if !isClient}
 						<div class="card p-8 text-center">
 							<p class="animate-pulse text-body">
-								Initializing...
+								Engineer is setting up the editor for you...
 							</p>
 						</div>
 					{:else if towerStore.selectedData}
 						{#if editorMode === "cells"}
 							<TowerEditor
 								tower={towerStore.selectedData}
-								onSave={() => towerStore.save()}
 							/>
 						{:else}
 							<WikiEditor
@@ -388,7 +387,7 @@
 					{:else if towerStore.isLoading}
 						<div class="card p-8 text-center">
 							<p class="animate-pulse text-body">
-								Loading tower data...
+								Commander is getting this tower's files ready...
 							</p>
 						</div>
 					{:else}
