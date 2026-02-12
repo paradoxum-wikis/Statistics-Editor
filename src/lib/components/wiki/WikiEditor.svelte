@@ -4,6 +4,7 @@
 	import { profileStore } from "$lib/stores/profile.svelte";
 	import { settingsStore } from "$lib/stores/settings.svelte";
 	import { setWikiOverride } from "$lib/wiki/wikiSource";
+	import { WikitextEditor } from "wikistxr";
 
 	let {
 		towerName,
@@ -16,10 +17,10 @@
 	let isClient = $state(false);
 
 	let text = $state(towerStore.effectiveWikitext);
-	let status = $state<
-		"ready" | "saving" | "saved" | "error"
-	>("ready");
+	let status = $state<"ready" | "saving" | "saved" | "error">("ready");
 	let errorMessage = $state<string | null>(null);
+	let editorContainer = $state<HTMLElement>();
+	let editor = $state<WikitextEditor>();
 
 	let profileName = $derived(profileStore.current);
 
@@ -29,17 +30,39 @@
 			: "Using loaded wiki",
 	);
 
-	function onInput(e: Event) {
-		text = (e.currentTarget as HTMLTextAreaElement).value;
+	function readEditorTextFromDom(container: HTMLElement): string {
+		const lineEls = Array.from(
+			container.querySelectorAll<HTMLElement>(".wt-line"),
+		);
+
+		if (lineEls.length > 0) {
+			return lineEls
+				.map((el) => (el.textContent ?? "").replace(/\u200B/g, ""))
+				.join("\n");
+		}
+
+		return (container.innerText ?? "").replace(/\r\n/g, "\n");
+	}
+
+	function syncFromEditorDom() {
+		if (!editorContainer) return;
+
+		const nextText = readEditorTextFromDom(editorContainer);
+
+		if (nextText !== text) {
+			text = nextText;
+		}
+
 		status = "ready";
+		towerStore.effectiveWikitext = nextText;
+		towerStore.isDirty = true;
+
 		if (settingsStore.debugMode) {
 			console.log(
-				"[WikiEditor] onInput updating effectiveWikitext, length:",
-				text.length,
+				"[WikiEditor] syncFromEditorDom -> effectiveWikitext length:",
+				nextText.length,
 			);
 		}
-		towerStore.effectiveWikitext = text;
-		towerStore.isDirty = true;
 	}
 
 	function saveOverride() {
@@ -92,16 +115,45 @@
 		towerStore.isDirty = false;
 		status = "ready";
 		errorMessage = null;
+
+		if (editor) {
+			editor.update(text);
+		}
 	}
 
 	onMount(() => {
 		isClient = true;
+
+		if (isClient && editorContainer) {
+			if (!document.getElementById("wikistxr-styles")) {
+				const style = document.createElement("style");
+				style.id = "wikistxr-styles";
+				style.textContent = WikitextEditor.getDefaultStyles();
+				document.head.appendChild(style);
+			}
+
+			editor = new WikitextEditor();
+			editor.attach(editorContainer);
+			editor.update(text);
+
+			const editorInputHandler = () => syncFromEditorDom();
+			editorContainer.addEventListener("input", editorInputHandler);
+
+			return () => {
+				editorContainer?.removeEventListener("input", editorInputHandler);
+			};
+		}
+
+		return;
 	});
 
 	$effect(() => {
 		if (!isClient) return;
 		if (text !== towerStore.effectiveWikitext) {
 			text = towerStore.effectiveWikitext;
+			if (editor) {
+				editor.update(text);
+			}
 		}
 
 		if (settingsStore.debugMode) {
@@ -118,91 +170,90 @@
 </script>
 
 {#if open}
-		<div class="wiki-header-row">
-			<div class="wiki-info-group">
-				<p class="wiki-info-text">
-					Editing:
-					<span class="font-medium text-foreground">
-						{towerName}
-					</span>
-					· Profile:
-					<span class="font-medium text-foreground">
-						{profileName}
-					</span>
-					· <span class="text-muted-foreground">{sourceLabel}</span>
-				</p>
-			</div>
-
-			<div class="wiki-actions-group">
-				<button
-					class="btn btn-secondary btn-sm"
-					onclick={discardChanges}
-					disabled={!towerStore.isDirty || status === "saving"}
-					title="Discard unsaved changes (revert to last loaded effective wiki)"
-				>
-					Discard
-				</button>
-
-				<button
-					class="btn btn-primary btn-sm"
-					onclick={saveOverride}
-					disabled={!canSave ||
-						!towerStore.isDirty ||
-						status === "saving"}
-					title="Save as profile-specific override and reload tower"
-				>
-					Save override
-				</button>
-			</div>
+	<div class="wiki-header-row">
+		<div class="wiki-info-group">
+			<p class="wiki-info-text">
+				Editing:
+				<span class="font-medium text-foreground">
+					{towerName}
+				</span>
+				· Profile:
+				<span class="font-medium text-foreground">
+					{profileName}
+				</span>
+				· <span class="text-muted-foreground">{sourceLabel}</span>
+			</p>
 		</div>
 
-		{#if errorMessage}
-			<div class="wiki-error-box">
-				<div class="wiki-error-title">Error</div>
-				<div class="wiki-error-body">
-					{errorMessage}
-				</div>
+		<div class="wiki-actions-group">
+			<button
+				class="btn btn-secondary btn-sm"
+				onclick={discardChanges}
+				disabled={!towerStore.isDirty || status === "saving"}
+				title="Discard unsaved changes (revert to last loaded effective wiki)"
+			>
+				Discard
+			</button>
+
+			<button
+				class="btn btn-primary btn-sm"
+				onclick={saveOverride}
+				disabled={!canSave ||
+					!towerStore.isDirty ||
+					status === "saving"}
+				title="Save as profile-specific override and reload tower"
+			>
+				Save override
+			</button>
+		</div>
+	</div>
+
+	{#if errorMessage}
+		<div class="wiki-error-box">
+			<div class="wiki-error-title">Error</div>
+			<div class="wiki-error-body">
+				{errorMessage}
 			</div>
-		{/if}
+		</div>
+	{/if}
 
-		<div class="space-y-2">
-			<div class="wiki-status-row">
-				<div class="wiki-status-text">
-					{#if status === "saving"}
-						Saving...
-					{:else if status === "saved"}
-						Saved override.
-					{:else if towerStore.isDirty}
-						Unsaved changes
-					{:else}
-						Ready
-					{/if}
-				</div>
-
-				{#if settingsStore.debugMode}
-					<div class="wiki-status-text">
-						Length: {text.length}
-					</div>
+	<div class="space-y-2">
+		<div class="wiki-status-row">
+			<div class="wiki-status-text">
+				{#if status === "saving"}
+					Saving...
+				{:else if status === "saved"}
+					Saved override.
+				{:else if towerStore.isDirty}
+					Unsaved changes
+				{:else}
+					Ready
 				{/if}
 			</div>
 
-			<textarea
-				class="wiki-textarea"
-				value={text}
-				oninput={onInput}
-				spellcheck="false"
-				autocapitalize="off"
-				autocomplete="off"
-			></textarea>
-
-			<p class="wiki-notes-text">
-				Notes:
-				<br />
-				• Saving writes a profile-specific override to localStorage and forces
-				a tower reload so formulas/tokens re-parse from the edited source.
-				<br />
-				• This editor does not validate wikitext yet. A malformed table may
-				result in missing/incorrect stats.
-			</p>
+			{#if settingsStore.debugMode}
+				<div class="wiki-status-text">
+					Length: {text.length}
+				</div>
+			{/if}
 		</div>
+
+		<div
+			class="wiki-textarea"
+			bind:this={editorContainer}
+			spellcheck="false"
+		></div>
+
+		<p class="wiki-notes-text">
+			Notes:
+			<br />
+			• Saving writes a profile-specific override to localStorage and forces
+			a tower reload so formulas/tokens re-parse from the edited source.
+			<br />
+			• This editor does not validate wikitext yet. A malformed table may result
+			in missing/incorrect stats.
+			<br />
+			• The editor with syntax highlighting is highly experimental. Expect bugs and rough edges, and please report any issues you encounter!
+		</p>
+	</div>
 {/if}

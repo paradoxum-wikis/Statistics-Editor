@@ -699,10 +699,12 @@
   background: var(--background);
   padding: 0.5rem 1rem;
   outline: none;
+  max-height: 30rem;
+  overflow: auto;
   transition:
     box-shadow 0.2s,
     border-color 0.2s;
-  @apply w-full font-mono text-xs leading-5 min-h-104;
+  @apply w-full font-mono text-xs leading-5;
 
   &:focus {
     box-shadow:

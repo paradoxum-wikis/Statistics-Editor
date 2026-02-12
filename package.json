@@ -32,6 +32,7 @@
   },
   "dependencies": {
     "@lucide/svelte": "^0.563.1",
-    "mediawiki-file-url": "^0.3.1"
+    "mediawiki-file-url": "^0.3.1",
+    "wikistxr": "^0.0.11"
   }
 }
