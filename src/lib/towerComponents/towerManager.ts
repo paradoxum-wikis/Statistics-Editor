@@ -242,6 +242,7 @@ export default class TowerManager {
         const tableData = tableDataUnknown as TableData;
 
         const skinName = tabName;
+        const isPvpSkin = /pvp/i.test(skinName);
         const defaults: any = {};
         const upgrades: any[] = [];
         const readOnlyAttributes: string[] = [];
@@ -259,7 +260,39 @@ export default class TowerManager {
           ) => Number(a["Level"]) - Number(b["Level"]),
         );
 
-        const formulaTokens: Record<string, string> = parsed.variables;
+        // Build skin specific formula tokens
+        // For PVP, $PVP-N$ overrides $N$ so the PVP tab can use
+        // different formulas while falling back to the regular ones
+        const formulaTokens: Record<string, string> = {};
+        for (const [key, val] of Object.entries(parsed.variables)) {
+          if (!/^\$PVP-/.test(key)) {
+            formulaTokens[key] = val;
+          }
+        }
+        if (isPvpSkin) {
+          for (const [key, val] of Object.entries(parsed.variables)) {
+            const pvpMatch = key.match(/^\$PVP-(.+)\$$/);
+            if (pvpMatch) {
+              const regularKey = `$${pvpMatch[1]}$`;
+              formulaTokens[regularKey] = val;
+            }
+          }
+        }
+
+        const detectionTypes = ["Lead", "Hidden", "Flying"];
+        const pvpOwnedDetectionTypes = new Set<string>();
+
+        if (isPvpSkin) {
+          for (const type of detectionTypes) {
+            const hasPvpVar = Object.keys(parsed.variables).some((k) =>
+              new RegExp(`^\\$PVP-\\d+${type}\\$$`).test(k),
+            );
+            if (hasPvpVar) {
+              pvpOwnedDetectionTypes.add(type);
+            }
+          }
+        }
+
         const cellFormulaTokens: Record<string, Record<string, string>> = {};
 
         let previousTotalPrice = 0;
@@ -290,9 +323,14 @@ export default class TowerManager {
               : Number(row["Total Price"]);
 
           const detections: any = {};
-          const detectionTypes = ["Lead", "Hidden", "Flying"];
           for (const type of detectionTypes) {
-            const varName = `$${level}${type}$`;
+            let varName: string;
+            if (isPvpSkin && pvpOwnedDetectionTypes.has(type)) {
+              varName = `$PVP-${level}${type}$`;
+            } else {
+              varName = `$${level}${type}$`;
+            }
+
             if (parsed.variables[varName]) {
               if (settingsStore.debugMode)
                 console.log(
@@ -326,14 +364,24 @@ export default class TowerManager {
               upgrade.Stats.Detections = detections;
             }
 
-            const titleKey = `$${level}Upgrade$`;
+            const titleKey = isPvpSkin
+              ? `$PVP-${level}Upgrade$`
+              : `$${level}Upgrade$`;
+            const titleFallback = `$${level}Upgrade$`;
             if (parsed.variables[titleKey]) {
               upgrade.Title = parsed.variables[titleKey];
+            } else if (isPvpSkin && parsed.variables[titleFallback]) {
+              upgrade.Title = parsed.variables[titleFallback];
             }
 
-            const imageKey = `$${level}UpgradeI$`;
+            const imageKey = isPvpSkin
+              ? `$PVP-${level}UpgradeI$`
+              : `$${level}UpgradeI$`;
+            const imageFallback = `$${level}UpgradeI$`;
             if (parsed.variables[imageKey]) {
               upgrade.Image = parsed.variables[imageKey];
+            } else if (isPvpSkin && parsed.variables[imageFallback]) {
+              upgrade.Image = parsed.variables[imageFallback];
             }
 
             upgrades.push(upgrade);
@@ -348,6 +396,8 @@ export default class TowerManager {
           ReadOnly: readOnlyAttributes,
           FormulaTokens: formulaTokens,
           CellFormulaTokens: cellFormulaTokens,
+          IsPvp: isPvpSkin,
+          PvpOwnedDetectionTypes: Array.from(pvpOwnedDetectionTypes),
         };
       }
 

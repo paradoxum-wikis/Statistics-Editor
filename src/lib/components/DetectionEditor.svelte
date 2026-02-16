@@ -7,7 +7,7 @@
     import { Check, ChevronDown } from "@lucide/svelte";
 
     let skinData = $derived(
-        towerStore.selectedData?.getSkin(towerStore.selectedData.skinNames[0]),
+        towerStore.selectedData?.getSkin(towerStore.selectedSkinName),
     );
     let levels = $derived(skinData?.levels.levels ?? []);
 
@@ -55,24 +55,43 @@
         const tower = towerStore.selectedData;
         if (!tower) return;
 
-        // Detection variables are global across all skins, so update every skin
-        for (const skinName of tower.skinNames) {
-            const skin = tower.getSkin(skinName);
-            if (!skin) continue;
+        const currentSkin = tower.getSkin(towerStore.selectedSkinName);
+        if (!currentSkin) return;
 
-            const totalLevels = skin.levels.levels.length;
+        if (currentSkin.isPvp) {
+            // only update pvp not others
+            const totalLevels = currentSkin.levels.levels.length;
             for (let i = 0; i < totalLevels; i++) {
                 const shouldHave = startLevel !== null && i >= startLevel;
-                skin.setDetection(i, type, shouldHave, false);
+                currentSkin.setDetection(i, type, shouldHave, false);
             }
-            skin.createData();
+            currentSkin.createData();
+        } else {
+            // regular
+            for (const skinName of tower.skinNames) {
+                const skin = tower.getSkin(skinName);
+                if (!skin || skin.isPvp) continue;
+
+                const totalLevels = skin.levels.levels.length;
+                for (let i = 0; i < totalLevels; i++) {
+                    const shouldHave = startLevel !== null && i >= startLevel;
+                    skin.setDetection(i, type, shouldHave, false);
+                }
+                skin.createData();
+            }
         }
+
         towerStore.save();
     }
 </script>
 
 <div class="space-y-4 pt-4 border-t border-border">
-    <h3 class="text-sm font-semibold text-foreground px-1">Detections</h3>
+    <h3 class="text-sm font-semibold text-foreground px-1">
+        Detections
+        {#if skinData?.isPvp}
+            <span class="text-xs font-normal text-muted-foreground ml-1">(PVP)</span>
+        {/if}
+    </h3>
 
     {#if skinData}
         <div class="grid gap-2">

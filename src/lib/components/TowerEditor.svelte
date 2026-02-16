@@ -15,7 +15,6 @@
         disabled?: boolean;
     } = $props();
 
-    let selectedSkinName = $state("Regular");
     let availableSkins = $derived(tower ? tower.skinNames : []);
     let updateTrigger = $state(0);
 
@@ -111,9 +110,9 @@
     $effect(() => {
         if (
             tower &&
-            !availableSkins.includes(untrack(() => selectedSkinName))
+            !availableSkins.includes(untrack(() => towerStore.selectedSkinName))
         ) {
-            selectedSkinName = availableSkins.includes("Regular")
+            towerStore.selectedSkinName = availableSkins.includes("Regular")
                 ? "Regular"
                 : availableSkins[0] || "";
         }
@@ -122,6 +121,8 @@
     function getTowerBaselineId(t: Tower): string {
         return (t as any)?.name ?? String(t);
     }
+
+    let selectedSkinName = $derived(towerStore.selectedSkinName);
 
     function rebuildBaselineForSkin(t: Tower, skinName: string) {
         if (settingsStore.debugMode) {
@@ -264,8 +265,8 @@
     {#if tower}
         {#key updateTrigger}
             <Tabs.Root
-                value={selectedSkinName}
-                onValueChange={(v) => (selectedSkinName = v)}
+                value={towerStore.selectedSkinName}
+                onValueChange={(v) => (towerStore.selectedSkinName = v)}
             >
                 <Tabs.List class="tabs-list">
                     {#each availableSkins as skinName}

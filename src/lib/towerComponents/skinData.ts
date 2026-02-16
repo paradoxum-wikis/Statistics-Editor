@@ -20,6 +20,15 @@ class SkinData {
   headers: string[] = [];
   rawRows: any[] = [];
   readOnlyAttributes: string[] = [];
+  isPvp: boolean = false;
+
+  /**
+   * Detection types that have PVP specific variables in the source.
+   * For types that are not in this set, PVP is inherited from regular vars.
+   * When a detection is edited on a PVP skin, the type gets added here so
+   * the patcher knows to write `$PVP-` prefixed variables for it. (awesome i know)
+   */
+  pvpOwnedDetectionTypes: Set<string> = new Set();
 
   /**
    * Token -> formula expression.
@@ -37,6 +46,14 @@ class SkinData {
     this.tower = tower;
     this.name = name;
     this.data = data;
+    this.isPvp = data?.IsPvp ?? false;
+
+    if (
+      data?.PvpOwnedDetectionTypes &&
+      Array.isArray(data.PvpOwnedDetectionTypes)
+    ) {
+      this.pvpOwnedDetectionTypes = new Set(data.PvpOwnedDetectionTypes);
+    }
 
     if (!data || typeof data !== "object") {
       console.error(
@@ -162,8 +179,8 @@ class SkinData {
       this.upgrades[level - 1].set(attribute, newValue);
     }
 
-    // Update `rawRows` + recompute any calculated columns before rebuilding Levels.
-    // This ensures cells like DPS update immediately when inputs change.
+    // Update `rawRows` + recompute any calculated columns before rebuilding Levels
+    // This pretty much guarantees cells like DPS update immediately when inputs change
     if (this.rawRows && Array.isArray(this.rawRows)) {
       const targetRowIndex = level;
       const targetRow = this.rawRows[targetRowIndex];
@@ -194,6 +211,10 @@ class SkinData {
       this.defaults.setDetection(name, value);
     } else {
       this.upgrades[level - 1].setDetection(name, value);
+    }
+
+    if (this.isPvp) {
+      this.pvpOwnedDetectionTypes.add(name);
     }
 
     if (rebuild) this.createData();

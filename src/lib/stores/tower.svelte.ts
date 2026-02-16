@@ -14,6 +14,8 @@ class TowerStore {
   isDirty = $state(false);
   #lastLoadedName = $state<string | null>(null);
 
+  selectedSkinName = $state<string>("Regular");
+
   baseline = $state<Record<string, unknown>>({});
   baselineTowerId = $state<string | null>(null);
   baselineSkinName = $state<string | null>(null);
@@ -53,6 +55,7 @@ class TowerStore {
     this.manager = new TowerManager(profile);
     this.#lastLoadedName = null;
     this.selectedData = null;
+    this.selectedSkinName = "Regular";
     this.effectiveWikitext = "";
     this.effectiveWikitextSource = "";
     this.originalWikitext = "";
@@ -99,6 +102,13 @@ class TowerStore {
         this.selectedData = tower;
         this.selectedName = name;
         this.#lastLoadedName = name;
+
+        const skins = tower.skinNames;
+        if (!skins.includes(this.selectedSkinName)) {
+          this.selectedSkinName = skins.includes("Regular")
+            ? "Regular"
+            : skins[0] || "";
+        }
 
         const anyTower = tower as unknown as {
           sourceWikitext?: string;

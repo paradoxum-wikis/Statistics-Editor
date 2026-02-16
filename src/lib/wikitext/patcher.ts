@@ -48,13 +48,22 @@ export function patchWikitext(sourceWikitext: string, tower: Tower): string {
  * - Existing formula tokens (preserved from original parse)
  * - Current detection states (derived from tower data)
  * - Upgrade titles/images (derived from tower data)
+ *
+ * PVP write `$PVP-` prefixed variables for detections, upgrades,
+ * and formula tokens that differ from the regular 'skin.'
  */
 function buildVariablesMap(tower: Tower): Record<string, string> {
   const variables: Record<string, string> = {};
 
+  // 1st pass collect regular skin detection states to diff against PVP
+  const regularDetections: Record<string, boolean>[] = [];
+  const regularUpgradeTitles: Record<number, string> = {};
+  const regularUpgradeImages: Record<number, string> = {};
+  const regularFormulaTokens: Record<string, string> = {};
+
   for (const skinName of tower.skinNames) {
     const skin = tower.getSkin(skinName);
-    if (!skin) continue;
+    if (!skin || skin.isPvp) continue;
 
     if (skin.formulaTokens) {
       for (const [key, val] of Object.entries(skin.formulaTokens)) {
@@ -64,7 +73,75 @@ function buildVariablesMap(tower: Tower): Record<string, string> {
         ) {
           continue;
         }
-        variables[key] = val;
+        regularFormulaTokens[key] = val;
+      }
+    }
+
+    const skinJson = tower.json[tower.name]?.[skinName];
+    if (!skinJson) continue;
+
+    const detectionTypes = ["Lead", "Hidden", "Flying"];
+    const currentDetections: Record<string, boolean> = {
+      Lead: false,
+      Hidden: false,
+      Flying: false,
+    };
+
+    // Level 0
+    if (skinJson.Defaults?.Detections) {
+      for (const type of detectionTypes) {
+        if (type in skinJson.Defaults.Detections) {
+          currentDetections[type] = skinJson.Defaults.Detections[type] === true;
+        }
+      }
+    }
+    regularDetections[0] = { ...currentDetections };
+
+    // Level 1+
+    if (skinJson.Upgrades) {
+      skinJson.Upgrades.forEach((up: any, idx: number) => {
+        const level = idx + 1;
+        if (up.Stats?.Detections) {
+          for (const type of detectionTypes) {
+            if (type in up.Stats.Detections) {
+              currentDetections[type] = up.Stats.Detections[type] === true;
+            }
+          }
+        }
+        regularDetections[level] = { ...currentDetections };
+
+        if (up.Title) regularUpgradeTitles[level] = up.Title;
+        if (up.Image) regularUpgradeImages[level] = up.Image;
+      });
+    }
+  }
+
+  // 2nd pass write vars for all skins
+  for (const skinName of tower.skinNames) {
+    const skin = tower.getSkin(skinName);
+    if (!skin) continue;
+
+    const isPvp = skin.isPvp;
+    const prefix = isPvp ? "PVP-" : "";
+
+    if (skin.formulaTokens) {
+      for (const [key, val] of Object.entries(skin.formulaTokens)) {
+        if (
+          /^\$\d+(?:Lead|Hidden|Flying)\$$/.test(key) ||
+          /^\$\d+UpgradeI?\$$/.test(key) ||
+          /^\$PVP-/.test(key)
+        ) {
+          continue;
+        }
+
+        if (isPvp) {
+          if (regularFormulaTokens[key] !== val) {
+            const innerKey = key.slice(1, -1); // strip surrounding $
+            variables[`$PVP-${innerKey}$`] = val;
+          }
+        } else {
+          variables[key] = val;
+        }
       }
     }
 
@@ -85,7 +162,15 @@ function buildVariablesMap(tower: Tower): Record<string, string> {
         const isEnabled = detections[type] === true;
 
         if (isEnabled !== currentDetections[type]) {
-          variables[`$${level}${type}$`] = String(isEnabled);
+          if (isPvp) {
+            // write PVP detection var only if this type is PVP owned
+            // (was explicitly defined or edited in PVP mode)
+            if (skin.pvpOwnedDetectionTypes.has(type)) {
+              variables[`$PVP-${level}${type}$`] = String(isEnabled);
+            }
+          } else {
+            variables[`$${level}${type}$`] = String(isEnabled);
+          }
           currentDetections[type] = isEnabled;
         }
       }
@@ -102,11 +187,19 @@ function buildVariablesMap(tower: Tower): Record<string, string> {
         processLevelDetections(level, up.Stats?.Detections);
 
         if (up.Title) {
-          variables[`$${level}Upgrade$`] = `"${up.Title}"`;
+          if (isPvp && regularUpgradeTitles[level] !== up.Title) {
+            variables[`$PVP-${level}Upgrade$`] = `"${up.Title}"`;
+          } else if (!isPvp) {
+            variables[`$${level}Upgrade$`] = `"${up.Title}"`;
+          }
         }
 
         if (up.Image) {
-          variables[`$${level}UpgradeI$`] = `"${up.Image}"`;
+          if (isPvp && regularUpgradeImages[level] !== up.Image) {
+            variables[`$PVP-${level}UpgradeI$`] = `"${up.Image}"`;
+          } else if (!isPvp) {
+            variables[`$${level}UpgradeI$`] = `"${up.Image}"`;
+          }
         }
       });
     }
