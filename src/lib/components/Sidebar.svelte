@@ -56,7 +56,7 @@
             loadingImages = new SvelteMap();
         });
 
-        const skin = tower.getSkin(tower.skinNames[0]);
+        const skin = tower.getSkin(towerStore.selectedSkinName);
         untrack(() => {
             if (skin?.upgrades) {
                 numUpgrades = skin.upgrades.length;
@@ -84,7 +84,7 @@
         const index = parseInt(upgrade);
         if (isNaN(index)) return;
 
-        const skin = tower.getSkin(tower.skinNames[0]);
+        const skin = tower.getSkin(towerStore.selectedSkinName);
         if (!skin?.upgrades?.[index]) return;
 
         const upgradeData = skin.upgrades[index];
