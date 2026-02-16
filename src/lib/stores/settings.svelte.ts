@@ -13,7 +13,7 @@ const SETTINGS: {
   },
   seeValueDifference: {
     key: "tds_editor_see_value_difference",
-    default: false,
+    default: true,
   },
 };
 
