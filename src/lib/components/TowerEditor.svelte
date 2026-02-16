@@ -40,7 +40,18 @@
     }
 
     function formatNumberForDisplay(n: number): string {
-        return String(Number(n.toFixed(2)));
+        if (!Number.isFinite(n)) return String(n);
+        if (n === 0) return "0";
+
+        const abs = Math.abs(n);
+
+        if (abs >= 1000) return String(Number(n.toFixed(0)));
+        if (abs >= 100) return String(Number(n.toFixed(2)));
+        if (abs >= 1) return String(Number(n.toFixed(3)));
+        if (abs >= 0.01) return String(Number(n.toFixed(4)));
+        if (abs >= 0.0001) return String(Number(n.toFixed(6)));
+
+        return n.toPrecision(6).replace(/\.?0+(e|$)/, "$1");
     }
 
     function formatDelta(delta: number): string {
