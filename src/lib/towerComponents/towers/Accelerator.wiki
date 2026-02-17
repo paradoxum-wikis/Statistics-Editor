@@ -1,4 +1,4 @@
-<variable>
+<var>
 $DPS$ = "Overcharge / (Charge-Up + Cooldown + (Overcharge / Damage * Tick))"
 
 $0Lead$ = true
@@ -20,7 +20,7 @@ $4UpgradeI$ = 11821093828
 
 $5Upgrade$ = "Vessel Of Infinite Destruction"
 $5UpgradeI$ = 11821093672
-</variable>
+</var>
 <div class="mobile-tabber"><tabber>
 |-|Regular =
 <div class="overflow-box">

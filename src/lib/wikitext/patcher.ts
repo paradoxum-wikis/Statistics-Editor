@@ -3,7 +3,7 @@ import { serializeTable, serializeVariables } from "./serializer";
 
 /**
  * Updates the given source wikitext with data from the Tower instance.
- * Replaces <variable> blocks and specific skin tables while preserving other content.
+ * Replaces <var> blocks and specific skin tables while preserving other content.
  *
  * @param sourceWikitext The original wiki text.
  * @param tower The current tower state.
@@ -212,8 +212,8 @@ function patchVariableBlock(
   text: string,
   variables: Record<string, string>,
 ): string {
-  const startTag = "<variable>";
-  const endTag = "</variable>";
+  const startTag = "<var>";
+  const endTag = "</var>";
   const startIndex = text.indexOf(startTag);
   const endIndex = text.indexOf(endTag);
 

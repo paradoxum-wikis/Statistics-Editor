@@ -50,12 +50,12 @@ export function serializeTable(data: SkinDataJSON): string {
 
 export function serializeVariables(variables: Record<string, string>): string {
   const lines: string[] = [];
-  lines.push("<variable>");
+  lines.push("<var>");
 
   for (const [key, val] of Object.entries(variables)) {
     lines.push(`${key} = ${val}`);
   }
 
-  lines.push("</variable>");
+  lines.push("</var>");
   return lines.join("\n");
 }

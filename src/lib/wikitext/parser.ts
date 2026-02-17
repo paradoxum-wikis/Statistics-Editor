@@ -28,7 +28,7 @@ export function parseWikitext(content: string): ParsedWikitext {
   const tabs: Record<string, TableData> = {};
   let text = content.replace(/\r\n/g, "\n");
 
-  const blockVariableRegex = /<variable>([\s\S]*?)<\/variable>/g;
+  const blockVariableRegex = /<var>([\s\S]*?)<\/var>/g;
   let blockMatch;
   while ((blockMatch = blockVariableRegex.exec(text)) !== null) {
     const blockContent = blockMatch[1];
