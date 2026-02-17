@@ -14,15 +14,15 @@ const SETTINGS: {
   theme: SettingString<"light" | "dark" | "system">;
 } = {
   debugMode: {
-    key: "tds_editor_debug",
+    key: "tdse_debug",
     default: false,
   },
   seeValueDifference: {
-    key: "tds_editor_see_value_difference",
+    key: "tdse_see_delta",
     default: true,
   },
   theme: {
-    key: "tds_editor_theme",
+    key: "tdse_theme",
     default: "system",
   },
 };
