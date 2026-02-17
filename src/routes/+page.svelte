@@ -42,7 +42,7 @@
 	async function goHome() {
 		const url = new URL(page.url);
 		const hadTowerParam = url.searchParams.has("tower");
-		towerStore.selectedData = null;
+		towerStore.unload();
 
 		if (hadTowerParam) url.searchParams.delete("tower");
 		editorMode = "cells";

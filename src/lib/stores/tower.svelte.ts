@@ -235,6 +235,16 @@ class TowerStore {
     }
     return false;
   }
+
+  unload(): void {
+    this.selectedData = null;
+    this.selectedName = "";
+    this.#lastLoadedName = null;
+    this.effectiveWikitext = "";
+    this.effectiveWikitextSource = "";
+    this.originalWikitext = "";
+    this.isDirty = false;
+  }
 }
 
 export const towerStore = new TowerStore();
