@@ -257,3 +257,11 @@
     </div>
     <DetectionEditor />
 </aside>
+
+<style>
+    @reference "../../routes/layout.css";
+
+    .sidebar-container {
+        @apply bg-card border-r border-border p-4 overflow-y-auto h-full flex flex-col;
+    }
+</style>

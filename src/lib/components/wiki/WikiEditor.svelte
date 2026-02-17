@@ -257,3 +257,68 @@
 		</p>
 	</div>
 {/if}
+
+<style>
+	@reference "../../../routes/layout.css";
+
+	.wiki-header-row {
+		@apply flex items-start justify-between gap-4;
+	}
+
+	.wiki-info-group {
+		@apply space-y-1;
+	}
+
+	.wiki-info-text {
+		@apply text-sm text-muted-foreground;
+	}
+
+	.wiki-actions-group {
+		@apply flex items-center gap-2;
+	}
+
+	.wiki-error-box {
+		border-radius: var(--radius) 0;
+		@apply border border-red-500/30 bg-red-500/10 p-3;
+	}
+
+	.wiki-error-title {
+		@apply text-sm font-medium text-red-600;
+	}
+
+	.wiki-error-body {
+		@apply text-xs text-red-600/90 wrap-break-word mt-1;
+	}
+
+	.wiki-status-row {
+		@apply flex items-center justify-between;
+	}
+
+	.wiki-status-text {
+		@apply text-xs text-muted-foreground;
+	}
+
+	.wiki-textarea {
+		border-radius: var(--radius) 0;
+		border: 1px solid var(--input);
+		background: var(--background);
+		padding: 0.5rem 1rem;
+		outline: none;
+		max-height: 30rem;
+		overflow: auto;
+		transition:
+			box-shadow 0.2s,
+			border-color 0.2s;
+		@apply w-full font-mono text-xs leading-5;
+
+		&:focus {
+			box-shadow:
+				0 0 0 2px var(--ring),
+				0 0 0 2px var(--ring);
+		}
+	}
+
+	.wiki-notes-text {
+		@apply text-xs text-muted-foreground;
+	}
+</style>

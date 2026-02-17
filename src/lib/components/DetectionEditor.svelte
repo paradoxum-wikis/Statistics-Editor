@@ -157,3 +157,17 @@
         </p>
     {/if}
 </div>
+
+<style>
+    @reference "../../routes/layout.css";
+
+    .detection-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.25rem;
+        border-radius: calc(var(--radius) - 0.25rem) 0;
+        border: 1px solid var(--border);
+        @apply bg-secondary/10;
+    }
+</style>

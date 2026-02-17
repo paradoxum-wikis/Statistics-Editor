@@ -53,3 +53,53 @@
         </p>
     </div>
 </div>
+
+<style>
+    @reference "../../routes/layout.css";
+
+    .intro-container {
+        border-radius: var(--radius) 0;
+        @apply border bg-card shadow p-8 max-w-3xl mx-auto space-y-6;
+    }
+
+    .intro-header {
+        @apply space-y-2;
+    }
+
+    .intro-title {
+        @apply text-3xl font-bold text-foreground;
+    }
+
+    .intro-subtitle {
+        @apply text-muted-foreground text-lg;
+    }
+
+    .intro-grid-container {
+        @apply space-y-4;
+    }
+
+    .intro-grid {
+        @apply grid gap-4 md:grid-cols-2;
+    }
+
+    .intro-card {
+        border-radius: var(--radius) 0;
+        @apply p-4 border border-border bg-secondary/10;
+    }
+
+    .intro-card-title {
+        @apply font-medium text-foreground mb-2;
+    }
+
+    .intro-card-text {
+        @apply text-sm text-muted-foreground;
+    }
+
+    .intro-footer {
+        @apply pt-4 border-t border-border;
+    }
+
+    .intro-footer-text {
+        @apply text-sm text-muted-foreground text-center;
+    }
+</style>

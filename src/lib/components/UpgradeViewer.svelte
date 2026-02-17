@@ -104,6 +104,8 @@
 </Tabs.Root>
 
 <style>
+    @reference "../../routes/layout.css";
+
     .upgrade-summary-box {
         margin-top: 0.75rem;
         border: 1px solid var(--border);
@@ -116,13 +118,13 @@
     .upgrade-summary-list {
         display: flex;
         flex-direction: column;
-        gap: 0.25rem;
+        gap: 0.25em;
     }
 
     .upgrade-summary-line {
         display: flex;
         align-items: center;
-        gap: 0.45rem;
+        gap: 0.25em;
         color: var(--foreground);
     }
 
@@ -131,5 +133,26 @@
         width: 1em;
         text-align: center;
         flex-shrink: 0;
+    }
+
+    .upgrade-heading {
+        @apply text-sm font-semibold mb-4 text-foreground;
+    }
+
+    :global(.upgrade-tabs-list) {
+        @apply flex space-x-1 mb-4;
+    }
+
+    :global(.upgrade-tab-trigger) {
+        border-radius: var(--radius) 0;
+        @apply px-2 py-1 text-xs bg-muted w-full;
+    }
+
+    .upgrade-image-container {
+        @apply w-full h-32 bg-muted rounded flex items-center justify-center text-muted-foreground;
+    }
+
+    .upgrade-name {
+        @apply mt-2 text-center text-sm font-medium;
     }
 </style>

@@ -474,3 +474,152 @@
         </div>
     {/if}
 </div>
+
+<style>
+    :global(.tabs-list) {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        background: var(--muted);
+        border-radius: var(--radius) 0;
+        padding: 0.25rem 0.5rem;
+    }
+
+    :global(.tab-trigger) {
+        padding: 0.25rem 1rem;
+        background: var(--card);
+        color: var(--foreground);
+        border: 1px solid var(--input);
+        border-radius: calc(var(--radius) - 0.25rem) 0;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: background-color 0.2s;
+
+        &:hover {
+            background: var(--accent);
+        }
+    }
+
+    .table-container {
+        overflow-x: auto;
+        box-shadow:
+            0 1px 3px 0 rgb(0 0 0 / 0.1),
+            0 1px 2px -1px rgb(0 0 0 / 0.1);
+        border: 1px solid var(--border);
+        background: var(--card);
+    }
+
+    .table {
+        min-width: 100%;
+        border-collapse: collapse;
+        font-size: 0.875rem;
+
+        thead,
+        tbody {
+            border-color: var(--border);
+
+            tr {
+                border-bottom: 1px solid var(--border);
+            }
+        }
+    }
+
+    .table-head {
+        background: var(--muted);
+    }
+
+    .table-body {
+        background: var(--card);
+
+        tr {
+            border-bottom: 1px solid var(--border);
+        }
+    }
+
+    .table-row:hover {
+        background: var(--accent);
+    }
+
+    .table-header {
+        padding: 0.5rem 0.75rem;
+        text-align: left;
+        font-weight: 600;
+        color: var(--foreground);
+    }
+
+    .table-header-sticky {
+        position: sticky;
+        left: 0;
+        background: var(--muted);
+        z-index: 10;
+        box-shadow: 1px 0 0 0 var(--border);
+    }
+
+    .table-cell {
+        padding: 0.5rem 0.75rem;
+        font-weight: 500;
+        color: var(--foreground);
+    }
+
+    .table-cell-sticky {
+        position: sticky;
+        left: 0;
+        background: var(--card);
+        z-index: 10;
+        box-shadow: 1px 0 0 0 var(--border);
+        text-align: center;
+    }
+
+    .table-data {
+        padding: 0.25rem;
+        min-width: 100px;
+    }
+
+    .cell-wrapper {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        border-radius: var(--radius) 0;
+        border: 1px solid var(--input);
+        background: transparent;
+        padding: 0.25rem 0.75rem;
+        transition:
+            box-shadow 0.2s,
+            border-color 0.2s;
+
+        &:focus-within {
+            border-color: var(--ring);
+            box-shadow: 0 0 0 1px var(--ring);
+        }
+    }
+
+    .table-input {
+        display: block;
+        width: 100%;
+        border: none;
+        background: transparent;
+        padding: 0;
+        font-size: 0.875rem;
+        outline: none;
+        flex: 1;
+        min-width: 0;
+
+        &:focus {
+            box-shadow: none;
+        }
+    }
+
+    .table-cell-readonly {
+        padding: 0.25rem 0.75rem;
+        color: var(--muted-foreground);
+        font-style: italic;
+        background: var(--muted);
+        border-radius: var(--radius) 0;
+    }
+
+    .delta-text {
+        font-size: 0.75rem;
+        line-height: 1rem;
+        white-space: nowrap;
+    }
+</style>
