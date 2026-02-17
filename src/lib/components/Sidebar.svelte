@@ -7,6 +7,8 @@
     import { SvelteMap } from "svelte/reactivity";
     import { settingsStore } from "$lib/stores/settings.svelte";
 
+    import { Home, Settings } from "@lucide/svelte";
+
     import DamageIcon from "$lib/assets/Damage.png";
     import CooldownIcon from "$lib/assets/Cooldown.png";
     import IncomeIcon from "$lib/assets/Income.png";
@@ -26,9 +28,11 @@
     let {
         class: className = "",
         settingsOpen = $bindable(false),
+        onHome,
     }: {
         class?: string;
         settingsOpen?: boolean;
+        onHome?: () => void | Promise<void>;
     } = $props();
 
     let upgradeImages = $state<{ [key: number]: string }>({});
@@ -91,7 +95,9 @@
         return JSON.stringify(v);
     }
 
-    function buildUpgradeSummariesForSkin(skin: any): { [key: number]: SummaryLine[] } {
+    function buildUpgradeSummariesForSkin(
+        skin: any,
+    ): { [key: number]: SummaryLine[] } {
         const result: { [key: number]: SummaryLine[] } = {};
         if (!skin?.levels?.levels) return result;
 
@@ -101,7 +107,11 @@
                 ? skin.headers
                 : skin.levels.attributes ?? [];
 
-        for (let upgradeIndex = 0; upgradeIndex < levels.length - 1; upgradeIndex++) {
+        for (
+            let upgradeIndex = 0;
+            upgradeIndex < levels.length - 1;
+            upgradeIndex++
+        ) {
             const fromLevel = upgradeIndex;
             const toLevel = upgradeIndex + 1;
             const lines: SummaryLine[] = [];
@@ -245,7 +255,7 @@
 </script>
 
 <aside class="sidebar-container {className}">
-    <div class="flex-1">
+    <div class="sidebar-scroll">
         <UpgradeViewer
             {upgradeImages}
             {upgradeNames}
@@ -254,14 +264,38 @@
             {loadingImages}
             {numUpgrades}
         />
+
+        <DetectionEditor />
     </div>
-    <DetectionEditor />
+
+    <div class="sidebar-bottom-bar">
+        <button class="icon-btn" onclick={() => onHome?.()} title="Home">
+            <Home size={20} />
+        </button>
+
+        <button
+            class="icon-btn"
+            onclick={() => (settingsOpen = true)}
+            title="Settings"
+        >
+            <Settings size={20} />
+        </button>
+    </div>
 </aside>
 
 <style>
     @reference "../../routes/layout.css";
 
     .sidebar-container {
-        @apply bg-card border-r border-border p-4 overflow-y-auto h-full flex flex-col;
+        @apply bg-card border-r border-border h-full flex flex-col;
+    }
+
+    .sidebar-scroll {
+        @apply flex-1 overflow-y-auto p-4 flex flex-col;
+    }
+
+    .sidebar-bottom-bar {
+        border-top: 1px solid var(--border);
+        @apply p-2 bg-card flex items-center justify-center gap-2;
     }
 </style>

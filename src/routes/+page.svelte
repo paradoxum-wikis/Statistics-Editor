@@ -15,7 +15,6 @@
 
 	import { Combobox, DropdownMenu, Popover, AlertDialog, Dialog } from "bits-ui";
 	import {
-		Settings,
 		Table,
 		FileBraces,
 		Trash2,
@@ -38,6 +37,16 @@
 	function backToCells() {
 		towerStore.forceReload();
 		editorMode = "cells";
+	}
+
+	async function goHome() {
+		const url = new URL(page.url);
+		const hadTowerParam = url.searchParams.has("tower");
+		towerStore.selectedData = null;
+
+		if (hadTowerParam) url.searchParams.delete("tower");
+		editorMode = "cells";
+		await goto(url, { keepFocus: true, noScroll: true });
 	}
 
 	let searchValue = $state("");
@@ -157,7 +166,11 @@
 
 
 <div class="h-screen bg-background relative">
-	<Sidebar class="absolute left-0 top-0 h-full w-[17%]" bind:settingsOpen />
+	<Sidebar
+		class="absolute left-0 top-0 h-full w-[17%]"
+		bind:settingsOpen
+		onHome={goHome}
+	/>
 
 	<!-- Main Content -->
 	<div class="ml-[17%] flex flex-col h-full">
@@ -193,13 +206,7 @@
 						</button>
 					</div>
 
-					<button
-						class="icon-btn"
-						onclick={() => (settingsOpen = true)}
-						title="Settings"
-					>
-						<Settings size={20} />
-					</button>
+
 
 					<!-- Profile Selector -->
 					<DropdownMenu.Root>
