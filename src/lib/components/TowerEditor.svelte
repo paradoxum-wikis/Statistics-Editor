@@ -1,6 +1,7 @@
 <script lang="ts">
     import { untrack } from "svelte";
     import { Tabs } from "bits-ui";
+    import Separator from "./Separator.svelte";
     import type Tower from "$lib/towerComponents/tower";
     import type SkinData from "$lib/towerComponents/skinData";
     import { settingsStore } from "$lib/stores/settings.svelte";
@@ -452,7 +453,8 @@
             </Tabs.Root>
         {/key}
 
-        <div class="flex justify-end gap-2 mt-4 border-t pt-4">
+        <Separator class="mt-4" />
+        <div class="flex justify-end gap-2 pt-4">
             <button
                 class="btn btn-secondary"
                 onclick={handleDiscard}

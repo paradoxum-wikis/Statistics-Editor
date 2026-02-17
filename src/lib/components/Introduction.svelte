@@ -1,3 +1,7 @@
+<script lang="ts">
+    import Separator from "./Separator.svelte";
+</script>
+
 <div class="intro-container">
     <div class="intro-header">
         <h2 class="intro-title">
@@ -47,7 +51,9 @@
         </div>
     </div>
 
-    <div class="intro-footer">
+    <Separator />
+
+    <div class="pt-4">
         <p class="intro-footer-text">
             Select a tower and get started!
         </p>
@@ -93,10 +99,6 @@
 
     .intro-card-text {
         @apply text-sm text-muted-foreground;
-    }
-
-    .intro-footer {
-        @apply pt-4 border-t border-border;
     }
 
     .intro-footer-text {

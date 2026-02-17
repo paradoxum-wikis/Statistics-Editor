@@ -7,7 +7,8 @@
     import { SvelteMap } from "svelte/reactivity";
     import { settingsStore } from "$lib/stores/settings.svelte";
 
-    import { Home, Settings } from "@lucide/svelte";
+    import Separator from "./Separator.svelte";
+    import { House, Settings } from "@lucide/svelte";
 
     import DamageIcon from "$lib/assets/Damage.png";
     import CooldownIcon from "$lib/assets/Cooldown.png";
@@ -268,9 +269,11 @@
         <DetectionEditor />
     </div>
 
+    <Separator />
+
     <div class="sidebar-bottom-bar">
         <button class="icon-btn" onclick={() => onHome?.()} title="Home">
-            <Home size={20} />
+            <House size={20} />
         </button>
 
         <button
@@ -295,7 +298,6 @@
     }
 
     .sidebar-bottom-bar {
-        border-top: 1px solid var(--border);
         @apply p-2 bg-card flex items-center justify-center gap-2;
     }
 </style>

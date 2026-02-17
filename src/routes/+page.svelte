@@ -163,8 +163,6 @@
 	}
 </script>
 
-
-
 <div class="h-screen bg-background relative">
 	<Sidebar
 		class="absolute left-0 top-0 h-full w-[17%]"

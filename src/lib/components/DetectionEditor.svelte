@@ -5,6 +5,7 @@
     import LeadIcon from "$lib/assets/LeadDetection.png";
     import { Select } from "bits-ui";
     import { Check, ChevronDown } from "@lucide/svelte";
+    import Separator from "./Separator.svelte";
 
     let skinData = $derived(
         towerStore.selectedData?.getSkin(towerStore.selectedSkinName),
@@ -85,7 +86,8 @@
     }
 </script>
 
-<div class="space-y-4 pt-4 border-t border-border">
+<div class="space-y-3 mt-4">
+    <Separator />
     <h3 class="text-sm font-semibold text-foreground px-1">
         Detections
         {#if skinData?.isPvp}
