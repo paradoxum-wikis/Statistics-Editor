@@ -157,10 +157,10 @@
 
 
 <div class="h-screen bg-background relative">
-	<Sidebar class="absolute left-0 top-0 h-full w-[15%]" bind:settingsOpen />
+	<Sidebar class="absolute left-0 top-0 h-full w-[17%]" bind:settingsOpen />
 
 	<!-- Main Content -->
-	<div class="ml-[15%] flex flex-col h-full">
+	<div class="ml-[17%] flex flex-col h-full">
 		<header class="header-bar">
 			<h1 class="text-heading text-xl font-bold">
 				{towerStore.selectedName || "TDS Statistics Editor"}
@@ -426,7 +426,7 @@
 			</div>
 		</header>
 
-		<main class="flex-1 p-8 overflow-x-auto">
+		<main class="flex-1 p-5 overflow-x-auto">
 			{#key `${isClient}-${towerStore.isLoading}-${towerStore.selectedName ?? ""}-${editorMode}`}
 				<div
 					in:fly={{
