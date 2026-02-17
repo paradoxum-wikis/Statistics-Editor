@@ -701,7 +701,7 @@
 }
 
 .settings-grid {
-  @apply grid gap-4 py-4;
+  @apply grid gap-4 py-2;
 }
 
 .settings-item {

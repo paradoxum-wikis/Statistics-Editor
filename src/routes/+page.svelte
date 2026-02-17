@@ -13,7 +13,7 @@
 	import Sidebar from "$lib/components/Sidebar.svelte";
 	import SettingsModal from "$lib/components/SettingsModal.svelte";
 
-	import { Combobox, DropdownMenu, Popover, AlertDialog } from "bits-ui";
+	import { Combobox, DropdownMenu, Popover, AlertDialog, Dialog } from "bits-ui";
 	import {
 		Settings,
 		Table,
@@ -21,6 +21,7 @@
 		Trash2,
 		Check,
 		ChevronsUpDown,
+		X,
 	} from "@lucide/svelte";
 
 	type EditorMode = "cells" | "wiki";
@@ -105,12 +106,29 @@
 		}
 	}
 
-	function handleCreateProfile() {
-		const name = prompt("Enter new profile name:");
-		if (name) {
-			if (profileStore.create(name)) {
-				towerStore.switchProfile(name);
-			}
+	let createProfileOpen = $state(false);
+	let newProfileName = $state("");
+
+	function openCreateProfileDialog() {
+		newProfileName = "";
+		createProfileOpen = true;
+	}
+
+	async function confirmCreateProfile() {
+		const name = newProfileName.trim();
+		if (!name) return;
+
+		if (profileStore.create(name)) {
+			await towerStore.switchProfile(name);
+			newProfileName = "";
+			createProfileOpen = false;
+		}
+	}
+
+	function handleCreateProfileInputKeydown(e: KeyboardEvent) {
+		if (e.key === "Enter") {
+			e.preventDefault();
+			void confirmCreateProfile();
 		}
 	}
 
@@ -206,7 +224,9 @@
 									>
 										<span>{profile}</span>
 										{#if profile === profileStore.current}
-											<span class="ml-auto">✓</span>
+											<span class="ml-auto">
+												<Check size={14} />
+											</span>
 										{:else if profile !== "Default"}
 											<button
 												class="ml-2 text-muted-foreground hover:text-destructive opacity-0 transition-opacity"
@@ -225,12 +245,60 @@
 							<DropdownMenu.Separator
 								class="-mx-1 my-1 h-px bg-muted"
 							/>
-							<DropdownMenu.Item
-								onclick={handleCreateProfile}
-								class="dropdown-item"
-							>
-								<span>+ Create Profile</span>
-							</DropdownMenu.Item>
+
+							<Dialog.Root bind:open={createProfileOpen}>
+								<Dialog.Trigger
+									class="dropdown-item w-full text-left"
+									onclick={openCreateProfileDialog}
+								>
+									<span>+ Create Profile</span>
+								</Dialog.Trigger>
+
+								<Dialog.Portal>
+									<Dialog.Overlay class="settings-overlay" />
+									<Dialog.Content class="settings-content">
+										<Dialog.Title class="settings-title">
+											Create Profile
+										</Dialog.Title>
+										<Dialog.Description
+											class="settings-description"
+										>
+											Enter a name for the new profile.
+										</Dialog.Description>
+
+										<div class="space-y-2">
+											<input
+												class="input"
+												type="text"
+												placeholder="My Profile"
+												bind:value={newProfileName}
+												onkeydown={handleCreateProfileInputKeydown}
+											/>
+										</div>
+
+										<div class="flex justify-end gap-2">
+											<Dialog.Close class="btn btn-outline">
+												Cancel
+											</Dialog.Close>
+											<button
+												class="btn btn-primary"
+												onclick={confirmCreateProfile}
+												disabled={!newProfileName.trim()}
+											>
+												Create
+											</button>
+										</div>
+
+										<Dialog.Close
+											class="icon-btn absolute right-3 top-3"
+											aria-label="Close"
+										>
+											<X size={16} />
+										</Dialog.Close>
+									</Dialog.Content>
+								</Dialog.Portal>
+							</Dialog.Root>
+
 							{#if profileStore.current !== "Default"}
 								<DropdownMenu.Item
 									class="dropdown-item text-destructive focus:text-destructive hover:bg-red-100"
@@ -404,8 +472,8 @@
 <!-- Delete Profile Confirmation -->
 <AlertDialog.Root bind:open={deleteProfileOpen}>
 	<AlertDialog.Portal>
-		<AlertDialog.Overlay class="alert-overlay" />
-		<AlertDialog.Content class="alert-content">
+		<AlertDialog.Overlay class="settings-overlay" />
+		<AlertDialog.Content class="settings-content">
 			<div class="flex flex-col space-y-2 text-center sm:text-left">
 				<AlertDialog.Title class="text-lg font-semibold">
 					Are you absolutely sure?
