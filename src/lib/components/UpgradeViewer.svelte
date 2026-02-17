@@ -74,25 +74,27 @@
                         <div class="upgrade-summary-list">
                             {#each upgradeSummaries[index] as line}
                                 <div class="upgrade-summary-line">
-                                    {#if line.icon}
-                                        <img
-                                            src={line.icon}
-                                            alt={line.stat}
-                                            class={`inline-block w-[1em] h-[1em] shrink-0 ${
-                                                isDetectionStat(line.stat)
+                                    <span class="upgrade-summary-marker">
+                                        {#if line.icon}
+                                            <img
+                                                src={line.icon}
+                                                alt={line.stat}
+                                                class={isDetectionStat(line.stat)
                                                     ? "dark:invert-0 invert"
-                                                    : ""
-                                            }`}
-                                        />
-                                    {:else}
-                                        <span class="upgrade-summary-bullet">●</span>
-                                    {/if}
+                                                    : ""}
+                                            />
+                                        {:else}
+                                            <span class="upgrade-summary-bullet">●</span>
+                                        {/if}
+                                    </span>
 
-                                    {#if line.kind === "change"}
-                                        <span>{line.stat}: {line.from} → {line.to}</span>
-                                    {:else}
-                                        <span>{line.stat}</span>
-                                    {/if}
+                                    <span class="upgrade-summary-text">
+                                        {#if line.kind === "change"}
+                                            {line.stat}: {line.from} → {line.to}
+                                        {:else}
+                                            {line.stat}
+                                        {/if}
+                                    </span>
                                 </div>
                             {/each}
                         </div>
@@ -123,16 +125,37 @@
 
     .upgrade-summary-line {
         display: flex;
-        align-items: center;
-        gap: 0.25em;
+        align-items: flex-start;
+        gap: 0.375em;
         color: var(--foreground);
     }
 
-    .upgrade-summary-bullet {
-        display: inline-block;
+    .upgrade-summary-marker {
         width: 1em;
-        text-align: center;
-        flex-shrink: 0;
+        flex: 0 0 1em;
+        display: inline-flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding-top: 0.1em;
+    }
+
+    .upgrade-summary-marker > img {
+        width: 1em;
+        height: 1em;
+        display: block;
+        margin-top: 0.05em;
+    }
+
+    .upgrade-summary-bullet {
+        display: block;
+        line-height: 1;
+    }
+
+    .upgrade-summary-text {
+        flex: 1 1 auto;
+        min-width: 0;
+        line-height: 1.25;
+        text-wrap: balance;
     }
 
     .upgrade-heading {
