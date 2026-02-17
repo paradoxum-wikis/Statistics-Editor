@@ -1,6 +1,7 @@
 <script lang="ts">
     import UpgradeViewer from "./UpgradeViewer.svelte";
     import DetectionEditor from "./DetectionEditor.svelte";
+    import { Popover } from "bits-ui";
     import { towerStore } from "$lib/stores/tower.svelte";
     import { imageLoader } from "$lib/services/imageLoader";
     import { untrack } from "svelte";
@@ -8,7 +9,14 @@
     import { settingsStore } from "$lib/stores/settings.svelte";
 
     import Separator from "./Separator.svelte";
-    import { House, Settings } from "@lucide/svelte";
+    import {
+        House,
+        Settings,
+        Sun,
+        Moon,
+        SunMoon,
+        Check,
+    } from "@lucide/svelte";
 
     import DamageIcon from "$lib/assets/Damage.png";
     import CooldownIcon from "$lib/assets/Cooldown.png";
@@ -275,6 +283,59 @@
         <button class="icon-btn" onclick={() => onHome?.()} title="Home">
             <House size={20} />
         </button>
+
+        <Popover.Root>
+            <Popover.Trigger class="icon-btn" title="Theme">
+                {#if settingsStore.theme === "light"}
+                    <Sun size={20} />
+                {:else if settingsStore.theme === "dark"}
+                    <Moon size={20} />
+                {:else}
+                    <SunMoon size={20} />
+                {/if}
+            </Popover.Trigger>
+            <Popover.Content
+                class="popover-content w-auto! min-w-42"
+                sideOffset={8}
+                align="center"
+            >
+            	<h4 class="font-medium text-sm mb-1">
+             		Theme
+             	</h4>
+                <div class="grid gap-0.5">
+                    <button
+                        class="dropdown-item w-full justify-start!"
+                        onclick={() => settingsStore.setTheme("light")}
+                    >
+                        <Sun class="mr-2 h-4 w-4" />
+                        <span>Light</span>
+                        {#if settingsStore.theme === "light"}
+                            <Check class="ms-2 h-4 w-4" />
+                        {/if}
+                    </button>
+                    <button
+                        class="dropdown-item w-full justify-start!"
+                        onclick={() => settingsStore.setTheme("dark")}
+                    >
+                        <Moon class="mr-2 h-4 w-4" />
+                        <span>Dark</span>
+                        {#if settingsStore.theme === "dark"}
+                            <Check class="ms-2 h-4 w-4" />
+                        {/if}
+                    </button>
+                    <button
+                        class="dropdown-item w-full justify-start!"
+                        onclick={() => settingsStore.setTheme("system")}
+                    >
+                        <SunMoon class="mr-2 h-4 w-4" />
+                        <span>System</span>
+                        {#if settingsStore.theme === "system"}
+                            <Check class="ms-2 h-4 w-4" />
+                        {/if}
+                    </button>
+                </div>
+            </Popover.Content>
+        </Popover.Root>
 
         <button
             class="icon-btn"

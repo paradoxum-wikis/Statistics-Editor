@@ -4,6 +4,7 @@
 	import { page } from "$app/state";
 	import { towerStore } from "$lib/stores/tower.svelte";
 	import { profileStore } from "$lib/stores/profile.svelte";
+	import { settingsStore } from "$lib/stores/settings.svelte";
 	import { cubicOut } from "svelte/easing";
 	import { fly } from "svelte/transition";
 
@@ -82,6 +83,7 @@
 	onMount(async () => {
 		isClient = true;
 		profileStore.init();
+		settingsStore.init();
 		await towerStore.init(profileStore.current);
 
 		const towerParam = page.url.searchParams.get("tower");
