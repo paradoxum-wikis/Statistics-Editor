@@ -167,6 +167,7 @@
 
     $effect(() => {
         imageLoader.setDebugMode(settingsStore.debugMode);
+        towerStore.effectiveWikitext;
 
         const tower = towerStore.selectedData;
         if (!tower) {
