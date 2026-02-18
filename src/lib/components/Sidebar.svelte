@@ -51,15 +51,19 @@
     let numUpgrades = $state(0);
     let loadingImages = $state(new SvelteMap<number, boolean>());
 
-    const ICON_BY_STAT: Record<string, string> = {
-        Damage: DamageIcon,
-        Cooldown: CooldownIcon,
-        Income: IncomeIcon,
-        Range: RangeIcon,
-        Hidden: HiddenIcon,
-        Flying: FlyingIcon,
-        Lead: LeadIcon,
-    };
+    const STATS_BY_ICON: Array<[icon: string, stats: string[]]> = [
+        [DamageIcon, ["Damage"]],
+        [CooldownIcon, ["Cooldown", "Tick"]],
+        [IncomeIcon, ["Income"]],
+        [RangeIcon, ["Range"]],
+        [HiddenIcon, ["Hidden"]],
+        [FlyingIcon, ["Flying"]],
+        [LeadIcon, ["Lead"]],
+    ];
+
+    const ICON_BY_STAT: Record<string, string> = Object.fromEntries(
+        STATS_BY_ICON.flatMap(([icon, stats]) => stats.map((s) => [s, icon])),
+    );
 
     const IGNORED_STATS = new Set([
         "Level",
@@ -71,10 +75,6 @@
         "Title",
         "Image",
     ]);
-
-    function hasIcon(stat: string): string | undefined {
-        return ICON_BY_STAT[stat];
-    }
 
     function normalizeForCompare(v: unknown): string {
         if (v === undefined || v === null) return "";
@@ -143,7 +143,7 @@
                     stat,
                     from: formatValue(fromVal),
                     to: formatValue(toVal),
-                    icon: hasIcon(stat),
+                    icon: ICON_BY_STAT[stat],
                 });
             }
 
@@ -154,7 +154,7 @@
                     lines.push({
                         kind: "grant",
                         stat: detection,
-                        icon: hasIcon(detection),
+                        icon: ICON_BY_STAT[detection],
                     });
                 }
             }
