@@ -1,6 +1,7 @@
 <script lang="ts">
     import UpgradeViewer from "./UpgradeViewer.svelte";
     import DetectionEditor from "./DetectionEditor.svelte";
+    import CostEditor from "./CostEditor.svelte";
     import { Popover } from "bits-ui";
     import { towerStore } from "$lib/stores/tower.svelte";
     import { imageLoader } from "$lib/services/imageLoader";
@@ -278,6 +279,7 @@
         />
 
         <DetectionEditor />
+        <CostEditor />
     </div>
 
     {#if showFooter}
