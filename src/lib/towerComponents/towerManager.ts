@@ -10,6 +10,90 @@ import {
   setWikiOverride,
 } from "$lib/wiki/wikiSource";
 
+/**
+ * Resolves a $FNC-$ function for the given row level.
+ * Returns the computed numeric value, or undefined if the function is unknown.
+ */
+function resolveFNC(
+  name: string,
+  level: number,
+  variables: Record<string, string>,
+  isPvpSkin: boolean,
+): number | undefined {
+  if (name === "TOTALPRICE") {
+    let total = 0;
+    for (let l = 0; l <= level; l++) {
+      const pvpKey = `$PVP-${l}Cost$`;
+      const baseKey = `$${l}Cost$`;
+      const costStr =
+        isPvpSkin && variables[pvpKey] !== undefined
+          ? variables[pvpKey]
+          : variables[baseKey];
+      if (costStr !== undefined) {
+        const num = Number(String(costStr).replace(/,/g, ""));
+        if (!isNaN(num)) total += num;
+      }
+    }
+    return total;
+  }
+  return undefined;
+}
+
+/**
+ * Resolves any $Var$ to a value, recursing when a variable points to another token.
+ */
+function resolveToken(
+  token: string,
+  level: number,
+  row: Record<string, string | number>,
+  formulaTokens: Record<string, string>,
+  variables: Record<string, string>,
+  isPvpSkin: boolean,
+  depth = 0,
+): string | number | undefined {
+  if (depth > 10) return undefined;
+
+  // $FNC-NAME$
+  const fncMatch = token.match(/^\$FNC-([A-Z]+)\$$/);
+  if (fncMatch) {
+    return resolveFNC(fncMatch[1], level, variables, isPvpSkin);
+  }
+
+  // $nVar$
+  const nVarMatch = token.match(/^\$n(.+)\$$/);
+  if (nVarMatch) {
+    const suffix = nVarMatch[1];
+    const pvpKey = `$PVP-${level}${suffix}$`;
+    const baseKey = `$${level}${suffix}$`;
+    const varVal =
+      isPvpSkin && variables[pvpKey] !== undefined
+        ? variables[pvpKey]
+        : variables[baseKey];
+    if (varVal === undefined) return undefined;
+    const num = Number(String(varVal).replace(/,/g, ""));
+    return isNaN(num) ? varVal : num;
+  }
+
+  // $Var$
+  if (token.startsWith("$") && formulaTokens[token] !== undefined) {
+    const formulaVal = formulaTokens[token];
+    if (/^\$[^$]+\$$/.test(formulaVal)) {
+      return resolveToken(
+        formulaVal,
+        level,
+        row,
+        formulaTokens,
+        variables,
+        isPvpSkin,
+        depth + 1,
+      );
+    }
+    return evaluateFormula(formulaVal, row);
+  }
+
+  return undefined;
+}
+
 const wikitextFiles = import.meta.glob("./towers/*.wiki", {
   query: "?raw",
   import: "default",
@@ -303,38 +387,21 @@ export default class TowerManager {
           if (!cellFormulaTokens[levelKey]) cellFormulaTokens[levelKey] = {};
 
           for (const [key, val] of Object.entries(row)) {
-            if (typeof val !== "string") continue;
+            if (typeof val !== "string" || !/^\$[^$]+\$$/.test(val)) continue;
 
-            // $nVar$ pattern
-            const nVarMatch = val.match(/^\$n(.+)\$$/);
-            if (nVarMatch) {
-              const suffix = nVarMatch[1];
-              const pvpKey = `$PVP-${level}${suffix}$`;
-              const baseKey = `$${level}${suffix}$`;
-              const varVal =
-                isPvpSkin && parsed.variables[pvpKey] !== undefined
-                  ? parsed.variables[pvpKey]
-                  : parsed.variables[baseKey];
-
-              if (varVal !== undefined) {
-                if (!readOnlyAttributes.includes(key)) {
-                  readOnlyAttributes.push(key);
-                }
-                cellFormulaTokens[levelKey][key] = val;
-                const num = Number(String(varVal).replace(/,/g, ""));
-                row[key] = isNaN(num) ? varVal : num;
-              }
-              continue;
-            }
-
-            // $Var$ pattern
-            if (val.startsWith("$") && formulaTokens[val]) {
-              if (!readOnlyAttributes.includes(key)) {
+            const result = resolveToken(
+              val,
+              level,
+              row,
+              formulaTokens,
+              parsed.variables,
+              isPvpSkin,
+            );
+            if (result !== undefined) {
+              if (!readOnlyAttributes.includes(key))
                 readOnlyAttributes.push(key);
-              }
-
               cellFormulaTokens[levelKey][key] = val;
-              row[key] = evaluateFormula(formulaTokens[val], row);
+              row[key] = result;
             }
           }
 
