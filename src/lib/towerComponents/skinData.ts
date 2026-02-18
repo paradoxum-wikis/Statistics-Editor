@@ -3,7 +3,7 @@ import Defaults from "./defaults";
 import Upgrade from "./upgrade";
 import Levels from "./levels";
 import Locator from "./locator";
-import { evaluateFormula } from "$lib/wikitext/evaluator";
+import { resolveToken } from "$lib/wikitext/functions";
 
 type FormulaToken = string; // e.g. "$DPS$", "$DPS2$"
 type FormulaTokenMap = Record<string, string>; // token -> expression
@@ -153,10 +153,14 @@ class SkinData {
       if (!perLevel) continue;
 
       for (const [col, token] of Object.entries(perLevel)) {
-        const formula = this.formulaTokens[token];
-        if (!formula) continue;
-
-        const result = evaluateFormula(formula, row as Record<string, any>);
+        const result = resolveToken(
+          token,
+          level,
+          row as Record<string, string | number>,
+          this.formulaTokens,
+          this.formulaTokens,
+          this.isPvp,
+        );
         if (typeof result === "number" && Number.isFinite(result)) {
           row[col] = result;
           this.setDerivedValueAtLevel(level, col, result);
@@ -175,6 +179,34 @@ class SkinData {
     );
 
     this.levels = new Levels(this);
+  }
+
+  setCost(level: number, value: number): void {
+    const costKey = `$${level}Cost$`;
+    const valueStr = String(value);
+    this.formulaTokens[costKey] = valueStr;
+    if (this.data.FormulaTokens) this.data.FormulaTokens[costKey] = valueStr;
+
+    this.recomputeCalculatedColumns();
+    if (this.rawRows?.length) {
+      const sorted = [...this.rawRows].sort(
+        (a, b) => Number(a.Level) - Number(b.Level),
+      );
+      let previous = 0;
+      for (const row of sorted) {
+        const lvl = Number(row.Level);
+        const totalPrice =
+          typeof row["Total Price"] === "number" ? row["Total Price"] : 0;
+        if (lvl === 0) {
+          if (this.data.Defaults) this.data.Defaults.Price = totalPrice;
+        } else {
+          const upgrade = this.data.Upgrades?.[lvl - 1];
+          if (upgrade) upgrade.Cost = totalPrice - previous;
+        }
+        previous = totalPrice;
+      }
+    }
+    this.createData();
   }
 
   set(level: number, attribute: string, newValue: any) {
