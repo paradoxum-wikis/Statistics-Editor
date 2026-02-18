@@ -2,7 +2,7 @@
     import { goto } from "$app/navigation";
     import { page } from "$app/state";
     import { cubicOut } from "svelte/easing";
-    import { fly } from "svelte/transition";
+    import { fly, fade } from "svelte/transition";
 
     import { towerStore } from "$lib/stores/tower.svelte";
     import { profileStore } from "$lib/stores/profile.svelte";
@@ -80,9 +80,7 @@
     }
 
     async function confirmReset() {
-        if (towerStore.selectedData) {
-            await towerStore.reset();
-        }
+        await towerStore.reset();
     }
 
     async function handleProfileChange(newProfile: string) {
@@ -97,7 +95,6 @@
 
     function openCreateProfileDialog() {
         newProfileName = "";
-        createProfileOpen = true;
     }
 
     async function confirmCreateProfile() {
@@ -143,15 +140,16 @@
     <!-- Sidebar Scrim -->
     {#if sidebarOpen}
         <div
-            class="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
+            class="settings-overlay"
             role="presentation"
             onclick={() => (sidebarOpen = false)}
+            transition:fade={{ duration: 200 }}
         ></div>
     {/if}
 
     <!-- Sidebar Overlay -->
     <div
-        class="fixed inset-y-0 left-0 z-50 w-72 transition-transform duration-200 {sidebarOpen
+        class="fixed inset-y-0 left-0 z-51 w-72 transition-transform duration-200 {sidebarOpen
             ? 'translate-x-0'
             : '-translate-x-full'}"
     >
@@ -178,7 +176,7 @@
                 <div class="relative">
                     <Combobox.Input
                         placeholder="Select a tower..."
-                        class="combobox-input w-full!"
+                        class="combobox-input w-[90dvw]!"
                         oninput={(e) => {
                             searchValue = e.currentTarget.value;
                             comboboxOpen = true;
@@ -292,26 +290,24 @@
                     <DropdownMenu.GroupHeading class="px-2 py-1.5 text-sm font-semibold">
                         Profiles
                     </DropdownMenu.GroupHeading>
-                    {#if isClient}
-                        {#each profileStore.list as profile (profile)}
-                            <DropdownMenu.Item
-                                onclick={() => handleProfileChange(profile)}
-                                class="dropdown-item"
-                            >
-                                <span>{profile}</span>
-                                {#if profile === profileStore.current}
-                                    <span class="ml-auto"><Check size={14} /></span>
-                                {:else if profile !== "Default"}
-                                    <button
-                                        class="ml-2 text-muted-foreground hover:text-destructive opacity-0 transition-opacity"
-                                        onclick={(e) => openDeleteProfileDialog(profile, e)}
-                                    >
-                                        <Trash2 size={14} />
-                                    </button>
-                                {/if}
-                            </DropdownMenu.Item>
-                        {/each}
-                    {/if}
+                    {#each profileStore.list as profile (profile)}
+                        <DropdownMenu.Item
+                            onclick={() => handleProfileChange(profile)}
+                            class="dropdown-item"
+                        >
+                            <span>{profile}</span>
+                            {#if profile === profileStore.current}
+                                <span class="ml-auto"><Check size={14} /></span>
+                            {:else if profile !== "Default"}
+                                <button
+                                    class="ml-2 text-muted-foreground hover:text-destructive opacity-0 transition-opacity"
+                                    onclick={(e) => openDeleteProfileDialog(profile, e)}
+                                >
+                                    <Trash2 size={14} />
+                                </button>
+                            {/if}
+                        </DropdownMenu.Item>
+                    {/each}
                 </DropdownMenu.Group>
                 <DropdownMenu.Separator class="-mx-1 my-1 h-px bg-muted" />
 
@@ -359,7 +355,7 @@
                     </Dialog.Portal>
                 </Dialog.Root>
 
-                {#if isClient && profileStore.current !== "Default"}
+                {#if profileStore.current !== "Default"}
                     <DropdownMenu.Item
                         class="dropdown-item text-destructive focus:text-destructive hover:bg-red-100"
                         onclick={(e) => openDeleteProfileDialog(profileStore.current, e)}
@@ -529,7 +525,7 @@
     }
 
     .mobile-header {
-        @apply border-b bg-card px-4 py-3 flex flex-col items-center gap-2 sticky top-0 z-10;
+        @apply border-b bg-card px-4 py-1 flex flex-col items-center gap-2 sticky top-0 z-10;
     }
 
     .mobile-main {
