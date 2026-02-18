@@ -28,6 +28,7 @@ class TowerStore {
    * - Wiki mode should bind to this, and after saving,
    *	 we can reload or parse it back into `selectedData`.
    */
+  refreshTrigger = $state(0);
   effectiveWikitext = $state<string>("");
 
   /**
@@ -158,6 +159,10 @@ class TowerStore {
   /**
    * Updates the effective wikitext based on current object state (unsaved).
    */
+  refresh(): void {
+    this.refreshTrigger++;
+  }
+
   syncWikitext(): void {
     if (this.manager && this.selectedData) {
       const generated = this.manager.generateWikitext(this.selectedData);

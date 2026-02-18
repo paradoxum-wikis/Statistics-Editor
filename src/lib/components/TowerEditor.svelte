@@ -18,7 +18,7 @@
     } = $props();
 
     let availableSkins = $derived(tower ? tower.skinNames : []);
-    let updateTrigger = $state(0);
+
 
     function cellKey(skinName: string, levelIndex: number, header: string) {
         return `${skinName}:${levelIndex}:${header}`;
@@ -233,7 +233,7 @@
         }
 
         skinData.set(levelIndex, attribute, parsedValue);
-        updateTrigger++;
+        towerStore.refresh();
         towerStore.syncWikitext();
     }
 
@@ -260,7 +260,7 @@
             rebuildBaselineForSkin(tower, selectedSkinName);
         }
 
-        updateTrigger++;
+        towerStore.refresh();
     }
 
     function handleSave() {
@@ -276,7 +276,7 @@
 
 <div class="space-y-4">
     {#if tower}
-        {#key updateTrigger}
+        {#key towerStore.refreshTrigger}
             <Tabs.Root
                 value={towerStore.selectedSkinName}
                 onValueChange={(v) => (towerStore.selectedSkinName = v)}
