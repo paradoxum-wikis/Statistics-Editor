@@ -4,7 +4,7 @@
     import HiddenIcon from "$lib/assets/HiddenDetection.png";
     import LeadIcon from "$lib/assets/LeadDetection.png";
     import { Select } from "bits-ui";
-    import { Check, ChevronDown } from "@lucide/svelte";
+    import { Check, ChevronDown, ScanEye } from "@lucide/svelte";
     import Separator from "./Separator.svelte";
 
     let skinData = $derived(
@@ -14,7 +14,7 @@
 
     let levelOptions = $derived([
         { value: "none", label: "∅" },
-        ...levels.map((_, i) => ({ value: i.toString(), label: `Lvl ${i}` })),
+        ...levels.map((_, i) => ({ value: i.toString(), label: `Lvl. ${i}` })),
     ]);
 
     const detectionTypes = [
@@ -83,12 +83,14 @@
         }
 
         towerStore.save();
+        towerStore.refresh();
     }
 </script>
 
 <div class="space-y-3 mt-4">
     <Separator />
     <h3 class="text-sm font-semibold text-foreground px-1">
+    	<ScanEye class="inline w-3.5 h-3.5 mb-0.5 opacity-70" />
         Detections
         {#if skinData?.isPvp}
             <span class="text-xs font-normal text-muted-foreground ml-1">(PVP)</span>
