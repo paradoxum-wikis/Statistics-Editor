@@ -7,6 +7,7 @@
     import { settingsStore } from "$lib/stores/settings.svelte";
     import { towerStore } from "$lib/stores/tower.svelte";
     import { fade } from "svelte/transition";
+    import MoneyIcon from "$lib/assets/Income.png";
 
     let {
         tower = null,
@@ -346,8 +347,11 @@
                                                         <td class="table-data">
                                                             {#if isEditableForSkin(skinData, header)}
                                                                 <div
-                                                                    class="cell-wrapper"
+                                                                    class="cell-wrapper {skinData.moneyColumns.includes(header) ? 'money-wrapper' : ''}"
                                                                 >
+                                                                    {#if skinData.moneyColumns.includes(header)}
+                                                                        <img src={MoneyIcon} alt="" class="money-icon money-icon-input" />
+                                                                    {/if}
                                                                     <input
                                                                         type="text"
                                                                         class="table-input"
@@ -415,15 +419,24 @@
                                                                 <div
                                                                     class="table-cell-readonly flex items-center justify-between gap-2"
                                                                 >
-                                                                    <span>
-                                                                        {getDisplayValueForCell(
-                                                                            skinData,
-                                                                            header,
-                                                                            level[
-                                                                                header
-                                                                            ],
-                                                                        )}
-                                                                    </span>
+                                                                    {#if skinData.moneyColumns.includes(header)}
+                                                                        <span class="money-value">
+                                                                            <img src={MoneyIcon} alt="" class="money-icon" />
+                                                                            {getDisplayValueForCell(
+                                                                                skinData,
+                                                                                header,
+                                                                                level[header],
+                                                                            )}
+                                                                        </span>
+                                                                    {:else}
+                                                                        <span>
+                                                                            {getDisplayValueForCell(
+                                                                                skinData,
+                                                                                header,
+                                                                                level[header],
+                                                                            )}
+                                                                        </span>
+                                                                    {/if}
                                                                     {#if settingsStore.seeValueDifference && deltaInfo.delta !== null && deltaInfo.delta !== 0}
                                                                         <span
                                                                             class={`delta-text text-xs ${deltaInfo.className}`}
@@ -623,5 +636,37 @@
         font-size: 0.75rem;
         line-height: 1rem;
         white-space: nowrap;
+    }
+
+    .money-icon {
+        width: 1.1em;
+        height: 1.1em;
+        object-fit: contain;
+        vertical-align: middle;
+        display: inline;
+        flex-shrink: 0;
+    }
+
+    .money-icon-input {
+        opacity: 0.75;
+    }
+
+    .money-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .money-value {
+        color: #44E500;
+        text-shadow:
+            0 0 0.09375em black,
+            0 0 0.09375em black,
+            0 0 0.09375em black,
+            0 0 0.09375em black,
+            0 0 0.09375em black;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
     }
 </style>

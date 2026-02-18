@@ -303,11 +303,32 @@ export default class TowerManager {
           if (!cellFormulaTokens[levelKey]) cellFormulaTokens[levelKey] = {};
 
           for (const [key, val] of Object.entries(row)) {
-            if (
-              typeof val === "string" &&
-              val.startsWith("$") &&
-              formulaTokens[val]
-            ) {
+            if (typeof val !== "string") continue;
+
+            // $nVar$ pattern
+            const nVarMatch = val.match(/^\$n(.+)\$$/);
+            if (nVarMatch) {
+              const suffix = nVarMatch[1];
+              const pvpKey = `$PVP-${level}${suffix}$`;
+              const baseKey = `$${level}${suffix}$`;
+              const varVal =
+                isPvpSkin && parsed.variables[pvpKey] !== undefined
+                  ? parsed.variables[pvpKey]
+                  : parsed.variables[baseKey];
+
+              if (varVal !== undefined) {
+                if (!readOnlyAttributes.includes(key)) {
+                  readOnlyAttributes.push(key);
+                }
+                cellFormulaTokens[levelKey][key] = val;
+                const num = Number(String(varVal).replace(/,/g, ""));
+                row[key] = isNaN(num) ? varVal : num;
+              }
+              continue;
+            }
+
+            // $Var$ pattern
+            if (val.startsWith("$") && formulaTokens[val]) {
               if (!readOnlyAttributes.includes(key)) {
                 readOnlyAttributes.push(key);
               }
@@ -398,6 +419,7 @@ export default class TowerManager {
           CellFormulaTokens: cellFormulaTokens,
           IsPvp: isPvpSkin,
           PvpOwnedDetectionTypes: Array.from(pvpOwnedDetectionTypes),
+          MoneyColumns: tableData.moneyColumns ?? [],
         };
       }
 

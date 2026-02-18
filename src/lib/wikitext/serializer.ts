@@ -3,9 +3,19 @@ interface TableRow extends Record<string, string | number | boolean | object> {}
 interface SkinDataJSON {
   Headers: string[];
   RawRows: TableRow[];
+  MoneyColumns?: string[];
 }
 
-function serializeRow(row: TableRow, headers: string[]): string {
+function formatMoneyNumber(n: number): string {
+  const s = Number.isInteger(n) ? n.toString() : n.toFixed(2);
+  return s.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+function serializeRow(
+  row: TableRow,
+  headers: string[],
+  moneyColumns: string[],
+): string {
   const parts: string[] = [];
 
   for (const header of headers) {
@@ -19,14 +29,22 @@ function serializeRow(row: TableRow, headers: string[]): string {
       val = JSON.stringify(val);
     }
 
-    parts.push(String(val));
+    let strVal = String(val);
+
+    if (moneyColumns.includes(header)) {
+      const formatted =
+        typeof val === "number" ? formatMoneyNumber(val) : strVal;
+      strVal = `{{Money|${formatted}}}`;
+    }
+
+    parts.push(strVal);
   }
 
   return `| ${parts.join(" || ")}`;
 }
 
 export function serializeTable(data: SkinDataJSON): string {
-  const { Headers, RawRows } = data;
+  const { Headers, RawRows, MoneyColumns = [] } = data;
   if (!Headers || !RawRows) return "";
 
   const lines: string[] = [];
@@ -40,7 +58,7 @@ export function serializeTable(data: SkinDataJSON): string {
 
   for (const row of sortedRows) {
     lines.push("|-");
-    lines.push(serializeRow(row, Headers));
+    lines.push(serializeRow(row, Headers, MoneyColumns));
   }
 
   lines.push("|}\n");

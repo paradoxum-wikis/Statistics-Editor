@@ -21,6 +21,7 @@ class SkinData {
   rawRows: any[] = [];
   readOnlyAttributes: string[] = [];
   isPvp: boolean = false;
+  moneyColumns: string[] = [];
 
   /**
    * Detection types that have PVP specific variables in the source.
@@ -106,6 +107,10 @@ class SkinData {
     ) {
       this.cellFormulaTokens = this.data
         .CellFormulaTokens as CellFormulaTokenMap;
+    }
+
+    if (this.data.MoneyColumns && Array.isArray(this.data.MoneyColumns)) {
+      this.moneyColumns = this.data.MoneyColumns;
     }
 
     this.createData();

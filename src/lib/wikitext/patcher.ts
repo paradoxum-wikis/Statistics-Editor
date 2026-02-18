@@ -35,6 +35,7 @@ export function patchWikitext(sourceWikitext: string, tower: Tower): string {
     const tableMarkup = serializeTable({
       Headers: skin.headers,
       RawRows: rowsForSerialization,
+      MoneyColumns: skin.moneyColumns,
     });
 
     text = patchSkinTable(text, skinName, tableMarkup, tower.skinNames);

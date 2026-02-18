@@ -1,6 +1,7 @@
 export interface TableData {
   headers: string[];
   rows: Record<string, string | number>[];
+  moneyColumns: string[];
 }
 
 export interface ParsedWikitext {
@@ -103,12 +104,15 @@ function parseTable(content: string): TableData | null {
   let currentRow: Record<string, string | number> = {};
   let colIdx = 0;
 
-  const cleanCell = (val: string): string | number => {
+  const moneyColumns = new Set<string>();
+
+  const cleanCell = (val: string, header?: string): string | number => {
     val = val.trim();
     val = stripRefs(val);
-    const moneyMatch = val.match(/{{Money\|([0-9,.]+)}}/);
+    const moneyMatch = val.match(/{{Money\|([^}]+)}}/);
     if (moneyMatch) {
-      val = moneyMatch[1];
+      if (header) moneyColumns.add(header);
+      val = moneyMatch[1].trim();
     }
     const cleanVal = val.replace(/,/g, "");
     if (!isNaN(Number(cleanVal)) && cleanVal !== "") {
@@ -118,7 +122,7 @@ function parseTable(content: string): TableData | null {
   };
 
   const cleanHeader = (val: string): string => {
-    return String(cleanCell(val));
+    return String(cleanCell(val, undefined));
   };
 
   for (let i = 0; i < lines.length; i++) {
@@ -150,7 +154,7 @@ function parseTable(content: string): TableData | null {
       const cellParts = line.substring(1).split("||");
       for (const part of cellParts) {
         if (headers[colIdx]) {
-          currentRow[headers[colIdx]] = cleanCell(part);
+          currentRow[headers[colIdx]] = cleanCell(part, headers[colIdx]);
         }
         colIdx++;
       }
@@ -162,5 +166,5 @@ function parseTable(content: string): TableData | null {
     rows.push(currentRow);
   }
 
-  return { headers, rows };
+  return { headers, rows, moneyColumns: Array.from(moneyColumns) };
 }
