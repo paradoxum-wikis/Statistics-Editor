@@ -10,7 +10,7 @@
 
     import Sidebar from "./Sidebar.svelte";
     import TowerEditor from "./TowerEditor.svelte";
-    import WikiEditor from "$lib/components/wiki/WikiEditor.svelte";
+    import WikiEditor from "./WikiEditor.svelte";
     import Introduction from "./Introduction.svelte";
     import SettingsModal from "./SettingsModal.svelte";
 

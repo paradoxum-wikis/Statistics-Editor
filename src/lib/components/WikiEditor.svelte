@@ -3,7 +3,7 @@
 	import { towerStore } from "$lib/stores/tower.svelte";
 	import { profileStore } from "$lib/stores/profile.svelte";
 	import { settingsStore } from "$lib/stores/settings.svelte";
-	import { setWikiOverride } from "$lib/wiki/wikiSource";
+	import { setWikiOverride } from "$lib/wikitext/wikiSource";
 	import { WikitextEditor } from "wikistxr";
 
 	let {
@@ -259,7 +259,7 @@
 {/if}
 
 <style>
-	@reference "../../../routes/layout.css";
+	@reference "../../routes/layout.css";
 
 	.wiki-header-row {
 		@apply flex items-start justify-between gap-4;

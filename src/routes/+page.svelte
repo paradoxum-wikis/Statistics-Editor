@@ -9,7 +9,7 @@
 	import { fly } from "svelte/transition";
 
 	import TowerEditor from "$lib/components/TowerEditor.svelte";
-	import WikiEditor from "$lib/components/wiki/WikiEditor.svelte";
+	import WikiEditor from "$lib/components/WikiEditor.svelte";
 	import Introduction from "$lib/components/Introduction.svelte";
 	import Sidebar from "$lib/components/Sidebar.svelte";
 	import SettingsModal from "$lib/components/SettingsModal.svelte";

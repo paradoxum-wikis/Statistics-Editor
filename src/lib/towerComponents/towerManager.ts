@@ -8,7 +8,7 @@ import {
   clearWikiOverride,
   loadEffectiveWikitext,
   setWikiOverride,
-} from "$lib/wiki/wikiSource";
+} from "$lib/wikitext/wikiSource";
 
 const wikitextFiles = import.meta.glob("./towers/*.wiki", {
   query: "?raw",
