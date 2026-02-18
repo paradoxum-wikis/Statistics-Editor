@@ -104,7 +104,7 @@
         return JSON.stringify(v);
     }
 
-    function buildUpgradeSummariesForSkin(
+    function buildUpgradeSummariesForeskin(
         skin: any,
     ): { [key: number]: SummaryLine[] } {
         const result: { [key: number]: SummaryLine[] } = {};
@@ -213,7 +213,7 @@
                     }
                 });
                 upgradeNames = names;
-                upgradeSummaries = buildUpgradeSummariesForSkin(skin);
+                upgradeSummaries = buildUpgradeSummariesForeskin(skin);
             } else {
                 numUpgrades = 0;
                 upgradeNames = {};
