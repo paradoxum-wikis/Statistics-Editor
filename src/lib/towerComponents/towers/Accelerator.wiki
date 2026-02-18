@@ -1,11 +1,28 @@
 <var>
 $DPS$ = "Overcharge / (Charge-Up + Cooldown + (Overcharge / Damage * Tick))"
+$CE$ = "Total Price / DPS"
+
+$0Cost$ = 7500
+$PVP-0Cost$ = 4250
+
+$1Cost$ = 2000
+$PVP-1Cost$ = 750
+
+$2Cost$ = 6000
+$PVP-2Cost$ = 2000
+
+$3Cost$ = 9999
+$PVP-3Cost$ = 4500
+
+$4Cost$ = 27500
+$4PVP-4Cost$ = 12000
+
+$5Cost$ = 60000
+$5PVP-5Cost$ = 28500
 
 $0Lead$ = true
-$0Hidden$ = false
-$0Flying$ = false
-
 $1Hidden$ = true
+
 $1Upgrade$ = "Extra Juice"
 $1UpgradeI$ = 11821094308
 
@@ -24,7 +41,7 @@ $5UpgradeI$ = 11821093672
 <div class="mobile-tabber"><tabber>
 |-|Regular =
 <div class="overflow-box">
-{| class="wikitable stats-table" style="width:850px;"
+{| class="wikitable stats-table"
 !Level
 !Total Price
 !Damage
@@ -37,75 +54,75 @@ $5UpgradeI$ = 11821093672
 !Cost Efficiency
 |-
 |0
-|{{Money|4,500}}
-|10
-|0.2
+|{{Money|7,500}}
+|12
+|0.208
+|6.5
 |2.5
-|2.5
-|300
-|18
+|9,000
+|20
 |$DPS$
-|{{Money|168.6}}
+|{{Money|$CE$}}
 |-
 |1
-|{{Money|5,500}}
+|{{Money|9,500}}
 |15
-|0.2
+|0.208
+|6.5
 |2.5
-|2.5
-|300
-|18
+|11,250
+|20
 |$DPS$
-|{{Money|167.94}}
+|{{Money|$CE$}}
 |-
 |2
-|{{Money|8,000}}
-|15
-|0.2
+|{{Money|15,500}}
+|25
+|0.208
+|6.5
 |2.5
-|2.5
-|600
-|20
+|18,750
+|22
 |$DPS$
-|{{Money|177.58}}
+|{{Money|$CE$}}
 |-
 |3
-|{{Money|12,750}}
+|{{Money|25,499}}
 |40
-|0.2
-|2.5
-|2.5
-|600
-|20
+|0.208
+|6.5
+|1
+|30,000
+|22
 |$DPS$
-|{{Money|172.55}}
+|{{Money|$CE$}}
 |-
 |4
-|{{Money|24,000}}
-|40
-|0.15
-|1.5
-|2.5
-|1,280
-|22.5
+|{{Money|52,999}}
+|50
+|0.158
+|5.5
+|1
+|50,000
+|24
 |$DPS$
-|{{Money|169.8}}
+|{{Money|$CE$}}
 |-
 |5
-|{{Money|60,000}}
-|100
-|0.1
-|1.5
-|2.5
-|2,400
-|25
+|{{Money|112,999}}
+|55
+|0.108
+|6.5
+|1
+|100,000
+|26
 |$DPS$
-|{{Money|164.8}}
+|{{Money|$CE$}}
 |}
 </div>
 |-|PVP =
 <div class="overflow-box">
-{| class="wikitable stats-table" style="width:850px;"
+{| class="wikitable stats-table"
 !Level
 !Total Price
 !Damage
@@ -120,68 +137,68 @@ $5UpgradeI$ = 11821093672
 |0
 |{{Money|4,250}}
 |12
-|0.2
+|0.208
 |2.5
 |2
 |300
 |18
-|30.93
-|{{Money|137.41}}
+|$DPS$
+|{{Money|$CE$}}
 |-
 |1
 |{{Money|5,000}}
 |15
-|0.2
+|0.208
 |2.5
 |2
 |300
 |18
-|34.64
-|{{Money|144.34}}
+|$DPS$
+|{{Money|$CE$}}
 |-
 |2
 |{{Money|7,000}}
 |15
-|0.2
+|0.208
 |2.5
 |2
 |600
 |18
-|46.8
-|{{Money|149.57}}
+|$DPS$
+|{{Money|$CE$}}
 |-
 |3
 |{{Money|11,500}}
 |35
-|0.15
+|0.158
 |2.5
 |2
 |600
 |20
-|83.23
-|{{Money|138.17}}
+|$DPS$
+|{{Money|$CE$}}
 |-
 |4
 |{{Money|23,500}}
 |35
-|0.1
+|0.108
 |1.5
 |2
 |1,280
 |20
-|171.82
-|{{Money|136.77}}
+|$DPS$
+|{{Money|$CE$}}
 |-
 |5
 |{{Money|52,000}}
 |90
-|0.1
+|0.108
 |1.5
 |2
 |2,400
 |23
-|376.18
-|{{Money|138.23}}
+|$DPS$
+|{{Money|$CE$}}
 |}
 </center>
 </div>
