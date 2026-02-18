@@ -109,11 +109,13 @@ function parseTable(content: string): TableData | null {
   const cleanCell = (val: string, header?: string): string | number => {
     val = val.trim();
     val = stripRefs(val);
-    const moneyMatch = val.match(/{{Money\|([^}]+)}}/);
-    if (moneyMatch) {
-      if (header) moneyColumns.add(header);
-      val = moneyMatch[1].trim();
+    const templateMatch = val.match(/{{([^|{}]+)\|([^}]+)}}/);
+    if (templateMatch) {
+      if (templateMatch[1].trim() === "Money" && header)
+        moneyColumns.add(header);
+      val = templateMatch[2].trim();
     }
+
     const cleanVal = val.replace(/,/g, "");
     if (!isNaN(Number(cleanVal)) && cleanVal !== "") {
       return Number(cleanVal);
