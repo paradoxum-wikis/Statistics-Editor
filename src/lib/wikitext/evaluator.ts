@@ -1,5 +1,9 @@
+const ARITHMETIC_ALLOWED = /^[\d.\s+\-*/%()_a-zA-Z]*$/;
+const DISALLOWED_SYNTAX = /[{}[\]:;,@#$&|^~`\\]/;
+
 /**
  * Evaluates a formula string using variables from a row.
+ * Only arithmetic operations are allowed.
  */
 export function evaluateFormula(
   formula: string,
@@ -31,6 +35,13 @@ export function evaluateFormula(
         numericContextAliased[underscored] = numericContext[k];
       }
     }
+  }
+
+  if (!ARITHMETIC_ALLOWED.test(formula) || DISALLOWED_SYNTAX.test(formula)) {
+    console.error(
+      `[Evaluator] Formula contains disallowed syntax: "${formula}"`,
+    );
+    return NaN;
   }
 
   let expression = formula;
