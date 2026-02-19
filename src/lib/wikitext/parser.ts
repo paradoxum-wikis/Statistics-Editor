@@ -34,7 +34,8 @@ export function parseWikitext(content: string): ParsedWikitext {
   while ((blockMatch = blockVariableRegex.exec(text)) !== null) {
     const blockContent = blockMatch[1];
     const lines = blockContent.split("\n");
-    for (const line of lines) {
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
       const trimmed = line.trim();
       if (!trimmed) continue;
       const parts = trimmed.split("=");
@@ -43,6 +44,32 @@ export function parseWikitext(content: string): ParsedWikitext {
       let value = parts.slice(1).join("=").trim();
 
       if (
+        (value.startsWith('"') && !value.endsWith('"')) ||
+        (value.startsWith("'") && !value.endsWith("'"))
+      ) {
+        const quoteChar = value[0];
+        let collected = value.substring(1);
+        let foundClosing = false;
+        while (i + 1 < lines.length) {
+          i++;
+          const nextLine = lines[i];
+
+          collected += "\n" + nextLine;
+          if (nextLine.trim().endsWith(quoteChar)) {
+            const lastIdx = collected.lastIndexOf(quoteChar);
+            if (lastIdx !== -1) {
+              collected = collected.substring(0, lastIdx);
+            }
+            foundClosing = true;
+            break;
+          }
+        }
+        if (foundClosing) {
+          value = collected;
+        } else {
+          value = quoteChar + collected;
+        }
+      } else if (
         (value.startsWith('"') && value.endsWith('"')) ||
         (value.startsWith("'") && value.endsWith("'"))
       ) {

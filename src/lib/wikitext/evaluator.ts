@@ -20,16 +20,29 @@ export function evaluateFormula(
     }
   }
 
+  // for example "Cost Efficiency" = "Cost_Efficiency"
+  const numericContextAliased: Record<string, number> = {
+    ...numericContext,
+  };
+  for (const k of Object.keys(numericContext)) {
+    if (/\s/.test(k)) {
+      const underscored = k.replace(/\s+/g, "_");
+      if (!(underscored in numericContextAliased)) {
+        numericContextAliased[underscored] = numericContext[k];
+      }
+    }
+  }
+
   let expression = formula;
 
-  const keys = Object.keys(numericContext)
+  const keys = Object.keys(numericContextAliased)
     .filter((k) => k.trim() !== "")
     .sort((a, b) => b.length - a.length);
 
   for (const key of keys) {
     const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     const regex = new RegExp(escapedKey, "g");
-    expression = expression.replace(regex, String(numericContext[key]));
+    expression = expression.replace(regex, String(numericContextAliased[key]));
   }
 
   try {
