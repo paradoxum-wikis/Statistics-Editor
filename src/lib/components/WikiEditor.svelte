@@ -247,13 +247,12 @@
 		<p class="wiki-notes-text">
 			Notes:
 			<br />
-			• Saving writes a profile-specific override to localStorage and forces
-			a tower reload so formulas/tokens re-parse from the edited source.
+			• The source editor uses Neowtext, which includes features such as variables and is likely to be unfamiliar to most people. Refer to the <a href="https://tds.fandom.com/wiki/Help:Neowtext" target="_blank" rel="noopener" class="text-blue-500 underline">help page</a> to learn more about it.
 			<br />
-			• This editor does not validate wikitext yet. A malformed table may result
+			• This editor does not validate Neowtext or wikitext yet. A malformed table may result
 			in missing/incorrect stats.
 			<br />
-			• The editor with syntax highlighting is highly experimental. Expect bugs and rough edges, and please report any issues you encounter!
+			• The source editor itself is highly experimental. Expect bugs and rough edges, and please report any issues you encounter!
 		</p>
 	</div>
 {/if}
