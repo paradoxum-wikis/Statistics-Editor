@@ -1,3 +1,5 @@
+import { settingsStore } from "$lib/stores/settings.svelte";
+
 const ARITHMETIC_ALLOWED = /^[\d.\s+\-*/%()_a-zA-Z]*$/;
 const DISALLOWED_SYNTAX = /[{}[\]:;,@#$&|^~`\\]/;
 
@@ -59,9 +61,10 @@ export function evaluateFormula(
   try {
     // eslint-disable-next-line no-new-func
     const result = new Function(`return ${expression}`)();
-    console.log(
-      `[Evaluator] Formula: "${formula}" -> Expression: "${expression}" -> Result: ${result}`,
-    );
+    if (settingsStore.debugMode)
+      console.log(
+        `[Evaluator] Formula: "${formula}" -> Expression: "${expression}" -> Result: ${result}`,
+      );
     return typeof result === "number" ? result : NaN;
   } catch (e) {
     console.error(`[Evaluator] Error evaluating "${expression}":`, e);
