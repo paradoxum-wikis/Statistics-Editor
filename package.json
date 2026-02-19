@@ -31,7 +31,7 @@
     "vite": "^7.3.1"
   },
   "dependencies": {
-    "@lucide/svelte": "^0.563.1",
+    "@lucide/svelte": "^0.575.0",
     "mediawiki-file-url": "^0.3.1",
     "wikistxr": "^0.0.12"
   }
