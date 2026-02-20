@@ -19,7 +19,7 @@ type CacheConfig = {
   keyPrefix: string;
   enableDebug: boolean;
   /**
-   * How long to keep an entry in the Cache API (ms). When exceeded, it will be re-fetched.
+   * How long to keep an entry in the Cache API (ms). When exceeded, it will be refetched.
    * Because Cache API doesn't enforce TTLs so we store metadata to implement this ourselves.
    */
   ttlMs: number;
@@ -193,6 +193,26 @@ class ImageLoaderService {
   resetState(): void {
     this.loading.clear();
     this.failed.clear();
+  }
+
+  /**
+   * Clears the in-memory cache entry for a specific upgrade index on a tower.
+   * Use when an upgrade's image ID changes so the new image is refetched.
+   */
+  clearUpgradeImageCache(towerName: string, index: number): void {
+    const existing = this.cache.get(towerName);
+    if (existing?.[index] !== undefined) {
+      delete existing[index];
+    }
+    this.failed.delete(`${towerName}:${index}`);
+  }
+
+  /**
+   * Clears the entire in-memory image cache for a tower.
+   * Use when the tower is reloaded so stale images are refetched.
+   */
+  clearTowerImageCache(towerName: string): void {
+    this.cache.delete(towerName);
   }
 
   /**

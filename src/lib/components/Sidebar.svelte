@@ -1,5 +1,6 @@
 <script lang="ts">
     import UpgradeViewer from "./UpgradeViewer.svelte";
+    import UpgradeEditor from "./UpgradeEditor.svelte";
     import DetectionEditor from "./DetectionEditor.svelte";
     import CostEditor from "./CostEditor.svelte";
     import { Popover } from "bits-ui";
@@ -48,6 +49,7 @@
     } = $props();
 
     let upgradeImages = $state<{ [key: number]: string }>({});
+    let prevTowerRef: object | null = null;
     let upgradeNames = $state<{ [key: number]: string }>({});
     let upgradeSummaries = $state<{ [key: number]: SummaryLine[] }>({});
     let selectedUpgrade = $state("0");
@@ -181,31 +183,34 @@
                 numUpgrades = 0;
                 loadingImages = new SvelteMap();
                 imageLoader.resetState();
+                prevTowerRef = null;
             });
             return;
+        }
+
+        const skin = tower.getSkin(towerStore.selectedSkinName);
+        const towerChanged = tower !== prevTowerRef;
+        if (towerChanged) {
+            imageLoader.clearTowerImageCache(tower.name);
+            prevTowerRef = tower;
         }
 
         const cachedImages = imageLoader.getCachedImages(tower.name);
 
         untrack(() => {
-            if (cachedImages) {
-                upgradeImages = { ...cachedImages };
-                if (settingsStore.debugMode) {
-                    console.log(
-                        `[Sidebar] Using cached images for ${tower.name}`,
-                    );
-                }
-            } else {
-                upgradeImages = {};
+            upgradeImages = cachedImages ? { ...cachedImages } : {};
+
+            if (settingsStore.debugMode && cachedImages) {
+                console.log(`[Sidebar] Using cached images for ${tower.name}`);
             }
 
-            // reset upgrade selection when tower changes
-            selectedUpgrade = "0";
+            if (towerChanged) {
+                selectedUpgrade = "0";
+            }
             imageLoader.resetState();
             loadingImages = new SvelteMap();
         });
 
-        const skin = tower.getSkin(towerStore.selectedSkinName);
         untrack(() => {
             if (skin?.upgrades) {
                 numUpgrades = skin.upgrades.length;
@@ -229,6 +234,7 @@
     $effect(() => {
         const tower = towerStore.selectedData;
         const upgrade = selectedUpgrade;
+        towerStore.refreshTrigger;
 
         if (!tower) return;
 
@@ -278,6 +284,7 @@
             {numUpgrades}
         />
 
+        <UpgradeEditor />
         <DetectionEditor />
         <CostEditor />
     </div>

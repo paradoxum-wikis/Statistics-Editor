@@ -90,7 +90,6 @@
     .cost-row {
         display: flex;
         align-items: center;
-        gap: 0.4rem;
         padding: 0.25rem 0.4rem;
         border-radius: calc(var(--radius) - 0.25rem) 0;
         border: 1px solid var(--border);
@@ -100,7 +99,7 @@
     .level-label {
         font-size: 0.7rem;
         color: var(--muted-foreground);
-        width: 3rem;
+        width: 2.75rem;
         flex-shrink: 0;
     }
 
