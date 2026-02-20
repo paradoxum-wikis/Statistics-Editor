@@ -93,8 +93,6 @@
         return JSON.stringify(v);
     }
 
-
-
     function buildUpgradeSummariesForeskin(
         skin: any,
     ): { [key: number]: SummaryLine[] } {
