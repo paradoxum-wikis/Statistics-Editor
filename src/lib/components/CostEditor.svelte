@@ -2,6 +2,8 @@
     import { towerStore } from "$lib/stores/tower.svelte";
     import Separator from "./Separator.svelte";
     import { CircleDollarSign } from "@lucide/svelte";
+    import { parseNumeric } from "$lib/utils/format";
+    import { getTargetSkins } from "$lib/utils/towah";
 
     type CostRow = { level: number; cost: number };
 
@@ -18,7 +20,7 @@
             const costKey = `$${i}Cost$`;
             const costStr = skinData.formulaTokens[costKey];
             if (costStr === undefined) return [];
-            const num = Number(String(costStr).replace(/,/g, ""));
+            const num = parseNumeric(costStr);
             if (isNaN(num)) return [];
             rows.push({ level: i, cost: num });
         }
@@ -31,14 +33,8 @@
         const currentSkin = tower.getSkin(towerStore.selectedSkinName);
         if (!currentSkin) return;
 
-        if (currentSkin.isPvp) {
-            currentSkin.setCost(level, value);
-        } else {
-            for (const skinName of tower.skinNames) {
-                const skin = tower.getSkin(skinName);
-                if (!skin || skin.isPvp) continue;
-                skin.setCost(level, value);
-            }
+        for (const skin of getTargetSkins(tower, currentSkin)) {
+            skin.setCost(level, value);
         }
 
         towerStore.save();

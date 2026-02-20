@@ -1,6 +1,7 @@
 <script lang="ts">
     import { towerStore } from "$lib/stores/tower.svelte";
     import { imageLoader } from "$lib/services/imageLoader";
+    import { getTargetSkins } from "$lib/utils/towah";
     import Separator from "./Separator.svelte";
     import { Layers } from "@lucide/svelte";
 
@@ -26,14 +27,8 @@
         const currentSkin = tower.getSkin(towerStore.selectedSkinName);
         if (!currentSkin) return;
 
-        if (currentSkin.isPvp) {
-            currentSkin.upgrades[index].upgradeData.Title = value;
-        } else {
-            for (const skinName of tower.skinNames) {
-                const skin = tower.getSkin(skinName);
-                if (!skin || skin.isPvp) continue;
-                skin.upgrades[index].upgradeData.Title = value;
-            }
+        for (const skin of getTargetSkins(tower, currentSkin)) {
+            skin.upgrades[index].upgradeData.Title = value;
         }
 
         towerStore.save();
@@ -46,14 +41,8 @@
         const currentSkin = tower.getSkin(towerStore.selectedSkinName);
         if (!currentSkin) return;
 
-        if (currentSkin.isPvp) {
-            currentSkin.upgrades[index].upgradeData.Image = value;
-        } else {
-            for (const skinName of tower.skinNames) {
-                const skin = tower.getSkin(skinName);
-                if (!skin || skin.isPvp) continue;
-                skin.upgrades[index].upgradeData.Image = value;
-            }
+        for (const skin of getTargetSkins(tower, currentSkin)) {
+            skin.upgrades[index].upgradeData.Image = value;
         }
 
         imageLoader.clearUpgradeImageCache(tower.name, index);

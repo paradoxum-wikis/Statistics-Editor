@@ -1,5 +1,6 @@
 <script lang="ts">
     import { towerStore } from "$lib/stores/tower.svelte";
+    import { getTargetSkins } from "$lib/utils/towah";
     import FlyingIcon from "$lib/assets/FlyingDetection.png";
     import HiddenIcon from "$lib/assets/HiddenDetection.png";
     import LeadIcon from "$lib/assets/LeadDetection.png";
@@ -59,27 +60,13 @@
         const currentSkin = tower.getSkin(towerStore.selectedSkinName);
         if (!currentSkin) return;
 
-        if (currentSkin.isPvp) {
-            // only update pvp not others
-            const totalLevels = currentSkin.levels.levels.length;
+        for (const skin of getTargetSkins(tower, currentSkin)) {
+            const totalLevels = skin.levels.levels.length;
             for (let i = 0; i < totalLevels; i++) {
                 const shouldHave = startLevel !== null && i >= startLevel;
-                currentSkin.setDetection(i, type, shouldHave, false);
+                skin.setDetection(i, type, shouldHave, false);
             }
-            currentSkin.createData();
-        } else {
-            // regular
-            for (const skinName of tower.skinNames) {
-                const skin = tower.getSkin(skinName);
-                if (!skin || skin.isPvp) continue;
-
-                const totalLevels = skin.levels.levels.length;
-                for (let i = 0; i < totalLevels; i++) {
-                    const shouldHave = startLevel !== null && i >= startLevel;
-                    skin.setDetection(i, type, shouldHave, false);
-                }
-                skin.createData();
-            }
+            skin.createData();
         }
 
         towerStore.save();

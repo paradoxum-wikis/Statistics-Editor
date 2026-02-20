@@ -9,6 +9,7 @@
     import { untrack } from "svelte";
     import { SvelteMap } from "svelte/reactivity";
     import { settingsStore } from "$lib/stores/settings.svelte";
+    import { formatValue } from "$lib/utils/format";
 
     import Separator from "./Separator.svelte";
     import {
@@ -92,22 +93,7 @@
         return JSON.stringify(v);
     }
 
-    function formatValue(v: unknown): string {
-        if (v === undefined || v === null) return "-";
-        if (typeof v === "number") {
-            if (!Number.isFinite(v)) return String(v);
-            const abs = Math.abs(v);
-            if (abs >= 1000) return String(Number(v.toFixed(0)));
-            if (abs >= 100) return String(Number(v.toFixed(2)));
-            if (abs >= 1) return String(Number(v.toFixed(3)));
-            if (abs >= 0.01) return String(Number(v.toFixed(4)));
-            if (abs >= 0.0001) return String(Number(v.toFixed(6)));
-            return v.toPrecision(6).replace(/\.?0+(e|$)/, "$1");
-        }
-        if (typeof v === "boolean") return v ? "true" : "false";
-        if (typeof v === "string") return v;
-        return JSON.stringify(v);
-    }
+
 
     function buildUpgradeSummariesForeskin(
         skin: any,

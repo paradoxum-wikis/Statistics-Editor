@@ -8,6 +8,7 @@
     import { towerStore } from "$lib/stores/tower.svelte";
     import { fade } from "svelte/transition";
     import MoneyIcon from "$lib/assets/Income.png";
+    import { formatNumber, formatValue } from "$lib/utils/format";
 
     let {
         tower = null,
@@ -41,24 +42,9 @@
         return INVERSE_STATS.has(header.trim().toLowerCase());
     }
 
-    function formatNumberForDisplay(n: number): string {
-        if (!Number.isFinite(n)) return String(n);
-        if (n === 0) return "0";
-
-        const abs = Math.abs(n);
-
-        if (abs >= 1000) return String(Number(n.toFixed(0)));
-        if (abs >= 100) return String(Number(n.toFixed(2)));
-        if (abs >= 1) return String(Number(n.toFixed(3)));
-        if (abs >= 0.01) return String(Number(n.toFixed(4)));
-        if (abs >= 0.0001) return String(Number(n.toFixed(6)));
-
-        return n.toPrecision(6).replace(/\.?0+(e|$)/, "$1");
-    }
-
     function formatDelta(delta: number): string {
         const sign = delta > 0 ? "+" : "";
-        return `${sign}${formatNumberForDisplay(delta)}`;
+        return `${sign}${formatNumber(delta)}`;
     }
 
     function computeDeltaClass(header: string, delta: number): string {
@@ -105,20 +91,7 @@
         };
     }
 
-    function getDisplayValueForCell(
-        skinData: SkinData,
-        header: string,
-        value: unknown,
-    ): string {
-        if (value !== undefined && value !== null) {
-            if (typeof value === "number") {
-                return formatNumberForDisplay(value);
-            }
-            return String(value);
-        }
 
-        return "-";
-    }
 
     $effect(() => {
         if (
@@ -422,19 +395,11 @@
                                                                     {#if skinData.moneyColumns.includes(header)}
                                                                         <span class="money-value">
                                                                             <img src={MoneyIcon} alt="" class="money-icon" />
-                                                                            {getDisplayValueForCell(
-                                                                                skinData,
-                                                                                header,
-                                                                                level[header],
-                                                                            )}
+                                                                            {formatValue(level[header])}
                                                                         </span>
                                                                     {:else}
                                                                         <span>
-                                                                            {getDisplayValueForCell(
-                                                                                skinData,
-                                                                                header,
-                                                                                level[header],
-                                                                            )}
+                                                                            {formatValue(level[header])}
                                                                         </span>
                                                                     {/if}
                                                                     {#if settingsStore.seeValueDifference && deltaInfo.delta !== null && deltaInfo.delta !== 0}

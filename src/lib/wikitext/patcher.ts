@@ -4,9 +4,6 @@ import { serializeTable, serializeVariables } from "./serializer";
 /**
  * Updates the given source wikitext with data from the Tower instance.
  * Replaces <var> blocks and specific skin tables while preserving other content.
- *
- * @param sourceWikitext The original wiki text.
- * @param tower The current tower state.
  */
 export function patchWikitext(sourceWikitext: string, tower: Tower): string {
   let text = sourceWikitext;

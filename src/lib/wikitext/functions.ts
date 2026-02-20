@@ -1,4 +1,5 @@
 import { evaluateFormula } from "$lib/wikitext/evaluator";
+import { parseNumeric } from "$lib/utils/format";
 
 /**
  * Resolves a $FNC-NAME$ function for the given row level.
@@ -14,7 +15,7 @@ export function resolveFNC(
     for (let l = 0; l <= level; l++) {
       const costStr = costVars[`$${l}Cost$`];
       if (costStr === undefined) continue;
-      const num = Number(String(costStr).replace(/,/g, ""));
+      const num = parseNumeric(costStr);
       if (!isNaN(num)) total += num;
     }
     return total;
@@ -54,7 +55,7 @@ export function resolveToken(
         ? variables[pvpKey]
         : variables[baseKey];
     if (varVal === undefined) return undefined;
-    const num = Number(String(varVal).replace(/,/g, ""));
+    const num = parseNumeric(varVal);
     return isNaN(num) ? varVal : num;
   }
 
