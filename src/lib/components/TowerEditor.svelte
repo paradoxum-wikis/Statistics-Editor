@@ -91,8 +91,6 @@
         };
     }
 
-
-
     $effect(() => {
         if (
             tower &&
@@ -243,8 +241,6 @@
             rebuildBaselineForSkin(tower, selectedSkinName);
         }
     }
-
-
 </script>
 
 <div class="space-y-4">
@@ -456,30 +452,6 @@
 </div>
 
 <style>
-    :global(.tabs-list) {
-        display: flex;
-        gap: 0.5rem;
-        margin-bottom: 1rem;
-        background: var(--muted);
-        border-radius: var(--radius) 0;
-        padding: 0.25rem 0.5rem;
-    }
-
-    :global(.tab-trigger) {
-        padding: 0.25rem 1rem;
-        background: var(--card);
-        color: var(--foreground);
-        border: 1px solid var(--input);
-        border-radius: calc(var(--radius) - 0.25rem) 0;
-        font-size: 0.875rem;
-        font-weight: 500;
-        transition: background-color 0.2s;
-
-        &:hover {
-            background: var(--accent);
-        }
-    }
-
     .table-container {
         overflow-x: auto;
         box-shadow:

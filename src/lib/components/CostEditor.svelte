@@ -1,12 +1,15 @@
 <script lang="ts">
     import { towerStore } from "$lib/stores/tower.svelte";
-    import Separator from "./Separator.svelte";
-    import { CircleDollarSign } from "@lucide/svelte";
-    import { parseNumeric } from "$lib/utils/format";
     import { getTargetSkins } from "$lib/utils/towah";
+    import { Collapsible } from "bits-ui";
+    import Separator from "./Separator.svelte";
+    import { CircleDollarSign, ChevronDown } from "@lucide/svelte";
+    import { slide } from "svelte/transition";
+    import { parseNumeric } from "$lib/utils/format";
 
     type CostRow = { level: number; cost: number };
 
+    let open = $state(false);
     let skinData = $derived(
         towerStore.selectedData?.getSkin(towerStore.selectedSkinName),
     );
@@ -42,42 +45,54 @@
     }
 </script>
 
-<div class="space-y-3 mt-4">
+<div class="mt-4">
     <Separator />
-    <h3 class="text-sm font-semibold text-foreground px-1">
-        <CircleDollarSign class="inline w-3.5 h-3.5 mb-0.5 opacity-70" />
-        Costs
-        {#if skinData?.isPvp}
-            <span class="text-xs font-normal text-muted-foreground ml-1">(PVP)</span>
-        {/if}
-    </h3>
-
-    {#if costRows.length > 0}
-        <div class="grid gap-1.5">
-            {#each costRows as row (row.level)}
-                <div class="cost-row">
-                    <span class="level-label">
-                        {row.level === 0 ? "Base" : `Upg. ${row.level}`}
-                    </span>
-                    <input
-                        type="number"
-                        class="cost-input"
-                        value={row.cost}
-                        min="0"
-                        step="1"
-                        onchange={(e) => {
-                            const val = parseInt(e.currentTarget.value);
-                            if (!isNaN(val) && val >= 0) updateCost(row.level, val);
-                        }}
-                    />
-                </div>
-            {/each}
-        </div>
-    {:else if skinData}
-        <p class="text-xs text-muted-foreground px-1">No cost variables defined.</p>
-    {:else}
-        <p class="text-xs text-muted-foreground px-1">Select a tower to edit costs.</p>
-    {/if}
+    <Collapsible.Root bind:open>
+        <Collapsible.Trigger class="section-trigger">
+            <span class="section-title">
+                <CircleDollarSign class="inline w-3.5 h-3.5 mb-0.5 opacity-70" />
+                Costs
+                {#if skinData?.isPvp}
+                    <span class="text-xs font-normal text-muted-foreground ml-1">(PVP)</span>
+                {/if}
+            </span>
+            <ChevronDown class="chevron-icon" style="transform: rotate({open ? '180deg' : '0deg'})" />
+        </Collapsible.Trigger>
+        <Collapsible.Content forceMount>
+            {#snippet child({ open: isOpen })}
+                {#if isOpen}
+                    <div class="pb-2" transition:slide={{ duration: 150 }}>
+                        {#if costRows.length > 0}
+                            <div class="grid gap-1.5">
+                                {#each costRows as row (row.level)}
+                                    <div class="cost-row">
+                                        <span class="level-label">
+                                            {row.level === 0 ? "Base" : `Upg. ${row.level}`}
+                                        </span>
+                                        <input
+                                            type="number"
+                                            class="cost-input"
+                                            value={row.cost}
+                                            min="0"
+                                            step="1"
+                                            onchange={(e) => {
+                                                const val = parseInt(e.currentTarget.value);
+                                                if (!isNaN(val) && val >= 0) updateCost(row.level, val);
+                                            }}
+                                        />
+                                    </div>
+                                {/each}
+                            </div>
+                        {:else if skinData}
+                            <p class="text-xs text-muted-foreground px-1">No cost variables defined.</p>
+                        {:else}
+                            <p class="text-xs text-muted-foreground px-1">Select a tower to edit costs.</p>
+                        {/if}
+                    </div>
+                {/if}
+            {/snippet}
+        </Collapsible.Content>
+    </Collapsible.Root>
 </div>
 
 <style>

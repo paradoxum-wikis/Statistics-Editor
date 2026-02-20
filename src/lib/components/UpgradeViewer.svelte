@@ -162,15 +162,6 @@
         @apply text-sm font-semibold mb-4 text-foreground;
     }
 
-    :global(.upgrade-tabs-list) {
-        @apply flex space-x-1 mb-4;
-    }
-
-    :global(.upgrade-tab-trigger) {
-        border-radius: var(--radius) 0;
-        @apply px-2 py-1 text-xs bg-muted w-full;
-    }
-
     .upgrade-image-container {
         @apply w-full h-32 bg-muted rounded flex items-center justify-center text-muted-foreground;
     }
