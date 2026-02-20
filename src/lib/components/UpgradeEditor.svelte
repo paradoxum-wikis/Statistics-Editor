@@ -124,7 +124,7 @@
         font-size: 0.68rem;
         font-weight: 600;
         color: var(--muted-foreground);
-        padding: .15rem .85rem;
+        padding: 0.15rem 0.85rem;
         border-bottom: 1px solid var(--border);
         @apply bg-secondary/30;
     }
