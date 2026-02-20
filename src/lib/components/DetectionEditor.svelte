@@ -4,10 +4,9 @@
     import FlyingIcon from "$lib/assets/FlyingDetection.png";
     import HiddenIcon from "$lib/assets/HiddenDetection.png";
     import LeadIcon from "$lib/assets/LeadDetection.png";
-    import { Collapsible, Select } from "bits-ui";
+    import { Select } from "bits-ui";
     import { Check, ChevronDown, ScanEye } from "@lucide/svelte";
-    import { slide } from "svelte/transition";
-    import Separator from "./Separator.svelte";
+    import CollapsibleSection from "./CollapsibleSection.svelte";
 
     let open = $state(true);
     let skinData = $derived(
@@ -71,92 +70,71 @@
     }
 </script>
 
-<div class="mt-4">
-    <Separator />
-    <Collapsible.Root bind:open>
-        <Collapsible.Trigger class="section-trigger">
-            <span class="section-title">
-                <ScanEye class="inline w-3.5 h-3.5 mb-0.5 opacity-70" />
-                Detections
-                {#if skinData?.isPvp}
-                    <span class="text-xs font-normal text-muted-foreground ml-1">(PVP)</span>
-                {/if}
-            </span>
-            <ChevronDown class="chevron-icon" style="transform: rotate({open ? '180deg' : '0deg'})" />
-        </Collapsible.Trigger>
-        <Collapsible.Content forceMount>
-            {#snippet child({ open: isOpen })}
-                {#if isOpen}
-                    <div class="pb-2" transition:slide={{ duration: 150 }}>
-                        {#if skinData}
-                            <div class="grid gap-2">
-                                {#each detectionTypes as detection}
-                                    <div class="detection-row">
-                                        <div class="flex items-center gap-3">
-                                            <img
-                                                src={detection.icon}
-                                                alt="{detection.type} Detection"
-                                                class="w-5 h-5 dark:invert-0 invert opacity-80"
-                                            />
-                                            <span class="text-xs font-medium">{detection.type}</span>
-                                        </div>
-
-                                        <Select.Root
-                                            type="single"
-                                            items={levelOptions}
-                                            value={selectedDetectionStart[detection.type]}
-                                            onValueChange={(val) =>
-                                                updateDetectionStart(
-                                                    detection.type,
-                                                    val === "none" ? null : parseInt(val),
-                                                )}
-                                        >
-                                            <Select.Trigger class="select-trigger w-22.5 h-7">
-                                                <span class="truncate">
-                                                    {levelOptions.find((o) => o.value === selectedDetectionStart[detection.type])?.label}
-                                                </span>
-                                                <ChevronDown class="w-3 h-3 opacity-50 ml-1" />
-                                            </Select.Trigger>
-                                            <Select.Portal>
-                                                <Select.Content
-                                                    class="select-content max-h-55"
-                                                    sideOffset={5}
-                                                >
-                                                    <Select.Viewport class="p-1">
-                                                        {#each levelOptions as option (option.value)}
-                                                            <Select.Item
-                                                                class="select-item p-1 px-3 my-1 text-sm"
-                                                                value={option.value}
-                                                                label={option.label}
-                                                            >
-                                                                {#snippet children({ selected })}
-                                                                    {option.label}
-                                                                    {#if selected}
-                                                                        <div class="ml-auto">
-                                                                            <Check class="w-3 h-3" />
-                                                                        </div>
-                                                                    {/if}
-                                                                {/snippet}
-                                                            </Select.Item>
-                                                        {/each}
-                                                    </Select.Viewport>
-                                                </Select.Content>
-                                            </Select.Portal>
-                                        </Select.Root>
-                                    </div>
-                                {/each}
-                            </div>
-                        {:else}
-                            <p class="text-xs text-muted-foreground px-1">
-                                Select a tower to edit detections.
-                            </p>
-                        {/if}
+<CollapsibleSection title="Detections" icon={ScanEye} bind:open isPvp={skinData?.isPvp ?? false}>
+    {#if skinData}
+        <div class="grid gap-2">
+            {#each detectionTypes as detection}
+                <div class="detection-row">
+                    <div class="flex items-center gap-3">
+                        <img
+                            src={detection.icon}
+                            alt="{detection.type} Detection"
+                            class="w-5 h-5 dark:invert-0 invert opacity-80"
+                        />
+                        <span class="text-xs font-medium">{detection.type}</span>
                     </div>
-                {/if}
-            {/snippet}
-        </Collapsible.Content>
-    </Collapsible.Root>
-</div>
+
+                    <Select.Root
+                        type="single"
+                        items={levelOptions}
+                        value={selectedDetectionStart[detection.type]}
+                        onValueChange={(val) =>
+                            updateDetectionStart(
+                                detection.type,
+                                val === "none" ? null : parseInt(val),
+                            )}
+                    >
+                        <Select.Trigger class="select-trigger w-22.5 h-7">
+                            <span class="truncate">
+                                {levelOptions.find((o) => o.value === selectedDetectionStart[detection.type])?.label}
+                            </span>
+                            <ChevronDown class="w-3 h-3 opacity-50 ml-1" />
+                        </Select.Trigger>
+                        <Select.Portal>
+                            <Select.Content
+                                class="select-content max-h-55"
+                                sideOffset={5}
+                            >
+                                <Select.Viewport class="p-1">
+                                    {#each levelOptions as option (option.value)}
+                                        <Select.Item
+                                            class="select-item p-1 px-3 my-1 text-sm"
+                                            value={option.value}
+                                            label={option.label}
+                                        >
+                                            {#snippet children({ selected })}
+                                                {option.label}
+                                                {#if selected}
+                                                    <div class="ml-auto">
+                                                        <Check class="w-3 h-3" />
+                                                    </div>
+                                                {/if}
+                                            {/snippet}
+                                        </Select.Item>
+                                    {/each}
+                                </Select.Viewport>
+                            </Select.Content>
+                        </Select.Portal>
+                    </Select.Root>
+                </div>
+            {/each}
+        </div>
+    {:else}
+        <p class="text-xs text-muted-foreground px-1">
+            Select a tower to edit detections.
+        </p>
+    {/if}
+</CollapsibleSection>
 
 <style>
     @reference "../../routes/layout.css";

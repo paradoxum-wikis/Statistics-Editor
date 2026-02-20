@@ -2,10 +2,8 @@
     import { towerStore } from "$lib/stores/tower.svelte";
     import { imageLoader } from "$lib/services/imageLoader";
     import { getTargetSkins } from "$lib/utils/towah";
-    import { Collapsible } from "bits-ui";
-    import Separator from "./Separator.svelte";
-    import { Layers, ChevronDown } from "@lucide/svelte";
-    import { slide } from "svelte/transition";
+    import CollapsibleSection from "./CollapsibleSection.svelte";
+    import { Layers } from "@lucide/svelte";
 
     type UpgradeRow = { index: number; title: string; image: string };
 
@@ -54,66 +52,45 @@
     }
 </script>
 
-<div class="mt-4">
-    <Separator />
-    <Collapsible.Root bind:open>
-        <Collapsible.Trigger class="section-trigger">
-            <span class="section-title">
-                <Layers class="inline w-3.5 h-3.5 mb-0.5 opacity-70" />
-                Upgrades
-                {#if skinData?.isPvp}
-                    <span class="text-xs font-normal text-muted-foreground ml-1">(PVP)</span>
-                {/if}
-            </span>
-            <ChevronDown class="chevron-icon" style="transform: rotate({open ? '180deg' : '0deg'})" />
-        </Collapsible.Trigger>
-        <Collapsible.Content forceMount>
-            {#snippet child({ open: isOpen })}
-                {#if isOpen}
-                    <div class="pb-2" transition:slide={{ duration: 150 }}>
-                        {#if upgradeRows.length > 0}
-                            <div class="grid gap-2">
-                                {#each upgradeRows as row (row.index)}
-                                    <div class="upgrade-card">
-                                        <div class="upgrade-card-header">
-                                            Upgrade {row.index + 1}
-                                        </div>
-                                        <div class="upgrade-card-body">
-                                            <div class="field-row">
-                                                <span class="field-label">Title</span>
-                                                <input
-                                                    type="text"
-                                                    class="field-input"
-                                                    placeholder="—"
-                                                    value={row.title}
-                                                    onchange={(e) => updateTitle(row.index, e.currentTarget.value)}
-                                                />
-                                            </div>
-                                            <div class="field-row">
-                                                <span class="field-label">Image</span>
-                                                <input
-                                                    type="text"
-                                                    class="field-input"
-                                                    placeholder="—"
-                                                    value={row.image}
-                                                    onchange={(e) => updateImage(row.index, e.currentTarget.value)}
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                {/each}
-                            </div>
-                        {:else if skinData}
-                            <p class="text-xs text-muted-foreground px-1">No upgrades defined.</p>
-                        {:else}
-                            <p class="text-xs text-muted-foreground px-1">Select a tower to edit upgrades.</p>
-                        {/if}
+<CollapsibleSection title="Upgrades" icon={Layers} bind:open isPvp={skinData?.isPvp ?? false}>
+    {#if upgradeRows.length > 0}
+        <div class="grid gap-2">
+            {#each upgradeRows as row (row.index)}
+                <div class="upgrade-card">
+                    <div class="upgrade-card-header">
+                        Upgrade {row.index + 1}
                     </div>
-                {/if}
-            {/snippet}
-        </Collapsible.Content>
-    </Collapsible.Root>
-</div>
+                    <div class="upgrade-card-body">
+                        <div class="field-row">
+                            <span class="field-label">Title</span>
+                            <input
+                                type="text"
+                                class="field-input"
+                                placeholder="—"
+                                value={row.title}
+                                onchange={(e) => updateTitle(row.index, e.currentTarget.value)}
+                            />
+                        </div>
+                        <div class="field-row">
+                            <span class="field-label">Image</span>
+                            <input
+                                type="text"
+                                class="field-input"
+                                placeholder="—"
+                                value={row.image}
+                                onchange={(e) => updateImage(row.index, e.currentTarget.value)}
+                            />
+                        </div>
+                    </div>
+                </div>
+            {/each}
+        </div>
+    {:else if skinData}
+        <p class="text-xs text-muted-foreground px-1">No upgrades defined.</p>
+    {:else}
+        <p class="text-xs text-muted-foreground px-1">Select a tower to edit upgrades.</p>
+    {/if}
+</CollapsibleSection>
 
 <style>
     @reference "../../routes/layout.css";
