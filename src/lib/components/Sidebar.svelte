@@ -11,7 +11,7 @@
     import { settingsStore } from "$lib/stores/settings.svelte";
     import { formatValue } from "$lib/utils/format";
 
-    import Separator from "./Separator.svelte";
+    import Separator from "./smol/Separator.svelte";
     import {
         House,
         Settings,

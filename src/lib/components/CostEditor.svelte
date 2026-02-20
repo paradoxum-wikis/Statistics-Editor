@@ -1,7 +1,7 @@
 <script lang="ts">
     import { towerStore } from "$lib/stores/tower.svelte";
     import { getTargetSkins } from "$lib/utils/towah";
-    import CollapsibleSection from "./CollapsibleSection.svelte";
+    import CollapsibleSection from "./smol/CollapsibleSection.svelte";
     import { CircleDollarSign } from "@lucide/svelte";
     import { parseNumeric } from "$lib/utils/format";
 

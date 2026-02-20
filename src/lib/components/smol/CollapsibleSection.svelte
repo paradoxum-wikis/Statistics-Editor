@@ -54,5 +54,5 @@
 </Col.Root>
 
 <style>
-    @reference "../../routes/layout.css";
+    @reference "../../../routes/layout.css";
 </style>

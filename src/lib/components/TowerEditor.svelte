@@ -1,7 +1,7 @@
 <script lang="ts">
     import { untrack } from "svelte";
     import { Tabs } from "bits-ui";
-    import Separator from "./Separator.svelte";
+    import Separator from "./smol/Separator.svelte";
     import type Tower from "$lib/towerComponents/tower";
     import type SkinData from "$lib/towerComponents/skinData";
     import { settingsStore } from "$lib/stores/settings.svelte";

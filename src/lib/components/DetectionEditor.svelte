@@ -6,7 +6,7 @@
     import LeadIcon from "$lib/assets/LeadDetection.png";
     import { Select } from "bits-ui";
     import { Check, ChevronDown, ScanEye } from "@lucide/svelte";
-    import CollapsibleSection from "./CollapsibleSection.svelte";
+    import CollapsibleSection from "./smol/CollapsibleSection.svelte";
 
     let open = $state(true);
     let skinData = $derived(

@@ -2,7 +2,7 @@
     import { towerStore } from "$lib/stores/tower.svelte";
     import { imageLoader } from "$lib/services/imageLoader";
     import { getTargetSkins } from "$lib/utils/towah";
-    import CollapsibleSection from "./CollapsibleSection.svelte";
+    import CollapsibleSection from "./smol/CollapsibleSection.svelte";
     import { Layers } from "@lucide/svelte";
 
     type UpgradeRow = { index: number; title: string; image: string };
