@@ -221,7 +221,7 @@
                     class="mode-toggle-btn {editorMode === 'cells' ? 'active' : 'inactive'}"
                     onclick={() => { editorMode = "cells"; towerStore.forceReload(); }}
                 >
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-1.5">
                         <Table size={16} />
                         <span>Visual</span>
                     </div>
@@ -230,7 +230,7 @@
                     class="mode-toggle-btn {editorMode === 'wiki' ? 'active' : 'inactive'}"
                     onclick={() => (editorMode = "wiki")}
                 >
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-1.5">
                         <FileBraces size={16} />
                         <span>Source</span>
                     </div>

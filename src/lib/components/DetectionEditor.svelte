@@ -1,9 +1,9 @@
 <script lang="ts">
     import { towerStore } from "$lib/stores/tower.svelte";
     import { getTargetSkins } from "$lib/utils/towah";
-    import FlyingIcon from "$lib/assets/FlyingDetection.png";
     import HiddenIcon from "$lib/assets/HiddenDetection.png";
     import LeadIcon from "$lib/assets/LeadDetection.png";
+    import FlyingIcon from "$lib/assets/FlyingDetection.png";
     import { Select } from "bits-ui";
     import { Check, ChevronDown, ScanEye } from "@lucide/svelte";
     import CollapsibleSection from "./smol/CollapsibleSection.svelte";
@@ -21,25 +21,25 @@
 
     const detectionTypes = [
         { type: "Hidden" as const, icon: HiddenIcon },
-        { type: "Flying" as const, icon: FlyingIcon },
         { type: "Lead" as const, icon: LeadIcon },
+        { type: "Flying" as const, icon: FlyingIcon },
     ];
 
-    let selectedDetectionStart = $state<Record<"Hidden" | "Flying" | "Lead", string>>({
+    let selectedDetectionStart = $state<Record<"Hidden" | "Lead" | "Flying", string>>({
         Hidden: "none",
-        Flying: "none",
         Lead: "none",
+        Flying: "none",
     });
 
     $effect(() => {
         selectedDetectionStart = {
             Hidden: getDetectionStartLevel("Hidden")?.toString() ?? "none",
-            Flying: getDetectionStartLevel("Flying")?.toString() ?? "none",
             Lead: getDetectionStartLevel("Lead")?.toString() ?? "none",
+            Flying: getDetectionStartLevel("Flying")?.toString() ?? "none",
         };
     });
 
-    function getDetectionStartLevel(type: "Hidden" | "Flying" | "Lead"): number | null {
+    function getDetectionStartLevel(type: "Hidden" | "Lead" | "Flying"): number | null {
         if (!levels.length) return null;
         for (let i = 0; i < levels.length; i++) {
             if (levels[i][type]) return i;
@@ -47,7 +47,7 @@
         return null;
     }
 
-    function updateDetectionStart(type: "Hidden" | "Flying" | "Lead", startLevel: number | null) {
+    function updateDetectionStart(type: "Hidden" | "Lead" | "Flying", startLevel: number | null) {
         selectedDetectionStart[type] = startLevel === null ? "none" : startLevel.toString();
 
         const tower = towerStore.selectedData;
@@ -75,11 +75,11 @@
         <div class="grid gap-2">
             {#each detectionTypes as detection}
                 <div class="detection-row">
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-1.5 px-1">
                         <img
                             src={detection.icon}
                             alt="{detection.type} Detection"
-                            class="w-5 h-5 dark:invert-0 invert opacity-80"
+                            class="w-5 h-5 dark:invert-0 invert"
                         />
                         <span class="text-xs font-medium">{detection.type}</span>
                     </div>

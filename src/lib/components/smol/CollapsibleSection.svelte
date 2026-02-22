@@ -33,7 +33,7 @@
     <Col.Trigger class="section-trigger">
         <span class="section-title">
             {#if IconComponent}
-                <IconComponent class="inline w-3.5 h-3.5 mb-0.5 opacity-70" />
+                <IconComponent class="inline w-3.5 h-3.5 opacity-70" />
             {/if}
             {title}
             {#if isPvp}
