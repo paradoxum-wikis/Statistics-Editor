@@ -4,21 +4,16 @@ $CE$ = "Total Price / DPS"
 $TP$ = "$FNC-TOTALPRICE$"
 
 $0Cost$ = 7500
-$PVP-0Cost$ = 4250
-
 $1Cost$ = 2000
-$PVP-1Cost$ = 750
-
 $2Cost$ = 6000
-$PVP-2Cost$ = 2000
-
 $3Cost$ = 9999
-$PVP-3Cost$ = 4500
-
 $4Cost$ = 27500
-$4PVP-4Cost$ = 12000
-
 $5Cost$ = 60000
+$PVP-0Cost$ = 4250
+$PVP-1Cost$ = 750
+$PVP-2Cost$ = 2000
+$PVP-3Cost$ = 4500
+$4PVP-4Cost$ = 12000
 $5PVP-5Cost$ = 28500
 
 $0Lead$ = true
@@ -26,16 +21,12 @@ $1Hidden$ = true
 
 $1Upgrade$ = "Extra Juice"
 $1UpgradeI$ = 11821094308
-
 $2Upgrade$ = "Second Energy Canister"
 $2UpgradeI$ = 11821094198
-
 $3Upgrade$ = "Powerhouse Armor"
 $3UpgradeI$ = 11821093989
-
 $4Upgrade$ = "Supercharger"
 $4UpgradeI$ = 11821093828
-
 $5Upgrade$ = "Vessel Of Infinite Destruction"
 $5UpgradeI$ = 11821093672
 </var>

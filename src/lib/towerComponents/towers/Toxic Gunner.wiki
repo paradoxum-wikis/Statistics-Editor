@@ -13,17 +13,14 @@ $4Cost$ = 14000
 $0Lead$ = true
 $0Hidden$ = false
 $0Flying$ = false
+$3Flying$ = true
 
 $1Upgrade$ = "Faster Reloading"
 $1UpgradeI$ = File:ToxicGunnerLevel1Icon.png
-
 $2Upgrade$ = "Poisonous Bullets"
 $2UpgradeI$ = File:ToxicGunnerLevel2Icon.png
-
-$3Flying$ = true
 $3Upgrade$ = "Sinister Gear"
 $3UpgradeI$ = File:ToxicGunnerLevel3Icon.png
-
 $4Upgrade$ = "Going Nuclear!"
 $4UpgradeI$ = File:ToxicGunnerLevel4Icon.png
 </var>
