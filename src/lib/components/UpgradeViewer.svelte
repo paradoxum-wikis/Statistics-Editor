@@ -55,7 +55,7 @@
                     <img
                         src={upgradeImages[index]}
                         alt={`Upgrade ${index + 1}`}
-                        class="w-full aspect-square object-contain"
+                        class="upgrade-bg"
                     />
                 {:else}
                     <div class="upgrade-image-container">
@@ -168,5 +168,11 @@
 
     .upgrade-name {
         @apply mt-2 text-center text-sm font-medium;
+    }
+
+    .upgrade-bg {
+	    background-image: repeating-conic-gradient(var(--upgrade-bg-1) 0 25%, var(--upgrade-bg-2) 0 50%);
+	    background-size: 1.9em 1.9em;
+		@apply w-full aspect-square object-contain;
     }
 </style>
