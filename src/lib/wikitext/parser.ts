@@ -106,7 +106,7 @@ export function parseWikitext(content: string): ParsedWikitext {
   } else {
     const tableData = parseTable(text);
     if (tableData) {
-      tabs["Default"] = tableData;
+      tabs["Regular"] = tableData;
     }
   }
 
