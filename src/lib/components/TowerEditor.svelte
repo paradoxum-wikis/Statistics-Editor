@@ -428,7 +428,7 @@
         {/key}
 
         <Separator class="mt-4" />
-        <div class="flex justify-end gap-2 pt-4">
+        <div class="flex justify-end gap-2">
             <button
                 class="btn btn-secondary"
                 onclick={handleDiscard}
@@ -523,7 +523,7 @@
         border: 1px solid var(--input);
         background: transparent;
         padding: 0.25rem 0.75rem;
-        transition: border-color 0.2s;
+        transition: border-color 0.25s;
 
         &:focus-within {
             border-color: var(--ring);

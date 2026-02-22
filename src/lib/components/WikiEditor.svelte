@@ -306,7 +306,7 @@
 		max-height: 30rem;
 		overflow: auto;
 		transition:
-			border-color 0.2s;
+			border-color 0.25s;
 		@apply w-full font-mono text-xs leading-5;
 	}
 

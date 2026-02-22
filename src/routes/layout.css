@@ -156,7 +156,7 @@
   padding: 0.5rem 1rem;
   font-size: 0.875rem;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.25s;
 
   ::placeholder {
     color: var(--muted-foreground);
@@ -177,7 +177,7 @@
   font-size: 0.875rem;
   font-weight: 500;
   outline: none;
-  transition: background-color 0.2s;
+  transition: background-color 0.25s;
 
   &:disabled {
     pointer-events: none;
@@ -298,7 +298,7 @@
   justify-content: center;
   border-radius: var(--radius) 0;
   padding: 0.5rem;
-  transition: background-color 0.2s;
+  transition: background-color 0.25s;
 
   &:hover {
     background-color: var(--muted);
@@ -314,7 +314,7 @@
   padding: 0.5rem 0.75rem;
   font-size: 0.875rem;
   font-weight: 500;
-  transition: background-color 0.2s;
+  transition: background-color 0.25s;
 
   &:hover {
     background-color: var(--muted);
@@ -436,7 +436,7 @@
   background: var(--background);
   padding: 0 1rem;
   font-size: 0.875rem;
-  transition: colors 0.2s;
+  transition: colors 0.25s;
 
   &:focus {
     outline: none;
@@ -490,6 +490,14 @@
 
 .upgrade-tab-trigger {
   border-radius: var(--radius) 0;
+  transition:
+    background-color 0.25s,
+    color 0.25s;
+
+  &[data-state="active"] {
+    background-color: var(--primary);
+    color: white;
+  }
   @apply px-2 py-1 text-xs bg-muted w-full;
 }
 
@@ -510,7 +518,7 @@
   border-radius: calc(var(--radius) - 0.25rem) 0;
   font-size: 0.875rem;
   font-weight: 500;
-  transition: background-color 0.2s;
+  transition: background-color 0.25s;
 
   &:hover {
     background: var(--accent);
@@ -547,6 +555,6 @@
   width: 0.875rem;
   height: 0.875rem;
   color: var(--muted-foreground);
-  transition: transform 150ms ease;
+  transition: transform 0.15s ease;
   flex-shrink: 0;
 }
