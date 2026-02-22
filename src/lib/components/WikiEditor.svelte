@@ -306,15 +306,8 @@
 		max-height: 30rem;
 		overflow: auto;
 		transition:
-			box-shadow 0.2s,
 			border-color 0.2s;
 		@apply w-full font-mono text-xs leading-5;
-
-		&:focus {
-			box-shadow:
-				0 0 0 2px var(--ring),
-				0 0 0 2px var(--ring);
-		}
 	}
 
 	.wiki-notes-text {

@@ -102,10 +102,6 @@
         color: var(--foreground);
         outline: none;
 
-        &:focus {
-            box-shadow: 0 0 0 2px var(--ring);
-        }
-
         &::-webkit-outer-spin-button,
         &::-webkit-inner-spin-button {
             -webkit-appearance: none;

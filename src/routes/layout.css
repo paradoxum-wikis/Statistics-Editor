@@ -142,9 +142,6 @@
   border: 1px solid var(--border);
   background: var(--card);
   padding: 1.5rem 2rem;
-  box-shadow:
-    0 1px 3px 0 rgb(0 0 0 / 0.1),
-    0 1px 2px -1px rgb(0 0 0 / 0.1);
 }
 
 .input {
@@ -159,15 +156,7 @@
   padding: 0.5rem 1rem;
   font-size: 0.875rem;
   outline: none;
-  transition:
-    box-shadow 0.2s,
-    border-color 0.2s;
-
-  &:focus {
-    box-shadow:
-      0 0 0 2px var(--ring),
-      0 0 0 2px var(--ring);
-  }
+  transition: border-color 0.2s;
 
   ::placeholder {
     color: var(--muted-foreground);
@@ -189,10 +178,6 @@
   font-weight: 500;
   outline: none;
   transition: background-color 0.2s;
-
-  &:focus-visible {
-    box-shadow: 0 0 0 2px var(--ring);
-  }
 
   &:disabled {
     pointer-events: none;
@@ -279,9 +264,6 @@
 .overflow-x-auto {
   scrollbar-width: thin;
   scrollbar-color: #cbd5e1 #f1f5f9;
-}
-.shadow-r {
-  box-shadow: 1px 0 0 0 #e2e8f0;
 }
 
 /* Active tab */
@@ -384,15 +366,6 @@
   }
 }
 
-.alert-overlay {
-  @apply fixed inset-0 z-50 bg-black/50 backdrop-blur-sm;
-}
-
-.alert-content {
-  border-radius: var(--radius) 0;
-  @apply fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg;
-}
-
 .settings-overlay {
   @apply fixed inset-0 z-50 bg-black/50 backdrop-blur-sm;
   @apply data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0;
@@ -467,7 +440,6 @@
 
   &:focus {
     outline: none;
-    box-shadow: 0 0 0 2px var(--ring);
   }
 
   &[data-placeholder] {
@@ -488,9 +460,6 @@
   border: 1px solid var(--border);
   background: var(--popover);
   color: var(--popover-foreground);
-  box-shadow:
-    0 4px 6px -1px rgb(0 0 0 / 0.1),
-    0 2px 4px -2px rgb(0 0 0 / 0.1);
   @apply data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2;
 }
 

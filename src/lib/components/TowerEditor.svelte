@@ -454,9 +454,6 @@
 <style>
     .table-container {
         overflow-x: auto;
-        box-shadow:
-            0 1px 3px 0 rgb(0 0 0 / 0.1),
-            0 1px 2px -1px rgb(0 0 0 / 0.1);
         border: 1px solid var(--border);
         background: var(--card);
     }
@@ -499,14 +496,6 @@
         color: var(--foreground);
     }
 
-    .table-header-sticky {
-        position: sticky;
-        left: 0;
-        background: var(--muted);
-        z-index: 10;
-        box-shadow: 1px 0 0 0 var(--border);
-    }
-
     .table-cell {
         padding: 0.5rem 0.75rem;
         font-weight: 500;
@@ -517,8 +506,7 @@
         position: sticky;
         left: 0;
         background: var(--card);
-        z-index: 10;
-        box-shadow: 1px 0 0 0 var(--border);
+        z-index: 7;
         text-align: center;
     }
 
@@ -535,13 +523,10 @@
         border: 1px solid var(--input);
         background: transparent;
         padding: 0.25rem 0.75rem;
-        transition:
-            box-shadow 0.2s,
-            border-color 0.2s;
+        transition: border-color 0.2s;
 
         &:focus-within {
             border-color: var(--ring);
-            box-shadow: 0 0 0 1px var(--ring);
         }
     }
 
@@ -555,10 +540,6 @@
         outline: none;
         flex: 1;
         min-width: 0;
-
-        &:focus {
-            box-shadow: none;
-        }
     }
 
     .table-cell-readonly {

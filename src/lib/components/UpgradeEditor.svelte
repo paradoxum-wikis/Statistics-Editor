@@ -142,10 +142,6 @@
         outline: none;
         min-width: 0;
 
-        &:focus {
-            box-shadow: 0 0 0 2px var(--ring);
-        }
-
         &::placeholder {
             color: var(--muted-foreground);
             opacity: 0.4;

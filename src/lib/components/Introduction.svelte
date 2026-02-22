@@ -65,7 +65,7 @@
 
     .intro-container {
         border-radius: var(--radius) 0;
-        @apply border bg-card shadow p-8 max-w-3xl mx-auto space-y-6;
+        @apply border bg-card p-8 max-w-3xl mx-auto space-y-6;
     }
 
     .intro-header {
