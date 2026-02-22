@@ -174,7 +174,7 @@
 		onHome={goHome}
 	/>
 
-	<div class="ml-[17%] flex flex-col h-full">
+	<div class="ms-[17%] flex flex-col h-full">
 		<header class="header-bar">
 			<h1 class="text-heading text-xl font-bold">
 				{towerStore.selectedName || "TDS Statistics Editor"}
@@ -225,12 +225,12 @@
 									>
 										<span>{profile}</span>
 										{#if profile === profileStore.current}
-											<span class="ml-auto">
+											<span class="ms-auto">
 												<Check size={14} />
 											</span>
 										{:else if profile !== "Default"}
 											<button
-												class="ml-2 text-muted-foreground hover:text-destructive opacity-0 transition-opacity"
+												class="ms-2 text-muted-foreground hover:text-destructive opacity-0 transition-opacity"
 												onclick={(e) => openDeleteProfileDialog(profile, e)}
 											>
 												<Trash2 size={14} />

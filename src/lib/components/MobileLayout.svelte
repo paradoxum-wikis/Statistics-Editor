@@ -297,10 +297,10 @@
                         >
                             <span>{profile}</span>
                             {#if profile === profileStore.current}
-                                <span class="ml-auto"><Check size={14} /></span>
+                                <span class="ms-auto"><Check size={14} /></span>
                             {:else if profile !== "Default"}
                                 <button
-                                    class="ml-2 text-muted-foreground hover:text-destructive opacity-0 transition-opacity"
+                                    class="ms-2 text-muted-foreground hover:text-destructive opacity-0 transition-opacity"
                                     onclick={(e) => openDeleteProfileDialog(profile, e)}
                                 >
                                     <Trash2 size={14} />
@@ -380,18 +380,18 @@
                 <h4 class="font-medium text-sm mb-2">Tools</h4>
                 <div class="grid gap-0.5">
                     <button class="dropdown-item w-full justify-start!" onclick={goHome}>
-                        <House class="mr-2 h-4 w-4" />
+                        <House class="me-2 h-4 w-4" />
                         <span>Home</span>
                     </button>
 
                     <Popover.Root>
                         <Popover.Trigger class="dropdown-item w-full justify-start!">
                             {#if settingsStore.theme === "light"}
-                                <Sun class="mr-2 h-4 w-4" />
+                                <Sun class="me-2 h-4 w-4" />
                             {:else if settingsStore.theme === "dark"}
-                                <Moon class="mr-2 h-4 w-4" />
+                                <Moon class="me-2 h-4 w-4" />
                             {:else}
-                                <SunMoon class="mr-2 h-4 w-4" />
+                                <SunMoon class="me-2 h-4 w-4" />
                             {/if}
                             <span>Theme</span>
                         </Popover.Trigger>
@@ -407,7 +407,7 @@
                                     class="dropdown-item w-full justify-start!"
                                     onclick={() => settingsStore.setTheme("light")}
                                 >
-                                    <Sun class="mr-2 h-4 w-4" />
+                                    <Sun class="me-2 h-4 w-4" />
                                     <span>Light</span>
                                     {#if settingsStore.theme === "light"}
                                         <Check class="ms-2 h-4 w-4" />
@@ -417,7 +417,7 @@
                                     class="dropdown-item w-full justify-start!"
                                     onclick={() => settingsStore.setTheme("dark")}
                                 >
-                                    <Moon class="mr-2 h-4 w-4" />
+                                    <Moon class="me-2 h-4 w-4" />
                                     <span>Dark</span>
                                     {#if settingsStore.theme === "dark"}
                                         <Check class="ms-2 h-4 w-4" />
@@ -427,7 +427,7 @@
                                     class="dropdown-item w-full justify-start!"
                                     onclick={() => settingsStore.setTheme("system")}
                                 >
-                                    <SunMoon class="mr-2 h-4 w-4" />
+                                    <SunMoon class="me-2 h-4 w-4" />
                                     <span>System</span>
                                     {#if settingsStore.theme === "system"}
                                         <Check class="ms-2 h-4 w-4" />
@@ -441,7 +441,7 @@
                         class="dropdown-item w-full justify-start!"
                         onclick={() => (settingsOpen = true)}
                     >
-                        <Settings class="mr-2 h-4 w-4" />
+                        <Settings class="me-2 h-4 w-4" />
                         <span>Settings</span>
                     </button>
 
@@ -449,7 +449,7 @@
                         <div class="-mx-1 my-1 h-px bg-muted"></div>
                         <Popover.Root>
                             <Popover.Trigger class="dropdown-item w-full justify-start! text-destructive hover:text-destructive!">
-                                <RotateCcw class="mr-2 h-4 w-4" />
+                                <RotateCcw class="me-2 h-4 w-4" />
                                 <span>Reset Tower</span>
                             </Popover.Trigger>
                             <Popover.Content

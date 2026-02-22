@@ -98,7 +98,7 @@
                             <span class="truncate">
                                 {levelOptions.find((o) => o.value === selectedDetectionStart[detection.type])?.label}
                             </span>
-                            <ChevronDown class="w-3 h-3 opacity-50 ml-1" />
+                            <ChevronDown class="w-3 h-3 opacity-50 ms-1" />
                         </Select.Trigger>
                         <Select.Portal>
                             <Select.Content
@@ -115,7 +115,7 @@
                                             {#snippet children({ selected })}
                                                 {option.label}
                                                 {#if selected}
-                                                    <div class="ml-auto">
+                                                    <div class="ms-auto">
                                                         <Check class="w-3 h-3" />
                                                     </div>
                                                 {/if}

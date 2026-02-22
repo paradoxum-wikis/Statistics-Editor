@@ -37,7 +37,7 @@
             {/if}
             {title}
             {#if isPvp}
-                <span class="text-xs font-normal text-muted-foreground ml-1">(PVP)</span>
+                <span class="text-xs font-normal text-muted-foreground">(PVP)</span>
             {/if}
         </span>
         <ChevronDown class="chevron-icon" style="transform: rotate({open ? '180deg' : '0deg'})" />

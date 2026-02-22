@@ -279,7 +279,7 @@
 
 .mode-toggle-group {
   border-radius: var(--radius) 0;
-  @apply flex bg-muted p-1 border border-border mr-2;
+  @apply flex bg-muted p-1 border border-border me-2;
 }
 
 .mode-toggle-btn {
@@ -361,7 +361,7 @@
 
 .combobox-item {
   border-radius: calc(var(--radius) - 0.25rem) 0;
-  @apply relative flex w-full cursor-default select-none items-center py-1.5 pl-4 pr-8 text-sm outline-none;
+  @apply relative flex w-full cursor-default select-none items-center py-1.5 ps-4 pe-8 text-sm outline-none;
 
   &[data-disabled] {
     @apply pointer-events-none opacity-50;

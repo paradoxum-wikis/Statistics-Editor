@@ -302,7 +302,7 @@
                             class="dropdown-item w-full justify-start!"
                             onclick={() => settingsStore.setTheme("light")}
                         >
-                            <Sun class="mr-2 h-4 w-4" />
+                            <Sun class="me-2 h-4 w-4" />
                             <span>Light</span>
                             {#if settingsStore.theme === "light"}
                                 <Check class="ms-2 h-4 w-4" />
@@ -312,7 +312,7 @@
                             class="dropdown-item w-full justify-start!"
                             onclick={() => settingsStore.setTheme("dark")}
                         >
-                            <Moon class="mr-2 h-4 w-4" />
+                            <Moon class="me-2 h-4 w-4" />
                             <span>Dark</span>
                             {#if settingsStore.theme === "dark"}
                                 <Check class="ms-2 h-4 w-4" />
@@ -322,7 +322,7 @@
                             class="dropdown-item w-full justify-start!"
                             onclick={() => settingsStore.setTheme("system")}
                         >
-                            <SunMoon class="mr-2 h-4 w-4" />
+                            <SunMoon class="me-2 h-4 w-4" />
                             <span>System</span>
                             {#if settingsStore.theme === "system"}
                                 <Check class="ms-2 h-4 w-4" />
