@@ -1,0 +1,135 @@
+<var>
+$DPS$ = Damage / Firerate
+$CE$ = Total Price / DPS
+$TP$ = $FNC-TOTALPRICE$
+
+$0Cost$ = 300
+$1Cost$ = 150
+$2Cost$ = 500
+$3Cost$ = 1500
+$4Cost$ = 4000
+$PVP-0Cost$ = 500
+$PVP-1Cost$ = 350
+$PVP-2Cost$ = 800
+$PVP-3Cost$ = 3250
+$PVP-4Cost$ = 5000
+
+$2Hidden$ = true
+$3Lead$ = true
+$0Flying$ = true
+
+$1Upgrade$ = Faster Reloading
+$1UpgradeI$ = 3280081327
+$2Upgrade$ = Geared Up
+$2UpgradeI$ = 3280367022
+$3Upgrade$ = Frontlines Sniping
+$3UpgradeI$ = 3280367963
+$4Upgrade$ = Spec Ops
+$4UpgradeI$ = 3280368786
+</var>
+<div class="mobile-tabber"><tabber>
+|-|Regular =
+<div class="overflow-box">
+{| class="wikitable stats-table"
+!Level
+!Total Price
+!Damage
+!Firerate
+!Range
+!DPS
+!Cost Efficiency
+|-
+|0
+|{{Money|$TP$}}
+|4
+|4.008
+|27.5
+|$DPS$
+|{{Money|$CE$}}
+|-
+|1
+|{{Money|$TP$}}
+|6
+|3.508
+|27.5
+|$DPS$
+|{{Money|$CE$}}
+|-
+|2
+|{{Money|$TP$}}
+|12
+|3.508
+|32.5
+|$DPS$
+|{{Money|$CE$}}
+|-
+|3
+|{{Money|$TP$}}
+|30
+|3.508
+|35
+|$DPS$
+|{{Money|$CE$}}
+|-
+|4
+|{{Money|$TP$}}
+|40
+|2.008
+|45
+|$DPS$
+|{{Money|$CE$}}
+|}
+</div>
+|-|PVP =
+<div class="overflow-box">
+{| class="wikitable stats-table"
+!Level
+!Total Price
+!Damage
+!Firerate
+!Range
+!DPS
+!Cost Efficiency
+|-
+|0
+|{{Money|$TP$}}
+|6
+|1.658
+|20
+|$DPS$
+|{{Money|$CE$}}
+|-
+|1
+|{{Money|$TP$}}
+|8
+|1.308
+|20
+|$DPS$
+|{{Money|$CE$}}
+|-
+|2
+|{{Money|$TP$}}
+|15
+|1.308
+|22.5
+|$DPS$
+|{{Money|$CE$}}
+|-
+|3
+|{{Money|$TP$}}
+|15
+|0.508
+|25
+|$DPS$
+|{{Money|$CE$}}
+|-
+|4
+|{{Money|$TP$}}
+|30
+|0.508
+|30
+|$DPS$
+|{{Money|$CE$}}
+|}
+</div>
+</tabber></div>
