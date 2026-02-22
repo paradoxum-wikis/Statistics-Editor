@@ -1,6 +1,13 @@
 <var>
 $DPS$ = "(Damage * Burst Count) / (Cooldown + (Firerate * Burst Count)) + (Poison Damage / Tick)"
 $DPS2$ = "Damage / Firerate + Poison Damage / Tick"
+$CE$ = "Total Price / DPS"
+
+$0Cost$ = 525
+$1Cost$ = 200
+$2Cost$ = 800
+$3Cost$ = 3500
+$4Cost$ = 14000
 
 $0Lead$ = true
 $0Hidden$ = false
@@ -20,7 +27,7 @@ $4Upgrade$ = "Going Nuclear!"
 $4UpgradeI$ = File:ToxicGunnerLevel4Icon.png
 </var>
 <div class="overflow-box">
-{| class="wikitable stats-table" style="width:1650px;"
+{| class="wikitable stats-table"
 !Level
 !Total Price
 !Damage
@@ -39,7 +46,7 @@ $4UpgradeI$ = File:ToxicGunnerLevel4Icon.png
 !Cost Efficiency
 |-
 |0
-|{{Money|525}}
+|{{Money|$FNC-TOTALPRICE$}}
 |1
 |1
 |4
@@ -53,10 +60,10 @@ $4UpgradeI$ = File:ToxicGunnerLevel4Icon.png
 |6
 |10%
 |$DPS$<ref>2.45 Gun DPS + 1 Poison DPS</ref>
-|{{Money|152.17}}
+|{{Money|$CE$}}
 |-
 |1
-|{{Money|725}}
+|{{Money|$FNC-TOTALPRICE$}}
 |1
 |1
 |4
@@ -70,12 +77,12 @@ $4UpgradeI$ = File:ToxicGunnerLevel4Icon.png
 |6
 |10%
 |$DPS$<ref>3.88 Gun DPS + 1 Poison DPS</ref>
-|{{Money|148.57}}
+|{{Money|$CE$}}
 |-
 |2
-|{{Money|1,525}}
+|{{Money|$FNC-TOTALPRICE$}}
 |1
-|4
+|3
 |8
 |0.108
 |1
@@ -84,13 +91,13 @@ $4UpgradeI$ = File:ToxicGunnerLevel4Icon.png
 |6
 |N/A
 |N/A
-|24
+|18
 |20%
-|$DPS$<ref>5.46 Gun DPS + 4 Poison DPS</ref>
-|{{Money|161.21}}
+|$DPS$<ref>5.46 Gun DPS + 3 Poison DPS</ref>
+|{{Money|$CE$}}
 |-
 |3
-|{{Money|5,025}}
+|{{Money|$FNC-TOTALPRICE$}}
 |4
 |4
 |20
@@ -104,10 +111,10 @@ $4UpgradeI$ = File:ToxicGunnerLevel4Icon.png
 |24
 |20%
 |$DPS$<ref>28.99 Gun DPS + 4 Poison DPS</ref>
-|{{Money|152.32}}
+|{{Money|$CE$}}
 |-
 |4
-|{{Money|19,025}}
+|{{Money|$FNC-TOTALPRICE$}}
 |11
 |10
 |N/A
@@ -121,6 +128,6 @@ $4UpgradeI$ = File:ToxicGunnerLevel4Icon.png
 |100
 |30%
 |$DPS2$<ref>76.92 Gun DPS + 10 Poison DPS</ref>
-|{{Money|218.88}}
+|{{Money|$CE$}}
 |}
 </div>
