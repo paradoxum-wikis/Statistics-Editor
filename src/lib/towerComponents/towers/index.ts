@@ -1,1 +1,7 @@
-export const towerNames = ["Accelerator", "Toxic Gunner"];
+export const towerNames = [
+  "Scout",
+  "Sniper",
+  "Paintballer",
+  "Accelerator",
+  "Toxic Gunner",
+];
