@@ -1,0 +1,79 @@
+<var>
+$DPS$ = Damage / Firerate
+$CE$ = Total Price / DPS
+$TP$ = $FNC-TOTALPRICE$
+
+$0Cost$ = 150
+$1Cost$ = 50
+$2Cost$ = 200
+$3Cost$ = 950
+$4Cost$ = 2500
+$PVP-0Cost$ = 300
+$PVP-1Cost$ = 100
+$PVP-2Cost$ = 650
+$PVP-3Cost$ = 1800
+$PVP-4Cost$ = 3250
+
+$1Hidden$ = true
+$2Lead$ = true
+
+$1Upgrade$ = Higher Caliber
+$1UpgradeI$ = 3032133716
+$2Upgrade$ = Precise Aiming
+$2UpgradeI$ = 115730014
+$3Upgrade$ = Golden Deagle
+$3UpgradeI$ = 3278741672
+$4Upgrade$ = Double Tap
+$4UpgradeI$ = 3279537687
+</var>
+<div class="overflow-box">
+{| class="wikitable stats-table"
+!Level
+!Total Price
+!Damage
+!Firerate
+!Range
+!DPS
+!Cost Efficiency
+|-
+|0
+|{{Money|$TP$}}
+|2
+|0.808
+|14
+|$DPS$
+|{{Money|$CE$}}
+|-
+|1
+|{{Money|$TP$}}
+|2
+|0.508
+|15
+|$DPS$
+|{{Money|$CE$}}
+|-
+|2
+|{{Money|$TP$}}
+|5
+|0.508
+|15
+|$DPS$
+|{{Money|$CE$}}
+|-
+|3
+|{{Money|$TP$}}
+|35
+|1.208
+|18
+|$DPS$
+|{{Money|$CE$}}
+|-
+|4
+|{{Money|$TP$}}
+|35
+|0.608
+|18
+|$DPS$
+|{{Money|$CE$}}
+|}
+</div>
