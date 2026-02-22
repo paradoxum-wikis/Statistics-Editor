@@ -4,7 +4,7 @@
 
 <div class="intro-container">
     <div class="intro-header">
-        <h2 class="intro-title">
+        <h2 class="intro-title unisans">
             Welcome to the TDS Statistics Editor!
         </h2>
         <p class="intro-subtitle">
@@ -73,7 +73,7 @@
     }
 
     .intro-title {
-        @apply text-3xl font-bold text-foreground;
+        @apply text-3xl text-foreground;
     }
 
     .intro-subtitle {

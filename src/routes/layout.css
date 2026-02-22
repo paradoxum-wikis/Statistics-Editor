@@ -1,6 +1,11 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @custom-variant dark (&:is(.dark *));
+@font-face {
+  font-family: "Uni Sans Heavy";
+  src: url("https://static.wikia.nocookie.net/abd-stand-archive/images/d/d6/Uni_Sans_Heavy.ttf")
+    format("truetype");
+}
 
 /* the @apply are things that i just migrated over, may convert them later */
 :root {
@@ -122,6 +127,10 @@
     height: 100%;
     font-family: "Montserrat", sans-serif;
   }
+}
+
+.unisans {
+  font-family: "Uni Sans Heavy", sans-serif;
 }
 
 .card {
@@ -250,7 +259,6 @@
 
 .text-heading {
   font-size: 1.875rem;
-  font-weight: 700;
   color: var(--foreground);
 }
 
@@ -274,7 +282,7 @@
 
 /* Active tab */
 .header-bar {
-  @apply border-b bg-card p-4 flex items-center justify-between sticky top-0 z-10;
+  @apply border-b bg-card p-2 px-3 flex items-center justify-between sticky top-0 z-10;
 }
 
 .mode-toggle-group {

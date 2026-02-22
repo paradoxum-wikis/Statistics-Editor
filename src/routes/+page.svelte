@@ -176,7 +176,7 @@
 
 	<div class="ms-[17%] flex flex-col h-full">
 		<header class="header-bar">
-			<h1 class="text-heading text-xl font-bold">
+			<h1 class="text-heading unisans">
 				{towerStore.selectedName || "TDS Statistics Editor"}
 			</h1>
 			<div class="flex items-center space-x-4">
