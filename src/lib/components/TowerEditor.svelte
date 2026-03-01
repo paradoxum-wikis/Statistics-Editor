@@ -6,7 +6,8 @@
     import type SkinData from "$lib/towerComponents/skinData";
     import { settingsStore } from "$lib/stores/settings.svelte";
     import { towerStore } from "$lib/stores/tower.svelte";
-    import { fade } from "svelte/transition";
+    import { fly } from "svelte/transition";
+    import { cubicOut } from "svelte/easing";
     import MoneyIcon from "$lib/assets/Income.png";
     import { formatNumber, formatValue } from "$lib/utils/format";
 
@@ -269,10 +270,10 @@
                                   ? skinData.levels.attributes
                                   : []}
                         {@const upgrades = skinData?.upgrades ?? []}
-                        {#if skinData}
+                        {#if skinData && towerStore.selectedSkinName === skinName}
                             <div
                                 class="table-container"
-                                in:fade={{ duration: 200 }}
+                                in:fly={{ y: 8, duration: 160, easing: cubicOut }}
                             >
                                 <table class="table">
                                     <thead class="table-head">
@@ -417,9 +418,9 @@
                                     </tbody>
                                 </table>
                             </div>
-                        {:else}
+                        {:else if towerStore.selectedSkinName === skinName}
                             <div class="text-center py-4 text-muted-foreground">
-                                No skin data available for {skinName}
+                                No skin data available.
                             </div>
                         {/if}
                     </Tabs.Content>

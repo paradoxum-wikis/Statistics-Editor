@@ -403,11 +403,15 @@
 							</p>
 						</div>
 					{:else if towerStore.selectedData}
-						{#if editorMode === "cells"}
-							<TowerEditor tower={towerStore.selectedData} />
-						{:else}
-							<WikiEditor towerName={towerStore.selectedName} open={true} />
-						{/if}
+						{#key editorMode}
+							<div in:fly={{ y: 8, duration: 160, easing: cubicOut }}>
+								{#if editorMode === "cells"}
+									<TowerEditor tower={towerStore.selectedData} />
+								{:else}
+									<WikiEditor towerName={towerStore.selectedName} open={true} />
+								{/if}
+							</div>
+						{/key}
 					{:else if towerStore.isLoading}
 						<div class="card p-8 text-center">
 							<p class="animate-pulse text-body">

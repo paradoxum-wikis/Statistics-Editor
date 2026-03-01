@@ -1,6 +1,7 @@
 <script lang="ts">
     import { Tabs } from "bits-ui";
     import { fade } from "svelte/transition";
+    import { cubicOut } from "svelte/easing";
 
     type SummaryLine = {
         kind: "change" | "grant";
@@ -46,61 +47,63 @@
 
     {#each Array(numUpgrades) as _, index}
         <Tabs.Content value={index.toString()}>
-            <div in:fade={{ duration: 200 }}>
-                {#if loadingImages.get(index)}
-                    <div class="upgrade-image-container">
-                        Loading...
-                    </div>
-                {:else if upgradeImages[index]}
-                    <img
-                        src={upgradeImages[index]}
-                        alt={`Upgrade ${index + 1}`}
-                        class="upgrade-bg"
-                    />
-                {:else}
-                    <div class="upgrade-image-container">
-                        No image available
-                    </div>
-                {/if}
-
-                {#if upgradeNames[index]}
-                    <div class="upgrade-name">
-                        {upgradeNames[index]}
-                    </div>
-                {/if}
-
-                {#if upgradeSummaries[index]?.length}
-                    <div class="upgrade-summary-box">
-                        <div class="upgrade-summary-list">
-                            {#each upgradeSummaries[index] as line}
-                                <div class="upgrade-summary-line">
-                                    <span class="upgrade-summary-marker">
-                                        {#if line.icon}
-                                            <img
-                                                src={line.icon}
-                                                alt={line.stat}
-                                                class={isDetectionStat(line.stat)
-                                                    ? "dark:invert-0 invert"
-                                                    : ""}
-                                            />
-                                        {:else}
-                                            <span class="upgrade-summary-bullet">●</span>
-                                        {/if}
-                                    </span>
-
-                                    <span class="upgrade-summary-text">
-                                        {#if line.kind === "change"}
-                                            {line.stat}: {line.from} → {line.to}
-                                        {:else}
-                                            {line.stat}
-                                        {/if}
-                                    </span>
-                                </div>
-                            {/each}
+            {#if selectedUpgrade === index.toString()}
+                <div in:fade={{ duration: 250, easing: cubicOut }}>
+                    {#if loadingImages.get(index)}
+                        <div class="upgrade-image-container">
+                            Loading...
                         </div>
-                    </div>
-                {/if}
-            </div>
+                    {:else if upgradeImages[index]}
+                        <img
+                            src={upgradeImages[index]}
+                            alt={`Upgrade ${index + 1}`}
+                            class="upgrade-bg"
+                        />
+                    {:else}
+                        <div class="upgrade-image-container">
+                            No image available
+                        </div>
+                    {/if}
+
+                    {#if upgradeNames[index]}
+                        <div class="upgrade-name">
+                            {upgradeNames[index]}
+                        </div>
+                    {/if}
+
+                    {#if upgradeSummaries[index]?.length}
+                        <div class="upgrade-summary-box">
+                            <div class="upgrade-summary-list">
+                                {#each upgradeSummaries[index] as line}
+                                    <div class="upgrade-summary-line">
+                                        <span class="upgrade-summary-marker">
+                                            {#if line.icon}
+                                                <img
+                                                    src={line.icon}
+                                                    alt={line.stat}
+                                                    class={isDetectionStat(line.stat)
+                                                        ? "dark:invert-0 invert"
+                                                        : ""}
+                                                />
+                                            {:else}
+                                                <span class="upgrade-summary-bullet">●</span>
+                                            {/if}
+                                        </span>
+
+                                        <span class="upgrade-summary-text">
+                                            {#if line.kind === "change"}
+                                                {line.stat}: {line.from} → {line.to}
+                                            {:else}
+                                                {line.stat}
+                                            {/if}
+                                        </span>
+                                    </div>
+                                {/each}
+                            </div>
+                        </div>
+                    {/if}
+                </div>
+            {/if}
         </Tabs.Content>
     {/each}
 </Tabs.Root>
