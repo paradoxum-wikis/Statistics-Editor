@@ -1,7 +1,9 @@
 <script lang="ts">
     import { Tabs } from "bits-ui";
     import { fade } from "svelte/transition";
+    import Separator from "./smol/Separator.svelte";
     import { cubicOut } from "svelte/easing";
+    import TDSWLogo from "$lib/assets/tdswbanner.png";
 
     type SummaryLine = {
         kind: "change" | "grant";
@@ -32,7 +34,18 @@
     }
 </script>
 
-<h2 class="upgrade-heading">Upgrades</h2>
+<div class="mb-3 px-2">
+	<a href="https://tds.fandom.com/wiki/" target="_blank" rel="noopener" class="animate-in fade-in">
+	    <img
+	        src="{TDSWLogo}"
+	        alt="TDS Wiki Logo"
+	        class="w-full max-h-14 object-contain drop-shadow-sm transition-transform duration-150 ease-out hover:scale-115"
+	    />
+    </a>
+</div>
+
+<Separator class="mb-4" />
+
 <Tabs.Root bind:value={selectedUpgrade}>
     <Tabs.List class="upgrade-tabs-list">
         {#each Array(numUpgrades) as _, index}
@@ -159,10 +172,6 @@
         min-width: 0;
         line-height: 1.25;
         text-wrap: balance;
-    }
-
-    .upgrade-heading {
-        @apply text-sm font-semibold mb-4 text-foreground;
     }
 
     .upgrade-image-container {
