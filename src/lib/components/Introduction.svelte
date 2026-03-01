@@ -73,7 +73,7 @@
     }
 
     .intro-title {
-        @apply text-3xl text-foreground;
+        @apply text-3xl text-foreground font-bold;
     }
 
     .intro-subtitle {

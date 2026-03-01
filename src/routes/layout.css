@@ -1,11 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @custom-variant dark (&:is(.dark *));
-@font-face {
-  font-family: "Uni Sans Heavy";
-  src: url("https://static.wikia.nocookie.net/abd-stand-archive/images/d/d6/Uni_Sans_Heavy.ttf")
-    format("truetype");
-}
 
 /* the @apply are things that i just migrated over, may convert them later */
 :root {
@@ -133,8 +128,12 @@
   }
 }
 
+h1,
+h2,
+h3,
+h4,
 .unisans {
-  font-family: "Uni Sans Heavy", sans-serif;
+  font-family: "UniSans", sans-serif;
 }
 
 .card {
@@ -249,6 +248,7 @@
 .text-heading {
   font-size: 1.875rem;
   color: var(--foreground);
+  @apply font-black;
 }
 
 .text-subheading {
