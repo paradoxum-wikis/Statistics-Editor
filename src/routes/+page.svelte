@@ -37,7 +37,6 @@
 	}
 
 	function backToCells() {
-		towerStore.forceReload();
 		editorMode = "cells";
 	}
 
@@ -74,10 +73,10 @@
 	const mainKey = $derived(
 		!isClient
 			? "init"
-			: towerStore.isLoading
-				? "loading"
-				: towerStore.selectedData
-					? `tower:${towerStore.selectedName}:${editorMode}`
+			: towerStore.selectedName
+				? `tower:${towerStore.selectedName}`
+				: towerStore.isLoading
+					? "loading"
 					: "intro",
 	);
 
@@ -395,7 +394,7 @@
 		</header>
 
 		<main class="flex-1 p-5 overflow-x-auto">
-			{#key `${isClient}-${towerStore.isLoading}-${towerStore.selectedName ?? ""}-${editorMode}`}
+			{#key mainKey}
 				<div in:fly={{ y: 8, duration: 160, easing: cubicOut }}>
 					{#if !isClient}
 						<div class="card p-8 text-center">

@@ -219,7 +219,7 @@
             <div class="mode-toggle-group">
                 <button
                     class="mode-toggle-btn {editorMode === 'cells' ? 'active' : 'inactive'}"
-                    onclick={() => { editorMode = "cells"; towerStore.forceReload(); }}
+                    onclick={() => (editorMode = "cells")}
                 >
                     <div class="flex items-center gap-1.5">
                         <Table size={16} />
