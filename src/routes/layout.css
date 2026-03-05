@@ -493,10 +493,12 @@ h4,
   transition:
     background-color 0.25s,
     color 0.25s;
+  cursor: pointer;
 
   &[data-state="active"] {
     background-color: var(--primary);
     color: white;
+    cursor: default;
   }
   @apply px-2 py-1 text-xs bg-muted w-full;
 }
