@@ -44,7 +44,7 @@
                             for="see-value-difference"
                             class="settings-label"
                         >
-                            See value difference
+                            See Value Difference
                         </label>
                         <p class="settings-help-text">
                             Shows how much a value changed compared to the
@@ -56,6 +56,52 @@
                         checked={settingsStore.seeValueDifference}
                         onCheckedChange={(v) =>
                             settingsStore.setSeeValueDifference(v)}
+                        class="switch-root"
+                    >
+                        <Switch.Thumb class="switch-thumb"></Switch.Thumb>
+                    </Switch.Root>
+                </div>
+
+                <div class="settings-item">
+                    <div class="settings-label-group">
+                        <label
+                            for="hide-cell-wrapper"
+                            class="settings-label"
+                        >
+                            Hide Cell Wrapper
+                        </label>
+                        <p class="settings-help-text">
+                            Hides the visual wrapper inside table cells, letting the number sit directly in the cell.
+                        </p>
+                    </div>
+                    <Switch.Root
+                        id="hide-cell-wrapper"
+                        checked={settingsStore.hideCellWrapper}
+                        onCheckedChange={(v) =>
+                            settingsStore.setHideCellWrapper(v)}
+                        class="switch-root"
+                    >
+                        <Switch.Thumb class="switch-thumb"></Switch.Thumb>
+                    </Switch.Root>
+                </div>
+
+                <div class="settings-item">
+                    <div class="settings-label-group">
+                        <label
+                            for="min-content-table-width"
+                            class="settings-label"
+                        >
+                        	Compact Table Width
+                        </label>
+                        <p class="settings-help-text">
+                            Prevents the table from stretching to the full width, keeping it only as wide as necessary.
+                        </p>
+                    </div>
+                    <Switch.Root
+                        id="min-content-table-width"
+                        checked={settingsStore.minTableWidth}
+                        onCheckedChange={(v) =>
+                            settingsStore.setMinTableWidth(v)}
                         class="switch-root"
                     >
                         <Switch.Thumb class="switch-thumb"></Switch.Thumb>

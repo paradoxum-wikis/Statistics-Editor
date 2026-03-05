@@ -272,10 +272,10 @@
                         {@const upgrades = skinData?.upgrades ?? []}
                         {#if skinData && towerStore.selectedSkinName === skinName}
                             <div
-                                class="table-container"
+                                class="table-container {settingsStore.minTableWidth ? 'min-content' : ''}"
                                 in:fly={{ y: 8, duration: 160, easing: cubicOut }}
                             >
-                                <table class="table">
+                                <table class="table {settingsStore.minTableWidth ? 'min-content' : ''}">
                                     <thead class="table-head">
                                         <tr>
                                             {#each headers as header}
@@ -317,7 +317,7 @@
                                                         <td class="table-data">
                                                             {#if isEditableForSkin(skinData, header)}
                                                                 <div
-                                                                    class="cell-wrapper {skinData.moneyColumns.includes(header) ? 'money-wrapper' : ''}"
+                                                                    class="cell-wrapper {skinData.moneyColumns.includes(header) ? 'money-wrapper' : ''} {settingsStore.hideCellWrapper ? 'hide-wrapper' : ''}"
                                                                 >
                                                                     {#if skinData.moneyColumns.includes(header)}
                                                                         <img src={MoneyIcon} alt="" class="money-icon money-icon-input" />
@@ -387,7 +387,7 @@
                                                                 </div>
                                                             {:else}
                                                                 <div
-                                                                    class="table-cell-readonly flex items-center justify-between gap-2"
+                                                                    class="table-cell-readonly flex items-center justify-between gap-2 {settingsStore.hideCellWrapper ? 'hide-wrapper' : ''}"
                                                                 >
                                                                     {#if skinData.moneyColumns.includes(header)}
                                                                         <span class="money-value">
@@ -457,12 +457,22 @@
         overflow-x: auto;
         border: 1px solid var(--border);
         background: var(--card);
+
+        &.min-content {
+            width: max-content;
+            max-width: 100%;
+        }
     }
 
     .table {
         min-width: 100%;
         border-collapse: collapse;
         font-size: 0.875rem;
+
+        &.min-content {
+            min-width: 0;
+            width: min-content;
+        }
 
         thead,
         tbody {
@@ -529,6 +539,15 @@
         &:focus-within {
             border-color: var(--ring);
         }
+
+        &.hide-wrapper {
+            border-color: transparent;
+            padding: 0.1rem;
+
+            &:focus-within {
+                border-color: transparent;
+            }
+        }
     }
 
     .table-input {
@@ -549,6 +568,11 @@
         font-style: italic;
         background: var(--muted);
         border-radius: var(--radius) 0;
+
+        &.hide-wrapper {
+            background: transparent;
+            padding: 0.1rem;
+        }
     }
 
     .delta-text {

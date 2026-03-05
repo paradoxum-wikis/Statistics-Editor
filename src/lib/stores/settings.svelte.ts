@@ -11,6 +11,8 @@ type SettingString<T extends string> = {
 const SETTINGS: {
   debugMode: SettingBoolean;
   seeValueDifference: SettingBoolean;
+  hideCellWrapper: SettingBoolean;
+  minTableWidth: SettingBoolean;
   theme: SettingString<"light" | "dark" | "system">;
 } = {
   debugMode: {
@@ -20,6 +22,14 @@ const SETTINGS: {
   seeValueDifference: {
     key: "tdse_see_delta",
     default: true,
+  },
+  hideCellWrapper: {
+    key: "tdse_hcw",
+    default: false,
+  },
+  minTableWidth: {
+    key: "tdse_mctw",
+    default: false,
   },
   theme: {
     key: "tdse_theme",
@@ -57,11 +67,15 @@ function writeStringSetting<T extends string>(
 class SettingsStore {
   debugMode = $state(SETTINGS.debugMode.default);
   seeValueDifference = $state(SETTINGS.seeValueDifference.default);
+  hideCellWrapper = $state(SETTINGS.hideCellWrapper.default);
+  minTableWidth = $state(SETTINGS.minTableWidth.default);
   theme = $state(SETTINGS.theme.default);
 
   constructor() {
     this.debugMode = readBooleanSetting(SETTINGS.debugMode);
     this.seeValueDifference = readBooleanSetting(SETTINGS.seeValueDifference);
+    this.hideCellWrapper = readBooleanSetting(SETTINGS.hideCellWrapper);
+    this.minTableWidth = readBooleanSetting(SETTINGS.minTableWidth);
     this.theme = readStringSetting(SETTINGS.theme);
   }
 
@@ -86,6 +100,16 @@ class SettingsStore {
   setSeeValueDifference(value: boolean) {
     this.seeValueDifference = value;
     writeBooleanSetting(SETTINGS.seeValueDifference, value);
+  }
+
+  setHideCellWrapper(value: boolean) {
+    this.hideCellWrapper = value;
+    writeBooleanSetting(SETTINGS.hideCellWrapper, value);
+  }
+
+  setMinTableWidth(value: boolean) {
+    this.minTableWidth = value;
+    writeBooleanSetting(SETTINGS.minTableWidth, value);
   }
 
   setTheme(value: "light" | "dark" | "system") {
