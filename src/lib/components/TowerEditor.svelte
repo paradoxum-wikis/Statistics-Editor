@@ -493,6 +493,14 @@
 
         tr {
             border-bottom: 1px solid var(--border);
+
+            &:nth-child(even) {
+                background: var(--secondary);
+
+                .table-cell-sticky {
+                    background: var(--secondary);
+                }
+            }
         }
     }
 
@@ -568,6 +576,8 @@
         font-style: italic;
         background: var(--muted);
         border-radius: var(--radius) 0;
+        border: 1px solid var(--border);
+        cursor: not-allowed;
 
         &.hide-wrapper {
             background: transparent;

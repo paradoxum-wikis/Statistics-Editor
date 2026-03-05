@@ -13,8 +13,8 @@
   --popover-foreground: oklch(0.129 0.042 264.695);
   --primary: oklch(0.4458 0.0713 249.06);
   --primary-foreground: oklch(0.984 0.003 247.858);
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
+  --secondary: oklch(0.988 0.007 247.896);
+  --secondary-foreground: oklch(0.228 0.042 265.755);
   --muted: oklch(0.968 0.007 247.896);
   --muted-foreground: oklch(0.554 0.046 257.417);
   --accent: oklch(0.968 0.007 247.896);
@@ -49,8 +49,8 @@
   --popover-foreground: oklch(0.984 0.003 247.858);
   --primary: oklch(0.4458 0.0713 249.06);
   --primary-foreground: oklch(0.984 0.003 247.858);
-  --secondary: oklch(0.279 0.041 260.031);
-  --secondary-foreground: oklch(0.984 0.003 247.858);
+  --secondary: oklch(0.259 0.041 260.031);
+  --secondary-foreground: oklch(0.964 0.003 247.858);
   --muted: oklch(0.279 0.041 260.031);
   --muted-foreground: oklch(0.704 0.04 256.788);
   --accent: oklch(0.279 0.041 260.031);
@@ -327,6 +327,10 @@ h4,
   @apply data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2;
 }
 
+button {
+  cursor: pointer;
+}
+
 .dropdown-item {
   border-radius: calc(var(--radius) - 0.25rem) 0;
   @apply flex justify-between items-center cursor-pointer px-4 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground;
@@ -493,7 +497,6 @@ h4,
   transition:
     background-color 0.25s,
     color 0.25s;
-  cursor: pointer;
 
   &[data-state="active"] {
     background-color: var(--primary);
