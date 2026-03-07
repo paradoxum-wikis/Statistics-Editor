@@ -547,8 +547,12 @@
         }
     }
 
-    .table-row:hover {
+    tr.table-row:hover {
         background: var(--accent);
+
+        .table-cell-sticky {
+            background: var(--accent);
+        }
     }
 
     .table-header {
