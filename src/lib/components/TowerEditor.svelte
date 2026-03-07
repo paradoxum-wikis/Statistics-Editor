@@ -558,9 +558,13 @@
         color: var(--foreground);
     }
 
-    .table-cell {
-        padding: 0.5rem 0.75rem;
-        font-weight: 500;
+    .table-header-sticky {
+        position: sticky;
+        left: 0;
+        background: var(--muted);
+        z-index: 7;
+        text-align: center;
+        font-weight: 600;
         color: var(--foreground);
     }
 
