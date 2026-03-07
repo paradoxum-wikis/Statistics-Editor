@@ -248,12 +248,13 @@
         headers: string[];
         rows: Record<string, string | number>[];
         moneyColumns: string[];
+        readOnlyColumns: string[];
         skinData: SkinData | null;
     }
 
     function isCellEditable(config: TableConfig, header: string): boolean {
         if (config.skinData) return isEditableForSkin(config.skinData, header);
-        return true;
+        return !config.readOnlyColumns.includes(header);
     }
 
     function commitEdit(config: TableConfig, rowIdx: number, header: string, value: string) {
@@ -424,6 +425,7 @@
                                 headers,
                                 rows: skinData.levels.levels,
                                 moneyColumns: skinData.moneyColumns,
+                                readOnlyColumns: [],
                                 skinData,
                             }}
                             {@render dataTable(primaryConfig, true)}
@@ -437,6 +439,7 @@
                                         headers: extraTable.headers,
                                         rows: extraTable.rows,
                                         moneyColumns: extraTable.moneyColumns,
+                                        readOnlyColumns: extraTable.readOnlyColumns,
                                         skinData: null,
                                     }}
                                     {@render dataTable(extraConfig, false)}

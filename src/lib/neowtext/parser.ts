@@ -3,6 +3,7 @@ export interface TableData {
   headers: string[];
   rows: Record<string, string | number>[];
   moneyColumns: string[];
+  readOnlyColumns: string[];
 }
 
 export interface ParsedWikitext {
@@ -233,5 +234,11 @@ function parseTable(tableContent: string): TableData | null {
 
   if (headers.length === 0) return null;
 
-  return { name, headers, rows, moneyColumns: Array.from(moneyColumns) };
+  return {
+    name,
+    headers,
+    rows,
+    moneyColumns: Array.from(moneyColumns),
+    readOnlyColumns: [],
+  };
 }

@@ -390,6 +390,46 @@ export default class TowerManager {
           }
         }
 
+        const resolvedExtraTables = extraTables.map((extra) => {
+          const extraReadOnly = new Set<string>(
+            extra.rows.flatMap((row) =>
+              Object.entries(row)
+                .filter(
+                  ([, val]) =>
+                    typeof val === "string" && /^\$[^$]+\$$/.test(val),
+                )
+                .map(([key]) => key),
+            ),
+          );
+
+          const resolvedRows = extra.rows.map((row) => {
+            const resolvedRow = { ...row };
+            const level = Number(resolvedRow["Level"] ?? 0);
+            for (const key of extraReadOnly) {
+              const val = resolvedRow[key];
+              if (typeof val !== "string") continue;
+              const result = resolveToken(
+                val,
+                level,
+                resolvedRow as Record<string, string | number>,
+                formulaTokens,
+                parsed.variables,
+                isPvpSkin,
+              );
+              if (result !== undefined) {
+                resolvedRow[key] = result;
+              }
+            }
+            return resolvedRow;
+          });
+
+          return {
+            ...extra,
+            rows: resolvedRows,
+            readOnlyColumns: Array.from(extraReadOnly),
+          };
+        });
+
         return {
           Defaults: defaults,
           Upgrades: upgrades,
@@ -402,7 +442,7 @@ export default class TowerManager {
           IsPvp: isPvpSkin,
           PvpOwnedDetectionTypes: Array.from(pvpOwnedDetectionTypes),
           MoneyColumns: tableData.moneyColumns ?? [],
-          ExtraTables: extraTables,
+          ExtraTables: resolvedExtraTables,
         };
       };
 
