@@ -327,7 +327,7 @@
                                                     {disabled}
                                                     onfocus={(e) => {
                                                         e.currentTarget.dataset.original = e.currentTarget.value;
-                                                        e.currentTarget.value = "";
+                                                        if (settingsStore.clearOnEdit) e.currentTarget.value = "";
                                                     }}
                                                     onblur={(e) => {
                                                         focusedCell = null;

@@ -107,6 +107,29 @@
                         <Switch.Thumb class="switch-thumb"></Switch.Thumb>
                     </Switch.Root>
                 </div>
+
+                <div class="settings-item">
+                    <div class="settings-label-group">
+                        <label
+                            for="clear-on-edit"
+                            class="settings-label"
+                        >
+                            Clear Cell on Edit
+                        </label>
+                        <p class="settings-help-text">
+                            Clears the input box when you click on a cell instead of keeping whatever was already there.
+                        </p>
+                    </div>
+                    <Switch.Root
+                        id="clear-on-edit"
+                        checked={settingsStore.clearOnEdit}
+                        onCheckedChange={(v) =>
+                            settingsStore.setClearOnEdit(v)}
+                        class="switch-root"
+                    >
+                        <Switch.Thumb class="switch-thumb"></Switch.Thumb>
+                    </Switch.Root>
+                </div>
             </div>
 
             <div class="settings-footer">

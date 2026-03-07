@@ -13,6 +13,7 @@ const SETTINGS: {
   seeValueDifference: SettingBoolean;
   hideCellWrapper: SettingBoolean;
   minTableWidth: SettingBoolean;
+  clearOnEdit: SettingBoolean;
   theme: SettingString<"light" | "dark" | "system">;
 } = {
   debugMode: {
@@ -30,6 +31,10 @@ const SETTINGS: {
   minTableWidth: {
     key: "tdse_mctw",
     default: false,
+  },
+  clearOnEdit: {
+    key: "tdse_coe",
+    default: true,
   },
   theme: {
     key: "tdse_theme",
@@ -69,6 +74,7 @@ class SettingsStore {
   seeValueDifference = $state(SETTINGS.seeValueDifference.default);
   hideCellWrapper = $state(SETTINGS.hideCellWrapper.default);
   minTableWidth = $state(SETTINGS.minTableWidth.default);
+  clearOnEdit = $state(SETTINGS.clearOnEdit.default);
   theme = $state(SETTINGS.theme.default);
 
   constructor() {
@@ -76,6 +82,7 @@ class SettingsStore {
     this.seeValueDifference = readBooleanSetting(SETTINGS.seeValueDifference);
     this.hideCellWrapper = readBooleanSetting(SETTINGS.hideCellWrapper);
     this.minTableWidth = readBooleanSetting(SETTINGS.minTableWidth);
+    this.clearOnEdit = readBooleanSetting(SETTINGS.clearOnEdit);
     this.theme = readStringSetting(SETTINGS.theme);
   }
 
@@ -110,6 +117,11 @@ class SettingsStore {
   setMinTableWidth(value: boolean) {
     this.minTableWidth = value;
     writeBooleanSetting(SETTINGS.minTableWidth, value);
+  }
+
+  setClearOnEdit(value: boolean) {
+    this.clearOnEdit = value;
+    writeBooleanSetting(SETTINGS.clearOnEdit, value);
   }
 
   setTheme(value: "light" | "dark" | "system") {
