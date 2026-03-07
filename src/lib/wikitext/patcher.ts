@@ -30,20 +30,20 @@ export function patchWikitext(sourceWikitext: string, tower: Tower): string {
       }
     }
 
-    const primaryMarkup = serializeTable({
-      Headers: skin.headers,
-      RawRows: rowsForSerialization,
-      MoneyColumns: skin.moneyColumns,
-      Name: skin.tableName || "",
-    });
+    const markups: string[] = [
+      serializeTable({
+        Headers: skin.headers,
+        RawRows: rowsForSerialization,
+        MoneyColumns: skin.moneyColumns,
+        Name: skin.tableName || "",
+      }),
+    ];
 
-    const extraMarkups = (skin.extraTables ?? []).map((table: TableData) =>
-      serializeExtraTable(table),
-    );
+    for (const table of skin.extraTables ?? []) {
+      markups.push(serializeExtraTable(table));
+    }
 
-    const tableMarkup = [primaryMarkup, ...extraMarkups].join("\n");
-
-    text = patchSkinTable(text, skinName, tableMarkup, tower.skinNames);
+    text = patchSkinTable(text, skinName, markups.join("\n"), tower.skinNames);
   }
 
   return text;

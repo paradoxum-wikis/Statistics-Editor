@@ -3,7 +3,7 @@ import { towerNames } from "./towers";
 import { resolveToken } from "$lib/wikitext/functions";
 import { settingsStore } from "$lib/stores/settings.svelte";
 import { parseWikitext, type TableData } from "$lib/wikitext/parser";
-import { serializeTable } from "$lib/wikitext/serializer";
+
 import { patchWikitext } from "$lib/wikitext/patcher";
 import {
   clearWikiOverride,
@@ -239,19 +239,11 @@ export default class TowerManager {
 
       const towerJson: any = {};
 
-      for (const [tabName, tablesArray] of Object.entries(parsed.tabs)) {
-        const tables = tablesArray as TableData[];
-        const primaryIndex = tables.findIndex((t) =>
-          t.headers.includes("Level"),
-        );
-        const tableData =
-          primaryIndex !== -1 ? tables[primaryIndex] : tables[0];
-        const extraTables = tables.filter(
-          (_, i) => i !== (primaryIndex !== -1 ? primaryIndex : 0),
-        );
-
-        const skinName = tabName;
-        const isPvpSkin = /pvp/i.test(skinName);
+      const buildSkinJson = (
+        tableData: TableData,
+        isPvpSkin: boolean,
+        extraTables: TableData[],
+      ) => {
         const defaults: any = {};
         const upgrades: any[] = [];
         const readOnlyAttributes: string[] = [];
@@ -398,7 +390,7 @@ export default class TowerManager {
           }
         }
 
-        towerJson[skinName] = {
+        return {
           Defaults: defaults,
           Upgrades: upgrades,
           Headers: tableData.headers,
@@ -412,6 +404,22 @@ export default class TowerManager {
           MoneyColumns: tableData.moneyColumns ?? [],
           ExtraTables: extraTables,
         };
+      };
+
+      for (const [tabName, tablesArray] of Object.entries(parsed.tabs)) {
+        const tables = tablesArray as TableData[];
+        const isPvpTab = /pvp/i.test(tabName);
+
+        const primaryIndex = tables.findIndex((t) =>
+          t.headers.includes("Level"),
+        );
+        const primaryTable =
+          primaryIndex !== -1 ? tables[primaryIndex] : tables[0];
+        const extraTables = tables.filter(
+          (_, i) => i !== (primaryIndex !== -1 ? primaryIndex : 0),
+        );
+
+        towerJson[tabName] = buildSkinJson(primaryTable, isPvpTab, extraTables);
       }
 
       const towerData = new Tower(name, towerJson);

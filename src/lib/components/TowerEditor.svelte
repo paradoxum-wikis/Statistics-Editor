@@ -21,7 +21,6 @@
 
     let availableSkins = $derived(tower ? tower.skinNames : []);
 
-
     function cellKey(skinName: string, levelIndex: number, header: string) {
         return `${skinName}:${levelIndex}:${header}`;
     }
@@ -205,6 +204,22 @@
         }
 
         skinData.set(levelIndex, attribute, parsedValue);
+        towerStore.refresh();
+        towerStore.syncWikitext();
+    }
+
+    function updateExtraTableStat(
+        row: Record<string, string | number>,
+        header: string,
+        value: string,
+    ) {
+        if (disabled) return;
+
+        let parsedValue: string | number = value;
+        if (!isNaN(Number(value)) && value.trim() !== "")
+            parsedValue = Number(value);
+
+        row[header] = parsedValue;
         towerStore.refresh();
         towerStore.syncWikitext();
     }
@@ -405,9 +420,9 @@
                                                                             {formatValue(level[header])}
                                                                         </span>
                                                                     {:else}
-                                                                        <span>
-                                                                            {formatValue(level[header])}
-                                                                        </span>
+                                                                                    <span class="cell-multiline">
+                                                                                        {formatValue(level[header])}
+                                                                                    </span>
                                                                     {/if}
                                                                     {#if settingsStore.seeValueDifference && deltaInfo.delta !== null && deltaInfo.delta !== 0}
                                                                         <span
@@ -429,57 +444,74 @@
                                 </table>
                             </div>
                             {#if skinData.extraTables?.length}
-                                {#each skinData.extraTables as extraTable}
-                                    <div
-                                        class="table-container extra-table-container {settingsStore.minTableWidth ? 'min-content' : ''}"
-                                    >
-                                        <table class="table {settingsStore.minTableWidth ? 'min-content' : ''}">
-                                            <thead class="table-head">
-                                                {#if extraTable.name}
-                                                    <tr>
-                                                        <th
-                                                            colspan={extraTable.headers.length}
-                                                            class="table-name-header"
-                                                        >
-                                                            {extraTable.name}
-                                                        </th>
-                                                    </tr>
-                                                {/if}
-                                                <tr>
-                                                    {#each extraTable.headers as header}
-                                                        <th
-                                                            scope="col"
-                                                            class="table-header whitespace-nowrap"
-                                                        >
-                                                            {header}
-                                                        </th>
-                                                    {/each}
-                                                </tr>
-                                            </thead>
-                                            <tbody class="table-body">
-                                                {#each extraTable.rows as row}
-                                                    <tr class="table-row">
-                                                        {#each extraTable.headers as header}
-                                                            <td class="table-data">
-                                                                <div class="table-cell-readonly {settingsStore.hideCellWrapper ? 'hide-wrapper' : ''}">
-                                                                    {#if extraTable.moneyColumns.includes(header)}
-                                                                        <span class="money-value">
-                                                                            <img src={MoneyIcon} alt="" class="money-icon" />
-                                                                            {formatValue(row[header])}
-                                                                        </span>
-                                                                    {:else}
-                                                                        <span>{formatValue(row[header])}</span>
-                                                                    {/if}
-                                                                </div>
-                                                            </td>
-                                                        {/each}
-                                                    </tr>
+                                                {#each skinData.extraTables as extraTable}
+                                                    <div
+                                                        class="table-container extra-table-container {settingsStore.minTableWidth ? 'min-content' : ''}"
+                                                    >
+                                                        <table class="table {settingsStore.minTableWidth ? 'min-content' : ''}">
+                                                            <thead class="table-head">
+                                                                {#if extraTable.name}
+                                                                    <tr>
+                                                                        <th
+                                                                            colspan={extraTable.headers.length}
+                                                                            class="table-name-header"
+                                                                        >
+                                                                            {extraTable.name}
+                                                                        </th>
+                                                                    </tr>
+                                                                {/if}
+                                                                <tr>
+                                                                    {#each extraTable.headers as header}
+                                                                        <th
+                                                                            scope="col"
+                                                                            class="table-header whitespace-nowrap"
+                                                                        >
+                                                                            {header}
+                                                                        </th>
+                                                                    {/each}
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody class="table-body">
+                                                                {#each extraTable.rows as row}
+                                                                    <tr class="table-row">
+                                                                        {#each extraTable.headers as header}
+                                                                            <td class="table-data">
+                                                                                <div
+                                                                                    class="cell-wrapper {extraTable.moneyColumns.includes(header) ? 'money-wrapper' : ''} {settingsStore.hideCellWrapper ? 'hide-wrapper' : ''}"
+                                                                                >
+                                                                                    {#if extraTable.moneyColumns.includes(header)}
+                                                                                        <img src={MoneyIcon} alt="" class="money-icon money-icon-input" />
+                                                                                    {/if}
+                                                                                    <input
+                                                                                        type="text"
+                                                                                        class="table-input"
+                                                                                        value={formatValue(row[header])}
+                                                                                        {disabled}
+                                                                                        onfocus={(e) => {
+                                                                                            e.currentTarget.dataset.original = e.currentTarget.value;
+                                                                                            e.currentTarget.value = "";
+                                                                                        }}
+                                                                                        onblur={(e) => {
+                                                                                            if (e.currentTarget.value === "") {
+                                                                                                e.currentTarget.value = e.currentTarget.dataset.original ?? "";
+                                                                                            } else {
+                                                                                                updateExtraTableStat(row, header, e.currentTarget.value);
+                                                                                            }
+                                                                                        }}
+                                                                                        onkeydown={(e) => {
+                                                                                            if (e.key === "Enter") e.currentTarget.blur();
+                                                                                        }}
+                                                                                    />
+                                                                                </div>
+                                                                            </td>
+                                                                        {/each}
+                                                                    </tr>
+                                                                {/each}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
                                                 {/each}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                {/each}
-                            {/if}
+                                            {/if}
                         {:else if towerStore.selectedSkinName === skinName}
                             <div class="text-center py-4 text-muted-foreground">
                                 No skin data available.
@@ -661,6 +693,10 @@
             background: transparent;
             padding: 0.1rem;
         }
+    }
+
+    .cell-multiline {
+        white-space: pre-line;
     }
 
     .delta-text {
