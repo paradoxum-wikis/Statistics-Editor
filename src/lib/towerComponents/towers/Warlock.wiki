@@ -1,3 +1,30 @@
+<var>
+$TP$ = $FNC-TOTALPRICE$
+$0Cost$ = 4200
+$1Cost$ = 2500
+$2Cost$ = 6800
+$3Cost$ = 12000
+$4Cost$ = 22500
+$5Cost$ = 32500
+$2Hidden$ = true
+$0Lead$ = true
+$1Upgrade$ = Acolyte
+$1UpgradeI$ = File:WarlockLevel1.png
+$2Upgrade$ = Forbidden Arts
+$2UpgradeI$ = File:WarlockLevel2.png
+$3Upgrade$ = Pact of the Blade
+$3UpgradeI$ = File:WarlockLevel3.png
+$4Upgrade$ = Eldritch Knight
+$4UpgradeI$ = File:WarlockLevel4.png
+$5Upgrade$ = Abyss Walker
+$5UpgradeI$ = File:WarlockLevel5.png
+$RDPS$ = Damage / Firerate
+$MDPS$ = (Normal Damage + AOE Damage) / Swingrate
+$MaxDPS$ = (Normal Damage + (AOE Damage * Max Hits)) / Swingrate
+$CE$ = Total Price / DPS
+</var>
+<div class="mobile-tabber"><tabber>
+|-|Regular =
 <div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="9" |Ranged Attack
@@ -12,58 +39,58 @@
 !Cost Efficiency
 |-
 |0
-|{{Money|4,200}}
+|{{Money|$TP$}}
 |25
 |1.108
 |18
 |N/A
-|22.56
-|{{Money|186.14}}
+|$RDPS$
+|{{Money|$CE$}}
 |-
 |1
-|{{Money|6,700}}
+|{{Money|$TP$}}
 |40
 |1.108
 |19
 |N/A
-|36.1
-|{{Money|185.59}}
+|$RDPS$
+|{{Money|$CE$}}
 |-
 |2
-|{{Money|13,500}}
+|{{Money|$TP$}}
 |60
 |0.808
 |22
 |15
-|74.26
-|{{Money|181.8}}
+|$RDPS$
+|{{Money|$CE$}}
 |-
 |3
-|{{Money|25,500}}
+|{{Money|$TP$}}
 |115
 |0.808
 |22
 |17.5
-|142.33
-|{{Money|179.17}}
+|$RDPS$
+|{{Money|$CE$}}
 |-
 |4
-|{{Money|48,000}}
+|{{Money|$TP$}}
 |190
 |0.808
 |24
 |17.5
-|235.15
-|{{Money|204.13}}
+|$RDPS$
+|{{Money|$CE$}}
 |-
 |5
-|{{Money|80,500}}
+|{{Money|$TP$}}
 |260
 |0.708
 |24
 |20
-|367.23
-|{{Money|219.21}}
+|$RDPS$
+|{{Money|$CE$}}
 |}
 </div>
 
@@ -87,7 +114,7 @@
 !Cost Efficiency
 |-
 |0
-|{{Money|4,200}}
+|{{Money|$TP$}}
 |45
 |25
 |N/A
@@ -97,12 +124,12 @@
 |N/A
 |7
 |2
-|34.86
-|47.31
-|{{Money|120.48}}
+|$MDPS$
+|$MaxDPS$
+|{{Money|$CE$}}
 |-
 |1
-|{{Money|6,700}}
+|{{Money|$TP$}}
 |75
 |40
 |N/A
@@ -112,12 +139,12 @@
 |N/A
 |7
 |2
-|57.27
-|77.19
-|{{Money|116.99}}
+|$MDPS$
+|$MaxDPS$
+|{{Money|$CE$}}
 |-
 |2
-|{{Money|13,500}}
+|{{Money|$TP$}}
 |140
 |60
 |N/A
@@ -127,12 +154,12 @@
 |N/A
 |7.5
 |2
-|99.6
-|129.48
-|{{Money|135.54}}
+|$MDPS$
+|$MaxDPS$
+|{{Money|$CE$}}
 |-
 |3
-|{{Money|25,500}}
+|{{Money|$TP$}}
 |200
 |115
 |N/A
@@ -142,12 +169,12 @@
 |N/A
 |7.5
 |2
-|174.23
-|237.83
-|{{Money|146.36}}
+|$MDPS$
+|$MaxDPS$
+|{{Money|$CE$}}
 |-
 |4
-|{{Money|48,000}}
+|{{Money|$TP$}}
 |350
 |190
 |2
@@ -157,12 +184,12 @@
 |40
 |8
 |3
-|298.67
-|508.85
-|{{Money|160.71}}
+|$MDPS$
+|$MaxDPS$
+|{{Money|$CE$}}
 |-
 |5
-|{{Money|80,500}}
+|{{Money|$TP$}}
 |550
 |260
 |2
@@ -172,7 +199,9 @@
 |40
 |9
 |3
-|448.01
-|735.62
-|{{Money|179.68}}
+|$MDPS$
+|$MaxDPS$
+|{{Money|$CE$}}
 |}
+</div>
+</tabber></div>
