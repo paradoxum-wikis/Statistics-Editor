@@ -4,6 +4,7 @@ import Upgrade from "./upgrade";
 import Levels from "./levels";
 import Locator from "./locator";
 import { resolveToken } from "$lib/wikitext/functions";
+import type { TableData } from "$lib/wikitext/parser";
 
 type FormulaToken = string; // e.g. "$DPS$", "$DPS2$"
 type FormulaTokenMap = Record<string, string>; // token -> expression
@@ -18,10 +19,12 @@ class SkinData {
   upgrades!: Upgrade[];
   levels!: Levels;
   headers: string[] = [];
+  tableName: string = "";
   rawRows: any[] = [];
   readOnlyAttributes: string[] = [];
   isPvp: boolean = false;
   moneyColumns: string[] = [];
+  extraTables: TableData[] = [];
 
   /**
    * Detection types that have PVP specific variables in the source.
@@ -83,6 +86,9 @@ class SkinData {
       this.data.Upgrades = [];
     }
 
+    if (this.data.TableName) {
+      this.tableName = this.data.TableName;
+    }
     if (this.data.Headers) {
       this.headers = this.data.Headers;
     }
@@ -111,6 +117,10 @@ class SkinData {
 
     if (this.data.MoneyColumns && Array.isArray(this.data.MoneyColumns)) {
       this.moneyColumns = this.data.MoneyColumns;
+    }
+
+    if (this.data.ExtraTables && Array.isArray(this.data.ExtraTables)) {
+      this.extraTables = this.data.ExtraTables;
     }
 
     this.createData();

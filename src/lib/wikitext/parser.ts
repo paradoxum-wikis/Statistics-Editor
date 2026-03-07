@@ -1,4 +1,5 @@
 export interface TableData {
+  name: string;
   headers: string[];
   rows: Record<string, string | number>[];
   moneyColumns: string[];
@@ -6,7 +7,7 @@ export interface TableData {
 
 export interface ParsedWikitext {
   variables: Record<string, string>;
-  tabs: Record<string, TableData>;
+  tabs: Record<string, TableData[]>;
 }
 
 /**
@@ -18,15 +19,15 @@ export interface ParsedWikitext {
  */
 const stripRefs = (s: string): string =>
   s
-    .replace(/<ref\b[^>]*>[\s\S]*?<\/ref>/gi, "") // remove paired refs
-    .replace(/<ref\b[^>]*\/>/gi, ""); // remove self-closing refs
+    .replace(/<ref\b[^>]*>[\s\S]*?<\/ref>/gi, "")
+    .replace(/<ref\b[^>]*\/>/gi, "");
 
 /**
  * Parses wikitext content into variables and tabbed tables.
  */
 export function parseWikitext(content: string): ParsedWikitext {
   const variables: Record<string, string> = {};
-  const tabs: Record<string, TableData> = {};
+  const tabs: Record<string, TableData[]> = {};
   let text = content.replace(/\r\n/g, "\n");
 
   const blockVariableRegex = /<var>([\s\S]*?)<\/var>/g;
@@ -98,15 +99,15 @@ export function parseWikitext(content: string): ParsedWikitext {
       const tabName = part.substring(0, splitIndex).trim();
       const tabContent = part.substring(splitIndex + 1).trim();
 
-      const tableData = parseTable(tabContent);
-      if (tableData) {
-        tabs[tabName] = tableData;
+      const tables = parseTables(tabContent);
+      if (tables.length > 0) {
+        tabs[tabName] = tables;
       }
     }
   } else {
-    const tableData = parseTable(text);
-    if (tableData) {
-      tabs["Regular"] = tableData;
+    const tables = parseTables(text);
+    if (tables.length > 0) {
+      tabs["Regular"] = tables;
     }
   }
 
@@ -114,17 +115,47 @@ export function parseWikitext(content: string): ParsedWikitext {
 }
 
 /**
- * Parses a table from wikitext into headers and rows.
+ * Extracts the table name from a colspan header row.
+ * Looks for `! colspan="N" |Table Name` patterns.
  */
-function parseTable(content: string): TableData | null {
-  const tableRegex = /\{\|[\s\S]*?\|\}/;
-  const match = content.match(tableRegex);
+function extractTableName(lines: string[]): string {
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed.startsWith("!")) continue;
 
-  if (!match) return null;
+    const colspanMatch = trimmed.match(/!\s*colspan\s*=\s*"?\d+"?\s*\|(.+)/i);
+    if (colspanMatch) {
+      return stripRefs(colspanMatch[1]).trim();
+    }
+  }
+  return "";
+}
 
-  const tableContent = match[0];
+/**
+ * Parses all tables from a block of wikitext content.
+ */
+function parseTables(content: string): TableData[] {
+  const results: TableData[] = [];
+  const tableRegex = /\{\|[\s\S]*?\|\}/g;
+  let match;
+
+  while ((match = tableRegex.exec(content)) !== null) {
+    const tableData = parseTable(match[0]);
+    if (tableData) {
+      results.push(tableData);
+    }
+  }
+
+  return results;
+}
+
+/**
+ * Parses a single table block (from {| to |}) into headers and rows.
+ */
+function parseTable(tableContent: string): TableData | null {
   const lines = tableContent.split("\n");
 
+  const name = extractTableName(lines);
   const headers: string[] = [];
   const rows: Record<string, string | number>[] = [];
 
@@ -170,6 +201,10 @@ function parseTable(content: string): TableData | null {
     }
 
     if (line.startsWith("!")) {
+      if (/colspan/i.test(line)) {
+        continue;
+      }
+
       const headerParts = line.substring(1).split("!!");
       for (const part of headerParts) {
         headers.push(cleanHeader(part));
@@ -195,5 +230,7 @@ function parseTable(content: string): TableData | null {
     rows.push(currentRow);
   }
 
-  return { headers, rows, moneyColumns: Array.from(moneyColumns) };
+  if (headers.length === 0) return null;
+
+  return { name, headers, rows, moneyColumns: Array.from(moneyColumns) };
 }

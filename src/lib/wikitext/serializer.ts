@@ -4,6 +4,7 @@ interface SkinDataJSON {
   Headers: string[];
   RawRows: TableRow[];
   MoneyColumns?: string[];
+  Name?: string;
 }
 
 function formatMoneyNumber(n: number): string {
@@ -44,12 +45,18 @@ function serializeRow(
 }
 
 export function serializeTable(data: SkinDataJSON): string {
-  const { Headers, RawRows, MoneyColumns = [] } = data;
+  const { Headers, RawRows, MoneyColumns = [], Name = "" } = data;
   if (!Headers || !RawRows) return "";
 
   const lines: string[] = [];
 
   lines.push(`{| class="article-table" style="width:100%"`);
+
+  if (Name) {
+    lines.push(`! colspan="${Headers.length}" |${Name}`);
+    lines.push("|-");
+  }
+
   lines.push(`! ${Headers.join(" !! ")}`);
 
   const sortedRows = [...RawRows].sort((a, b) => {

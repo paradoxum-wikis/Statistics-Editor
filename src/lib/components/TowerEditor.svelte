@@ -277,6 +277,16 @@
                             >
                                 <table class="table {settingsStore.minTableWidth ? 'min-content' : ''}">
                                     <thead class="table-head">
+                                        {#if skinData.tableName}
+                                            <tr>
+                                                <th
+                                                    colspan={headers.length}
+                                                    class="table-name-header"
+                                                >
+                                                    {skinData.tableName}
+                                                </th>
+                                            </tr>
+                                        {/if}
                                         <tr>
                                             {#each headers as header}
                                                 <th
@@ -418,6 +428,58 @@
                                     </tbody>
                                 </table>
                             </div>
+                            {#if skinData.extraTables?.length}
+                                {#each skinData.extraTables as extraTable}
+                                    <div
+                                        class="table-container extra-table-container {settingsStore.minTableWidth ? 'min-content' : ''}"
+                                    >
+                                        <table class="table {settingsStore.minTableWidth ? 'min-content' : ''}">
+                                            <thead class="table-head">
+                                                {#if extraTable.name}
+                                                    <tr>
+                                                        <th
+                                                            colspan={extraTable.headers.length}
+                                                            class="table-name-header"
+                                                        >
+                                                            {extraTable.name}
+                                                        </th>
+                                                    </tr>
+                                                {/if}
+                                                <tr>
+                                                    {#each extraTable.headers as header}
+                                                        <th
+                                                            scope="col"
+                                                            class="table-header whitespace-nowrap"
+                                                        >
+                                                            {header}
+                                                        </th>
+                                                    {/each}
+                                                </tr>
+                                            </thead>
+                                            <tbody class="table-body">
+                                                {#each extraTable.rows as row}
+                                                    <tr class="table-row">
+                                                        {#each extraTable.headers as header}
+                                                            <td class="table-data">
+                                                                <div class="table-cell-readonly {settingsStore.hideCellWrapper ? 'hide-wrapper' : ''}">
+                                                                    {#if extraTable.moneyColumns.includes(header)}
+                                                                        <span class="money-value">
+                                                                            <img src={MoneyIcon} alt="" class="money-icon" />
+                                                                            {formatValue(row[header])}
+                                                                        </span>
+                                                                    {:else}
+                                                                        <span>{formatValue(row[header])}</span>
+                                                                    {/if}
+                                                                </div>
+                                                            </td>
+                                                        {/each}
+                                                    </tr>
+                                                {/each}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                {/each}
+                            {/if}
                         {:else if towerStore.selectedSkinName === skinName}
                             <div class="text-center py-4 text-muted-foreground">
                                 No skin data available.
@@ -453,6 +515,8 @@
 </div>
 
 <style>
+    @reference "../../routes/layout.css";
+
     .table-container {
         overflow-x: auto;
         border: 1px solid var(--border);
@@ -462,6 +526,20 @@
             width: max-content;
             max-width: 100%;
         }
+    }
+
+    .extra-table-container {
+        margin-top: 0.75rem;
+    }
+
+    .table-name-header {
+        padding: 0.4rem 0.75rem;
+        text-align: center;
+        font-weight: 700;
+        font-size: 0.8rem;
+        color: var(--foreground);
+        border-bottom: 1px solid var(--border);
+        @apply bg-secondary/40;
     }
 
     .table {

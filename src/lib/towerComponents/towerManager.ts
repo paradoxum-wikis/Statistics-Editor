@@ -3,6 +3,7 @@ import { towerNames } from "./towers";
 import { resolveToken } from "$lib/wikitext/functions";
 import { settingsStore } from "$lib/stores/settings.svelte";
 import { parseWikitext, type TableData } from "$lib/wikitext/parser";
+import { serializeTable } from "$lib/wikitext/serializer";
 import { patchWikitext } from "$lib/wikitext/patcher";
 import {
   clearWikiOverride,
@@ -228,7 +229,7 @@ export default class TowerManager {
 
       const parsed = parseWikitext(text) as {
         variables: Record<string, string>;
-        tabs: Record<string, TableData>;
+        tabs: Record<string, TableData[]>;
       };
 
       if (settingsStore.debugMode) {
@@ -238,8 +239,16 @@ export default class TowerManager {
 
       const towerJson: any = {};
 
-      for (const [tabName, tableDataUnknown] of Object.entries(parsed.tabs)) {
-        const tableData = tableDataUnknown as TableData;
+      for (const [tabName, tablesArray] of Object.entries(parsed.tabs)) {
+        const tables = tablesArray as TableData[];
+        const primaryIndex = tables.findIndex((t) =>
+          t.headers.includes("Level"),
+        );
+        const tableData =
+          primaryIndex !== -1 ? tables[primaryIndex] : tables[0];
+        const extraTables = tables.filter(
+          (_, i) => i !== (primaryIndex !== -1 ? primaryIndex : 0),
+        );
 
         const skinName = tabName;
         const isPvpSkin = /pvp/i.test(skinName);
@@ -260,9 +269,6 @@ export default class TowerManager {
           ) => Number(a["Level"]) - Number(b["Level"]),
         );
 
-        // Build skin specific formula tokens
-        // For PVP, $PVP-N$ overrides $N$ so the PVP tab can use
-        // different formulas while falling back to the regular ones
         const formulaTokens: Record<string, string> = {};
         for (const [key, val] of Object.entries(parsed.variables)) {
           if (!/^\$PVP-/.test(key)) {
@@ -396,6 +402,7 @@ export default class TowerManager {
           Defaults: defaults,
           Upgrades: upgrades,
           Headers: tableData.headers,
+          TableName: tableData.name || "",
           RawRows: rows,
           ReadOnly: readOnlyAttributes,
           FormulaTokens: formulaTokens,
@@ -403,6 +410,7 @@ export default class TowerManager {
           IsPvp: isPvpSkin,
           PvpOwnedDetectionTypes: Array.from(pvpOwnedDetectionTypes),
           MoneyColumns: tableData.moneyColumns ?? [],
+          ExtraTables: extraTables,
         };
       }
 

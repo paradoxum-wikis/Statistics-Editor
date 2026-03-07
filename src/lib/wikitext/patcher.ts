@@ -1,4 +1,5 @@
 import type Tower from "$lib/towerComponents/tower";
+import type { TableData } from "./parser";
 import { serializeTable, serializeVariables } from "./serializer";
 
 /**
@@ -29,11 +30,18 @@ export function patchWikitext(sourceWikitext: string, tower: Tower): string {
       }
     }
 
-    const tableMarkup = serializeTable({
+    const primaryMarkup = serializeTable({
       Headers: skin.headers,
       RawRows: rowsForSerialization,
       MoneyColumns: skin.moneyColumns,
+      Name: skin.tableName || "",
     });
+
+    const extraMarkups = (skin.extraTables ?? []).map((table: TableData) =>
+      serializeExtraTable(table),
+    );
+
+    const tableMarkup = [primaryMarkup, ...extraMarkups].join("\n");
 
     text = patchSkinTable(text, skinName, tableMarkup, tower.skinNames);
   }
@@ -85,7 +93,6 @@ function buildVariablesMap(tower: Tower): Record<string, string> {
       Flying: false,
     };
 
-    // Level 0
     if (skinJson.Defaults?.Detections) {
       for (const type of detectionTypes) {
         if (type in skinJson.Defaults.Detections) {
@@ -95,7 +102,6 @@ function buildVariablesMap(tower: Tower): Record<string, string> {
     }
     regularDetections[0] = { ...currentDetections };
 
-    // Level 1+
     if (skinJson.Upgrades) {
       skinJson.Upgrades.forEach((up: any, idx: number) => {
         const level = idx + 1;
@@ -134,7 +140,7 @@ function buildVariablesMap(tower: Tower): Record<string, string> {
 
         if (isPvp) {
           if (regularFormulaTokens[key] !== val) {
-            const innerKey = key.slice(1, -1); // strip surrounding $
+            const innerKey = key.slice(1, -1);
             variables[`$PVP-${innerKey}$`] = val;
           }
         } else {
@@ -161,8 +167,6 @@ function buildVariablesMap(tower: Tower): Record<string, string> {
 
         if (isEnabled !== currentDetections[type]) {
           if (isPvp) {
-            // write PVP detection var only if this type is PVP owned
-            // (was explicitly defined or edited in PVP mode)
             if (skin.pvpOwnedDetectionTypes.has(type)) {
               variables[`$PVP-${level}${type}$`] = String(isEnabled);
             }
@@ -228,7 +232,30 @@ function patchVariableBlock(
 }
 
 /**
- * Replaces the table for a specific skin, handling both <tabber> sections and single files.
+ * Finds the start of the first table and the end of the last table
+ * in a block of content.
+ *
+ * Returns [startIndex, endIndex] or null.
+ */
+function findAllTablesSpan(content: string): [number, number] | null {
+  const firstStart = content.indexOf("{|");
+  if (firstStart === -1) return null;
+
+  let lastEnd = -1;
+  let searchFrom = firstStart;
+  while (true) {
+    const end = content.indexOf("|}", searchFrom);
+    if (end === -1) break;
+    lastEnd = end + 2;
+    searchFrom = end + 2;
+  }
+
+  if (lastEnd === -1) return null;
+  return [firstStart, lastEnd];
+}
+
+/**
+ * Replaces tables for a specific skin.
  */
 function patchSkinTable(
   text: string,
@@ -241,20 +268,18 @@ function patchSkinTable(
   const isTabbed = tabberStart !== -1 && tabberEnd !== -1;
 
   if (!isTabbed) {
-    const tableStart = text.indexOf("{|");
-    const tableEnd = text.indexOf("|}", tableStart);
+    const span = findAllTablesSpan(text);
 
-    if (tableStart !== -1 && tableEnd !== -1) {
+    if (span) {
       return (
-        text.substring(0, tableStart) +
+        text.substring(0, span[0]) +
         newTableMarkup.trim() +
-        text.substring(tableEnd + 2)
+        text.substring(span[1])
       );
     }
     return text + "\n" + newTableMarkup;
   }
 
-  // <tabber> mode
   const tabberContent = text.substring(tabberStart + 8, tabberEnd);
   const escapedSkinName = escapeRegExp(skinName);
   const tabHeaderRegex = new RegExp(
@@ -271,12 +296,27 @@ function patchSkinTable(
   const restOfContent = tabberContent.substring(matchIndexInContent);
   const nextDelimiterIndex = restOfContent.indexOf("|-|");
 
+  const tabSection =
+    nextDelimiterIndex === -1
+      ? restOfContent
+      : restOfContent.substring(0, nextDelimiterIndex);
+
   const endOfTabContentIndex =
     nextDelimiterIndex === -1
       ? tabberContent.length
       : matchIndexInContent + nextDelimiterIndex;
 
-  const newTabContent = "\n" + newTableMarkup + "\n";
+  const span = findAllTablesSpan(tabSection);
+  let newTabContent: string;
+  if (span) {
+    newTabContent =
+      tabSection.substring(0, span[0]) +
+      newTableMarkup.trim() +
+      tabSection.substring(span[1]);
+  } else {
+    newTabContent = "\n" + newTableMarkup + "\n";
+  }
+
   const newTabberContent =
     tabberContent.substring(0, matchIndexInContent) +
     newTabContent +
@@ -291,4 +331,13 @@ function patchSkinTable(
 
 function escapeRegExp(string: string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function serializeExtraTable(table: TableData): string {
+  return serializeTable({
+    Headers: table.headers,
+    RawRows: table.rows,
+    MoneyColumns: table.moneyColumns,
+    Name: table.name || "",
+  });
 }
