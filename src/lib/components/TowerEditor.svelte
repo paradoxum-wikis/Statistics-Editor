@@ -26,16 +26,10 @@
         node.focus();
     }
 
-    let focusedExtraCell = $state<string | null>(null);
+    let focusedCell = $state<string | null>(null);
 
-    function extraCellKey(tableIdx: number, rowIdx: number, header: string): string {
-        return `${tableIdx}:${rowIdx}:${header}`;
-    }
-
-
-
-    function cellKey(skinName: string, levelIndex: number, header: string) {
-        return `${skinName}:${levelIndex}:${header}`;
+    function mkCellKey(skinName: string, tableIdx: number, rowIdx: number, header: string): string {
+        return `${skinName}:${tableIdx}:${rowIdx}:${header}`;
     }
 
     function toNumberOrNull(v: unknown): number | null {
@@ -62,20 +56,18 @@
 
     function computeDeltaClass(header: string, delta: number): string {
         if (delta === 0) return "";
-
         if (isInverseStat(header)) {
             return delta < 0 ? "text-green-500" : "text-red-500";
         }
-
         return delta > 0 ? "text-green-500" : "text-red-500";
     }
 
-    function getBaselineValue(
-        skinName: string,
-        levelIndex: number,
-        header: string,
-    ): unknown {
-        return towerStore.baseline[cellKey(skinName, levelIndex, header)];
+    function baselineCellKey(skinName: string, levelIndex: number, header: string) {
+        return `${skinName}:${levelIndex}:${header}`;
+    }
+
+    function getBaselineValue(skinName: string, levelIndex: number, header: string): unknown {
+        return towerStore.baseline[baselineCellKey(skinName, levelIndex, header)];
     }
 
     function getDeltaForCell(
@@ -86,18 +78,13 @@
     ): { delta: number | null; className: string } {
         const base = getBaselineValue(skinName, levelIndex, header);
         const current = skinData.levels.getCell(levelIndex, header);
-
         const baseN = toNumberOrNull(base);
         const currentN = toNumberOrNull(current);
-
         if (baseN == null || currentN == null) {
             return { delta: null, className: "" };
         }
-
         const delta = currentN - baseN;
-
         const normalized = Math.abs(delta) < 1e-12 ? 0 : delta;
-
         return {
             delta: normalized,
             className: computeDeltaClass(header, normalized),
@@ -143,8 +130,7 @@
             for (const header of headers) {
                 const value =
                     header === "Level" ? i : skinData.levels.getCell(i, header);
-
-                next[cellKey(skinName, i, header)] = value;
+                next[baselineCellKey(skinName, i, header)] = value;
             }
         }
 
@@ -161,7 +147,6 @@
             towerStore.baselineSkinName = null;
             return;
         }
-
         const currentTowerId = getTowerBaselineId(t);
         if (towerStore.baselineTowerId !== currentTowerId) {
             const initial =
@@ -176,14 +161,12 @@
         const t = tower;
         const skinName = selectedSkinName;
         if (!t || !skinName) return;
-
         const currentTowerId = getTowerBaselineId(t);
         if (
             towerStore.baselineTowerId == null ||
             towerStore.baselineTowerId !== currentTowerId
         )
             return;
-
         if (towerStore.baselineSkinName == null) {
             rebuildBaselineForSkin(t, skinName);
         }
@@ -203,7 +186,6 @@
         value: string,
     ) {
         if (!skinData || disabled) return;
-
         let parsedValue: any = value;
         if (value === "true") parsedValue = true;
         else if (value === "false") parsedValue = false;
@@ -215,23 +197,20 @@
                 `[TowerEditor] updateStat: Level ${levelIndex}, ${attribute} = ${parsedValue}`,
             );
         }
-
         skinData.set(levelIndex, attribute, parsedValue);
         towerStore.refresh();
         towerStore.syncWikitext();
     }
 
-    function updateExtraTableStat(
+    function updateRowStat(
         row: Record<string, string | number>,
         header: string,
         value: string,
     ) {
         if (disabled) return;
-
         let parsedValue: string | number = value;
         if (!isNaN(Number(value)) && value.trim() !== "")
             parsedValue = Number(value);
-
         row[header] = parsedValue;
         towerStore.refresh();
         towerStore.syncWikitext();
@@ -243,34 +222,177 @@
                 `[TowerEditor] Discard requested (tower=${tower?.name ?? "null"}, skin=${selectedSkinName})`,
             );
         }
-
-        if (settingsStore.debugMode) {
-            console.log(`[TowerEditor] Discard: awaiting store reload...`);
-        }
-
         await towerStore.discardChanges();
-
         if (settingsStore.debugMode) {
             console.log(
                 `[TowerEditor] Discard: reload complete (tower=${tower?.name ?? "null"}, skin=${selectedSkinName}); rebuilding baseline...`,
             );
         }
-
         if (tower && selectedSkinName) {
             rebuildBaselineForSkin(tower, selectedSkinName);
         }
-
         towerStore.refresh();
     }
 
     function handleSave() {
         towerStore.save();
-
         if (tower && selectedSkinName) {
             rebuildBaselineForSkin(tower, selectedSkinName);
         }
     }
+
+    interface TableConfig {
+        skinName: string;
+        tableIdx: number;
+        tableName: string;
+        headers: string[];
+        rows: Record<string, string | number>[];
+        moneyColumns: string[];
+        skinData: SkinData | null;
+    }
+
+    function isCellEditable(config: TableConfig, header: string): boolean {
+        if (config.skinData) return isEditableForSkin(config.skinData, header);
+        return true;
+    }
+
+    function commitEdit(config: TableConfig, rowIdx: number, header: string, value: string) {
+        if (config.skinData) {
+            updateStatForSkin(config.skinData, rowIdx, header, value);
+        } else {
+            updateRowStat(config.rows[rowIdx], header, value);
+        }
+    }
 </script>
+
+{#snippet dataTable(config: TableConfig, isFirst: boolean)}
+    <div
+        class="table-container {!isFirst ? 'extra-table-container' : ''} {settingsStore.minTableWidth ? 'min-content' : ''}"
+        in:fly={isFirst ? { y: 8, duration: 160, easing: cubicOut } : { duration: 0 }}
+    >
+        <table class="table {settingsStore.minTableWidth ? 'min-content' : ''}">
+            <thead class="table-head">
+                {#if config.tableName}
+                    <tr>
+                        <th colspan={config.headers.length} class="table-name-header">
+                            {config.tableName}
+                        </th>
+                    </tr>
+                {/if}
+                <tr>
+                    {#each config.headers as header (header)}
+                        <th
+                            scope="col"
+                            class={header === "Level"
+                                ? "table-header-sticky px-2"
+                                : "table-header whitespace-nowrap"}
+                        >
+                            {header}
+                        </th>
+                    {/each}
+                </tr>
+            </thead>
+            <tbody class="table-body">
+                {#each config.rows as row, rowIdx (rowIdx)}
+                    <tr class="table-row">
+                        {#each config.headers as header (header)}
+                            {#if header === "Level"}
+                                <td class="table-cell-sticky">
+                                    {row[header] ?? rowIdx}
+                                </td>
+                            {:else}
+                                {@const editable = isCellEditable(config, header)}
+                                {@const deltaInfo =
+                                    config.skinData && settingsStore.seeValueDifference
+                                        ? getDeltaForCell(config.skinData, config.skinName, rowIdx, header)
+                                        : { delta: null, className: "" }}
+                                {@const isMoney = config.moneyColumns.includes(header)}
+                                {@const ck = mkCellKey(config.skinName, config.tableIdx, rowIdx, header)}
+                                {@const cellVal = config.rows[rowIdx]?.[header]}
+                                {@const isFocused = focusedCell === ck}
+                                <td class="table-data">
+                                    {#if editable}
+                                        <div
+                                            class="cell-wrapper {isMoney ? 'money-wrapper' : ''} {settingsStore.hideCellWrapper ? 'hide-wrapper' : ''}"
+                                        >
+                                            {#if isMoney}
+                                                <img src={MoneyIcon} alt="" class="money-icon money-icon-input" />
+                                            {/if}
+                                            {#if isFocused}
+                                                <input
+                                                    use:focusOnMount
+                                                    type="text"
+                                                    class="table-input"
+                                                    value={formatValue(cellVal)}
+                                                    {disabled}
+                                                    onfocus={(e) => {
+                                                        e.currentTarget.dataset.original = e.currentTarget.value;
+                                                        e.currentTarget.value = "";
+                                                    }}
+                                                    onblur={(e) => {
+                                                        focusedCell = null;
+                                                        const next = e.currentTarget.value;
+                                                        const original = e.currentTarget.dataset.original ?? "";
+                                                        if (next === "") {
+                                                            e.currentTarget.value = original;
+                                                        } else if (next !== original) {
+                                                            commitEdit(config, rowIdx, header, next);
+                                                        }
+                                                    }}
+                                                    onkeydown={(e) => {
+                                                        if (e.key === "Enter") e.currentTarget.blur();
+                                                        if (e.key === "Escape") {
+                                                            e.currentTarget.value = e.currentTarget.dataset.original ?? "";
+                                                            focusedCell = null;
+                                                        }
+                                                    }}
+                                                />
+                                            {:else}
+                                                <button
+                                                    type="button"
+                                                    class="cell-display"
+                                                    {disabled}
+                                                    onclick={() => { focusedCell = ck; }}
+                                                >
+                                                    {@html renderCellHtml(cellVal)}
+                                                </button>
+                                            {/if}
+                                            {#if settingsStore.seeValueDifference && deltaInfo.delta !== null && deltaInfo.delta !== 0}
+                                                <span class={`delta-text ${deltaInfo.className}`}>
+                                                    ({formatDelta(deltaInfo.delta)})
+                                                </span>
+                                            {/if}
+                                        </div>
+                                    {:else}
+                                        <div
+                                            class="table-cell-readonly flex items-center justify-between gap-2 {settingsStore.hideCellWrapper ? 'hide-wrapper' : ''}"
+                                        >
+                                            {#if isMoney}
+                                                <span class="money-value">
+                                                    <img src={MoneyIcon} alt="" class="money-icon" />
+                                                    {@html renderCellHtml(cellVal)}
+                                                </span>
+                                            {:else}
+                                                <span class="cell-multiline">
+                                                    {@html renderCellHtml(cellVal)}
+                                                </span>
+                                            {/if}
+                                            {#if settingsStore.seeValueDifference && deltaInfo.delta !== null && deltaInfo.delta !== 0}
+                                                <span class={`delta-text text-xs ${deltaInfo.className}`}>
+                                                    ({formatDelta(deltaInfo.delta)})
+                                                </span>
+                                            {/if}
+                                        </div>
+                                    {/if}
+                                </td>
+                            {/if}
+                        {/each}
+                    </tr>
+                {/each}
+            </tbody>
+        </table>
+    </div>
+{/snippet}
 
 <div class="space-y-4">
     {#if tower}
@@ -280,260 +402,46 @@
                 onValueChange={(v) => (towerStore.selectedSkinName = v)}
             >
                 <Tabs.List class="tabs-list">
-                    {#each availableSkins as skinName}
+                    {#each availableSkins as skinName (skinName)}
                         <Tabs.Trigger value={skinName} class="tab-trigger">
                             {skinName}
                         </Tabs.Trigger>
                     {/each}
                 </Tabs.List>
 
-                {#each availableSkins as skinName}
+                {#each availableSkins as skinName (skinName)}
                     <Tabs.Content value={skinName}>
                         {@const skinData = tower.getSkin(skinName)}
-                        {@const levels = skinData ? skinData.levels.levels : []}
-                        {@const headers =
-                            skinData && skinData.headers.length > 0
-                                ? skinData.headers
-                                : skinData
-                                  ? skinData.levels.attributes
-                                  : []}
-                        {@const upgrades = skinData?.upgrades ?? []}
                         {#if skinData && towerStore.selectedSkinName === skinName}
-                            <div
-                                class="table-container {settingsStore.minTableWidth ? 'min-content' : ''}"
-                                in:fly={{ y: 8, duration: 160, easing: cubicOut }}
-                            >
-                                <table class="table {settingsStore.minTableWidth ? 'min-content' : ''}">
-                                    <thead class="table-head">
-                                        {#if skinData.tableName}
-                                            <tr>
-                                                <th
-                                                    colspan={headers.length}
-                                                    class="table-name-header"
-                                                >
-                                                    {skinData.tableName}
-                                                </th>
-                                            </tr>
-                                        {/if}
-                                        <tr>
-                                            {#each headers as header}
-                                                <th
-                                                    scope="col"
-                                                    class={header === "Level"
-                                                        ? "table-header-sticky px-2"
-                                                        : "table-header whitespace-nowrap"}
-                                                >
-                                                    {header}
-                                                </th>
-                                            {/each}
-                                        </tr>
-                                    </thead>
-                                    <tbody class="table-body">
-                                        {#each levels as level, index (index)}
-                                            <tr class="table-row">
-                                                {#each headers as header (header)}
-                                                    {#if header === "Level"}
-                                                        <td
-                                                            class="table-cell-sticky"
-                                                        >
-                                                            {index}
-                                                        </td>
-                                                    {:else}
-                                                        {@const deltaInfo =
-                                                            settingsStore.seeValueDifference
-                                                                ? getDeltaForCell(
-                                                                      skinData,
-                                                                      skinName,
-                                                                      index,
-                                                                      header,
-                                                                  )
-                                                                : {
-                                                                      delta: null,
-                                                                      className:
-                                                                          "",
-                                                                  }}
-                                                        <td class="table-data">
-                                                            {#if isEditableForSkin(skinData, header)}
-                                                                <div
-                                                                    class="cell-wrapper {skinData.moneyColumns.includes(header) ? 'money-wrapper' : ''} {settingsStore.hideCellWrapper ? 'hide-wrapper' : ''}"
-                                                                >
-                                                                    {#if skinData.moneyColumns.includes(header)}
-                                                                        <img src={MoneyIcon} alt="" class="money-icon money-icon-input" />
-                                                                    {/if}
-                                                                    <input
-                                                                        type="text"
-                                                                        class="table-input"
-                                                                        value={level[
-                                                                            header
-                                                                        ] ??
-                                                                            ""}
-                                                                        {disabled}
-                                                                        onfocus={(
-                                                                            e,
-                                                                        ) => {
-                                                                            e.currentTarget.dataset.original =
-                                                                                e.currentTarget.value;
-                                                                            e.currentTarget.value =
-                                                                                "";
-                                                                        }}
-                                                                        onblur={(
-                                                                            e,
-                                                                        ) => {
-                                                                            if (
-                                                                                e
-                                                                                    .currentTarget
-                                                                                    .value ===
-                                                                                ""
-                                                                            ) {
-                                                                                e.currentTarget.value =
-                                                                                    e
-                                                                                        .currentTarget
-                                                                                        .dataset
-                                                                                        .original ??
-                                                                                    "";
-                                                                            } else {
-                                                                                updateStatForSkin(
-                                                                                    skinData,
-                                                                                    index,
-                                                                                    header,
-                                                                                    e
-                                                                                        .currentTarget
-                                                                                        .value,
-                                                                                );
-                                                                            }
-                                                                        }}
-                                                                        onkeydown={(
-                                                                            e,
-                                                                        ) => {
-                                                                            if (
-                                                                                e.key ===
-                                                                                "Enter"
-                                                                            ) {
-                                                                                e.currentTarget.blur();
-                                                                            }
-                                                                        }}
-                                                                    />
-                                                                    {#if settingsStore.seeValueDifference && deltaInfo.delta !== null && deltaInfo.delta !== 0}
-                                                                        <span
-                                                                            class={`delta-text ${deltaInfo.className}`}
-                                                                        >
-                                                                            ({formatDelta(
-                                                                                deltaInfo.delta,
-                                                                            )})
-                                                                        </span>
-                                                                    {/if}
-                                                                </div>
-                                                            {:else}
-                                                                <div
-                                                                    class="table-cell-readonly flex items-center justify-between gap-2 {settingsStore.hideCellWrapper ? 'hide-wrapper' : ''}"
-                                                                >
-                                                                    {#if skinData.moneyColumns.includes(header)}
-                                                                        <span class="money-value">
-                                                                            <img src={MoneyIcon} alt="" class="money-icon" />
-                                                                            {formatValue(level[header])}
-                                                                        </span>
-                                                                    {:else}
-                                                                                    <span class="cell-multiline">
-                                                                                        {formatValue(level[header])}
-                                                                                    </span>
-                                                                    {/if}
-                                                                    {#if settingsStore.seeValueDifference && deltaInfo.delta !== null && deltaInfo.delta !== 0}
-                                                                        <span
-                                                                            class={`delta-text text-xs ${deltaInfo.className}`}
-                                                                        >
-                                                                            ({formatDelta(
-                                                                                deltaInfo.delta,
-                                                                            )})
-                                                                        </span>
-                                                                    {/if}
-                                                                </div>
-                                                            {/if}
-                                                        </td>
-                                                    {/if}
-                                                {/each}
-                                            </tr>
-                                        {/each}
-                                    </tbody>
-                                </table>
-                            </div>
+                            {@const headers =
+                                skinData.headers.length > 0
+                                    ? skinData.headers
+                                    : skinData.levels.attributes}
+                            {@const primaryConfig = {
+                                skinName,
+                                tableIdx: 0,
+                                tableName: skinData.tableName,
+                                headers,
+                                rows: skinData.levels.levels,
+                                moneyColumns: skinData.moneyColumns,
+                                skinData,
+                            }}
+                            {@render dataTable(primaryConfig, true)}
+
                             {#if skinData.extraTables?.length}
-                                                {#each skinData.extraTables as extraTable, tableIdx}
-                                                    <div
-                                                        class="table-container extra-table-container {settingsStore.minTableWidth ? 'min-content' : ''}"
-                                                    >
-                                                        <table class="table {settingsStore.minTableWidth ? 'min-content' : ''}">
-                                                            <thead class="table-head">
-                                                                {#if extraTable.name}
-                                                                    <tr>
-                                                                        <th
-                                                                            colspan={extraTable.headers.length}
-                                                                            class="table-name-header"
-                                                                        >
-                                                                            {extraTable.name}
-                                                                        </th>
-                                                                    </tr>
-                                                                {/if}
-                                                                <tr>
-                                                                    {#each extraTable.headers as header}
-                                                                        <th
-                                                                            scope="col"
-                                                                            class="table-header whitespace-nowrap"
-                                                                        >
-                                                                            {header}
-                                                                        </th>
-                                                                    {/each}
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody class="table-body">
-                                                                {#each extraTable.rows as row, rowIdx}
-                                                                    <tr class="table-row">
-                                                                        {#each extraTable.headers as header}
-                                                                            {@const ck = extraCellKey(tableIdx, rowIdx, header)}
-                                                                            {@const isFocused = focusedExtraCell === ck}
-                                                                            <td class="table-data">
-                                                                                <div
-                                                                                    class="cell-wrapper {extraTable.moneyColumns.includes(header) ? 'money-wrapper' : ''} {settingsStore.hideCellWrapper ? 'hide-wrapper' : ''}"
-                                                                                >
-                                                                                    {#if extraTable.moneyColumns.includes(header)}
-                                                                                        <img src={MoneyIcon} alt="" class="money-icon money-icon-input" />
-                                                                                    {/if}
-                                                                                    {#if isFocused}
-                                                                                        <input
-                                                                                            use:focusOnMount
-                                                                                            type="text"
-                                                                                            class="table-input"
-                                                                                            value={formatValue(row[header])}
-                                                                                            {disabled}
-                                                                                            onblur={(e) => {
-                                                                                                focusedExtraCell = null;
-                                                                                                if (e.currentTarget.value !== formatValue(row[header])) {
-                                                                                                    updateExtraTableStat(row, header, e.currentTarget.value);
-                                                                                                }
-                                                                                            }}
-                                                                                            onkeydown={(e) => {
-                                                                                                if (e.key === "Enter") e.currentTarget.blur();
-                                                                                                if (e.key === "Escape") focusedExtraCell = null;
-                                                                                            }}
-                                                                                        />
-                                                                                    {:else}
-                                                                                        <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
-                                                                                        <span
-                                                                                            class="extra-cell-display"
-                                                                                            onclick={() => { if (!disabled) focusedExtraCell = ck; }}
-                                                                                        >
-                                                                                            {@html renderCellHtml(row[header])}
-                                                                                        </span>
-                                                                                    {/if}
-                                                                                </div>
-                                                                            </td>
-                                                                        {/each}
-                                                                    </tr>
-                                                                {/each}
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                {/each}
-                                            {/if}
+                                {#each skinData.extraTables as extraTable, tableIdx (tableIdx)}
+                                    {@const extraConfig = {
+                                        skinName,
+                                        tableIdx: tableIdx + 1,
+                                        tableName: extraTable.name,
+                                        headers: extraTable.headers,
+                                        rows: extraTable.rows,
+                                        moneyColumns: extraTable.moneyColumns,
+                                        skinData: null,
+                                    }}
+                                    {@render dataTable(extraConfig, false)}
+                                {/each}
+                            {/if}
                         {:else if towerStore.selectedSkinName === skinName}
                             <div class="text-center py-4 text-muted-foreground">
                                 No skin data available.
@@ -722,13 +630,22 @@
         white-space: pre-line;
     }
 
-    .extra-cell-display {
+    .cell-display {
         display: block;
         width: 100%;
-        padding: 0.1rem 0;
+        padding: 0;
         cursor: text;
         line-height: 1.4;
         white-space: normal;
+        background: none;
+        border: none;
+        text-align: left;
+        font: inherit;
+        color: inherit;
+
+        &:disabled {
+            cursor: default;
+        }
     }
 
     .delta-text {
