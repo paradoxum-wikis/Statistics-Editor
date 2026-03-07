@@ -1,3 +1,35 @@
+<var>
+$TP$ = $FNC-TOTALPRICE$
+$0Cost$ = 4200
+$1Cost$ = 3950
+$2Cost$ = 11320
+$3Cost$ = 26650
+$4Cost$ = 65000
+$PVP-0Cost$ = 1500
+$PVP-1Cost$ = 1000
+$PVP-2Cost$ = 3500
+$PVP-3Cost$ = 10000
+$PVP-4Cost$ = 40000
+$2Hidden$ = true
+$0Lead$ = true
+$0Flying$ = true
+$PVP-0Lead$ = true
+$PVP-0Flying$ = true
+$PVP-2Hidden$ = true
+$1Upgrade$ = Soul Forge
+$1UpgradeI$ = File:NecromancerLevel1.png
+$2Upgrade$ = Skull Centrifuge
+$2UpgradeI$ = File:NecromancerLevel2.png
+$3Upgrade$ = Graveward
+$3UpgradeI$ = File:NecromancerLevel3.png
+$4Upgrade$ = Apostle Of Hades
+$4UpgradeI$ = File:NecromancerLevel4.png
+$NecDPS$ = Damage / Firerate
+$Nec4DPS$ = (Damage * Max Hits) / Firerate
+$UnitDPS$ = Damage / Firerate
+$ExecDPS$ = (Damage / Tick) / Firerate
+$CE$ = Total Price / DPS
+</var>
 <div class="mobile-tabber"><tabber>
 |-|Regular =
 <div class="overflow-box">
@@ -22,7 +54,7 @@
 !Cost Efficiency
 |-
 |0
-|{{Money|4,200}}
+|{{Money|$TP$}}
 |15
 |N/A
 |1.208
@@ -35,11 +67,11 @@
 |3
 |3
 |1
-|12.42
-|{{Money|338.24}}
+|$NecDPS$
+|{{Money|$CE$}}
 |-
 |1
-|{{Money|8,150}}
+|{{Money|$TP$}}
 |20
 |N/A
 |1.108
@@ -52,11 +84,11 @@
 |3
 |3
 |1
-|18.05
-|{{Money|451.51}}
+|$NecDPS$
+|{{Money|$CE$}}
 |-
 |2
-|{{Money|19,470}}
+|{{Money|$TP$}}
 |30
 |N/A
 |1.108
@@ -69,11 +101,11 @@
 |6
 |3
 |1
-|27.08
-|{{Money|719.09}}
+|$NecDPS$
+|{{Money|$CE$}}
 |-
 |3
-|{{Money|46,120}}
+|{{Money|$TP$}}
 |45
 |N/A
 |0.808
@@ -86,11 +118,11 @@
 |6
 |3
 |2
-|55.69
-|{{Money|828.11}}
+|$NecDPS$
+|{{Money|$CE$}}
 |-
 |4
-|{{Money|111,120}}
+|{{Money|$TP$}}
 |30
 |500
 |0.408
@@ -103,8 +135,8 @@
 |9
 |3
 |3
-|220.59
-|{{Money|503.74}}
+|$Nec4DPS$
+|{{Money|$CE$}}
 |}
 </div>
 
@@ -146,7 +178,7 @@
 |N/A
 |6
 |Hidden
-|35.31
+|$UnitDPS$
 |-
 |1–2
 |[[Giant Skeleton (Unit)|Giant Skeleton]]
@@ -170,7 +202,7 @@
 |N/A
 |6
 |Hidden
-|127.12
+|$UnitDPS$
 |-
 |2–3
 |[[Hallow Guard (Unit)|Hallow Guard]]
@@ -194,7 +226,7 @@
 |0.1
 |32
 |Flying, Hidden
-|124.83
+|$ExecDPS$
 |}
 </div>
 
@@ -209,34 +241,34 @@
 !Combined DPS<ref name="cdps">DPS does not include collision damage and assumes only one enemy is hit by an unit.<br>For the [[Executioner Skeleton]], DPS is calculated as (Damage ÷ Tick) ÷ Firerate.</ref>
 |-
 |0
-|{{Money|4,200}}
+|{{Money|$TP$}}
 |3x [[Skeleton]]
 |270
 |N/A
 |-
 |1
-|{{Money|8,150}}
+|{{Money|$TP$}}
 |3x [[Sword Skeleton]]
 |360
-|105.93
+|$UnitDPS$
 |-
 |2
-|{{Money|19,470}}
+|{{Money|$TP$}}
 |1x [[Giant Skeleton (Unit)|Giant Skeleton]]<br/>5x [[Sword Skeleton]]
 |1,800
-|176.55
+|$UnitDPS$
 |-
 |3
-|{{Money|46,120}}
+|{{Money|$TP$}}
 |2x [[Giant Skeleton (Unit)|Giant Skeleton]]<br/>2x [[Sword Skeleton]]<br/>1x [[Skeleton Knight]]<br/>1x [[Hallow Guard (Unit)|Hallow Guard]]
 |5,210
-|197.74
+|$UnitDPS$
 |-
 |4
-|{{Money|111,120}}
+|{{Money|$TP$}}
 |1x [[Executioner Skeleton]]<br/>5x [[Skeleton Knight]]<br/>3x [[Hallow Guard (Unit)|Hallow Guard]]
 |12,001
-|760.43
+|$UnitDPS$
 |}
 </div>
 |-|PVP =
@@ -262,7 +294,7 @@
 !Cost Efficiency
 |-
 |0
-|{{Money|1,500}}
+|{{Money|$TP$}}
 |10
 |N/A
 |1.508
@@ -275,11 +307,11 @@
 |2
 |2
 |1
-|6.63
-|{{Money|226.24}}
+|$NecDPS$
+|{{Money|$CE$}}
 |-
 |1
-|{{Money|2,500}}
+|{{Money|$TP$}}
 |12
 |N/A
 |1.208
@@ -292,11 +324,11 @@
 |4
 |2
 |1
-|9.93
-|{{Money|186.3}}
+|$NecDPS$
+|{{Money|$CE$}}
 |-
 |2
-|{{Money|6,000}}
+|{{Money|$TP$}}
 |12
 |N/A
 |1.208
@@ -309,11 +341,11 @@
 |6
 |3
 |1
-|9.93
-|{{Money|604.23}}
+|$NecDPS$
+|{{Money|$CE$}}
 |-
 |3
-|{{Money|16,000}}
+|{{Money|$TP$}}
 |30
 |N/A
 |0.808
@@ -326,11 +358,11 @@
 |6
 |3
 |2
-|37.13
-|{{Money|430.92}}
+|$NecDPS$
+|{{Money|$CE$}}
 |-
 |4
-|{{Money|56,000}}
+|{{Money|$TP$}}
 |20
 |500
 |0.408
@@ -343,8 +375,8 @@
 |9
 |3
 |3
-|147.06
-|{{Money|380.8}}
+|$Nec4DPS$
+|{{Money|$CE$}}
 |}
 </div>
 
@@ -386,7 +418,7 @@
 |N/A
 |6
 |Hidden
-|24.75
+|$UnitDPS$
 |-
 |2
 |[[Giant Skeleton (Unit)|Giant Skeleton]]
@@ -410,7 +442,7 @@
 |N/A
 |6
 |Hidden
-|136.78
+|$UnitDPS$
 |-
 |3
 |[[Hallow Guard (Unit)|Hallow Guard]]
@@ -434,7 +466,7 @@
 |0.1
 |32
 |Flying, Hidden
-|124.83
+|$ExecDPS$
 |}
 </div>
 
@@ -449,34 +481,34 @@
 !Combined DPS<ref name="cdps"/>
 |-
 |0
-|{{Money|1,500}}
+|{{Money|$TP$}}
 |2x [[Skeleton]]
 |180
 |N/A
 |-
 |1
-|{{Money|2,500}}
+|{{Money|$TP$}}
 |4x [[Skeleton]]
 |360
 |N/A
 |-
 |2
-|{{Money|6,000}}
+|{{Money|$TP$}}
 |3x [[Skeleton]]<br/>3x [[Sword Skeleton]]
 |540
-|74.25
+|$UnitDPS$
 |-
 |3
-|{{Money|16,000}}
+|{{Money|$TP$}}
 |1x [[Giant Skeleton (Unit)|Giant Skeleton]]<br/>4x [[Sword Skeleton]]<br/>1x [[Skeleton Knight]]
 |1,810
-|235.78
+|$UnitDPS$
 |-
 |4
-|{{Money|56,000}}
+|{{Money|$TP$}}
 |1x [[Executioner Skeleton]]<br/>6x [[Skeleton Knight]]<br/>2x [[Hallow Guard (Unit)|Hallow Guard]]
 |9,850
-|945.51
+|$UnitDPS$
 |}
 </div>
 </tabber></div>
