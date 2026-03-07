@@ -167,6 +167,7 @@ function parseTable(tableContent: string): TableData | null {
   const cleanCell = (val: string, header?: string): string | number => {
     val = val.trim();
     val = stripRefs(val);
+    val = val.replace(/<br\s*\/?>/gi, "\n");
     const templateMatch = val.match(/{{([^|{}]+)\|([^}]+)}}/);
     if (templateMatch) {
       if (templateMatch[1].trim() === "Money" && header)
