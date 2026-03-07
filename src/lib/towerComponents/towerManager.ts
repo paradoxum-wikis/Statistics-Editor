@@ -1,15 +1,15 @@
 import Tower from "./tower";
 import { towerNames } from "./towers";
-import { resolveToken } from "$lib/wikitext/functions";
+import { resolveToken } from "$lib/neowtext/functions";
 import { settingsStore } from "$lib/stores/settings.svelte";
-import { parseWikitext, type TableData } from "$lib/wikitext/parser";
+import { parseWikitext, type TableData } from "$lib/neowtext/parser";
 
-import { patchWikitext } from "$lib/wikitext/patcher";
+import { patchWikitext } from "$lib/neowtext/patcher";
 import {
   clearWikiOverride,
   loadEffectiveWikitext,
   setWikiOverride,
-} from "$lib/wikitext/wikiSource";
+} from "$lib/neowtext/wikiSource";
 
 const wikitextFiles = import.meta.glob("./towers/*.wiki", {
   query: "?raw",

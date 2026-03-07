@@ -1,4 +1,4 @@
-import { evaluateFormula } from "$lib/wikitext/evaluator";
+import { evaluateFormula } from "$lib/neowtext/evaluator";
 import { parseNumeric } from "$lib/utils/format";
 
 /**

@@ -1,0 +1,178 @@
+<div class="overflow-box">
+{| class="wikitable stats-table"
+! colspan="9" |Ranged Attack
+|-
+!Level
+!Total Price
+!Damage
+!Firerate
+!Range
+!Knockback Force
+!DPS
+!Cost Efficiency
+|-
+|0
+|{{Money|4,200}}
+|25
+|1.108
+|18
+|N/A
+|22.56
+|{{Money|186.14}}
+|-
+|1
+|{{Money|6,700}}
+|40
+|1.108
+|19
+|N/A
+|36.1
+|{{Money|185.59}}
+|-
+|2
+|{{Money|13,500}}
+|60
+|0.808
+|22
+|15
+|74.26
+|{{Money|181.8}}
+|-
+|3
+|{{Money|25,500}}
+|115
+|0.808
+|22
+|17.5
+|142.33
+|{{Money|179.17}}
+|-
+|4
+|{{Money|48,000}}
+|190
+|0.808
+|24
+|17.5
+|235.15
+|{{Money|204.13}}
+|-
+|5
+|{{Money|80,500}}
+|260
+|0.708
+|24
+|20
+|367.23
+|{{Money|219.21}}
+|}
+</div>
+
+<div class="overflow-box">
+{| class="wikitable stats-table"
+! colspan="15" |Melee Attack
+|-
+!Level
+!Total Price
+!Normal Damage
+!AOE Damage<ref>AOE Damage is damage dealt to both the targeted enemies and any additional enemies, with the number being based on the '''Warlock's''' max hits. The damage is the same as the ranged attack's damage.</ref>
+!Base Bleed Damage
+!Swingrate
+!Bleed Stack
+!EV
+!Max Stack
+!Range
+!Max Hits
+!DPS<ref>DPS is calculated as (Damage + AOE Damage) ÷ Swingrate. DPS does not include bleed damage.</ref>
+!Max DPS<ref>Max DPS is calculated as (Damage + AOE Damage x Max Hits) ÷ Swingrate. Max DPS does not include bleed damage.</ref>
+!Cost Efficiency
+|-
+|0
+|{{Money|4,200}}
+|45
+|25
+|N/A
+|2.008
+|N/A
+|N/A
+|N/A
+|7
+|2
+|34.86
+|47.31
+|{{Money|120.48}}
+|-
+|1
+|{{Money|6,700}}
+|75
+|40
+|N/A
+|2.008
+|N/A
+|N/A
+|N/A
+|7
+|2
+|57.27
+|77.19
+|{{Money|116.99}}
+|-
+|2
+|{{Money|13,500}}
+|140
+|60
+|N/A
+|2.008
+|N/A
+|N/A
+|N/A
+|7.5
+|2
+|99.6
+|129.48
+|{{Money|135.54}}
+|-
+|3
+|{{Money|25,500}}
+|200
+|115
+|N/A
+|1.808
+|N/A
+|N/A
+|N/A
+|7.5
+|2
+|174.23
+|237.83
+|{{Money|146.36}}
+|-
+|4
+|{{Money|48,000}}
+|350
+|190
+|2
+|1.808
+|2
+|0.28
+|40
+|8
+|3
+|298.67
+|508.85
+|{{Money|160.71}}
+|-
+|5
+|{{Money|80,500}}
+|550
+|260
+|2
+|1.808
+|5
+|0.28
+|40
+|9
+|3
+|448.01
+|735.62
+|{{Money|179.68}}
+|}

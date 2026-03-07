@@ -3,8 +3,8 @@ import Defaults from "./defaults";
 import Upgrade from "./upgrade";
 import Levels from "./levels";
 import Locator from "./locator";
-import { resolveToken } from "$lib/wikitext/functions";
-import type { TableData } from "$lib/wikitext/parser";
+import { resolveToken } from "$lib/neowtext/functions";
+import type { TableData } from "$lib/neowtext/parser";
 
 type FormulaToken = string; // e.g. "$DPS$", "$DPS2$"
 type FormulaTokenMap = Record<string, string>; // token -> expression

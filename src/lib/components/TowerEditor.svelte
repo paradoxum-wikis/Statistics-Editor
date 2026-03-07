@@ -10,6 +10,7 @@
     import { cubicOut } from "svelte/easing";
     import MoneyIcon from "$lib/assets/Income.png";
     import { formatNumber, formatValue } from "$lib/utils/format";
+    import { renderCellHtml } from "$lib/neowtext/render";
 
     let {
         tower = null,
@@ -31,20 +32,7 @@
         return `${tableIdx}:${rowIdx}:${header}`;
     }
 
-    function renderCellHtml(val: unknown): string {
-        return formatValue(val)
-            .replace(/\n/g, "<br>")
-            .replace(/\[\[([^\]|]+)\|([^\]]+)\]\]/g, (_, link, text) => {
-                const slug = link.trim().replace(/ /g, "_");
-                const url = `https://tds.fandom.com/wiki/${encodeURIComponent(slug)}`;
-                return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="wiki-link">${text.trim()}</a>`;
-            })
-            .replace(/\[\[([^\]]+)\]\]/g, (_, link) => {
-                const slug = link.trim().replace(/ /g, "_");
-                const url = `https://tds.fandom.com/wiki/${encodeURIComponent(slug)}`;
-                return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="wiki-link">${link.trim()}</a>`;
-            });
-    }
+
 
     function cellKey(skinName: string, levelIndex: number, header: string) {
         return `${skinName}:${levelIndex}:${header}`;

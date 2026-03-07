@@ -3,7 +3,7 @@
 	import { towerStore } from "$lib/stores/tower.svelte";
 	import { profileStore } from "$lib/stores/profile.svelte";
 	import { settingsStore } from "$lib/stores/settings.svelte";
-	import { setWikiOverride } from "$lib/wikitext/wikiSource";
+	import { setWikiOverride } from "$lib/neowtext/wikiSource";
 	import { WikitextEditor } from "wikistxr";
 
 	let {
