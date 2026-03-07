@@ -355,7 +355,7 @@
                                                     {disabled}
                                                     onclick={() => { focusedCell = ck; }}
                                                 >
-                                                    {@html renderCellHtml(cellVal)}
+                                                    {@html renderCellHtml(cellVal, false)}
                                                 </button>
                                             {/if}
                                             {#if settingsStore.seeValueDifference && deltaInfo.delta !== null && deltaInfo.delta !== 0}
@@ -371,11 +371,11 @@
                                             {#if isMoney}
                                                 <span class="money-value">
                                                     <img src={MoneyIcon} alt="" class="money-icon" />
-                                                    {@html renderCellHtml(cellVal)}
+                                                    {@html renderCellHtml(cellVal, true)}
                                                 </span>
                                             {:else}
                                                 <span class="cell-multiline">
-                                                    {@html renderCellHtml(cellVal)}
+                                                    {@html renderCellHtml(cellVal, true)}
                                                 </span>
                                             {/if}
                                             {#if settingsStore.seeValueDifference && deltaInfo.delta !== null && deltaInfo.delta !== 0}
