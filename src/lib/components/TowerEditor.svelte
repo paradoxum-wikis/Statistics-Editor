@@ -21,6 +21,20 @@
 
     let availableSkins = $derived(tower ? tower.skinNames : []);
 
+    function focusOnMount(node: HTMLElement) {
+        node.focus();
+    }
+
+    let focusedExtraCell = $state<string | null>(null);
+
+    function extraCellKey(tableIdx: number, rowIdx: number, header: string): string {
+        return `${tableIdx}:${rowIdx}:${header}`;
+    }
+
+    function renderCellHtml(val: unknown): string {
+        return formatValue(val).replace(/\n/g, "<br>");
+    }
+
     function cellKey(skinName: string, levelIndex: number, header: string) {
         return `${skinName}:${levelIndex}:${header}`;
     }
@@ -444,7 +458,7 @@
                                 </table>
                             </div>
                             {#if skinData.extraTables?.length}
-                                                {#each skinData.extraTables as extraTable}
+                                                {#each skinData.extraTables as extraTable, tableIdx}
                                                     <div
                                                         class="table-container extra-table-container {settingsStore.minTableWidth ? 'min-content' : ''}"
                                                     >
@@ -472,9 +486,11 @@
                                                                 </tr>
                                                             </thead>
                                                             <tbody class="table-body">
-                                                                {#each extraTable.rows as row}
+                                                                {#each extraTable.rows as row, rowIdx}
                                                                     <tr class="table-row">
                                                                         {#each extraTable.headers as header}
+                                                                            {@const ck = extraCellKey(tableIdx, rowIdx, header)}
+                                                                            {@const isFocused = focusedExtraCell === ck}
                                                                             <td class="table-data">
                                                                                 <div
                                                                                     class="cell-wrapper {extraTable.moneyColumns.includes(header) ? 'money-wrapper' : ''} {settingsStore.hideCellWrapper ? 'hide-wrapper' : ''}"
@@ -482,26 +498,33 @@
                                                                                     {#if extraTable.moneyColumns.includes(header)}
                                                                                         <img src={MoneyIcon} alt="" class="money-icon money-icon-input" />
                                                                                     {/if}
-                                                                                    <input
-                                                                                        type="text"
-                                                                                        class="table-input"
-                                                                                        value={formatValue(row[header])}
-                                                                                        {disabled}
-                                                                                        onfocus={(e) => {
-                                                                                            e.currentTarget.dataset.original = e.currentTarget.value;
-                                                                                            e.currentTarget.value = "";
-                                                                                        }}
-                                                                                        onblur={(e) => {
-                                                                                            if (e.currentTarget.value === "") {
-                                                                                                e.currentTarget.value = e.currentTarget.dataset.original ?? "";
-                                                                                            } else {
-                                                                                                updateExtraTableStat(row, header, e.currentTarget.value);
-                                                                                            }
-                                                                                        }}
-                                                                                        onkeydown={(e) => {
-                                                                                            if (e.key === "Enter") e.currentTarget.blur();
-                                                                                        }}
-                                                                                    />
+                                                                                    {#if isFocused}
+                                                                                        <input
+                                                                                            use:focusOnMount
+                                                                                            type="text"
+                                                                                            class="table-input"
+                                                                                            value={formatValue(row[header])}
+                                                                                            {disabled}
+                                                                                            onblur={(e) => {
+                                                                                                focusedExtraCell = null;
+                                                                                                if (e.currentTarget.value !== formatValue(row[header])) {
+                                                                                                    updateExtraTableStat(row, header, e.currentTarget.value);
+                                                                                                }
+                                                                                            }}
+                                                                                            onkeydown={(e) => {
+                                                                                                if (e.key === "Enter") e.currentTarget.blur();
+                                                                                                if (e.key === "Escape") focusedExtraCell = null;
+                                                                                            }}
+                                                                                        />
+                                                                                    {:else}
+                                                                                        <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
+                                                                                        <span
+                                                                                            class="extra-cell-display"
+                                                                                            onclick={() => { if (!disabled) focusedExtraCell = ck; }}
+                                                                                        >
+                                                                                            {@html renderCellHtml(row[header])}
+                                                                                        </span>
+                                                                                    {/if}
                                                                                 </div>
                                                                             </td>
                                                                         {/each}
@@ -642,11 +665,12 @@
     .table-data {
         padding: 0.25rem;
         min-width: 100px;
+        vertical-align: top;
     }
 
     .cell-wrapper {
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         width: 100%;
         border-radius: var(--radius) 0;
         border: 1px solid var(--input);
@@ -697,6 +721,15 @@
 
     .cell-multiline {
         white-space: pre-line;
+    }
+
+    .extra-cell-display {
+        display: block;
+        width: 100%;
+        padding: 0.1rem 0;
+        cursor: text;
+        line-height: 1.4;
+        white-space: normal;
     }
 
     .delta-text {
