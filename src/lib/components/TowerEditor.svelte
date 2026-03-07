@@ -32,7 +32,18 @@
     }
 
     function renderCellHtml(val: unknown): string {
-        return formatValue(val).replace(/\n/g, "<br>");
+        return formatValue(val)
+            .replace(/\n/g, "<br>")
+            .replace(/\[\[([^\]|]+)\|([^\]]+)\]\]/g, (_, link, text) => {
+                const slug = link.trim().replace(/ /g, "_");
+                const url = `https://tds.fandom.com/wiki/${encodeURIComponent(slug)}`;
+                return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="wiki-link">${text.trim()}</a>`;
+            })
+            .replace(/\[\[([^\]]+)\]\]/g, (_, link) => {
+                const slug = link.trim().replace(/ /g, "_");
+                const url = `https://tds.fandom.com/wiki/${encodeURIComponent(slug)}`;
+                return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="wiki-link">${link.trim()}</a>`;
+            });
     }
 
     function cellKey(skinName: string, levelIndex: number, header: string) {
@@ -730,6 +741,16 @@
         cursor: text;
         line-height: 1.4;
         white-space: normal;
+    }
+
+    .wiki-link {
+        color: var(--primary);
+        text-decoration: underline;
+        text-underline-offset: 2px;
+
+        &:hover {
+            opacity: 0.8;
+        }
     }
 
     .delta-text {
