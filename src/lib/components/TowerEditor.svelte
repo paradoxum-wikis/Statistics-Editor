@@ -743,16 +743,6 @@
         white-space: normal;
     }
 
-    .wiki-link {
-        color: var(--primary);
-        text-decoration: underline;
-        text-underline-offset: 2px;
-
-        &:hover {
-            opacity: 0.8;
-        }
-    }
-
     .delta-text {
         font-size: 0.75rem;
         line-height: 1rem;

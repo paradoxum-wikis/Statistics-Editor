@@ -563,3 +563,13 @@ button {
   transition: transform 0.15s ease;
   flex-shrink: 0;
 }
+
+.wiki-link {
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
