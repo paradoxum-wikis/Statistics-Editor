@@ -250,25 +250,25 @@ $CE$ = Total Price / DPS
 |{{Money|$TP$}}
 |3x [[Sword Skeleton]]
 |360
-|$UnitDPS$
+|105.93
 |-
 |2
 |{{Money|$TP$}}
 |1x [[Giant Skeleton (Unit)|Giant Skeleton]]<br/>5x [[Sword Skeleton]]
 |1,800
-|$UnitDPS$
+|176.55
 |-
 |3
 |{{Money|$TP$}}
 |2x [[Giant Skeleton (Unit)|Giant Skeleton]]<br/>2x [[Sword Skeleton]]<br/>1x [[Skeleton Knight]]<br/>1x [[Hallow Guard (Unit)|Hallow Guard]]
 |5,210
-|$UnitDPS$
+|197.74
 |-
 |4
 |{{Money|$TP$}}
 |1x [[Executioner Skeleton]]<br/>5x [[Skeleton Knight]]<br/>3x [[Hallow Guard (Unit)|Hallow Guard]]
 |12,001
-|$UnitDPS$
+|760.43
 |}
 </div>
 |-|PVP =
@@ -496,19 +496,19 @@ $CE$ = Total Price / DPS
 |{{Money|$TP$}}
 |3x [[Skeleton]]<br/>3x [[Sword Skeleton]]
 |540
-|$UnitDPS$
+|74.25
 |-
 |3
 |{{Money|$TP$}}
 |1x [[Giant Skeleton (Unit)|Giant Skeleton]]<br/>4x [[Sword Skeleton]]<br/>1x [[Skeleton Knight]]
 |1,810
-|$UnitDPS$
+|235.78
 |-
 |4
 |{{Money|$TP$}}
 |1x [[Executioner Skeleton]]<br/>6x [[Skeleton Knight]]<br/>2x [[Hallow Guard (Unit)|Hallow Guard]]
 |9,850
-|$UnitDPS$
+|945.51
 |}
 </div>
 </tabber></div>
