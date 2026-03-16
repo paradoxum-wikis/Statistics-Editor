@@ -1,4 +1,3 @@
-import SkinData from "./skinData";
 import BaseStats from "./baseStats";
 import Locator from "./locator";
 

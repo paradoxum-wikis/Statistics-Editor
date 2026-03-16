@@ -126,7 +126,6 @@ function buildVariablesMap(tower: Tower): Record<string, string> {
     if (!skin) continue;
 
     const isPvp = skin.isPvp;
-    const prefix = isPvp ? "PVP-" : "";
 
     if (skin.formulaTokens) {
       for (const [key, val] of Object.entries(skin.formulaTokens)) {
