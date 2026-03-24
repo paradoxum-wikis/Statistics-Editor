@@ -1,0 +1,156 @@
+<var>
+$DPS$ = Damage / Firerate
+$CE$ = Total Price / DPS
+$TP$ = $FNC-TOTALPRICE$
+$FNC-ROF$ = Firerate
+
+$0Cost$ = 8250
+$1Cost$ = 3250
+$2Cost$ = 7500
+$3Cost$ = 20000
+$4Cost$ = 35000
+$5Cost$ = 75000
+$PVP-0Cost$ = 4000
+$PVP-1Cost$ = 1000
+$PVP-2Cost$ = 2750
+$PVP-3Cost$ = 9000
+$PVP-4Cost$ = 20000
+$PVP-5Cost$ = 42500
+
+$1Hidden$ = true
+$4Lead$ = true
+$PVP-2Lead$ = true
+
+$1Upgrade$ = Radar
+$1UpgradeI$ = File:Radar.png
+$2Upgrade$ = Stronger Ammunition
+$2UpgradeI$ = File:Radar.png
+$3Upgrade$ = Dual Turret
+$3UpgradeI$ = File:Turret3.png
+$4Upgrade$ = Even Heavier Ammo
+$4UpgradeI$ = File:Turret4.png
+$5Upgrade$ = Even Heavier Ammo
+$4UpgradeI$ = File:Turret5.png
+</var>
+<div class="mobile-tabber"><tabber>
+|-|Regular =
+<div class="overflow-box">
+{| class="wikitable stats-table"
+!Level
+!Total Price
+!Damage
+!Firerate
+!Range
+!DPS
+!Cost Efficiency
+|-
+|0
+|{{Money|$TP$}}
+|20
+|0.4
+|15
+|$DPS$
+|{{Money|$CE$}}
+|-
+|1
+|{{Money|$TP$}}
+|20
+|0.3
+|20
+|$DPS$
+|{{Money|$CE$}}
+|-
+|2
+|{{Money|$TP$}}
+|30
+|0.3
+|20
+|$DPS$
+|{{Money|$CE$}}
+|-
+|3
+|{{Money|$TP$}}
+|40
+|0.16
+|22
+|$DPS$
+|{{Money|$CE$}}
+|-
+|4
+|{{Money|$TP$}}
+|65
+|0.16
+|24
+|$DPS$
+|{{Money|$CE$}}
+|-
+|5
+|{{Money|$TP$}}
+|78
+|0.12
+|27
+|$DPS$
+|{{Money|$CE$}}
+|}
+</div>
+|-|PVP =
+<div class="overflow-box">
+{| class="wikitable stats-table"
+!Level
+!Total Price
+!Damage
+!Firerate
+!Range
+!DPS
+!Cost Efficiency
+|-
+|0
+|{{Money|$TP$}}
+|10
+|0.35
+|16.5
+|$DPS$
+|{{Money|$CE$}}
+|-
+|1
+|{{Money|$TP$}}
+|10
+|0.3
+|21
+|$DPS$
+|{{Money|$CE$}}
+|-
+|2
+|{{Money|$TP$}}
+|15
+|0.3
+|21
+|$DPS$
+|{{Money|$CE$}}
+|-
+|3
+|{{Money|$TP$}}
+|15
+|0.15
+|23
+|$DPS$
+|{{Money|$CE$}}
+|-
+|4
+|{{Money|$TP$}}
+|32
+|0.15
+|24.5
+|$DPS$
+|{{Money|$CE$}}
+|-
+|5
+|{{Money|$TP$}}
+|55
+|0.12
+|26.5
+|$DPS$
+|{{Money|$CE$}}
+|}
+</div>
+</tabber></div>
