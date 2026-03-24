@@ -1,3 +1,6 @@
+import { settingsStore } from "$lib/stores/settings.svelte";
+import { applyROFBug } from "$lib/utils/format";
+
 export interface TableData {
   name: string;
   headers: string[];
@@ -241,4 +244,29 @@ function parseTable(tableContent: string): TableData | null {
     moneyColumns: Array.from(moneyColumns),
     readOnlyColumns: [],
   };
+}
+
+export function applyROFBugToTabs(
+  tabs: Record<string, TableData[]>,
+  variables: Record<string, string>,
+): Record<string, TableData[]> {
+  const cols = variables["$FNC-ROF$"]?.split(";").map((s) => s.trim());
+  if (!cols) return tabs;
+
+  return Object.fromEntries(
+    Object.entries(tabs).map(([tab, tables]) => [
+      tab,
+      tables.map((t) => ({
+        ...t,
+        rows: t.rows.map((row) => {
+          const r = { ...row };
+          for (const col of cols) {
+            const n = Number(r[col]);
+            if (r[col] !== "" && !isNaN(n)) r[col] = applyROFBug(n);
+          }
+          return r;
+        }),
+      })),
+    ]),
+  );
 }

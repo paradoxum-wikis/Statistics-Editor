@@ -14,6 +14,7 @@ const SETTINGS: {
   hideCellWrapper: SettingBoolean;
   minTableWidth: SettingBoolean;
   clearOnEdit: SettingBoolean;
+  rofBug: SettingBoolean;
   theme: SettingString<"light" | "dark" | "system">;
 } = {
   debugMode: {
@@ -35,6 +36,10 @@ const SETTINGS: {
   clearOnEdit: {
     key: "tdse_coe",
     default: true,
+  },
+  rofBug: {
+    key: "tdse_rof_bug",
+    default: false,
   },
   theme: {
     key: "tdse_theme",
@@ -75,6 +80,7 @@ class SettingsStore {
   hideCellWrapper = $state(SETTINGS.hideCellWrapper.default);
   minTableWidth = $state(SETTINGS.minTableWidth.default);
   clearOnEdit = $state(SETTINGS.clearOnEdit.default);
+  rofBug = $state(SETTINGS.rofBug.default);
   theme = $state(SETTINGS.theme.default);
 
   constructor() {
@@ -83,6 +89,7 @@ class SettingsStore {
     this.hideCellWrapper = readBooleanSetting(SETTINGS.hideCellWrapper);
     this.minTableWidth = readBooleanSetting(SETTINGS.minTableWidth);
     this.clearOnEdit = readBooleanSetting(SETTINGS.clearOnEdit);
+    this.rofBug = readBooleanSetting(SETTINGS.rofBug);
     this.theme = readStringSetting(SETTINGS.theme);
   }
 
@@ -122,6 +129,11 @@ class SettingsStore {
   setClearOnEdit(value: boolean) {
     this.clearOnEdit = value;
     writeBooleanSetting(SETTINGS.clearOnEdit, value);
+  }
+
+  setRofBug(value: boolean) {
+    this.rofBug = value;
+    writeBooleanSetting(SETTINGS.rofBug, value);
   }
 
   setTheme(value: "light" | "dark" | "system") {

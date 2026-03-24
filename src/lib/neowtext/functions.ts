@@ -1,5 +1,7 @@
 import { evaluateFormula } from "$lib/neowtext/evaluator";
 import { parseNumeric } from "$lib/utils/format";
+import { settingsStore } from "$lib/stores/settings.svelte";
+import { applyROFBug } from "$lib/utils/format";
 
 /**
  * Resolves a $FNC-NAME$ function for the given row level.
@@ -40,9 +42,7 @@ export function resolveToken(
 
   // $FNC-NAME$
   const fncMatch = token.match(/^\$FNC-([A-Z]+)\$$/);
-  if (fncMatch) {
-    return resolveFNC(fncMatch[1], level, formulaTokens);
-  }
+  if (fncMatch) return resolveFNC(fncMatch[1], level, formulaTokens);
 
   // $nVar$
   const nVarMatch = token.match(/^\$n(.+)\$$/);
@@ -54,8 +54,23 @@ export function resolveToken(
       isPvpSkin && variables[pvpKey] !== undefined
         ? variables[pvpKey]
         : variables[baseKey];
+
     if (varVal === undefined) return undefined;
-    const num = parseNumeric(varVal);
+
+    let num = parseNumeric(varVal);
+
+    const rofConfig = formulaTokens["$FNC-ROF$"];
+    if (rofConfig && settingsStore.rofBug && !isNaN(num)) {
+      if (
+        rofConfig
+          .split(";")
+          .map((s) => s.trim())
+          .includes(suffix)
+      ) {
+        num = applyROFBug(num);
+      }
+    }
+
     return isNaN(num) ? varVal : num;
   }
 

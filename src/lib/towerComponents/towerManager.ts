@@ -1,8 +1,11 @@
 import Tower from "./tower";
 import { towerNames } from "./towers";
 import { resolveToken } from "$lib/neowtext/functions";
-import { settingsStore } from "$lib/stores/settings.svelte";
-import { parseWikitext, type TableData } from "$lib/neowtext/parser";
+import {
+  parseWikitext,
+  applyROFBugToTabs,
+  type TableData,
+} from "$lib/neowtext/parser";
 
 import { patchWikitext } from "$lib/neowtext/patcher";
 import {
@@ -21,11 +24,23 @@ export default class TowerManager {
   towerData: Record<string, any> | null;
   towerNames: string[];
   towers: { [name: string]: Tower };
+  private debug: () => boolean;
+  private rofBug: () => boolean;
 
-  constructor(dataKey: string | null) {
+  constructor(
+    dataKey: string | null,
+    debug: () => boolean = () => false,
+    rofBug: () => boolean = () => false,
+  ) {
     this.dataKey = dataKey;
+    this.debug = debug;
+    this.rofBug = rofBug;
     this.towerData = null;
     this.towerNames = [];
+    this.towers = {};
+  }
+
+  clearAllCache(): void {
     this.towers = {};
   }
 
@@ -79,14 +94,14 @@ export default class TowerManager {
   }
 
   saveTower(tower: Tower): string | null {
-    if (settingsStore.debugMode) {
+    if (this.debug()) {
       console.log(`[TowerManager] saveTower called for ${tower.name}`);
     }
     if (!this.dataKey) return null;
 
     if (!this.towerData) {
       const localData = localStorage.getItem(this.dataKey);
-      if (settingsStore.debugMode) {
+      if (this.debug()) {
         console.log(
           `[TowerManager] saveTower: Initializing towerData from storage for key: ${this.dataKey}`,
         );
@@ -106,7 +121,7 @@ export default class TowerManager {
     const patched = this.generateWikitext(tower);
 
     if (patched) {
-      if (settingsStore.debugMode) {
+      if (this.debug()) {
         console.log(
           `[TowerManager] Patched wikitext length: ${patched.length}`,
         );
@@ -127,7 +142,7 @@ export default class TowerManager {
   save(): void {
     if (!this.dataKey) return;
 
-    if (settingsStore.debugMode) {
+    if (this.debug()) {
       console.log(`[TowerManager] Saving data to key: ${this.dataKey}`);
       console.log(`[TowerManager] Data being saved:`, this.towerData);
     }
@@ -135,7 +150,7 @@ export default class TowerManager {
     const plainData = JSON.parse(JSON.stringify(this.towerData));
     const stringified = JSON.stringify(plainData);
 
-    if (settingsStore.debugMode) {
+    if (this.debug()) {
       console.log(`[TowerManager] Stringified data:`, stringified);
     }
 
@@ -143,7 +158,7 @@ export default class TowerManager {
   }
 
   clearCache(name: string): void {
-    if (settingsStore.debugMode) {
+    if (this.debug()) {
       console.log(`[TowerManager] clearing cache for ${name}`);
     }
     if (this.towers[name]) {
@@ -156,7 +171,7 @@ export default class TowerManager {
 
     if (!this.towerData) {
       const localData = localStorage.getItem(this.dataKey);
-      if (settingsStore.debugMode) {
+      if (this.debug()) {
         console.log(
           `[TowerManager] resetTower: Initializing towerData from storage for key: ${this.dataKey}`,
         );
@@ -177,13 +192,13 @@ export default class TowerManager {
 
   async getTower(name: string): Promise<Tower | null> {
     if (this.towers[name]) {
-      if (settingsStore.debugMode) {
+      if (this.debug()) {
         console.log(`[TowerManager] Returning cached tower for ${name}`);
       }
       return this.towers[name];
     }
 
-    if (settingsStore.debugMode) {
+    if (this.debug()) {
       console.log(`[TowerManager] Loading tower ${name} (no cache)`);
     }
 
@@ -198,13 +213,12 @@ export default class TowerManager {
       const loadBase = async (): Promise<string> => {
         try {
           const url = new URL(wikitextPath, import.meta.url).href;
-          if (settingsStore.debugMode)
+          if (this.debug())
             console.log(`[TowerManager] Fetching wikitext from: ${url}`);
           const res = await fetch(`${url}?t=${Date.now()}`);
           if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
           const text = await res.text();
-          if (settingsStore.debugMode)
-            console.log("[TowerManager] Fetch successful");
+          if (this.debug()) console.log("[TowerManager] Fetch successful");
           return text;
         } catch (e) {
           console.warn(
@@ -221,18 +235,18 @@ export default class TowerManager {
         loadBase,
       );
 
-      if (settingsStore.debugMode) {
+      if (this.debug()) {
         console.log(
           `[TowerManager] Loaded effective wikitext from ${source}, length: ${text.length}`,
         );
       }
 
-      const parsed = parseWikitext(text) as {
-        variables: Record<string, string>;
-        tabs: Record<string, TableData[]>;
-      };
+      const parsed = parseWikitext(text);
+      const effectiveTabs = this.rofBug()
+        ? applyROFBugToTabs(parsed.tabs, parsed.variables)
+        : parsed.tabs;
 
-      if (settingsStore.debugMode) {
+      if (this.debug()) {
         console.log(`[TowerManager] Using wikitext source: ${source}`);
         console.log("[TowerManager] Parsed Variables:", parsed.variables);
       }
@@ -334,7 +348,7 @@ export default class TowerManager {
             }
 
             if (parsed.variables[varName]) {
-              if (settingsStore.debugMode)
+              if (this.debug())
                 console.log(
                   `[TowerManager] Found detection var ${varName}: ${parsed.variables[varName]}`,
                 );
@@ -446,7 +460,7 @@ export default class TowerManager {
         };
       };
 
-      for (const [tabName, tablesArray] of Object.entries(parsed.tabs)) {
+      for (const [tabName, tablesArray] of Object.entries(effectiveTabs)) {
         const tables = tablesArray as TableData[];
         const isPvpTab = /pvp/i.test(tabName);
 

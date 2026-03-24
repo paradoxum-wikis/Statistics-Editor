@@ -130,6 +130,29 @@
                         <Switch.Thumb class="switch-thumb"></Switch.Thumb>
                     </Switch.Root>
                 </div>
+
+                <div class="settings-item">
+                    <div class="settings-label-group">
+                        <label
+                            for="rof-bug"
+                            class="settings-label"
+                        >
+                        	ROF Bug
+                        </label>
+                        <p class="settings-help-text">
+                        	Calculate statistics with the infamous Rate of Fire bug.
+                        </p>
+                    </div>
+                    <Switch.Root
+                        id="rof-bug"
+                        checked={settingsStore.rofBug}
+                        onCheckedChange={(v) =>
+                            settingsStore.setRofBug(v)}
+                        class="switch-root"
+                    >
+                        <Switch.Thumb class="switch-thumb"></Switch.Thumb>
+                    </Switch.Root>
+                </div>
             </div>
 
             <div class="settings-footer">

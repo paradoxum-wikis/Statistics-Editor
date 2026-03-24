@@ -37,3 +37,16 @@ export function formatValue(v: unknown): string {
   if (typeof v === "string") return v;
   return JSON.stringify(v);
 }
+
+/**
+ * Formats with ROF bug into account
+ */
+export function applyROFBug(seconds: number): number {
+  if (isNaN(seconds) || seconds <= 0) return seconds;
+  const raw_frames = seconds * 60;
+  const frames =
+    Math.abs(raw_frames - Math.round(raw_frames)) < 1e-9
+      ? Math.round(raw_frames) + 1.5
+      : Math.ceil(raw_frames) + 1;
+  return Math.round((frames / 60) * 1000) / 1000;
+}
