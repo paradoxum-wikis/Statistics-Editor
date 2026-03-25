@@ -68,6 +68,8 @@ function buildVariablesMap(tower: Tower): Record<string, string> {
   const preserveTokens = (skin: any) => {
     if (!skin?.formulaTokens) return;
     for (const [key, val] of Object.entries(skin.formulaTokens)) {
+      if (/^\$FNC-(?:PVP-)?(?:COST|DETECTION|UPGRADE|UPGRADEICON)\$$/.test(key))
+        continue;
       variables[key] = val as string;
     }
   };
