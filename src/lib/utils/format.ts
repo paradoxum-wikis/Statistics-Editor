@@ -4,7 +4,9 @@
  */
 export function parseNumeric(v: string | number): number {
   if (typeof v === "number") return v;
-  return Number(String(v).replace(/,/g, ""));
+  const s = String(v).replace(/,/g, "").trim();
+  if (s === "") return NaN;
+  return Number(s);
 }
 
 /**

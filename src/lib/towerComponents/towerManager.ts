@@ -220,20 +220,48 @@ export default class TowerManager {
           });
         }
 
-        const getArr = (val: string) =>
-          (val?.split(";") || []).map((s) => s.trim());
-        const pfx = isPvp ? "$FNC-PVP-" : "$FNC-";
+        const getArr = (val?: string) =>
+          val ? val.split(";").map((s) => s.trim()) : [];
         const v = parsed.variables;
 
-        const costs = getArr(v[`${pfx}COST$`] ?? v["$FNC-COST$"]);
-        const detects = getArr(v[`${pfx}DETECTION$`] ?? v["$FNC-DETECTION$"]);
-        const upgs = getArr(v[`${pfx}UPGRADE$`] ?? v["$FNC-UPGRADE$"]);
-        const icons = getArr(v[`${pfx}UPGRADEICON$`] ?? v["$FNC-UPGRADEICON$"]);
+        const baseCosts = getArr(v["$FNC-COST$"]);
+        const baseDetects = getArr(v["$FNC-DETECTION$"]);
+        const baseUpgs = getArr(v["$FNC-UPGRADE$"]);
+        const baseIcons = getArr(v["$FNC-UPGRADEICON$"]);
+
+        const mergeArrays = (base: string[], pvp?: string[]) => {
+          if (!pvp || pvp.length === 0) return base;
+          const max = Math.max(base.length, pvp.length);
+          return Array.from({ length: max }, (_, i) => {
+            const pv = pvp[i]?.trim();
+            return pv !== undefined && pv !== "" ? pv : (base[i] ?? "");
+          });
+        };
+
+        const costs = isPvp
+          ? mergeArrays(baseCosts, getArr(v["$FNC-PVP-COST$"]))
+          : baseCosts;
+        const detects = isPvp
+          ? mergeArrays(baseDetects, getArr(v["$FNC-PVP-DETECTION$"]))
+          : baseDetects;
+        const upgs = isPvp
+          ? mergeArrays(baseUpgs, getArr(v["$FNC-PVP-UPGRADE$"]))
+          : baseUpgs;
+        const icons = isPvp
+          ? mergeArrays(baseIcons, getArr(v["$FNC-PVP-UPGRADEICON$"]))
+          : baseIcons;
+
+        const parseDetectLevel = (t?: string) => {
+          const s = t?.trim();
+          if (!s) return -1;
+          const n = Number(s);
+          return Number.isFinite(n) ? n : -1;
+        };
 
         const detLvls = {
-          Hidden: detects[0] ? Number(detects[0]) : -1,
-          Lead: detects[1] ? Number(detects[1]) : -1,
-          Flying: detects[2] ? Number(detects[2]) : -1,
+          Hidden: parseDetectLevel(detects[0]),
+          Lead: parseDetectLevel(detects[1]),
+          Flying: parseDetectLevel(detects[2]),
         };
 
         const cellFormulaTokens: Record<string, Record<string, string>> = {};
