@@ -25,8 +25,9 @@ class TowerStore {
     $effect(() => {
       settingsStore.rofBug;
       untrack(() => {
-        this.manager?.clearAllCache();
+        if (this.manager) this.manager.towers = {};
         this.#lastLoadedName = null;
+
         if (this.selectedName) {
           this.load(this.selectedName).then(() => {
             this.baseline = {};

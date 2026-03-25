@@ -168,7 +168,6 @@ class SkinData {
           level,
           row as Record<string, string | number>,
           this.formulaTokens,
-          this.formulaTokens,
           this.isPvp,
         );
         if (typeof result === "number" && Number.isFinite(result)) {

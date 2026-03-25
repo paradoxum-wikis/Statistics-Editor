@@ -6,7 +6,6 @@ import {
   applyROFBugToTabs,
   type TableData,
 } from "$lib/neowtext/parser";
-
 import { patchWikitext } from "$lib/neowtext/patcher";
 import {
   clearWikiOverride,
@@ -20,55 +19,34 @@ const wikitextFiles = import.meta.glob("./towers/*.wiki", {
 });
 
 export default class TowerManager {
-  dataKey: string | null;
-  towerData: Record<string, any> | null;
-  towerNames: string[];
-  towers: { [name: string]: Tower };
-  private debug: () => boolean;
-  private rofBug: () => boolean;
+  towerData: Record<string, any> | null = null;
+  towerNames: string[] = [];
+  towers: { [name: string]: Tower } = {};
 
   constructor(
-    dataKey: string | null,
-    debug: () => boolean = () => false,
-    rofBug: () => boolean = () => false,
-  ) {
-    this.dataKey = dataKey;
-    this.debug = debug;
-    this.rofBug = rofBug;
-    this.towerData = null;
-    this.towerNames = [];
-    this.towers = {};
-  }
-
-  clearAllCache(): void {
-    this.towers = {};
-  }
+    public dataKey: string | null,
+    private debug: () => boolean = () => false,
+    private rofBug: () => boolean = () => false,
+  ) {}
 
   static getProfiles(): string[] {
     if (typeof localStorage === "undefined") return ["Default"];
-    const profiles = localStorage.getItem("tds_profiles");
-    return profiles ? JSON.parse(profiles) : ["Default"];
+    return JSON.parse(localStorage.getItem("tds_profiles") || '["Default"]');
   }
 
   static addProfile(name: string): void {
     if (typeof localStorage === "undefined") return;
-    const profiles = TowerManager.getProfiles();
+    const profiles = this.getProfiles();
     if (!profiles.includes(name)) {
-      profiles.push(name);
-      localStorage.setItem("tds_profiles", JSON.stringify(profiles));
+      localStorage.setItem("tds_profiles", JSON.stringify([...profiles, name]));
     }
   }
 
   static deleteProfile(name: string): void {
-    if (typeof localStorage === "undefined") return;
-    if (name === "Default") return;
-    const profiles = TowerManager.getProfiles();
-    const index = profiles.indexOf(name);
-    if (index > -1) {
-      profiles.splice(index, 1);
-      localStorage.setItem("tds_profiles", JSON.stringify(profiles));
-      localStorage.removeItem(name);
-    }
+    if (typeof localStorage === "undefined" || name === "Default") return;
+    const profiles = this.getProfiles().filter((p) => p !== name);
+    localStorage.setItem("tds_profiles", JSON.stringify(profiles));
+    localStorage.removeItem(name);
   }
 
   /**
@@ -77,13 +55,10 @@ export default class TowerManager {
    * Useful for "unsaved changes" previews.
    */
   generateWikitext(tower: Tower): string | null {
-    const sourceWikitext = (tower as unknown as { sourceWikitext?: string })
-      .sourceWikitext;
-
-    if (!sourceWikitext) return null;
-
+    const src = (tower as any).sourceWikitext;
+    if (!src) return null;
     try {
-      return patchWikitext(sourceWikitext, tower);
+      return patchWikitext(src, tower);
     } catch (err) {
       console.error(
         `[TowerManager] Failed to generate wikitext for ${tower.name}:`,
@@ -94,46 +69,32 @@ export default class TowerManager {
   }
 
   saveTower(tower: Tower): string | null {
-    if (this.debug()) {
+    if (this.debug())
       console.log(`[TowerManager] saveTower called for ${tower.name}`);
-    }
     if (!this.dataKey) return null;
 
     if (!this.towerData) {
-      const localData = localStorage.getItem(this.dataKey);
-      if (this.debug()) {
+      if (this.debug())
         console.log(
           `[TowerManager] saveTower: Initializing towerData from storage for key: ${this.dataKey}`,
         );
-      }
-      this.towerData = localData ? JSON.parse(localData) : {};
+      this.towerData = JSON.parse(localStorage.getItem(this.dataKey) || "{}");
     }
 
-    if (this.towerData) {
-      this.towerData[tower.name] = JSON.parse(
-        JSON.stringify(tower.json[tower.name]),
-      );
-      this.save();
-    }
-
-    const profileName = this.dataKey ?? "Default";
+    this.towerData![tower.name] = structuredClone(tower.json[tower.name]);
+    this.save();
 
     const patched = this.generateWikitext(tower);
-
     if (patched) {
-      if (this.debug()) {
+      if (this.debug())
         console.log(
           `[TowerManager] Patched wikitext length: ${patched.length}`,
         );
-      }
-      setWikiOverride(profileName, tower.name, patched);
-
-      (tower as unknown as { sourceWikitext?: string }).sourceWikitext =
-        patched;
-      (
-        tower as unknown as { wikitextSource?: "override" | "base" }
-      ).wikitextSource = "override";
-
+      setWikiOverride(this.dataKey ?? "Default", tower.name, patched);
+      Object.assign(tower, {
+        sourceWikitext: patched,
+        wikitextSource: "override",
+      });
       return patched;
     }
     return null;
@@ -141,78 +102,57 @@ export default class TowerManager {
 
   save(): void {
     if (!this.dataKey) return;
-
     if (this.debug()) {
       console.log(`[TowerManager] Saving data to key: ${this.dataKey}`);
       console.log(`[TowerManager] Data being saved:`, this.towerData);
     }
-
-    const plainData = JSON.parse(JSON.stringify(this.towerData));
-    const stringified = JSON.stringify(plainData);
-
-    if (this.debug()) {
+    const stringified = JSON.stringify(this.towerData);
+    if (this.debug())
       console.log(`[TowerManager] Stringified data:`, stringified);
-    }
-
     localStorage.setItem(this.dataKey, stringified);
   }
 
   clearCache(name: string): void {
-    if (this.debug()) {
-      console.log(`[TowerManager] clearing cache for ${name}`);
-    }
-    if (this.towers[name]) {
-      delete this.towers[name];
-    }
+    if (this.debug()) console.log(`[TowerManager] clearing cache for ${name}`);
+    if (this.towers[name]) delete this.towers[name];
   }
 
   resetTower(name: string): void {
     if (!this.dataKey) return;
 
     if (!this.towerData) {
-      const localData = localStorage.getItem(this.dataKey);
-      if (this.debug()) {
+      if (this.debug())
         console.log(
           `[TowerManager] resetTower: Initializing towerData from storage for key: ${this.dataKey}`,
         );
-      }
-      this.towerData = localData ? JSON.parse(localData) : {};
+      this.towerData = JSON.parse(localStorage.getItem(this.dataKey) || "{}");
     }
 
-    if (this.towerData && this.towerData[name]) {
-      delete this.towerData[name];
+    if (this.towerData![name]) {
+      delete this.towerData![name];
       this.save();
     }
-
-    const profileName = this.dataKey ?? "Default";
-    clearWikiOverride(profileName, name);
-
+    clearWikiOverride(this.dataKey ?? "Default", name);
     this.clearCache(name);
   }
 
   async getTower(name: string): Promise<Tower | null> {
     if (this.towers[name]) {
-      if (this.debug()) {
+      if (this.debug())
         console.log(`[TowerManager] Returning cached tower for ${name}`);
-      }
       return this.towers[name];
     }
 
-    if (this.debug()) {
+    if (this.debug())
       console.log(`[TowerManager] Loading tower ${name} (no cache)`);
-    }
 
-    const wikitextPath = `./towers/${name}.wiki`;
-    const wikitextLoader = wikitextFiles[wikitextPath];
-
+    const wikitextLoader = wikitextFiles[`./towers/${name}.wiki`];
     if (!wikitextLoader) return null;
 
     try {
-      const profileName = this.dataKey ?? "Default";
-
-      const loadBase = async (): Promise<string> => {
+      const loadBase = async () => {
         try {
-          const url = new URL(wikitextPath, import.meta.url).href;
+          const url = new URL(`./towers/${name}.wiki`, import.meta.url).href;
           if (this.debug())
             console.log(`[TowerManager] Fetching wikitext from: ${url}`);
           const res = await fetch(`${url}?t=${Date.now()}`);
@@ -230,16 +170,14 @@ export default class TowerManager {
       };
 
       const { source, text } = await loadEffectiveWikitext(
-        profileName,
+        this.dataKey ?? "Default",
         name,
         loadBase,
       );
-
-      if (this.debug()) {
+      if (this.debug())
         console.log(
           `[TowerManager] Loaded effective wikitext from ${source}, length: ${text.length}`,
         );
-      }
 
       const parsed = parseWikitext(text);
       const effectiveTabs = this.rofBug()
@@ -255,150 +193,101 @@ export default class TowerManager {
 
       const buildSkinJson = (
         tableData: TableData,
-        isPvpSkin: boolean,
+        isPvp: boolean,
         extraTables: TableData[],
       ) => {
         const defaults: any = {};
         const upgrades: any[] = [];
-        const readOnlyAttributes: string[] = [];
-
-        const currentDetections: { [key: string]: boolean } = {
+        const readOnly = new Set<string>();
+        const curDetections: Record<string, boolean> = {
           Lead: false,
           Hidden: false,
           Flying: false,
         };
 
-        const rows = tableData.rows.sort(
-          (
-            a: Record<string, string | number>,
-            b: Record<string, string | number>,
-          ) => Number(a["Level"]) - Number(b["Level"]),
+        const rows = [...tableData.rows].sort(
+          (a, b) => Number(a["Level"]) - Number(b["Level"]),
         );
 
-        const formulaTokens: Record<string, string> = {};
-        for (const [key, val] of Object.entries(parsed.variables)) {
-          if (!/^\$PVP-/.test(key)) {
-            formulaTokens[key] = val;
-          }
-        }
-        if (isPvpSkin) {
-          for (const [key, val] of Object.entries(parsed.variables)) {
-            const pvpMatch = key.match(/^\$PVP-(.+)\$$/);
-            if (pvpMatch) {
-              const regularKey = `$${pvpMatch[1]}$`;
-              formulaTokens[regularKey] = val;
-            }
-          }
+        const formulaTokens = Object.fromEntries(
+          Object.entries(parsed.variables).filter(
+            ([k]) => !k.startsWith("$PVP-"),
+          ),
+        );
+        if (isPvp) {
+          Object.entries(parsed.variables).forEach(([k, v]) => {
+            if (k.startsWith("$PVP-")) formulaTokens[`$${k.slice(5)}`] = v;
+          });
         }
 
-        const detectionTypes = ["Lead", "Hidden", "Flying"];
-        const pvpOwnedDetectionTypes = new Set<string>();
+        const getArr = (val: string) =>
+          (val?.split(";") || []).map((s) => s.trim());
+        const pfx = isPvp ? "$FNC-PVP-" : "$FNC-";
+        const v = parsed.variables;
 
-        if (isPvpSkin) {
-          for (const type of detectionTypes) {
-            const hasPvpVar = Object.keys(parsed.variables).some((k) =>
-              new RegExp(`^\\$PVP-\\d+${type}\\$$`).test(k),
-            );
-            if (hasPvpVar) {
-              pvpOwnedDetectionTypes.add(type);
-            }
-          }
-        }
+        const costs = getArr(v[`${pfx}COST$`] ?? v["$FNC-COST$"]);
+        const detects = getArr(v[`${pfx}DETECTION$`] ?? v["$FNC-DETECTION$"]);
+        const upgs = getArr(v[`${pfx}UPGRADE$`] ?? v["$FNC-UPGRADE$"]);
+        const icons = getArr(v[`${pfx}UPGRADEICON$`] ?? v["$FNC-UPGRADEICON$"]);
+
+        const detLvls = {
+          Hidden: detects[0] ? Number(detects[0]) : -1,
+          Lead: detects[1] ? Number(detects[1]) : -1,
+          Flying: detects[2] ? Number(detects[2]) : -1,
+        };
 
         const cellFormulaTokens: Record<string, Record<string, string>> = {};
-
-        let previousTotalPrice = 0;
+        let prevPrice = 0;
 
         for (const row of rows) {
           const level = Number(row["Level"]);
-          const levelKey = String(level);
-          if (!cellFormulaTokens[levelKey]) cellFormulaTokens[levelKey] = {};
+          cellFormulaTokens[level] ??= {};
 
           for (const [key, val] of Object.entries(row)) {
             if (typeof val !== "string" || !/^\$[^$]+\$$/.test(val)) continue;
-
-            const result = resolveToken(
-              val,
-              level,
-              row,
-              formulaTokens,
-              parsed.variables,
-              isPvpSkin,
-            );
+            const result = resolveToken(val, level, row, formulaTokens, isPvp);
             if (result !== undefined) {
-              if (!readOnlyAttributes.includes(key))
-                readOnlyAttributes.push(key);
-              cellFormulaTokens[levelKey][key] = val;
+              readOnly.add(key);
+              cellFormulaTokens[level][key] = val;
               row[key] = result;
             }
           }
 
+          const tpRaw = row["Total Price"];
           const totalPrice =
-            typeof row["Total Price"] === "string"
-              ? Number(String(row["Total Price"]).replace(/[^0-9.-]+/g, ""))
-              : Number(row["Total Price"]);
+            typeof tpRaw === "string"
+              ? Number(tpRaw.replace(/[^0-9.-]+/g, ""))
+              : Number(tpRaw);
 
-          const detections: any = {};
-          for (const type of detectionTypes) {
-            let varName: string;
-            if (isPvpSkin && pvpOwnedDetectionTypes.has(type)) {
-              varName = `$PVP-${level}${type}$`;
-            } else {
-              varName = `$${level}${type}$`;
-            }
-
-            if (parsed.variables[varName]) {
+          const detections: Record<string, boolean> = {};
+          for (const type of ["Hidden", "Lead", "Flying"]) {
+            if (level === detLvls[type as keyof typeof detLvls]) {
               if (this.debug())
                 console.log(
-                  `[TowerManager] Found detection var ${varName}: ${parsed.variables[varName]}`,
+                  `[TowerManager] Found detection var ${type} at level ${level}`,
                 );
-              currentDetections[type] = parsed.variables[varName] === "true";
+              curDetections[type] = true;
             }
-
-            if (currentDetections[type]) {
-              detections[type] = true;
-            }
+            if (curDetections[type]) detections[type] = true;
           }
 
           if (level === 0) {
-            Object.assign(defaults, row);
-            defaults.Price = totalPrice;
-            if (Object.keys(detections).length > 0) {
+            Object.assign(defaults, row, { Price: totalPrice });
+            if (Object.keys(detections).length)
               defaults.Detections = detections;
-            }
-            previousTotalPrice = totalPrice;
+            prevPrice = totalPrice;
           } else {
-            const cost = totalPrice - previousTotalPrice;
-            previousTotalPrice = totalPrice;
+            const parsedCost = Number(costs[level]?.replace(/[^0-9.-]+/g, ""));
+            const cost = !isNaN(parsedCost)
+              ? parsedCost
+              : totalPrice - prevPrice;
+            prevPrice = totalPrice;
 
-            const upgrade: any = {
-              Cost: cost,
-              Stats: row,
-            };
-
-            if (Object.keys(detections).length > 0) {
+            const upgrade: any = { Cost: cost, Stats: row };
+            if (Object.keys(detections).length)
               upgrade.Stats.Detections = detections;
-            }
-
-            const titleKey = isPvpSkin
-              ? `$PVP-${level}Upgrade$`
-              : `$${level}Upgrade$`;
-            const titleFallback = `$${level}Upgrade$`;
-            if (parsed.variables[titleKey]) {
-              upgrade.Title = parsed.variables[titleKey];
-            } else if (isPvpSkin && parsed.variables[titleFallback]) {
-              upgrade.Title = parsed.variables[titleFallback];
-            }
-
-            const imageKey = isPvpSkin
-              ? `$PVP-${level}UpgradeI$`
-              : `$${level}UpgradeI$`;
-            const imageFallback = `$${level}UpgradeI$`;
-            if (parsed.variables[imageKey]) {
-              upgrade.Image = parsed.variables[imageKey];
-            } else if (isPvpSkin && parsed.variables[imageFallback]) {
-              upgrade.Image = parsed.variables[imageFallback];
-            }
+            if (upgs[level - 1]) upgrade.Title = upgs[level - 1];
+            if (icons[level - 1]) upgrade.Image = icons[level - 1];
 
             upgrades.push(upgrade);
           }
@@ -406,41 +295,34 @@ export default class TowerManager {
 
         const resolvedExtraTables = extraTables.map((extra) => {
           const extraReadOnly = new Set<string>(
-            extra.rows.flatMap((row) =>
-              Object.entries(row)
+            extra.rows.flatMap((r) =>
+              Object.entries(r)
                 .filter(
                   ([, val]) =>
                     typeof val === "string" && /^\$[^$]+\$$/.test(val),
                 )
-                .map(([key]) => key),
+                .map(([k]) => k),
             ),
           );
 
-          const resolvedRows = extra.rows.map((row) => {
-            const resolvedRow = { ...row };
-            const level = Number(resolvedRow["Level"] ?? 0);
-            for (const key of extraReadOnly) {
-              const val = resolvedRow[key];
-              if (typeof val !== "string") continue;
-              const result = resolveToken(
-                val,
-                level,
-                resolvedRow as Record<string, string | number>,
-                formulaTokens,
-                parsed.variables,
-                isPvpSkin,
-              );
-              if (result !== undefined) {
-                resolvedRow[key] = result;
-              }
-            }
-            return resolvedRow;
-          });
-
           return {
             ...extra,
-            rows: resolvedRows,
             readOnlyColumns: Array.from(extraReadOnly),
+            rows: extra.rows.map((row) => {
+              const resRow = { ...row };
+              const level = Number(resRow["Level"] ?? 0);
+              for (const key of extraReadOnly) {
+                const result = resolveToken(
+                  resRow[key] as string,
+                  level,
+                  resRow,
+                  formulaTokens,
+                  isPvp,
+                );
+                if (result !== undefined) resRow[key] = result;
+              }
+              return resRow;
+            }),
           };
         });
 
@@ -450,42 +332,35 @@ export default class TowerManager {
           Headers: tableData.headers,
           TableName: tableData.name || "",
           RawRows: rows,
-          ReadOnly: readOnlyAttributes,
+          ReadOnly: Array.from(readOnly),
           FormulaTokens: formulaTokens,
           CellFormulaTokens: cellFormulaTokens,
-          IsPvp: isPvpSkin,
-          PvpOwnedDetectionTypes: Array.from(pvpOwnedDetectionTypes),
+          IsPvp: isPvp,
           MoneyColumns: tableData.moneyColumns ?? [],
           ExtraTables: resolvedExtraTables,
         };
       };
 
-      for (const [tabName, tablesArray] of Object.entries(effectiveTabs)) {
-        const tables = tablesArray as TableData[];
-        const isPvpTab = /pvp/i.test(tabName);
-
-        const primaryIndex = tables.findIndex((t) =>
+      for (const [tabName, tables] of Object.entries(effectiveTabs)) {
+        const isPvp = /pvp/i.test(tabName);
+        const pIdx = (tables as TableData[]).findIndex((t) =>
           t.headers.includes("Level"),
         );
-        const primaryTable =
-          primaryIndex !== -1 ? tables[primaryIndex] : tables[0];
-        const extraTables = tables.filter(
-          (_, i) => i !== (primaryIndex !== -1 ? primaryIndex : 0),
+        const primaryTable = pIdx !== -1 ? tables[pIdx] : tables[0];
+        const extraTables = (tables as TableData[]).filter(
+          (_, i) => i !== Math.max(0, pIdx),
         );
 
-        towerJson[tabName] = buildSkinJson(primaryTable, isPvpTab, extraTables);
+        towerJson[tabName] = buildSkinJson(primaryTable, isPvp, extraTables);
       }
 
       const towerData = new Tower(name, towerJson);
+      Object.assign(towerData, {
+        sourceWikitext: text,
+        wikitextSource: source,
+      });
 
-      (towerData as unknown as { sourceWikitext?: string }).sourceWikitext =
-        text;
-      (
-        towerData as unknown as { wikitextSource?: "override" | "base" }
-      ).wikitextSource = source;
-
-      this.towers[name] = towerData;
-      return towerData;
+      return (this.towers[name] = towerData);
     } catch (err) {
       console.error("Failed to load wikitext for", name, ":", err);
       return null;
@@ -493,8 +368,8 @@ export default class TowerManager {
   }
 
   async getTowerNames(): Promise<string[]> {
-    if (this.towerNames && this.towerNames.length) return this.towerNames;
-    this.towerNames = towerNames.slice();
-    return this.towerNames;
+    return this.towerNames.length
+      ? this.towerNames
+      : (this.towerNames = [...towerNames]);
   }
 }

@@ -1,7 +1,6 @@
 import { evaluateFormula } from "$lib/neowtext/evaluator";
-import { parseNumeric } from "$lib/utils/format";
+import { parseNumeric, applyROFBug } from "$lib/utils/format";
 import { settingsStore } from "$lib/stores/settings.svelte";
-import { applyROFBug } from "$lib/utils/format";
 
 /**
  * Resolves a $FNC-NAME$ function for the given row level.
@@ -10,19 +9,19 @@ import { applyROFBug } from "$lib/utils/format";
 export function resolveFNC(
   name: string,
   level: number,
-  costVars: Record<string, string>,
+  tokens: Record<string, string>,
+  isPvp: boolean,
 ): number | undefined {
-  if (name === "TOTALPRICE") {
-    let total = 0;
-    for (let l = 0; l <= level; l++) {
-      const costStr = costVars[`$${l}Cost$`];
-      if (costStr === undefined) continue;
-      const num = parseNumeric(costStr);
-      if (!isNaN(num)) total += num;
-    }
-    return total;
-  }
-  return undefined;
+  if (name !== "TOTALPRICE") return undefined;
+
+  const key =
+    isPvp && tokens["$FNC-PVP-COST$"] ? "$FNC-PVP-COST$" : "$FNC-COST$";
+  const costs = tokens[key]?.split(";") || [];
+
+  return costs.slice(0, level + 1).reduce((sum, cost) => {
+    const num = parseNumeric(cost);
+    return sum + (isNaN(num) ? 0 : num);
+  }, 0);
 }
 
 /**
@@ -33,62 +32,23 @@ export function resolveToken(
   token: string,
   level: number,
   row: Record<string, string | number>,
-  formulaTokens: Record<string, string>,
-  variables: Record<string, string>,
-  isPvpSkin: boolean,
+  tokens: Record<string, string>,
+  isPvp: boolean,
   depth = 0,
 ): string | number | undefined {
   if (depth > 10) return undefined;
 
   // $FNC-NAME$
   const fncMatch = token.match(/^\$FNC-([A-Z]+)\$$/);
-  if (fncMatch) return resolveFNC(fncMatch[1], level, formulaTokens);
-
-  // $nVar$
-  const nVarMatch = token.match(/^\$n(.+)\$$/);
-  if (nVarMatch) {
-    const suffix = nVarMatch[1];
-    const pvpKey = `$PVP-${level}${suffix}$`;
-    const baseKey = `$${level}${suffix}$`;
-    const varVal =
-      isPvpSkin && variables[pvpKey] !== undefined
-        ? variables[pvpKey]
-        : variables[baseKey];
-
-    if (varVal === undefined) return undefined;
-
-    let num = parseNumeric(varVal);
-
-    const rofConfig = formulaTokens["$FNC-ROFBUG$"];
-    if (rofConfig && settingsStore.rofBug && !isNaN(num)) {
-      if (
-        rofConfig
-          .split(";")
-          .map((s) => s.trim())
-          .includes(suffix)
-      ) {
-        num = applyROFBug(num);
-      }
-    }
-
-    return isNaN(num) ? varVal : num;
-  }
+  if (fncMatch) return resolveFNC(fncMatch[1], level, tokens, isPvp);
 
   // $Var$
-  if (token.startsWith("$") && formulaTokens[token] !== undefined) {
-    const formulaVal = formulaTokens[token];
-    if (/^\$[^$]+\$$/.test(formulaVal)) {
-      return resolveToken(
-        formulaVal,
-        level,
-        row,
-        formulaTokens,
-        variables,
-        isPvpSkin,
-        depth + 1,
-      );
+  if (token.startsWith("$") && tokens[token] !== undefined) {
+    const val = tokens[token];
+    if (/^\$[^$]+\$$/.test(val)) {
+      return resolveToken(val, level, row, tokens, isPvp, depth + 1);
     }
-    return evaluateFormula(formulaVal, row);
+    return evaluateFormula(val, row);
   }
 
   return undefined;
