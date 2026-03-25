@@ -15,16 +15,22 @@
     let costRows = $derived.by((): CostRow[] => {
         towerStore.effectiveWikitext;
         if (!skinData?.formulaTokens) return [];
+
         const levels = skinData.levels?.levels ?? [];
         const rows: CostRow[] = [];
+
+        const costKey = skinData.isPvp && skinData.formulaTokens["$FNC-PVP-COST$"] !== undefined
+            ? "$FNC-PVP-COST$"
+            : "$FNC-COST$";
+
+        const costArr = (skinData.formulaTokens[costKey] || "").split(";").map(s => s.trim());
+
         for (let i = 0; i < levels.length; i++) {
-            const costKey = `$${i}Cost$`;
-            const costStr = skinData.formulaTokens[costKey];
-            if (costStr === undefined) return [];
-            const num = parseNumeric(costStr);
-            if (isNaN(num)) return [];
-            rows.push({ level: i, cost: num });
+            const costStr = costArr[i];
+            const num = parseNumeric(costStr || "0");
+            rows.push({ level: i, cost: isNaN(num) ? 0 : num });
         }
+
         return rows;
     });
 

@@ -52,157 +52,112 @@ export function patchWikitext(sourceWikitext: string, tower: Tower): string {
 /**
  * Reconstructs the variables map from:
  * - Existing formula tokens (preserved from original parse)
- * - Current detection states (derived from tower data)
- * - Upgrade titles/images (derived from tower data)
+ * - Funcs (Cost, Detection, Upgrades, Icons)
  *
- * PVP write `$PVP-` prefixed variables for detections, upgrades,
- * and formula tokens that differ from the regular 'skin.'
+ * Automatically diffs PVP against Regular and writes $FNC-PVP-* arrays
+ * if the PVP skin deviates from the base tower.
  */
 function buildVariablesMap(tower: Tower): Record<string, string> {
   const variables: Record<string, string> = {};
 
-  // 1st pass collect regular skin detection states to diff against PVP
-  const regularDetections: Record<string, boolean>[] = [];
-  const regularUpgradeTitles: Record<number, string> = {};
-  const regularUpgradeImages: Record<number, string> = {};
-  const regularFormulaTokens: Record<string, string> = {};
+  const baseSkinName =
+    tower.skinNames.find((n) => !tower.getSkin(n)?.isPvp) || tower.skinNames[0];
+  const baseSkin = tower.getSkin(baseSkinName);
+  const baseSkinJson = tower.json[tower.name]?.[baseSkinName];
 
-  for (const skinName of tower.skinNames) {
-    const skin = tower.getSkin(skinName);
-    if (!skin || skin.isPvp) continue;
-
-    if (skin.formulaTokens) {
-      for (const [key, val] of Object.entries(skin.formulaTokens)) {
-        if (
-          /^\$\d+(?:Lead|Hidden|Flying)\$$/.test(key) ||
-          /^\$\d+UpgradeI?\$$/.test(key)
-        ) {
-          continue;
-        }
-        regularFormulaTokens[key] = val;
-      }
+  const preserveTokens = (skin: any) => {
+    if (!skin?.formulaTokens) return;
+    for (const [key, val] of Object.entries(skin.formulaTokens)) {
+      variables[key] = val as string;
     }
+  };
 
-    const skinJson = tower.json[tower.name]?.[skinName];
-    if (!skinJson) continue;
+  preserveTokens(baseSkin);
 
-    const detectionTypes = ["Lead", "Hidden", "Flying"];
-    const currentDetections: Record<string, boolean> = {
-      Lead: false,
-      Hidden: false,
-      Flying: false,
-    };
+  const extractFncArrays = (skinJson: any) => {
+    const costs: string[] = [];
+    const upgrades: string[] = [];
+    const icons: string[] = [];
 
+    const detects = { Hidden: -1, Lead: -1, Flying: -1 };
+    const curDetects = { Hidden: false, Lead: false, Flying: false };
+
+    costs.push(skinJson.Defaults?.Price?.toString() ?? "0");
     if (skinJson.Defaults?.Detections) {
-      for (const type of detectionTypes) {
-        if (type in skinJson.Defaults.Detections) {
-          currentDetections[type] = skinJson.Defaults.Detections[type] === true;
+      for (const type of ["Hidden", "Lead", "Flying"]) {
+        if (skinJson.Defaults.Detections[type]) {
+          detects[type as keyof typeof detects] = 0;
+          curDetects[type as keyof typeof curDetects] = true;
         }
       }
     }
-    regularDetections[0] = { ...currentDetections };
 
     if (skinJson.Upgrades) {
       skinJson.Upgrades.forEach((up: any, idx: number) => {
-        const level = idx + 1;
+        const lvl = idx + 1;
+        costs.push(up.Cost?.toString() ?? "0");
+        upgrades.push(up.Title ?? "");
+        icons.push(up.Image ?? "");
+
         if (up.Stats?.Detections) {
-          for (const type of detectionTypes) {
-            if (type in up.Stats.Detections) {
-              currentDetections[type] = up.Stats.Detections[type] === true;
+          for (const type of ["Hidden", "Lead", "Flying"]) {
+            if (
+              up.Stats.Detections[type] &&
+              !curDetects[type as keyof typeof curDetects]
+            ) {
+              detects[type as keyof typeof detects] = lvl;
+              curDetects[type as keyof typeof curDetects] = true;
             }
           }
         }
-        regularDetections[level] = { ...currentDetections };
-
-        if (up.Title) regularUpgradeTitles[level] = up.Title;
-        if (up.Image) regularUpgradeImages[level] = up.Image;
       });
     }
+
+    const detStr = [
+      detects.Hidden !== -1 ? detects.Hidden : "",
+      detects.Lead !== -1 ? detects.Lead : "",
+      detects.Flying !== -1 ? detects.Flying : "",
+    ].join("; ");
+
+    return {
+      costStr: costs.join("; "),
+      upgradeStr: upgrades.join("; "),
+      iconStr: icons.join("; "),
+      detStr: detStr,
+    };
+  };
+
+  const baseFnc = baseSkinJson ? extractFncArrays(baseSkinJson) : null;
+  if (baseFnc) {
+    if (baseFnc.costStr) variables["$FNC-COST$"] = baseFnc.costStr;
+    if (baseFnc.detStr && baseFnc.detStr !== "; ; ")
+      variables["$FNC-DETECTION$"] = baseFnc.detStr;
+    if (baseFnc.upgradeStr) variables["$FNC-UPGRADE$"] = baseFnc.upgradeStr;
+    if (baseFnc.iconStr) variables["$FNC-UPGRADEICON$"] = baseFnc.iconStr;
   }
 
-  // 2nd pass write vars for all skins
   for (const skinName of tower.skinNames) {
     const skin = tower.getSkin(skinName);
-    if (!skin) continue;
+    if (!skin || !skin.isPvp) continue;
 
-    const isPvp = skin.isPvp;
+    preserveTokens(skin);
 
-    if (skin.formulaTokens) {
-      for (const [key, val] of Object.entries(skin.formulaTokens)) {
-        if (
-          /^\$\d+(?:Lead|Hidden|Flying)\$$/.test(key) ||
-          /^\$\d+UpgradeI?\$$/.test(key) ||
-          /^\$PVP-/.test(key)
-        ) {
-          continue;
-        }
+    const pvpJson = tower.json[tower.name]?.[skinName];
+    if (!pvpJson) continue;
 
-        if (isPvp) {
-          if (regularFormulaTokens[key] !== val) {
-            const innerKey = key.slice(1, -1);
-            variables[`$PVP-${innerKey}$`] = val;
-          }
-        } else {
-          variables[key] = val;
-        }
-      }
-    }
+    const pvpFnc = extractFncArrays(pvpJson);
+    if (baseFnc) {
+      if (pvpFnc.costStr !== baseFnc.costStr)
+        variables["$FNC-PVP-COST$"] = pvpFnc.costStr;
 
-    const skinJson = tower.json[tower.name]?.[skinName];
-    if (!skinJson) continue;
+      if (pvpFnc.detStr !== baseFnc.detStr && pvpFnc.detStr !== "; ; ")
+        variables["$FNC-PVP-DETECTION$"] = pvpFnc.detStr;
 
-    const detectionTypes = ["Lead", "Hidden", "Flying"];
-    const currentDetections: Record<string, boolean> = {
-      Lead: false,
-      Hidden: false,
-      Flying: false,
-    };
+      if (pvpFnc.upgradeStr !== baseFnc.upgradeStr)
+        variables["$FNC-PVP-UPGRADE$"] = pvpFnc.upgradeStr;
 
-    const processLevelDetections = (level: number, detections: any) => {
-      if (!detections) return;
-      for (const type of detectionTypes) {
-        if (!(type in detections)) continue;
-        const isEnabled = detections[type] === true;
-
-        if (isEnabled !== currentDetections[type]) {
-          if (isPvp) {
-            if (skin.pvpOwnedDetectionTypes.has(type)) {
-              variables[`$PVP-${level}${type}$`] = String(isEnabled);
-            }
-          } else {
-            variables[`$${level}${type}$`] = String(isEnabled);
-          }
-          currentDetections[type] = isEnabled;
-        }
-      }
-    };
-
-    // Level 0
-    processLevelDetections(0, skinJson.Defaults?.Detections);
-
-    // Level 1+
-    if (skinJson.Upgrades) {
-      skinJson.Upgrades.forEach((up: any, idx: number) => {
-        const level = idx + 1;
-
-        processLevelDetections(level, up.Stats?.Detections);
-
-        if (up.Title) {
-          if (isPvp && regularUpgradeTitles[level] !== up.Title) {
-            variables[`$PVP-${level}Upgrade$`] = `"${up.Title}"`;
-          } else if (!isPvp) {
-            variables[`$${level}Upgrade$`] = `"${up.Title}"`;
-          }
-        }
-
-        if (up.Image) {
-          if (isPvp && regularUpgradeImages[level] !== up.Image) {
-            variables[`$PVP-${level}UpgradeI$`] = `"${up.Image}"`;
-          } else if (!isPvp) {
-            variables[`$${level}UpgradeI$`] = `"${up.Image}"`;
-          }
-        }
-      });
+      if (pvpFnc.iconStr !== baseFnc.iconStr)
+        variables["$FNC-PVP-UPGRADEICON$"] = pvpFnc.iconStr;
     }
   }
 

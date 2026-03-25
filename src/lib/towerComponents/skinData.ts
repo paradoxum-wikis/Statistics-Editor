@@ -191,10 +191,18 @@ class SkinData {
   }
 
   setCost(level: number, value: number): void {
-    const costKey = `$${level}Cost$`;
-    const valueStr = String(value);
-    this.formulaTokens[costKey] = valueStr;
-    if (this.data.FormulaTokens) this.data.FormulaTokens[costKey] = valueStr;
+    const costKey =
+      this.isPvp && this.formulaTokens["$FNC-PVP-COST$"] !== undefined
+        ? "$FNC-PVP-COST$"
+        : "$FNC-COST$";
+    const costs = (this.formulaTokens[costKey] || "")
+      .split(";")
+      .map((s) => s.trim());
+    costs[level] = String(value);
+
+    const newCostStr = costs.join("; ");
+    this.formulaTokens[costKey] = newCostStr;
+    if (this.data.FormulaTokens) this.data.FormulaTokens[costKey] = newCostStr;
 
     this.recomputeCalculatedColumns();
     if (this.rawRows?.length) {
