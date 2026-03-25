@@ -3,34 +3,12 @@ $DPS$ = Damage / Firerate
 $CE$ = Total Price / DPS
 $TP$ = $FNC-TOTALPRICE$
 $FNC-ROFBUG$ = Firerate
-
-$0Cost$ = 8250
-$1Cost$ = 3250
-$2Cost$ = 7500
-$3Cost$ = 20000
-$4Cost$ = 35000
-$5Cost$ = 75000
-$PVP-0Cost$ = 4000
-$PVP-1Cost$ = 1000
-$PVP-2Cost$ = 2750
-$PVP-3Cost$ = 9000
-$PVP-4Cost$ = 20000
-$PVP-5Cost$ = 42500
-
-$1Hidden$ = true
-$4Lead$ = true
-$PVP-2Lead$ = true
-
-$1Upgrade$ = Radar
-$1UpgradeI$ = File:Radar.png
-$2Upgrade$ = Stronger Ammunition
-$2UpgradeI$ = File:Radar.png
-$3Upgrade$ = Dual Turret
-$3UpgradeI$ = File:Turret3.png
-$4Upgrade$ = Even Heavier Ammo
-$4UpgradeI$ = File:Turret4.png
-$5Upgrade$ = Even Heavier Ammo
-$4UpgradeI$ = File:Turret5.png
+$FNC-COST$ = 8250; 3250; 7500; 20000; 35000; 75000
+$FNC-PVP-COST$ = 4000; 1000; 2750; 9000; 20000; 42500
+$FNC-DETECTION$ = 1; 4;
+$FNC-PVP-DETECTION$ = ; ; 2
+$FNC-UPGRADE$ = Radar; Stronger Ammunition; Dual Turret; Even Heavier Ammo
+$FNC-UPGRADEICON$ = File:Radar.png; File:Radar.png; File:Turret3.png; File:Turret4.png; File:Turret5.png
 </var>
 <div class="mobile-tabber"><tabber>
 |-|Regular =
