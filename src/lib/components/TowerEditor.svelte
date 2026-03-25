@@ -9,8 +9,9 @@
     import { fly } from "svelte/transition";
     import { cubicOut } from "svelte/easing";
     import MoneyIcon from "$lib/assets/Income.png";
-    import { formatNumber, formatValue } from "$lib/utils/format";
+    import { formatNumber, formatValue, applyROFBug } from "$lib/utils/format";
     import { renderCellHtml } from "$lib/neowtext/render";
+    import { evaluateFormula } from "$lib/neowtext/evaluator";
 
     let {
         tower = null,
@@ -20,7 +21,7 @@
         disabled?: boolean;
     } = $props();
 
-    let availableSkins = $derived(tower ? tower.skinNames : []);
+    const availableSkins = $derived(tower?.skinNames ?? []);
 
     function focusOnMount(node: HTMLElement) {
         node.focus();
@@ -102,11 +103,14 @@
         }
     });
 
-    function getTowerBaselineId(t: Tower): string {
-        return (t as any)?.name ?? String(t);
-    }
+    const selectedSkinName = $derived(towerStore.selectedSkinName);
 
-    let selectedSkinName = $derived(towerStore.selectedSkinName);
+    const rofCols = $derived(
+      new Set(
+        (tower?.getSkin(selectedSkinName)?.formulaTokens?.["$FNC-ROFBUG$"] ?? "")
+          .split(";").map((s: string) => s.trim()).filter(Boolean)
+      )
+    );
 
     function rebuildBaselineForSkin(t: Tower, skinName: string) {
         if (settingsStore.debugMode) {
@@ -117,15 +121,10 @@
         const skinData = t.getSkin(skinName);
         if (!skinData) return;
 
-        const headers =
-            skinData && skinData.headers.length > 0
-                ? skinData.headers
-                : skinData
-                  ? skinData.levels.attributes
-                  : [];
-        const levels = skinData.levels.levels;
+        const headers = skinData.headers.length > 0 ? skinData.headers : skinData.levels.attributes;
 
         const next: Record<string, unknown> = {};
+        const { levels } = skinData.levels;
         for (let i = 0; i < levels.length; i++) {
             for (const header of headers) {
                 const value =
@@ -135,7 +134,7 @@
         }
 
         towerStore.baseline = next;
-        towerStore.baselineTowerId = getTowerBaselineId(t);
+        towerStore.baselineTowerId = t.name;
         towerStore.baselineSkinName = skinName;
     }
 
@@ -147,28 +146,15 @@
             towerStore.baselineSkinName = null;
             return;
         }
-        const currentTowerId = getTowerBaselineId(t);
-        if (towerStore.baselineTowerId !== currentTowerId) {
-            const initial =
-                availableSkins.includes("Regular")
-                    ? "Regular"
-                    : availableSkins[0] || "";
-            if (initial) rebuildBaselineForSkin(t, initial);
-        }
-    });
-
-    $effect(() => {
-        const t = tower;
-        const skinName = selectedSkinName;
-        if (!t || !skinName) return;
-        const currentTowerId = getTowerBaselineId(t);
-        if (
-            towerStore.baselineTowerId == null ||
-            towerStore.baselineTowerId !== currentTowerId
-        )
-            return;
-        if (towerStore.baselineSkinName == null) {
-            rebuildBaselineForSkin(t, skinName);
+        const currentTowerId = t.name;
+        const needsRebuild =
+            towerStore.baselineTowerId !== currentTowerId ||
+            towerStore.baselineSkinName == null;
+        if (needsRebuild) {
+            const skin = availableSkins.includes("Regular")
+                ? "Regular"
+                : availableSkins[0] || "";
+            if (skin) rebuildBaselineForSkin(t, skin);
         }
     });
 
@@ -264,6 +250,38 @@
             updateRowStat(config.rows[rowIdx], header, value);
         }
     }
+
+    function getDisplayValue(
+      row: Record<string, string | number>,
+      header: string,
+      levelIndex: number,
+      skinData: SkinData | null,
+    ): unknown {
+      if (!settingsStore.rofBug || rofCols.size === 0) return row[header];
+
+      if (rofCols.has(header)) {
+        const n = Number(row[header]);
+        return (!isNaN(n) && n !== 0) ? applyROFBug(n) : row[header];
+      }
+
+      if (skinData) {
+        const formula = skinData.cellFormulaTokens?.[String(levelIndex)]?.[header];
+        if (formula) {
+          const tokenValue = skinData.formulaTokens?.[formula];
+          if (tokenValue) {
+            const displayRow = { ...row };
+            for (const col of rofCols) {
+              const n = Number(displayRow[col]);
+              if (!isNaN(n) && n !== 0) displayRow[col] = applyROFBug(n);
+            }
+            const result = evaluateFormula(tokenValue, displayRow);
+            if (result != null) return result;
+          }
+        }
+      }
+
+      return row[header];
+    }
 </script>
 
 {#snippet dataTable(config: TableConfig, isFirst: boolean)}
@@ -309,7 +327,7 @@
                                         : { delta: null, className: "" }}
                                 {@const isMoney = config.moneyColumns.includes(header)}
                                 {@const ck = mkCellKey(config.skinName, config.tableIdx, rowIdx, header)}
-                                {@const cellVal = config.rows[rowIdx]?.[header]}
+                                {@const cellVal = getDisplayValue(row, header, rowIdx, config.skinData)}
                                 {@const isFocused = focusedCell === ck}
                                 <td class="table-data">
                                     {#if editable}
@@ -324,7 +342,7 @@
                                                     use:focusOnMount
                                                     type="text"
                                                     class="table-input"
-                                                    value={formatValue(cellVal)}
+                                                    value={formatValue(config.rows[rowIdx]?.[header])}
                                                     {disabled}
                                                     onfocus={(e) => {
                                                         e.currentTarget.dataset.original = e.currentTarget.value;

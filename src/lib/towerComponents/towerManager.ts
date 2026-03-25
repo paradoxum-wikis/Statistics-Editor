@@ -26,7 +26,6 @@ export default class TowerManager {
   constructor(
     public dataKey: string | null,
     private debug: () => boolean = () => false,
-    private rofBug: () => boolean = () => false,
   ) {}
 
   static getProfiles(): string[] {
@@ -180,9 +179,6 @@ export default class TowerManager {
         );
 
       const parsed = parseWikitext(text);
-      const effectiveTabs = this.rofBug()
-        ? applyROFBugToTabs(parsed.tabs, parsed.variables)
-        : parsed.tabs;
 
       if (this.debug()) {
         console.log(`[TowerManager] Using wikitext source: ${source}`);
@@ -369,7 +365,7 @@ export default class TowerManager {
         };
       };
 
-      for (const [tabName, tables] of Object.entries(effectiveTabs)) {
+      for (const [tabName, tables] of Object.entries(parsed.tabs)) {
         const isPvp = /pvp/i.test(tabName);
         const pIdx = (tables as TableData[]).findIndex((t) =>
           t.headers.includes("Level"),

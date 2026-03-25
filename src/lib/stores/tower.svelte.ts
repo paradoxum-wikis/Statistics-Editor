@@ -17,27 +17,9 @@ class TowerStore {
 
   selectedSkinName = $state<string>("Regular");
 
-  baseline = $state<Record<string, unknown>>({});
+  baseline = $state.raw<Record<string, unknown>>({});
   baselineTowerId = $state<string | null>(null);
   baselineSkinName = $state<string | null>(null);
-
-  _ = $effect.root(() => {
-    $effect(() => {
-      settingsStore.rofBug;
-      untrack(() => {
-        if (this.manager) this.manager.towers = {};
-        this.#lastLoadedName = null;
-
-        if (this.selectedName) {
-          this.load(this.selectedName).then(() => {
-            this.baseline = {};
-            this.baselineTowerId = null;
-            this.baselineSkinName = null;
-          });
-        }
-      });
-    });
-  });
 
   /**
    * Canonical source of truth for what the UI should be editing/viewing.
@@ -64,11 +46,7 @@ class TowerStore {
    * Sets up the tower manager with a profile and loads tower names.
    */
   async init(profile: string): Promise<void> {
-    this.manager = new TowerManager(
-      profile,
-      () => settingsStore.debugMode,
-      () => settingsStore.rofBug,
-    );
+    this.manager = new TowerManager(profile, () => settingsStore.debugMode);
     this.names = await this.manager.getTowerNames();
   }
 
@@ -76,11 +54,7 @@ class TowerStore {
    * Switches to a new profile, clearing state and reloading if a tower was selected.
    */
   async switchProfile(profile: string): Promise<void> {
-    this.manager = new TowerManager(
-      profile,
-      () => settingsStore.debugMode,
-      () => settingsStore.rofBug,
-    );
+    this.manager = new TowerManager(profile, () => settingsStore.debugMode);
     this.#lastLoadedName = null;
     this.selectedData = null;
     this.selectedSkinName = "Regular";
