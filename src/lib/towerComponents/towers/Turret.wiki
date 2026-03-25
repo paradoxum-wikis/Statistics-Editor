@@ -6,7 +6,7 @@ $FNC-ROFBUG$ = Firerate
 $FNC-COST$ = 8250; 3250; 7500; 20000; 35000; 75000
 $FNC-PVP-COST$ = 4000; 1000; 2750; 9000; 20000; 42500
 $FNC-DETECTION$ = 1; 4;
-$FNC-PVP-DETECTION$ = ; ; 2
+$FNC-PVP-DETECTION$ = ; 2
 $FNC-UPGRADE$ = Radar; Stronger Ammunition; Dual Turret; Even Heavier Ammo
 $FNC-UPGRADEICON$ = File:Radar.png; File:Radar.png; File:Turret3.png; File:Turret4.png; File:Turret5.png
 </var>
