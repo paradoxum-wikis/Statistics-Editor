@@ -250,7 +250,7 @@ export function applyROFBugToTabs(
   tabs: Record<string, TableData[]>,
   variables: Record<string, string>,
 ): Record<string, TableData[]> {
-  const cols = variables["$FNC-ROF$"]?.split(";").map((s) => s.trim());
+  const cols = variables["$FNC-ROFBUG$"]?.split(";").map((s) => s.trim());
   if (!cols) return tabs;
 
   return Object.fromEntries(

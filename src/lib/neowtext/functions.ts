@@ -59,7 +59,7 @@ export function resolveToken(
 
     let num = parseNumeric(varVal);
 
-    const rofConfig = formulaTokens["$FNC-ROF$"];
+    const rofConfig = formulaTokens["$FNC-ROFBUG$"];
     if (rofConfig && settingsStore.rofBug && !isNaN(num)) {
       if (
         rofConfig

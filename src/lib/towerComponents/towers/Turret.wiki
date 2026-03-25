@@ -2,7 +2,7 @@
 $DPS$ = Damage / Firerate
 $CE$ = Total Price / DPS
 $TP$ = $FNC-TOTALPRICE$
-$FNC-ROF$ = Firerate
+$FNC-ROFBUG$ = Firerate
 
 $0Cost$ = 8250
 $1Cost$ = 3250
