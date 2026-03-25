@@ -11,7 +11,7 @@
     import MoneyIcon from "$lib/assets/Income.png";
     import { formatNumber, formatValue, applyROFBug } from "$lib/utils/format";
     import { renderCellHtml } from "$lib/neowtext/render";
-    import { evaluateFormula } from "$lib/neowtext/evaluator";
+    import { resolveToken } from "$lib/neowtext/functions";
 
     let {
         tower = null,
@@ -267,16 +267,19 @@
       if (skinData) {
         const formula = skinData.cellFormulaTokens?.[String(levelIndex)]?.[header];
         if (formula) {
-          const tokenValue = skinData.formulaTokens?.[formula];
-          if (tokenValue) {
-            const displayRow = { ...row };
-            for (const col of rofCols) {
-              const n = Number(displayRow[col]);
-              if (!isNaN(n) && n !== 0) displayRow[col] = applyROFBug(n);
-            }
-            const result = evaluateFormula(tokenValue, displayRow);
-            if (result != null) return result;
+          const displayRow = { ...row };
+          for (const col of rofCols) {
+            const n = Number(displayRow[col]);
+            if (!isNaN(n) && n !== 0) displayRow[col] = applyROFBug(n);
           }
+          const result = resolveToken(
+            formula,
+            levelIndex,
+            displayRow,
+            skinData.formulaTokens,
+            skinData.isPvp,
+          );
+          if (result != null) return result;
         }
       }
 
