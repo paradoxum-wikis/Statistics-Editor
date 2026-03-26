@@ -52,7 +52,8 @@ export function resolveToken(
       Object.entries(row).map(([k, v]) => [stripRefs(k), v]),
     );
 
-    return evaluateFormula(val, context);
+    const result = evaluateFormula(val, context);
+    return Number.isNaN(result) ? val : result;
   }
 
   return undefined;

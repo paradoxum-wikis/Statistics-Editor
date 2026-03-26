@@ -1,4 +1,3 @@
-import { settingsStore } from "$lib/stores/settings.svelte";
 import { applyROFBug, stripRefs } from "$lib/utils/format";
 
 export interface TableData {
@@ -12,6 +11,19 @@ export interface TableData {
 export interface ParsedWikitext {
   variables: Record<string, string>;
   tabs: Record<string, TableData[]>;
+}
+
+/**
+ * Factory that precompiles a single regex to replace all vars in one pass.
+ */
+function createVariableReplacer(variables: Record<string, string>) {
+  const keys = Object.keys(variables).sort((a, b) => b.length - a.length);
+  if (keys.length === 0) return (text: string) => text;
+
+  const escapedKeys = keys.map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+  const regex = new RegExp(escapedKeys.join("|"), "g");
+
+  return (text: string) => text.replace(regex, (match) => variables[match]);
 }
 
 /**
@@ -66,13 +78,17 @@ export function parseWikitext(content: string): ParsedWikitext {
         (value.startsWith('"') && value.endsWith('"')) ||
         (value.startsWith("'") && value.endsWith("'"))
       ) {
-        value = value.substring(1, value.length - 1);
+        if (value.indexOf(value[0], 1) === value.length - 1) {
+          value = value.substring(1, value.length - 1);
+        }
       }
       value = value.trim();
 
       variables[key] = value;
     }
   }
+
+  const applyVariables = createVariableReplacer(variables);
 
   const tabberRegex = /<tabber>([\s\S]*?)<\/tabber>/;
   const tabberMatch = text.match(tabberRegex);
@@ -87,16 +103,18 @@ export function parseWikitext(content: string): ParsedWikitext {
       const splitIndex = part.indexOf("=");
       if (splitIndex === -1) continue;
 
-      const tabName = part.substring(0, splitIndex).trim();
+      const rawTabName = part.substring(0, splitIndex).trim();
+      const tabName = applyVariables(rawTabName);
+
       const tabContent = part.substring(splitIndex + 1).trim();
 
-      const tables = parseTables(tabContent);
+      const tables = parseTables(tabContent, applyVariables);
       if (tables.length > 0) {
         tabs[tabName] = tables;
       }
     }
   } else {
-    const tables = parseTables(text);
+    const tables = parseTables(text, applyVariables);
     if (tables.length > 0) {
       tabs["Regular"] = tables;
     }
@@ -125,13 +143,16 @@ function extractTableName(lines: string[]): string {
 /**
  * Parses all tables from a block of wikitext content.
  */
-function parseTables(content: string): TableData[] {
+function parseTables(
+  content: string,
+  applyVariables: (text: string) => string,
+): TableData[] {
   const results: TableData[] = [];
   const tableRegex = /\{\|[\s\S]*?\|\}/g;
   let match;
 
   while ((match = tableRegex.exec(content)) !== null) {
-    const tableData = parseTable(match[0]);
+    const tableData = parseTable(match[0], applyVariables);
     if (tableData) {
       results.push(tableData);
     }
@@ -143,10 +164,13 @@ function parseTables(content: string): TableData[] {
 /**
  * Parses a single table block (from {| to |}) into headers and rows.
  */
-function parseTable(tableContent: string): TableData | null {
+function parseTable(
+  tableContent: string,
+  applyVariables: (text: string) => string,
+): TableData | null {
   const lines = tableContent.split("\n");
 
-  const name = extractTableName(lines);
+  const name = applyVariables(extractTableName(lines));
   const headers: string[] = [];
   const rows: Record<string, string | number>[] = [];
 
@@ -165,6 +189,10 @@ function parseTable(tableContent: string): TableData | null {
       val = templateMatch[2].trim();
     }
 
+    if (!/^\$[^$]+\$$/.test(val)) {
+      val = applyVariables(val);
+    }
+
     const cleanVal = val.replace(/,/g, "");
     if (!isNaN(Number(cleanVal)) && cleanVal !== "") {
       return Number(cleanVal);
@@ -173,7 +201,8 @@ function parseTable(tableContent: string): TableData | null {
   };
 
   const cleanHeader = (val: string): string => {
-    return String(cleanCell(val, undefined));
+    let cleanText = stripRefs(String(cleanCell(val, undefined))).trim();
+    return applyVariables(cleanText);
   };
 
   for (let i = 0; i < lines.length; i++) {
@@ -248,7 +277,10 @@ export function applyROFBugToTabs(
           const r = { ...row };
           for (const actualCol of Object.keys(r)) {
             if (cols.includes(stripRefs(actualCol))) {
-              const cleanStr = stripRefs(r[actualCol]).replace(/,/g, "");
+              const cleanStr = stripRefs(String(r[actualCol])).replace(
+                /,/g,
+                "",
+              );
               const n = Number(cleanStr);
               if (cleanStr !== "" && !isNaN(n)) {
                 r[actualCol] = applyROFBug(n);
