@@ -50,7 +50,7 @@ export function serializeTable(data: SkinDataJSON): string {
 
   const lines: string[] = [];
 
-  lines.push(`{| class="article-table" style="width:100%"`);
+  lines.push(`{| class="wikitable stats-table"`);
 
   if (Name) {
     lines.push(`! colspan="${Headers.length}" |${Name}`);
