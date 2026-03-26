@@ -31,7 +31,7 @@ $FNC-UPGRADEICON$ = 11821094308; 11821094198; 11821093989; 11821093828; 11821093
 |-|PVP =
 <div class="overflow-box">
 {| class="wikitable stats-table"
-! Level !! Total Price !! Damage !! Tick !! Charge-Up !! Cooldown !! Overcharge !! Range !! DPS !! Cost Efficiency
+! Level !! Total Price !! Damage !! Tick !! Charge-Up<ref name="charge">The Charge-Up happens when the '''Accelerator''' first starts attacking or its cooldown ends. This is indicated by an animation where the '''Accelerator''' charges up its plasma gun.</ref> !! Cooldown<ref name="cooldown">The Cooldown happens when the Overcharge occurs. This is indicated by an animation where the '''Accelerator''' waves its hand.</ref> !! Overcharge !! Range !! DPS<ref name="dps">DPS is calculated as Overcharge ÷ (Charge-Up + Cooldown + [Overcharge ÷ Damage x Tick]).</ref> !! Cost Efficiency
 |-
 | 0 || {{Money|$TP$}} || 12 || 0.2 || 2.5 || 2 || 300 || 18 || $DPS$ || {{Money|$CE$}}
 |-
