@@ -4,7 +4,7 @@
     import Separator from "./smol/Separator.svelte";
     import { cubicOut } from "svelte/easing";
     import TDSWLogo from "$lib/assets/tdswbanner.png";
-    import { stripRefs } from "$lib/utils/format";
+    import { stripRefs, formatReadOnly, parseNumeric } from "$lib/utils/format";
 
     type SummaryLine = {
         kind: "change" | "grant";
@@ -107,7 +107,7 @@
 
                                         <span class="upgrade-summary-text">
                                             {#if line.kind === "change"}
-                                                {stripRefs(line.stat)}: {stripRefs(line.from)} → {stripRefs(line.to)}
+                                                {stripRefs(line.stat)}: {formatReadOnly(line.from)} → {formatReadOnly(line.to)}
                                             {:else}
                                                 {stripRefs(line.stat)}
                                             {/if}

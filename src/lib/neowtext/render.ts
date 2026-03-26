@@ -9,14 +9,7 @@ function wikilinkToAnchor(link: string, text: string): string {
 }
 
 export function renderCellHtml(val: unknown, readOnly = false): string {
-  let str: string;
-  if (readOnly) {
-    const n =
-      typeof val === "number" ? val : Number(String(val).replace(/,/g, ""));
-    str = Number.isFinite(n) ? formatReadOnly(n) : formatValue(val);
-  } else {
-    str = formatValue(val);
-  }
+  const str = readOnly ? formatReadOnly(val) : formatValue(val);
   return str
     .replace(/\n/g, "<br>")
     .replace(/\[\[([^\]|]+)\|([^\]]+)\]\]/g, (_, link, text) =>
