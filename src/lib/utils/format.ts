@@ -1,4 +1,14 @@
 /**
+ * Strips garbage ref tag for visual display.
+ */
+export function stripRefs(s: unknown): string {
+  if (s === undefined || s === null) return "";
+  return String(s)
+    .replace(/<ref\b[^>]*>[\s\S]*?<\/ref>/gi, "")
+    .replace(/<ref\b[^>]*\/>/gi, "");
+}
+
+/**
  * Parses a string or number into a number.
  * Commas are stripped before conversion.
  */
@@ -36,7 +46,7 @@ export function formatValue(v: unknown): string {
   if (v === undefined || v === null) return "-";
   if (typeof v === "number") return formatNumber(v);
   if (typeof v === "boolean") return v ? "true" : "false";
-  if (typeof v === "string") return v;
+  if (typeof v === "string") return stripRefs(v);
   return JSON.stringify(v);
 }
 

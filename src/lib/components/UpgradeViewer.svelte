@@ -4,6 +4,7 @@
     import Separator from "./smol/Separator.svelte";
     import { cubicOut } from "svelte/easing";
     import TDSWLogo from "$lib/assets/tdswbanner.png";
+    import { stripRefs } from "$lib/utils/format";
 
     type SummaryLine = {
         kind: "change" | "grant";
@@ -30,7 +31,8 @@
     } = $props();
 
     function isDetectionStat(stat: string): boolean {
-        return stat === "Hidden" || stat === "Flying" || stat === "Lead";
+        const cleanStat = stripRefs(stat);
+        return cleanStat === "Hidden" || cleanStat === "Flying" || cleanStat === "Lead";
     }
 </script>
 
@@ -80,7 +82,7 @@
 
                     {#if upgradeNames[index]}
                         <div class="upgrade-name">
-                            {upgradeNames[index]}
+                            {stripRefs(upgradeNames[index])}
                         </div>
                     {/if}
 
@@ -93,7 +95,7 @@
                                             {#if line.icon}
                                                 <img
                                                     src={line.icon}
-                                                    alt={line.stat}
+                                                    alt={stripRefs(line.stat)}
                                                     class={isDetectionStat(line.stat)
                                                         ? "dark:invert-0 invert"
                                                         : ""}
@@ -105,9 +107,9 @@
 
                                         <span class="upgrade-summary-text">
                                             {#if line.kind === "change"}
-                                                {line.stat}: {line.from} → {line.to}
+                                                {stripRefs(line.stat)}: {stripRefs(line.from)} → {stripRefs(line.to)}
                                             {:else}
-                                                {line.stat}
+                                                {stripRefs(line.stat)}
                                             {/if}
                                         </span>
                                     </div>

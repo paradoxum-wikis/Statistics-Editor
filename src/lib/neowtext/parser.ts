@@ -1,5 +1,5 @@
 import { settingsStore } from "$lib/stores/settings.svelte";
-import { applyROFBug } from "$lib/utils/format";
+import { applyROFBug, stripRefs } from "$lib/utils/format";
 
 export interface TableData {
   name: string;
@@ -13,18 +13,6 @@ export interface ParsedWikitext {
   variables: Record<string, string>;
   tabs: Record<string, TableData[]>;
 }
-
-/**
- * Strip garbage wiki only reference markup.
- *
- * Currently, it only removes ref tags.
- * This prevents header/value contamination like:
- *   DPS<ref>...</ref>  ->  DPS
- */
-const stripRefs = (s: string): string =>
-  s
-    .replace(/<ref\b[^>]*>[\s\S]*?<\/ref>/gi, "")
-    .replace(/<ref\b[^>]*\/>/gi, "");
 
 /**
  * Parses wikitext content into variables and tabbed tables.
@@ -80,8 +68,7 @@ export function parseWikitext(content: string): ParsedWikitext {
       ) {
         value = value.substring(1, value.length - 1);
       }
-
-      value = stripRefs(value).trim();
+      value = value.trim();
 
       variables[key] = value;
     }
@@ -129,7 +116,7 @@ function extractTableName(lines: string[]): string {
 
     const colspanMatch = trimmed.match(/!\s*colspan\s*=\s*"?\d+"?\s*\|(.+)/i);
     if (colspanMatch) {
-      return stripRefs(colspanMatch[1]).trim();
+      return colspanMatch[1].trim();
     }
   }
   return "";
@@ -259,9 +246,14 @@ export function applyROFBugToTabs(
         ...t,
         rows: t.rows.map((row) => {
           const r = { ...row };
-          for (const col of cols) {
-            const n = Number(r[col]);
-            if (r[col] !== "" && !isNaN(n)) r[col] = applyROFBug(n);
+          for (const actualCol of Object.keys(r)) {
+            if (cols.includes(stripRefs(actualCol))) {
+              const cleanStr = stripRefs(r[actualCol]).replace(/,/g, "");
+              const n = Number(cleanStr);
+              if (cleanStr !== "" && !isNaN(n)) {
+                r[actualCol] = applyROFBug(n);
+              }
+            }
           }
           return r;
         }),

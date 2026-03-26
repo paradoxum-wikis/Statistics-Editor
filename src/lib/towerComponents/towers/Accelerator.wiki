@@ -13,19 +13,19 @@ $FNC-UPGRADEICON$ = 11821094308; 11821094198; 11821093989; 11821093828; 11821093
 |-|Regular =
 <div class="overflow-box">
 {| class="wikitable stats-table"
-! Level !! Total Price !! Damage !! Tick !! Charge-Up !! Cooldown !! Overcharge !! Range !! DPS !! Cost Efficiency
+! Level !! Total Price !! Damage !! Tick !! Charge-Up<ref name="charge">The Charge-Up happens when the '''Accelerator''' first starts attacking or its cooldown ends. This is indicated by an animation where the '''Accelerator''' charges up its plasma gun.</ref> !! Cooldown<ref name="cooldown">The Cooldown happens when the Overcharge occurs. This is indicated by an animation where the '''Accelerator''' waves its hand.</ref> !! Overcharge !! Range !! DPS<ref name="dps">DPS is calculated as Overcharge ÷ (Charge-Up + Cooldown + [Overcharge ÷ Damage x Tick]).</ref> !! Cost Efficiency
 |-
-| 0 || {{Money|$TP$}} || 12 || 0.208 || 6.5 || 2.5 || 9000 || 20 || $DPS$ || {{Money|$CE$}}
+| 0 || {{Money|$TP$}} || 12 || 0.2 || 6.5 || 2.5 || 9,000 || 20 || $DPS$ || {{Money|$CE$}}
 |-
-| 1 || {{Money|$TP$}} || 15 || 0.208 || 6.5 || 2.5 || 11250 || 20 || $DPS$ || {{Money|$CE$}}
+| 1 || {{Money|$TP$}} || 15 || 0.2 || 6.5 || 2.5 || 11,250 || 20 || $DPS$ || {{Money|$CE$}}
 |-
-| 2 || {{Money|$TP$}} || 25 || 0.208 || 6.5 || 2.5 || 18750 || 22 || $DPS$ || {{Money|$CE$}}
+| 2 || {{Money|$TP$}} || 25 || 0.2 || 6.5 || 2.5 || 18,750 || 22 || $DPS$ || {{Money|$CE$}}
 |-
-| 3 || {{Money|$TP$}} || 40 || 0.208 || 6.5 || 1 || 30000 || 22 || $DPS$ || {{Money|$CE$}}
+| 3 || {{Money|$TP$}} || 40 || 0.2 || 6.5 || 1 || 30,000 || 22 || $DPS$ || {{Money|$CE$}}
 |-
-| 4 || {{Money|$TP$}} || 50 || 0.158 || 5.5 || 1 || 50000 || 24 || $DPS$ || {{Money|$CE$}}
+| 4 || {{Money|$TP$}} || 50 || 0.15 || 5.5 || 1 || 50,000 || 24 || $DPS$ || {{Money|$CE$}}
 |-
-| 5 || {{Money|$TP$}} || 55 || 0.108 || 6.5 || 1 || 100000 || 26 || $DPS$ || {{Money|$CE$}}
+| 5 || {{Money|$TP$}} || 55 || 0.1 || 6.5 || 1 || 100,000 || 26 || $DPS$ || {{Money|$CE$}}
 |}
 </div>
 |-|PVP =
@@ -33,17 +33,17 @@ $FNC-UPGRADEICON$ = 11821094308; 11821094198; 11821093989; 11821093828; 11821093
 {| class="wikitable stats-table"
 ! Level !! Total Price !! Damage !! Tick !! Charge-Up !! Cooldown !! Overcharge !! Range !! DPS !! Cost Efficiency
 |-
-| 0 || {{Money|$TP$}} || 12 || 0.208 || 2.5 || 2 || 300 || 18 || $DPS$ || {{Money|$CE$}}
+| 0 || {{Money|$TP$}} || 12 || 0.2 || 2.5 || 2 || 300 || 18 || $DPS$ || {{Money|$CE$}}
 |-
-| 1 || {{Money|$TP$}} || 15 || 0.208 || 2.5 || 2 || 300 || 18 || $DPS$ || {{Money|$CE$}}
+| 1 || {{Money|$TP$}} || 15 || 0.2 || 2.5 || 2 || 300 || 18 || $DPS$ || {{Money|$CE$}}
 |-
-| 2 || {{Money|$TP$}} || 15 || 0.208 || 2.5 || 2 || 600 || 18 || $DPS$ || {{Money|$CE$}}
+| 2 || {{Money|$TP$}} || 15 || 0.2 || 2.5 || 2 || 600 || 18 || $DPS$ || {{Money|$CE$}}
 |-
-| 3 || {{Money|$TP$}} || 35 || 0.158 || 2.5 || 2 || 600 || 20 || $DPS$ || {{Money|$CE$}}
+| 3 || {{Money|$TP$}} || 35 || 0.15 || 2.5 || 2 || 600 || 20 || $DPS$ || {{Money|$CE$}}
 |-
-| 4 || {{Money|$TP$}} || 35 || 0.108 || 1.5 || 2 || 1280 || 20 || $DPS$ || {{Money|$CE$}}
+| 4 || {{Money|$TP$}} || 35 || 0.1 || 1.5 || 2 || 1280 || 20 || $DPS$ || {{Money|$CE$}}
 |-
-| 5 || {{Money|$TP$}} || 90 || 0.108 || 1.5 || 2 || 2400 || 23 || $DPS$ || {{Money|$CE$}}
+| 5 || {{Money|$TP$}} || 90 || 0.1 || 1.5 || 2 || 2,400 || 23 || $DPS$ || {{Money|$CE$}}
 |}
 </center>
 </div>

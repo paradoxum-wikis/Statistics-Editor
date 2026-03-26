@@ -9,7 +9,7 @@
     import { fly } from "svelte/transition";
     import { cubicOut } from "svelte/easing";
     import MoneyIcon from "$lib/assets/Income.png";
-    import { formatNumber, formatValue, applyROFBug } from "$lib/utils/format";
+    import { formatNumber, formatValue, applyROFBug, stripRefs } from "$lib/utils/format";
     import { renderCellHtml } from "$lib/neowtext/render";
     import { resolveToken } from "$lib/neowtext/functions";
 
@@ -309,7 +309,7 @@
                                 ? "table-header-sticky px-2"
                                 : "table-header whitespace-nowrap"}
                         >
-                            {header}
+                        	{stripRefs(header)}
                         </th>
                     {/each}
                 </tr>
