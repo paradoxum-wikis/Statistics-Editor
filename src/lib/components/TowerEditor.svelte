@@ -46,10 +46,6 @@
 
     const INVERSE_STATS = new Set(["cooldown", "cost", "price"]);
 
-    function isInverseStat(header: string): boolean {
-        return INVERSE_STATS.has(header.trim().toLowerCase());
-    }
-
     function formatDelta(delta: number): string {
         const sign = delta > 0 ? "+" : "";
         return `${sign}${formatNumber(delta)}`;
@@ -57,10 +53,8 @@
 
     function computeDeltaClass(header: string, delta: number): string {
         if (delta === 0) return "";
-        if (isInverseStat(header)) {
-            return delta < 0 ? "text-green-500" : "text-red-500";
-        }
-        return delta > 0 ? "text-green-500" : "text-red-500";
+        const inv = INVERSE_STATS.has(stripRefs(header).trim().toLowerCase());
+        return (inv ? delta < 0 : delta > 0) ? "text-green-500" : "text-red-500";
     }
 
     function baselineCellKey(skinName: string, levelIndex: number, header: string) {
@@ -158,13 +152,6 @@
         }
     });
 
-    function isEditableForSkin(skinData: SkinData, attr: string) {
-        if (!skinData) return false;
-        if (skinData.readOnlyAttributes.includes(attr)) return false;
-        if (attr === "Cost") return true;
-        return skinData.locator.hasLocation(attr);
-    }
-
     function updateStatForSkin(
         skinData: SkinData,
         levelIndex: number,
@@ -239,8 +226,10 @@
     }
 
     function isCellEditable(config: TableConfig, header: string): boolean {
-        if (config.skinData) return isEditableForSkin(config.skinData, header);
-        return !config.readOnlyColumns.includes(header);
+        return config.skinData
+            ? !config.skinData.readOnlyAttributes.includes(header) &&
+              (stripRefs(header) !== "Cost" || config.skinData.locator.hasLocation(header))
+            : !config.readOnlyColumns.includes(header);
     }
 
     function commitEdit(config: TableConfig, rowIdx: number, header: string, value: string) {
