@@ -649,6 +649,7 @@
         &.hide-wrapper {
             background: transparent;
             padding: 0.1rem;
+            border: 0;
         }
     }
 
