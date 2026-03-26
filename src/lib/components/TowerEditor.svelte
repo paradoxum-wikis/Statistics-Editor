@@ -246,9 +246,10 @@
       levelIndex: number,
       skinData: SkinData | null,
     ): unknown {
+      const cleanHeader = stripRefs(header);
       if (!settingsStore.rofBug || rofCols.size === 0) return row[header];
 
-      if (rofCols.has(header)) {
+      if (rofCols.has(cleanHeader)) {
         const n = Number(row[header]);
         return (!isNaN(n) && n !== 0) ? applyROFBug(n) : row[header];
       }
@@ -256,11 +257,15 @@
       if (skinData) {
         const formula = skinData.cellFormulaTokens?.[String(levelIndex)]?.[header];
         if (formula) {
-          const displayRow = { ...row };
+          const displayRow = Object.fromEntries(
+            Object.entries(row).map(([k, v]) => [stripRefs(k), v])
+          );
+
           for (const col of rofCols) {
             const n = Number(displayRow[col]);
             if (!isNaN(n) && n !== 0) displayRow[col] = applyROFBug(n);
           }
+
           const result = resolveToken(
             formula,
             levelIndex,

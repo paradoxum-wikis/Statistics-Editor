@@ -1,6 +1,5 @@
 import { evaluateFormula } from "$lib/neowtext/evaluator";
-import { parseNumeric, applyROFBug } from "$lib/utils/format";
-import { settingsStore } from "$lib/stores/settings.svelte";
+import { parseNumeric, stripRefs } from "$lib/utils/format";
 
 /**
  * Resolves a $FNC-NAME$ function for the given row level.
@@ -48,7 +47,12 @@ export function resolveToken(
     if (/^\$[^$]+\$$/.test(val)) {
       return resolveToken(val, level, row, tokens, isPvp, depth + 1);
     }
-    return evaluateFormula(val, row);
+
+    const context = Object.fromEntries(
+      Object.entries(row).map(([k, v]) => [stripRefs(k), v]),
+    );
+
+    return evaluateFormula(val, context);
   }
 
   return undefined;
