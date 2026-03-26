@@ -33,8 +33,17 @@ function serializeRow(
     let strVal = String(val);
 
     if (moneyColumns.includes(header)) {
+      const s = String(val).trim();
       const formatted =
-        typeof val === "number" ? formatMoneyNumber(val) : strVal;
+        typeof val === "number"
+          ? formatMoneyNumber(val)
+          : s === ""
+            ? ""
+            : /[.,]/.test(s)
+              ? s
+              : Number.isFinite(+s)
+                ? formatMoneyNumber(+s)
+                : s;
       strVal = `{{Money|${formatted}}}`;
     }
 
