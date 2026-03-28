@@ -239,49 +239,43 @@
             updateRowStat(config.rows[rowIdx], header, value);
         }
     }
-
-    function getDisplayValue(
-      row: Record<string, string | number>,
-      header: string,
-      levelIndex: number,
-      skinData: SkinData | null,
-    ): unknown {
-      const cleanHeader = stripRefs(header);
-      if (!settingsStore.rofBug || rofCols.size === 0) return row[header];
-
-      if (rofCols.has(cleanHeader)) {
-        const n = Number(row[header]);
-        return (!isNaN(n) && n !== 0) ? applyROFBug(n) : row[header];
-      }
-
-      if (skinData) {
-        const formula = skinData.cellFormulaTokens?.[String(levelIndex)]?.[header];
-        if (formula) {
-          const displayRow = Object.fromEntries(
-            Object.entries(row).map(([k, v]) => [stripRefs(k), v])
-          );
-
-          for (const col of rofCols) {
-            const n = Number(displayRow[col]);
-            if (!isNaN(n) && n !== 0) displayRow[col] = applyROFBug(n);
-          }
-
-          const result = resolveToken(
-            formula,
-            levelIndex,
-            displayRow,
-            skinData.formulaTokens,
-            skinData.isPvp,
-          );
-          if (result != null) return result;
-        }
-      }
-
-      return row[header];
-    }
 </script>
 
 {#snippet dataTable(config: TableConfig, isFirst: boolean)}
+    {@const displayRows = (!settingsStore.rofBug || rofCols.size === 0)
+        ? config.rows
+        : config.rows.map((r, rowIdx) => {
+            const cleanRow: Record<string, string | number> = {};
+            for (const [k, v] of Object.entries(r)) cleanRow[stripRefs(k)] = v;
+
+            for (const col of rofCols) {
+                const n = Number(cleanRow[col]);
+                if (!isNaN(n) && n !== 0) cleanRow[col] = applyROFBug(n);
+            }
+
+            if (config.skinData) {
+                const tokens = config.skinData.cellFormulaTokens?.[String(rowIdx)];
+                if (tokens) {
+                    for (let pass = 0; pass < 2; pass++) {
+                        for (const [col, tok] of Object.entries(tokens)) {
+                            const res = resolveToken(
+                                tok, rowIdx, cleanRow,
+                                config.skinData.formulaTokens, config.skinData.isPvp
+                            );
+                            if (res != null) cleanRow[stripRefs(col)] = res;
+                        }
+                    }
+                }
+            }
+
+            const outRow = { ...r };
+            for (const k of Object.keys(r)) {
+                outRow[k] = cleanRow[stripRefs(k)] ?? r[k];
+            }
+            return outRow;
+        })
+    }
+
     <div
         class="table-container {!isFirst ? 'extra-table-container' : ''} {settingsStore.minTableWidth ? 'min-content' : ''}"
         in:fly={isFirst ? { y: 8, duration: 160, easing: cubicOut } : { duration: 0 }}
@@ -303,13 +297,13 @@
                                 ? "table-header-sticky px-2"
                                 : "table-header whitespace-nowrap"}
                         >
-                        	{stripRefs(header)}
+                            {stripRefs(header)}
                         </th>
                     {/each}
                 </tr>
             </thead>
             <tbody class="table-body">
-                {#each config.rows as row, rowIdx (rowIdx)}
+                {#each displayRows as row, rowIdx (rowIdx)}
                     <tr class="table-row">
                         {#each config.headers as header (header)}
                             {#if header === "Level"}
@@ -318,19 +312,18 @@
                                 </td>
                             {:else}
                                 {@const editable = isCellEditable(config, header)}
-                                {@const deltaInfo =
-                                    config.skinData && settingsStore.seeValueDifference
+                                {@const deltaInfo = config.skinData && settingsStore.seeValueDifference
                                         ? getDeltaForCell(config.skinData, config.skinName, rowIdx, header)
                                         : { delta: null, className: "" }}
                                 {@const isMoney = config.moneyColumns.includes(header)}
                                 {@const ck = mkCellKey(config.skinName, config.tableIdx, rowIdx, header)}
-                                {@const cellVal = getDisplayValue(row, header, rowIdx, config.skinData)}
+
+                                {@const cellVal = row[header]}
                                 {@const isFocused = focusedCell === ck}
+
                                 <td class="table-data">
                                     {#if editable}
-                                        <div
-                                            class="cell-wrapper {isMoney ? 'money-wrapper' : ''} {settingsStore.hideCellWrapper ? 'hide-wrapper' : ''}"
-                                        >
+                                        <div class="cell-wrapper {isMoney ? 'money-wrapper' : ''} {settingsStore.hideCellWrapper ? 'hide-wrapper' : ''}">
                                             {#if isMoney}
                                                 <img src={MoneyIcon} alt="" class="money-icon money-icon-input" />
                                             {/if}
@@ -380,9 +373,7 @@
                                             {/if}
                                         </div>
                                     {:else}
-                                        <div
-                                            class="table-cell-readonly flex items-center justify-between gap-2 {settingsStore.hideCellWrapper ? 'hide-wrapper' : ''}"
-                                        >
+                                        <div class="table-cell-readonly flex items-center justify-between gap-2 {settingsStore.hideCellWrapper ? 'hide-wrapper' : ''}">
                                             {#if isMoney}
                                                 <span class="money-value">
                                                     <img src={MoneyIcon} alt="" class="money-icon" />
