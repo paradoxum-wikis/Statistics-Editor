@@ -144,29 +144,24 @@ class SkinData {
    * - `this.rawRows` (so persistence keeps numeric recomputed results)
    * - `this.data.Defaults` / `this.data.Upgrades[*].Stats` to match recomputed values
    */
-  recomputeCalculatedColumns(): void {
-    if (!this.rawRows || !Array.isArray(this.rawRows)) return;
-    if (!this.formulaTokens || Object.keys(this.formulaTokens).length === 0)
-      return;
-    if (
-      !this.cellFormulaTokens ||
-      Object.keys(this.cellFormulaTokens).length === 0
-    )
-      return;
+  recomputeCalculatedColumns(onlyLevel?: number): void {
+    if (!this.rawRows?.length) return;
+    if (!Object.keys(this.formulaTokens).length) return;
+    if (!Object.keys(this.cellFormulaTokens).length) return;
 
-    for (let level = 0; level < this.rawRows.length; level++) {
+    const start = onlyLevel ?? 0;
+    const end = onlyLevel != null ? onlyLevel + 1 : this.rawRows.length;
+
+    for (let level = start; level < end; level++) {
       const row = this.rawRows[level];
       if (!row || typeof row !== "object") continue;
-
-      const levelKey = String(level);
-      const perLevel = this.cellFormulaTokens[levelKey];
+      const perLevel = this.cellFormulaTokens[String(level)];
       if (!perLevel) continue;
-
       for (const [col, token] of Object.entries(perLevel)) {
         const result = resolveToken(
           token,
           level,
-          row as Record<string, string | number>,
+          row,
           this.formulaTokens,
           this.isPvp,
         );
@@ -233,17 +228,12 @@ class SkinData {
       this.upgrades[level - 1].set(attribute, newValue);
     }
 
-    // Update `rawRows` + recompute any calculated columns before rebuilding Levels
-    // This pretty much guarantees cells like DPS update immediately when inputs change
-    if (this.rawRows && Array.isArray(this.rawRows)) {
-      const targetRowIndex = level;
-      const targetRow = this.rawRows[targetRowIndex];
-      if (targetRow && typeof targetRow === "object") {
-        targetRow[attribute] = newValue;
-      }
+    // Sync the edited value into `rawRows` anj recompute any derived columns
+    // such as DPS, then rebuild Levels so dependent cells update immediately
+    if (this.rawRows?.[level] && typeof this.rawRows[level] === "object") {
+      this.rawRows[level][attribute] = newValue;
     }
-
-    this.recomputeCalculatedColumns();
+    this.recomputeCalculatedColumns(level);
     this.createData();
   }
 
