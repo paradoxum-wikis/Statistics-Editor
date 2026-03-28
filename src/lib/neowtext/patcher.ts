@@ -179,7 +179,17 @@ function patchVariableBlock(
     return serializeVariables(variables) + "\n\n" + text;
   }
 
-  const newBlock = serializeVariables(variables);
+  const oldBlock = text.substring(startIndex + startTag.length, endIndex);
+  const orderedVars: Record<string, string> = {};
+
+  for (const [, key] of oldBlock.matchAll(/^\s*([^=\s]+)\s*=/gm)) {
+    if (key in variables) {
+      orderedVars[key] = variables[key];
+    }
+  }
+
+  Object.assign(orderedVars, variables);
+  const newBlock = serializeVariables(orderedVars);
   return (
     text.substring(0, startIndex) +
     newBlock +
