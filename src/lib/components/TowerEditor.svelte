@@ -285,6 +285,7 @@
                                                 <input
                                                     use:focusOnMount
                                                     type="text"
+                                                    size="1"
                                                     class="table-input"
                                                     value={formatValue(config.rows[rowIdx]?.[header])}
                                                     {disabled}
