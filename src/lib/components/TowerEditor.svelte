@@ -22,12 +22,20 @@
     } = $props();
 
     const availableSkins = $derived(tower?.skinNames ?? []);
+    const selectedSkinName = $derived(towerStore.selectedSkinName);
+
+    const rofCols = $derived(
+        new Set(
+            (tower?.getSkin(selectedSkinName)?.formulaTokens?.["$FNC-ROFBUG$"] ?? "")
+                .split(";").map((s: string) => s.trim()).filter(Boolean)
+        )
+    );
+
+    let focusedCell = $state<string | null>(null);
 
     function focusOnMount(node: HTMLElement) {
         node.focus();
     }
-
-    let focusedCell = $state<string | null>(null);
 
     function mkCellKey(skinName: string, tableIdx: number, rowIdx: number, header: string): string {
         return `${skinName}:${tableIdx}:${rowIdx}:${header}`;
@@ -36,9 +44,7 @@
     function toNumberOrNull(v: unknown): number | null {
         if (typeof v === "number" && Number.isFinite(v)) return v;
         if (typeof v === "string") {
-            const s = v.trim();
-            if (!s) return null;
-            const n = Number(s);
+            const n = Number(v.trim());
             return Number.isFinite(n) ? n : null;
         }
         return null;
@@ -47,8 +53,7 @@
     const INVERSE_STATS = new Set(["cooldown", "cost", "price"]);
 
     function formatDelta(delta: number): string {
-        const sign = delta > 0 ? "+" : "";
-        return `${sign}${formatNumber(delta)}`;
+        return `${delta > 0 ? "+" : ""}${formatNumber(delta)}`;
     }
 
     function computeDeltaClass(header: string, delta: number): string {
@@ -57,12 +62,8 @@
         return (inv ? delta < 0 : delta > 0) ? "text-green-500" : "text-red-500";
     }
 
-    function baselineCellKey(skinName: string, levelIndex: number, header: string) {
+    function baselineCellKey(skinName: string, levelIndex: number, header: string): string {
         return `${skinName}:${levelIndex}:${header}`;
-    }
-
-    function getBaselineValue(skinName: string, levelIndex: number, header: string): unknown {
-        return towerStore.baseline[baselineCellKey(skinName, levelIndex, header)];
     }
 
     function getDeltaForCell(
@@ -71,59 +72,39 @@
         levelIndex: number,
         header: string,
     ): { delta: number | null; className: string } {
-        const base = getBaselineValue(skinName, levelIndex, header);
+        const base = towerStore.baseline[baselineCellKey(skinName, levelIndex, header)];
         const current = skinData.levels.getCell(levelIndex, header);
         const baseN = toNumberOrNull(base);
         const currentN = toNumberOrNull(current);
-        if (baseN == null || currentN == null) {
-            return { delta: null, className: "" };
-        }
+        if (baseN == null || currentN == null) return { delta: null, className: "" };
         const delta = currentN - baseN;
         const normalized = Math.abs(delta) < 1e-12 ? 0 : delta;
-        return {
-            delta: normalized,
-            className: computeDeltaClass(header, normalized),
-        };
+        return { delta: normalized, className: computeDeltaClass(header, normalized) };
     }
 
     $effect(() => {
-        if (
-            tower &&
-            !availableSkins.includes(untrack(() => towerStore.selectedSkinName))
-        ) {
+        if (tower && !availableSkins.includes(untrack(() => towerStore.selectedSkinName))) {
             towerStore.selectedSkinName = availableSkins.includes("Regular")
                 ? "Regular"
-                : availableSkins[0] || "";
+                : (availableSkins[0] ?? "");
         }
     });
 
-    const selectedSkinName = $derived(towerStore.selectedSkinName);
-
-    const rofCols = $derived(
-      new Set(
-        (tower?.getSkin(selectedSkinName)?.formulaTokens?.["$FNC-ROFBUG$"] ?? "")
-          .split(";").map((s: string) => s.trim()).filter(Boolean)
-      )
-    );
-
     function rebuildBaselineForSkin(t: Tower, skinName: string) {
         if (settingsStore.debugMode) {
-            console.log(
-                `[TowerEditor] Rebuilding baseline for ${t.name} (skin: ${skinName})`,
-            );
+            console.log(`[TowerEditor] Rebuilding baseline for ${t.name} (skin: ${skinName})`);
         }
         const skinData = t.getSkin(skinName);
         if (!skinData) return;
 
         const headers = skinData.headers.length > 0 ? skinData.headers : skinData.levels.attributes;
-
         const next: Record<string, unknown> = {};
         const { levels } = skinData.levels;
+
         for (let i = 0; i < levels.length; i++) {
             for (const header of headers) {
-                const value =
+                next[baselineCellKey(skinName, i, header)] =
                     header === "Level" ? i : skinData.levels.getCell(i, header);
-                next[baselineCellKey(skinName, i, header)] = value;
             }
         }
 
@@ -140,78 +121,53 @@
             towerStore.baselineSkinName = null;
             return;
         }
-        const currentTowerId = t.name;
-        const needsRebuild =
-            towerStore.baselineTowerId !== currentTowerId ||
-            towerStore.baselineSkinName == null;
-        if (needsRebuild) {
-            const skin = availableSkins.includes("Regular")
-                ? "Regular"
-                : availableSkins[0] || "";
+        if (
+            towerStore.baselineTowerId !== t.name ||
+            towerStore.baselineSkinName == null
+        ) {
+            const skin = availableSkins.includes("Regular") ? "Regular" : (availableSkins[0] ?? "");
             if (skin) rebuildBaselineForSkin(t, skin);
         }
     });
 
-    function updateStatForSkin(
-        skinData: SkinData,
-        levelIndex: number,
-        attribute: string,
-        value: string,
-    ) {
+    function updateStatForSkin(skinData: SkinData, levelIndex: number, attribute: string, value: string) {
         if (!skinData || disabled) return;
-        let parsedValue: any = value;
+        let parsedValue: unknown = value;
         if (value === "true") parsedValue = true;
         else if (value === "false") parsedValue = false;
-        else if (!isNaN(Number(value)) && value.trim() !== "")
-            parsedValue = Number(value);
+        else if (value.trim() !== "" && !isNaN(Number(value))) parsedValue = Number(value);
 
         if (settingsStore.debugMode) {
-            console.log(
-                `[TowerEditor] updateStat: Level ${levelIndex}, ${attribute} = ${parsedValue}`,
-            );
+            console.log(`[TowerEditor] updateStat: Level ${levelIndex}, ${attribute} = ${parsedValue}`);
         }
         skinData.set(levelIndex, attribute, parsedValue);
         towerStore.refresh();
         towerStore.syncWikitext();
     }
 
-    function updateRowStat(
-        row: Record<string, string | number>,
-        header: string,
-        value: string,
-    ) {
+    function updateRowStat(row: Record<string, string | number>, header: string, value: string) {
         if (disabled) return;
-        let parsedValue: string | number = value;
-        if (!isNaN(Number(value)) && value.trim() !== "")
-            parsedValue = Number(value);
-        row[header] = parsedValue;
+        const n = Number(value);
+        row[header] = value.trim() !== "" && !isNaN(n) ? n : value;
         towerStore.refresh();
         towerStore.syncWikitext();
     }
 
     async function handleDiscard() {
         if (settingsStore.debugMode) {
-            console.log(
-                `[TowerEditor] Discard requested (tower=${tower?.name ?? "null"}, skin=${selectedSkinName})`,
-            );
+            console.log(`[TowerEditor] Discard requested (tower=${tower?.name ?? "null"}, skin=${selectedSkinName})`);
         }
         await towerStore.discardChanges();
         if (settingsStore.debugMode) {
-            console.log(
-                `[TowerEditor] Discard: reload complete (tower=${tower?.name ?? "null"}, skin=${selectedSkinName}); rebuilding baseline...`,
-            );
+            console.log(`[TowerEditor] Discard complete; rebuilding baseline...`);
         }
-        if (tower && selectedSkinName) {
-            rebuildBaselineForSkin(tower, selectedSkinName);
-        }
+        if (tower && selectedSkinName) rebuildBaselineForSkin(tower, selectedSkinName);
         towerStore.refresh();
     }
 
     function handleSave() {
         towerStore.save();
-        if (tower && selectedSkinName) {
-            rebuildBaselineForSkin(tower, selectedSkinName);
-        }
+        if (tower && selectedSkinName) rebuildBaselineForSkin(tower, selectedSkinName);
     }
 
     interface TableConfig {
@@ -239,43 +195,44 @@
             updateRowStat(config.rows[rowIdx], header, value);
         }
     }
-</script>
 
-{#snippet dataTable(config: TableConfig, isFirst: boolean)}
-    {@const displayRows = (!settingsStore.rofBug || rofCols.size === 0)
-        ? config.rows
-        : config.rows.map((r, rowIdx) => {
+    function buildDisplayRows(config: TableConfig): Record<string, string | number>[] {
+        if (!settingsStore.rofBug || rofCols.size === 0) return config.rows;
+
+        return config.rows.map((r, rowIdx) => {
             const cleanRow: Record<string, string | number> = {};
-            for (const [k, v] of Object.entries(r)) cleanRow[stripRefs(k)] = v;
-
-            for (const col of rofCols) {
-                const n = Number(cleanRow[col]);
-                if (!isNaN(n) && n !== 0) cleanRow[col] = applyROFBug(n);
+            for (const [k, v] of Object.entries(r)) {
+                const ck = stripRefs(k);
+                if (rofCols.has(ck)) {
+                    const n = Number(v);
+                    cleanRow[ck] = !isNaN(n) && n !== 0 ? applyROFBug(n) : (v as string | number);
+                } else {
+                    cleanRow[ck] = v as string | number;
+                }
             }
 
-            if (config.skinData) {
-                const tokens = config.skinData.cellFormulaTokens?.[String(rowIdx)];
-                if (tokens) {
-                    for (let pass = 0; pass < 2; pass++) {
-                        for (const [col, tok] of Object.entries(tokens)) {
-                            const res = resolveToken(
-                                tok, rowIdx, cleanRow,
-                                config.skinData.formulaTokens, config.skinData.isPvp
-                            );
-                            if (res != null) cleanRow[stripRefs(col)] = res;
-                        }
+            const tokens = config.skinData?.cellFormulaTokens?.[String(rowIdx)];
+            if (tokens) {
+                for (let pass = 0; pass < 2; pass++) {
+                    for (const [col, tok] of Object.entries(tokens)) {
+                        const res = resolveToken(
+                            tok, rowIdx, cleanRow,
+                            config.skinData!.formulaTokens, config.skinData!.isPvp,
+                        );
+                        if (res != null) cleanRow[stripRefs(col)] = res;
                     }
                 }
             }
 
             const outRow = { ...r };
-            for (const k of Object.keys(r)) {
-                outRow[k] = cleanRow[stripRefs(k)] ?? r[k];
-            }
+            for (const k of Object.keys(r)) outRow[k] = cleanRow[stripRefs(k)] ?? r[k];
             return outRow;
-        })
+        });
     }
+</script>
 
+{#snippet dataTable(config: TableConfig, isFirst: boolean)}
+    {@const displayRows = buildDisplayRows(config)}
     <div
         class="table-container {!isFirst ? 'extra-table-container' : ''} {settingsStore.minTableWidth ? 'min-content' : ''}"
         in:fly={isFirst ? { y: 8, duration: 160, easing: cubicOut } : { duration: 0 }}
@@ -313,14 +270,11 @@
                             {:else}
                                 {@const editable = isCellEditable(config, header)}
                                 {@const deltaInfo = config.skinData && settingsStore.seeValueDifference
-                                        ? getDeltaForCell(config.skinData, config.skinName, rowIdx, header)
-                                        : { delta: null, className: "" }}
+                                    ? getDeltaForCell(config.skinData, config.skinName, rowIdx, header)
+                                    : { delta: null, className: "" }}
                                 {@const isMoney = config.moneyColumns.includes(header)}
                                 {@const ck = mkCellKey(config.skinName, config.tableIdx, rowIdx, header)}
-
-                                {@const cellVal = row[header]}
                                 {@const isFocused = focusedCell === ck}
-
                                 <td class="table-data">
                                     {#if editable}
                                         <div class="cell-wrapper {isMoney ? 'money-wrapper' : ''} {settingsStore.hideCellWrapper ? 'hide-wrapper' : ''}">
@@ -363,11 +317,11 @@
                                                     {disabled}
                                                     onclick={() => { focusedCell = ck; }}
                                                 >
-                                                    {@html renderCellHtml(cellVal, false)}
+                                                    {@html renderCellHtml(row[header], false)}
                                                 </button>
                                             {/if}
                                             {#if settingsStore.seeValueDifference && deltaInfo.delta !== null && deltaInfo.delta !== 0}
-                                                <span class={`delta-text ${deltaInfo.className}`}>
+                                                <span class="delta-text {deltaInfo.className}">
                                                     ({formatDelta(deltaInfo.delta)})
                                                 </span>
                                             {/if}
@@ -377,15 +331,15 @@
                                             {#if isMoney}
                                                 <span class="money-value">
                                                     <img src={MoneyIcon} alt="" class="money-icon" />
-                                                    {@html renderCellHtml(cellVal, true)}
+                                                    {@html renderCellHtml(row[header], true)}
                                                 </span>
                                             {:else}
                                                 <span class="cell-multiline">
-                                                    {@html renderCellHtml(cellVal, true)}
+                                                    {@html renderCellHtml(row[header], true)}
                                                 </span>
                                             {/if}
                                             {#if settingsStore.seeValueDifference && deltaInfo.delta !== null && deltaInfo.delta !== 0}
-                                                <span class={`delta-text text-xs ${deltaInfo.className}`}>
+                                                <span class="delta-text text-xs {deltaInfo.className}">
                                                     ({formatDelta(deltaInfo.delta)})
                                                 </span>
                                             {/if}
@@ -420,11 +374,10 @@
                     <Tabs.Content value={skinName}>
                         {@const skinData = tower.getSkin(skinName)}
                         {#if skinData && towerStore.selectedSkinName === skinName}
-                            {@const headers =
-                                skinData.headers.length > 0
-                                    ? skinData.headers
-                                    : skinData.levels.attributes}
-                            {@const primaryConfig = {
+                            {@const headers = skinData.headers.length > 0
+                                ? skinData.headers
+                                : skinData.levels.attributes}
+                            {@render dataTable({
                                 skinName,
                                 tableIdx: 0,
                                 tableName: skinData.tableName,
@@ -433,24 +386,20 @@
                                 moneyColumns: skinData.moneyColumns,
                                 readOnlyColumns: [],
                                 skinData,
-                            }}
-                            {@render dataTable(primaryConfig, true)}
+                            }, true)}
 
-                            {#if skinData.extraTables?.length}
-                                {#each skinData.extraTables as extraTable, tableIdx (tableIdx)}
-                                    {@const extraConfig = {
-                                        skinName,
-                                        tableIdx: tableIdx + 1,
-                                        tableName: extraTable.name,
-                                        headers: extraTable.headers,
-                                        rows: extraTable.rows,
-                                        moneyColumns: extraTable.moneyColumns,
-                                        readOnlyColumns: extraTable.readOnlyColumns,
-                                        skinData: null,
-                                    }}
-                                    {@render dataTable(extraConfig, false)}
-                                {/each}
-                            {/if}
+                            {#each skinData.extraTables ?? [] as extraTable, tableIdx (tableIdx)}
+                                {@render dataTable({
+                                    skinName,
+                                    tableIdx: tableIdx + 1,
+                                    tableName: extraTable.name,
+                                    headers: extraTable.headers,
+                                    rows: extraTable.rows,
+                                    moneyColumns: extraTable.moneyColumns,
+                                    readOnlyColumns: extraTable.readOnlyColumns,
+                                    skinData: null,
+                                }, false)}
+                            {/each}
                         {:else if towerStore.selectedSkinName === skinName}
                             <div class="text-center py-4 text-muted-foreground">
                                 No skin data available.
@@ -463,18 +412,10 @@
 
         <Separator class="mt-4" />
         <div class="flex justify-end gap-2">
-            <button
-                class="btn btn-secondary"
-                onclick={handleDiscard}
-                disabled={!towerStore.isDirty}
-            >
+            <button class="btn btn-secondary" onclick={handleDiscard} disabled={!towerStore.isDirty}>
                 Clear Changes
             </button>
-            <button
-                class="btn btn-primary"
-                onclick={handleSave}
-                disabled={!towerStore.isDirty}
-            >
+            <button class="btn btn-primary" onclick={handleSave} disabled={!towerStore.isDirty}>
                 Save Changes
             </button>
         </div>
