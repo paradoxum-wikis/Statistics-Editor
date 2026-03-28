@@ -3,6 +3,32 @@ import { settingsStore } from "$lib/stores/settings.svelte";
 const ARITHMETIC_ALLOWED = /^[\d.\s+\-*/%()_a-zA-Z]*$/;
 const DISALLOWED_SYNTAX = /[{}[\]:;,@#$&|^~`\\]/;
 
+const replacerCache = new Map<
+  string,
+  (expr: string, ctx: Record<string, number>) => string
+>();
+
+function getReplacer(
+  keys: string[],
+): (expr: string, ctx: Record<string, number>) => string {
+  const cacheKey = keys.join("\0");
+  if (replacerCache.has(cacheKey)) return replacerCache.get(cacheKey)!;
+
+  const sorted = [...keys]
+    .filter((k) => k.trim())
+    .sort((a, b) => b.length - a.length);
+  const regex = new RegExp(
+    sorted.map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|"),
+    "g",
+  );
+
+  const fn = (expr: string, ctx: Record<string, number>) =>
+    expr.replace(regex, (match) => String(ctx[match] ?? match));
+
+  replacerCache.set(cacheKey, fn);
+  return fn;
+}
+
 /**
  * Evaluates a formula string using variables from a row.
  * Only arithmetic operations are allowed.
@@ -46,25 +72,14 @@ export function evaluateFormula(
     return NaN;
   }
 
-  let expression = formula;
-
-  const keys = Object.keys(numericContextAliased)
-    .filter((k) => k.trim() !== "")
-    .sort((a, b) => b.length - a.length);
-
-  for (const key of keys) {
-    const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const regex = new RegExp(escapedKey, "g");
-    expression = expression.replace(regex, String(numericContextAliased[key]));
-  }
+  const keys = Object.keys(numericContextAliased);
+  const replace = getReplacer(keys);
+  const expression = replace(formula, numericContextAliased);
 
   try {
-    // eslint-disable-next-line no-new-func
     const result = new Function(`return ${expression}`)();
     if (settingsStore.debugMode)
-      console.log(
-        `[Evaluator] Formula: "${formula}" -> Expression: "${expression}" -> Result: ${result}`,
-      );
+      console.log(`[Evaluator] "${formula}" -> "${expression}" -> ${result}`);
     return typeof result === "number" ? result : NaN;
   } catch (e) {
     console.error(`[Evaluator] Error evaluating "${expression}":`, e);
