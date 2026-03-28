@@ -274,20 +274,17 @@ export function applyROFBugToTabs(
       tables.map((t) => ({
         ...t,
         rows: t.rows.map((row) => {
-          const r = { ...row };
-          for (const actualCol of Object.keys(r)) {
-            if (cols.includes(stripRefs(actualCol))) {
-              const cleanStr = stripRefs(String(r[actualCol])).replace(
-                /,/g,
-                "",
-              );
-              const n = Number(cleanStr);
-              if (cleanStr !== "" && !isNaN(n)) {
-                r[actualCol] = applyROFBug(n);
+          let r: Record<string, string | number> | null = null;
+          for (const col of Object.keys(row)) {
+            if (cols.includes(stripRefs(col))) {
+              const n = Number(row[col]);
+              if (!isNaN(n) && n !== 0) {
+                if (!r) r = { ...row };
+                r[col] = applyROFBug(n);
               }
             }
           }
-          return r;
+          return r ?? row;
         }),
       })),
     ]),
