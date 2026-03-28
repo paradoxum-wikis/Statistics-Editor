@@ -1,7 +1,6 @@
 import TowerManager from "$lib/towerComponents/towerManager";
 import type Tower from "$lib/towerComponents/tower";
 import { settingsStore } from "$lib/stores/settings.svelte";
-import { untrack } from "svelte";
 
 /**
  * Manages tower selection and data reactively.

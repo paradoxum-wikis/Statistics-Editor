@@ -24,6 +24,19 @@
     const availableSkins = $derived(tower?.skinNames ?? []);
     const selectedSkinName = $derived(towerStore.selectedSkinName);
 
+    const activeSkinData = $derived.by(() => {
+        towerStore.refreshTrigger;
+        if (!tower) return null;
+        const skin = tower.getSkin(towerStore.selectedSkinName);
+        if (!skin) return null;
+        return {
+            skin,
+            headers: skin.headers.length > 0 ? skin.headers : skin.levels.attributes,
+            rows: [...skin.levels.levels],
+            extraTables: skin.extraTables?.map(t => ({ ...t, rows: [...t.rows] })) ?? [],
+        };
+    });
+
     const rofCols = $derived(
         new Set(
             (tower?.getSkin(selectedSkinName)?.formulaTokens?.["$FNC-ROFBUG$"] ?? "")
@@ -358,58 +371,45 @@
 
 <div class="space-y-4">
     {#if tower}
-        {#key towerStore.refreshTrigger}
-            <Tabs.Root
-                value={towerStore.selectedSkinName}
-                onValueChange={(v) => (towerStore.selectedSkinName = v)}
-            >
-                <Tabs.List class="tabs-list">
-                    {#each availableSkins as skinName (skinName)}
-                        <Tabs.Trigger value={skinName} class="tab-trigger">
-                            {skinName}
-                        </Tabs.Trigger>
-                    {/each}
-                </Tabs.List>
+	    <Tabs.Root value={towerStore.selectedSkinName} onValueChange={(v) => (towerStore.selectedSkinName = v)}>
+	        <Tabs.List class="tabs-list">
+	            {#each availableSkins as skinName (skinName)}
+	                <Tabs.Trigger value={skinName} class="tab-trigger">{skinName}</Tabs.Trigger>
+	            {/each}
+	        </Tabs.List>
 
-                {#each availableSkins as skinName (skinName)}
-                    <Tabs.Content value={skinName}>
-                        {@const skinData = tower.getSkin(skinName)}
-                        {#if skinData && towerStore.selectedSkinName === skinName}
-                            {@const headers = skinData.headers.length > 0
-                                ? skinData.headers
-                                : skinData.levels.attributes}
-                            {@render dataTable({
-                                skinName,
-                                tableIdx: 0,
-                                tableName: skinData.tableName,
-                                headers,
-                                rows: skinData.levels.levels,
-                                moneyColumns: skinData.moneyColumns,
-                                readOnlyColumns: [],
-                                skinData,
-                            }, true)}
+	        {#each availableSkins as skinName (skinName)}
+	            <Tabs.Content value={skinName}>
+              		{#if activeSkinData}
+	                    {@render dataTable({
+	                        skinName,
+	                        tableIdx: 0,
+	                        tableName: activeSkinData.skin.tableName,
+	                        headers: activeSkinData.headers,
+	                        rows: activeSkinData.rows,
+	                        moneyColumns: activeSkinData.skin.moneyColumns,
+	                        readOnlyColumns: [],
+	                        skinData: activeSkinData.skin,
+	                    }, true)}
 
-                            {#each skinData.extraTables ?? [] as extraTable, tableIdx (tableIdx)}
-                                {@render dataTable({
-                                    skinName,
-                                    tableIdx: tableIdx + 1,
-                                    tableName: extraTable.name,
-                                    headers: extraTable.headers,
-                                    rows: extraTable.rows,
-                                    moneyColumns: extraTable.moneyColumns,
-                                    readOnlyColumns: extraTable.readOnlyColumns,
-                                    skinData: null,
-                                }, false)}
-                            {/each}
-                        {:else if towerStore.selectedSkinName === skinName}
-                            <div class="text-center py-4 text-muted-foreground">
-                                No skin data available.
-                            </div>
-                        {/if}
-                    </Tabs.Content>
-                {/each}
-            </Tabs.Root>
-        {/key}
+	                    {#each activeSkinData.extraTables as extraTable, tableIdx (tableIdx)}
+	                        {@render dataTable({
+	                            skinName,
+	                            tableIdx: tableIdx + 1,
+	                            tableName: extraTable.name,
+	                            headers: extraTable.headers,
+	                            rows: extraTable.rows,
+	                            moneyColumns: extraTable.moneyColumns,
+	                            readOnlyColumns: extraTable.readOnlyColumns,
+	                            skinData: null,
+	                        }, false)}
+	                    {/each}
+	                {:else if towerStore.selectedSkinName === skinName}
+	                    <div class="text-center py-4 text-muted-foreground">No skin data available.</div>
+	                {/if}
+	            </Tabs.Content>
+	        {/each}
+	    </Tabs.Root>
 
         <Separator class="mt-4" />
         <div class="flex justify-end gap-2">
