@@ -68,7 +68,7 @@ class BaseStats {
   }
 
   addAttributeValue(name: string, value: any): void {
-    this.attributeNames.push(name);
+    if (!this.attributeNames.includes(name)) this.attributeNames.push(name);
     this.attributes[name] = value;
   }
 
