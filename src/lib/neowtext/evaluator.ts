@@ -1,8 +1,7 @@
 import { settingsStore } from "$lib/stores/settings.svelte";
 import { toDisplayNumber, stripRefs } from "$lib/utils/format";
 
-const ARITHMETIC_ALLOWED = /^[\d.\s+\-*/%()_a-zA-Z]*$/;
-const DISALLOWED_SYNTAX = /[{}[\]:;,@#$&|^~`\\]/;
+const ARITHMETIC_ALLOWED = /^[\d+\-*/%.()\s]+$/;
 
 const replacerCache = new Map<
   string,
@@ -18,6 +17,7 @@ function getReplacer(
   const sorted = [...keys]
     .filter((k) => k.trim())
     .sort((a, b) => b.length - a.length);
+
   const regex = new RegExp(
     sorted.map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|"),
     "g",
@@ -38,40 +38,43 @@ export function evaluateFormula(
   formula: string,
   row: Record<string, string | number>,
 ): number {
-  const numericContext: Record<string, number> = {};
+  // for example "Cost Efficiency" = "Cost_Efficiency"
+  const numericContextAliased: Record<string, number> = {};
+
   for (const [key, value] of Object.entries(row)) {
     const n = toDisplayNumber(value);
-    if (n !== null) numericContext[stripRefs(key)] = n;
-  }
-
-  // for example "Cost Efficiency" = "Cost_Efficiency"
-  const numericContextAliased: Record<string, number> = {
-    ...numericContext,
-  };
-  for (const k of Object.keys(numericContext)) {
-    if (/\s/.test(k)) {
-      const underscored = k.replace(/\s+/g, "_");
-      if (!(underscored in numericContextAliased)) {
-        numericContextAliased[underscored] = numericContext[k];
+    if (n !== null) {
+      const cleanKey = stripRefs(key);
+      numericContextAliased[cleanKey] = n;
+      if (/\s/.test(cleanKey)) {
+        numericContextAliased[cleanKey.replace(/\s+/g, "_")] = n;
       }
     }
   }
 
-  if (!ARITHMETIC_ALLOWED.test(formula) || DISALLOWED_SYNTAX.test(formula)) {
+  let expression = formula
+    .replace(/\+\+\s*([a-zA-Z0-9_\-$]+)/g, "(1 + $1)") // prefix ++
+    .replace(/([a-zA-Z0-9_\-$]+)\s*\+\+/g, "($1 + 1)") // postfix ++
+    .replace(/--\s*([a-zA-Z0-9_\-$]+)/g, "(1 - $1)") // prefix --
+    .replace(/([a-zA-Z0-9_\-$]+)\s*--/g, "($1 - 1)"); // postfix --
+
+  const keys = Object.keys(numericContextAliased);
+  expression = getReplacer(keys)(expression, numericContextAliased);
+
+  if (!ARITHMETIC_ALLOWED.test(expression)) {
     console.error(
-      `[Evaluator] Formula contains disallowed syntax: "${formula}"`,
+      `[Evaluator] Formula contains disallowed syntax: "${expression}"`,
     );
     return NaN;
   }
 
-  const keys = Object.keys(numericContextAliased);
-  const replace = getReplacer(keys);
-  const expression = replace(formula, numericContextAliased);
-
   try {
     const result = new Function(`return ${expression}`)();
-    if (settingsStore.debugMode)
+
+    if (settingsStore.debugMode) {
       console.log(`[Evaluator] "${formula}" -> "${expression}" -> ${result}`);
+    }
+
     return typeof result === "number" ? result : NaN;
   } catch (e) {
     console.error(`[Evaluator] Error evaluating "${expression}":`, e);
