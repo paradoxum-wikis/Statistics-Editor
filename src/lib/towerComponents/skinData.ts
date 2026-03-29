@@ -19,6 +19,7 @@ class SkinData {
   upgrades!: Upgrade[];
   levels!: Levels;
   headers: string[] = [];
+  rawHeaders: string[] = [];
   tableName: string = "";
   rawRows: any[] = [];
   readOnlyAttributes: string[] = [];
@@ -91,6 +92,9 @@ class SkinData {
     }
     if (this.data.Headers) {
       this.headers = this.data.Headers;
+    }
+    if (this.data.RawHeaders) {
+      this.rawHeaders = this.data.RawHeaders;
     }
     if (this.data.RawRows) {
       this.rawRows = this.data.RawRows;
@@ -229,7 +233,7 @@ class SkinData {
     }
 
     // Sync the edited value into `rawRows` anj recompute any derived columns
-    // such as DPS, then rebuild Levels so dependent cells update immediately
+    // such as DPS, then rebuild Levels so dependent cells update
     if (this.rawRows?.[level] && typeof this.rawRows[level] === "object") {
       this.rawRows[level][attribute] = newValue;
     }

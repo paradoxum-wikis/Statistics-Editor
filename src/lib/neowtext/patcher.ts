@@ -33,6 +33,7 @@ export function patchWikitext(sourceWikitext: string, tower: Tower): string {
     const markups: string[] = [
       serializeTable({
         Headers: skin.headers,
+        RawHeaders: skin.rawHeaders,
         RawRows: rowsForSerialization,
         MoneyColumns: skin.moneyColumns,
         Name: skin.tableName || "",

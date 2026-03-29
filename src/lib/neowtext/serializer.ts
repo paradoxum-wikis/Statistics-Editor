@@ -2,6 +2,7 @@ interface TableRow extends Record<string, string | number | boolean | object> {}
 
 interface SkinDataJSON {
   Headers: string[];
+  RawHeaders?: string[];
   RawRows: TableRow[];
   MoneyColumns?: string[];
   Name?: string;
@@ -54,7 +55,7 @@ function serializeRow(
 }
 
 export function serializeTable(data: SkinDataJSON): string {
-  const { Headers, RawRows, MoneyColumns = [], Name = "" } = data;
+  const { Headers, RawHeaders, RawRows, MoneyColumns = [], Name = "" } = data;
   if (!Headers || !RawRows) return "";
 
   const lines: string[] = [];
@@ -66,7 +67,7 @@ export function serializeTable(data: SkinDataJSON): string {
     lines.push("|-");
   }
 
-  lines.push(`! ${Headers.join(" !! ")}`);
+  lines.push(`! ${(RawHeaders?.length ? RawHeaders : Headers).join(" !! ")}`);
 
   const sortedRows = [...RawRows].sort((a, b) => {
     return Number(a["Level"]) - Number(b["Level"]);

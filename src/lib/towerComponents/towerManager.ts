@@ -264,16 +264,16 @@ export default class TowerManager {
           const level = Number(row["Level"]);
           cellFormulaTokens[level] ??= {};
           const formulaEntries = (Object.entries(row) as [string, unknown][])
-            .map(([k, v]): [string, string] | null => {
+            .map(([k, v]): [string, string, string] | null => {
               if (typeof v !== "string") return null;
               const stripped = stripRefs(v).trim();
               if (!/^\$[^$]+\$$/.test(stripped)) return null;
-              return [k, stripped];
+              return [k, stripped, v];
             })
-            .filter((x): x is [string, string] => x !== null);
+            .filter((x): x is [string, string, string] => x !== null);
 
           for (let pass = 0; pass < 2; pass++) {
-            for (const [key, val] of formulaEntries) {
+            for (const [key, val, ogVal] of formulaEntries) {
               const result = resolveToken(
                 val,
                 level,
@@ -283,7 +283,7 @@ export default class TowerManager {
               );
               if (result !== undefined) {
                 readOnly.add(key);
-                cellFormulaTokens[level][key] = val;
+                cellFormulaTokens[level][key] = ogVal;
                 row[key] = result;
               }
             }
@@ -367,6 +367,7 @@ export default class TowerManager {
           Defaults: defaults,
           Upgrades: upgrades,
           Headers: tableData.headers,
+          RawHeaders: tableData.rawHeaders,
           TableName: tableData.name || "",
           RawRows: rows,
           ReadOnly: Array.from(readOnly),

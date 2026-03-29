@@ -35,6 +35,7 @@ export function resolveToken(
   isPvp: boolean,
   depth = 0,
 ): string | number | undefined {
+  token = stripRefs(token).trim();
   if (depth > 10) return undefined;
 
   // $FNC-NAME$
