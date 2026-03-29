@@ -14,6 +14,7 @@ function getReplacer(
   const cacheKey = keys.join("\0");
   if (replacerCache.has(cacheKey)) return replacerCache.get(cacheKey)!;
 
+  // for example "Cost" matching inside "Cost Efficiency"
   const sorted = [...keys]
     .filter((k) => k.trim())
     .sort((a, b) => b.length - a.length);
