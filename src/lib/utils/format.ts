@@ -81,6 +81,5 @@ export function toDisplayNumber(v: unknown): number | null {
   } else {
     return null;
   }
-  if (!Number.isFinite(n)) return null;
-  return Math.round(n * 100) / 100;
+  return Number.isFinite(n) ? n : null;
 }
