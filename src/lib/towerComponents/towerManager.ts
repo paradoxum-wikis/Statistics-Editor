@@ -1,17 +1,14 @@
 import Tower from "./tower";
 import { towerNames } from "./towers";
 import { resolveToken } from "$lib/neowtext/functions";
-import {
-  parseWikitext,
-  applyROFBugToTabs,
-  type TableData,
-} from "$lib/neowtext/parser";
+import { parseWikitext, type TableData } from "$lib/neowtext/parser";
 import { patchWikitext } from "$lib/neowtext/patcher";
 import {
   clearWikiOverride,
   loadEffectiveWikitext,
   setWikiOverride,
 } from "$lib/neowtext/wikiSource";
+import { stripRefs } from "$lib/utils/format";
 
 const wikitextFiles = import.meta.glob("./towers/*.wiki", {
   query: "?raw",
@@ -266,14 +263,29 @@ export default class TowerManager {
         for (const row of rows) {
           const level = Number(row["Level"]);
           cellFormulaTokens[level] ??= {};
+          const formulaEntries = (Object.entries(row) as [string, unknown][])
+            .map(([k, v]): [string, string] | null => {
+              if (typeof v !== "string") return null;
+              const stripped = stripRefs(v).trim();
+              if (!/^\$[^$]+\$$/.test(stripped)) return null;
+              return [k, stripped];
+            })
+            .filter((x): x is [string, string] => x !== null);
 
-          for (const [key, val] of Object.entries(row)) {
-            if (typeof val !== "string" || !/^\$[^$]+\$$/.test(val)) continue;
-            const result = resolveToken(val, level, row, formulaTokens, isPvp);
-            if (result !== undefined) {
-              readOnly.add(key);
-              cellFormulaTokens[level][key] = val;
-              row[key] = result;
+          for (let pass = 0; pass < 2; pass++) {
+            for (const [key, val] of formulaEntries) {
+              const result = resolveToken(
+                val,
+                level,
+                row,
+                formulaTokens,
+                isPvp,
+              );
+              if (result !== undefined) {
+                readOnly.add(key);
+                cellFormulaTokens[level][key] = val;
+                row[key] = result;
+              }
             }
           }
 
@@ -321,10 +333,10 @@ export default class TowerManager {
           const extraReadOnly = new Set<string>(
             extra.rows.flatMap((r) =>
               Object.entries(r)
-                .filter(
-                  ([, val]) =>
-                    typeof val === "string" && /^\$[^$]+\$$/.test(val),
-                )
+                .filter(([, val]) => {
+                  if (typeof val !== "string") return false;
+                  return /^\$[^$]+\$$/.test(stripRefs(val).trim());
+                })
                 .map(([k]) => k),
             ),
           );
@@ -336,8 +348,9 @@ export default class TowerManager {
               const resRow = { ...row };
               const level = Number(resRow["Level"] ?? 0);
               for (const key of extraReadOnly) {
+                const stripped = stripRefs(resRow[key] as string).trim();
                 const result = resolveToken(
-                  resRow[key] as string,
+                  stripped,
                   level,
                   resRow,
                   formulaTokens,

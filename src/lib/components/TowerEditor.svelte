@@ -9,7 +9,7 @@
     import { fly } from "svelte/transition";
     import { cubicOut } from "svelte/easing";
     import MoneyIcon from "$lib/assets/Income.png";
-    import { formatNumber, formatValue, applyROFBug, stripRefs } from "$lib/utils/format";
+    import { formatNumber, formatValue, applyROFBug, stripRefs, toDisplayNumber } from "$lib/utils/format";
     import { renderCellHtml } from "$lib/neowtext/render";
     import { resolveToken } from "$lib/neowtext/functions";
 
@@ -54,15 +54,6 @@
         return `${skinName}:${tableIdx}:${rowIdx}:${header}`;
     }
 
-    function toNumberOrNull(v: unknown): number | null {
-        if (typeof v === "number" && Number.isFinite(v)) return v;
-        if (typeof v === "string") {
-            const n = Number(v.trim());
-            return Number.isFinite(n) ? n : null;
-        }
-        return null;
-    }
-
     const INVERSE_STATS = new Set(["cooldown", "cost", "price"]);
 
     function formatDelta(delta: number): string {
@@ -85,14 +76,11 @@
         levelIndex: number,
         header: string,
     ): { delta: number | null; className: string } {
-        const base = towerStore.baseline[baselineCellKey(skinName, levelIndex, header)];
-        const current = skinData.levels.getCell(levelIndex, header);
-        const baseN = toNumberOrNull(base);
-        const currentN = toNumberOrNull(current);
+        const baseN = toDisplayNumber(towerStore.baseline[baselineCellKey(skinName, levelIndex, header)]);
+        const currentN = toDisplayNumber(skinData.levels.getCell(levelIndex, header));
         if (baseN == null || currentN == null) return { delta: null, className: "" };
         const delta = currentN - baseN;
-        const normalized = Math.abs(delta) < 1e-12 ? 0 : delta;
-        return { delta: normalized, className: computeDeltaClass(header, normalized) };
+        return { delta: Math.abs(delta) < 1e-9 ? 0 : delta, className: computeDeltaClass(header, delta) };
     }
 
     $effect(() => {

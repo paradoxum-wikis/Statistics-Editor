@@ -189,7 +189,7 @@ function parseTable(
       val = templateMatch[2].trim();
     }
 
-    if (!/^\$[^$]+\$$/.test(val)) {
+    if (!/^\$[^$]+\$$/.test(stripRefs(val).trim())) {
       val = applyVariables(val);
     }
 

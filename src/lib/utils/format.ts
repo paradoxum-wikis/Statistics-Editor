@@ -65,3 +65,22 @@ export function applyROFBug(seconds: number): number {
       : Math.ceil(raw_frames) + 1;
   return Math.round((frames / 60) * 1000) / 1000;
 }
+
+/**
+ * Parses a value to the same as whatever is displayed on the table.
+ * This matches formatReadOnly's precision so formulas and deltas
+ * use the same values the user sees.
+ */
+export function toDisplayNumber(v: unknown): number | null {
+  let n: number;
+  if (typeof v === "number") {
+    n = v;
+  } else if (typeof v === "string") {
+    const cleaned = stripRefs(v).replace(/,/g, "").trim();
+    n = parseFloat(cleaned);
+  } else {
+    return null;
+  }
+  if (!Number.isFinite(n)) return null;
+  return Math.round(n * 100) / 100;
+}

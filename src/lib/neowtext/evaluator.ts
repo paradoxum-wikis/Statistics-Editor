@@ -1,4 +1,5 @@
 import { settingsStore } from "$lib/stores/settings.svelte";
+import { toDisplayNumber, stripRefs } from "$lib/utils/format";
 
 const ARITHMETIC_ALLOWED = /^[\d.\s+\-*/%()_a-zA-Z]*$/;
 const DISALLOWED_SYNTAX = /[{}[\]:;,@#$&|^~`\\]/;
@@ -39,17 +40,8 @@ export function evaluateFormula(
 ): number {
   const numericContext: Record<string, number> = {};
   for (const [key, value] of Object.entries(row)) {
-    let numVal: number;
-    if (typeof value === "number") {
-      numVal = value;
-    } else {
-      const clean = String(value).replace(/,/g, "");
-      numVal = parseFloat(clean);
-    }
-
-    if (!isNaN(numVal)) {
-      numericContext[key] = numVal;
-    }
+    const n = toDisplayNumber(value);
+    if (n !== null) numericContext[stripRefs(key)] = n;
   }
 
   // for example "Cost Efficiency" = "Cost_Efficiency"
