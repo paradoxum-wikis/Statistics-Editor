@@ -1,27 +1,14 @@
 <var>
 $TP$ = $FNC-TOTALPRICE$
-$0Cost$ = 4200
-$1Cost$ = 2500
-$2Cost$ = 6800
-$3Cost$ = 12000
-$4Cost$ = 22500
-$5Cost$ = 32500
-$2Hidden$ = true
-$0Lead$ = true
-$1Upgrade$ = Acolyte
-$1UpgradeI$ = File:WarlockLevel1.png
-$2Upgrade$ = Forbidden Arts
-$2UpgradeI$ = File:WarlockLevel2.png
-$3Upgrade$ = Pact of the Blade
-$3UpgradeI$ = File:WarlockLevel3.png
-$4Upgrade$ = Eldritch Knight
-$4UpgradeI$ = File:WarlockLevel4.png
-$5Upgrade$ = Abyss Walker
-$5UpgradeI$ = File:WarlockLevel5.png
+$FNC-COST$ = 4200; 2500; 6800; 12000; 22500; 32500
+$FNC-DETECTION$ = 2; 0;
+$FNC-UPGRADE$ = Alcoyte; Forbidden Arts; Pact of the Blade; Eldritch Knight; Abyss Walker
+$FNC-UPGRADEICON$ = File:WarlockLevel1.png; File:WarlockLevel2.png; File:WarlockLevel3.png; File:WarlockLevel4.png; File:WarlockLevel5.png
 $RDPS$ = Damage / Firerate
 $MDPS$ = (Normal Damage + AOE Damage) / Swingrate
 $MaxDPS$ = (Normal Damage + (AOE Damage * Max Hits)) / Swingrate
 $CE$ = Total Price / DPS
+$FNC-ROFBUG$ = Firerate
 </var>
 <div class="mobile-tabber"><tabber>
 |-|Regular =
