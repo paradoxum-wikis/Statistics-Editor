@@ -44,10 +44,23 @@ export function resolveToken(
 
   // $Var$
   if (token.startsWith("$") && tokens[token] !== undefined) {
-    const val = tokens[token];
+    let val = tokens[token];
+
     if (/^\$[^$]+\$$/.test(val)) {
       return resolveToken(val, level, row, tokens, isPvp, depth + 1);
     }
+
+    val = val.replace(/\$([^$\s]+)\$/g, (match) => {
+      const resolved = resolveToken(
+        match,
+        level,
+        row,
+        tokens,
+        isPvp,
+        depth + 1,
+      );
+      return resolved !== undefined ? String(resolved) : "0";
+    });
 
     const context = Object.fromEntries(
       Object.entries(row).map(([k, v]) => [stripRefs(k), v]),
