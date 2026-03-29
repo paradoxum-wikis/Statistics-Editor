@@ -201,9 +201,12 @@
         if (!settingsStore.rofBug || rofCols.size === 0) return config.rows;
 
         return config.rows.map((r, rowIdx) => {
+        	const keyMap = new Map<string, string>();
+         	for (const k of Object.keys(r)) keyMap.set(k, stripRefs(k));
+
             const cleanRow: Record<string, string | number> = {};
             for (const [k, v] of Object.entries(r)) {
-                const ck = stripRefs(k);
+                const ck = keyMap.get(k)!;
                 if (rofCols.has(ck)) {
                     const n = Number(v);
                     cleanRow[ck] = !isNaN(n) && n !== 0 ? applyROFBug(n) : (v as string | number);
@@ -226,7 +229,7 @@
             }
 
             const outRow = { ...r };
-            for (const k of Object.keys(r)) outRow[k] = cleanRow[stripRefs(k)] ?? r[k];
+            for (const k of Object.keys(r)) outRow[k] = cleanRow[keyMap.get(k)!] ?? r[k];
             return outRow;
         });
     }
