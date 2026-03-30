@@ -38,6 +38,7 @@
   --sidebar-ring: oklch(0.704 0.04 256.788);
   --upgrade-bg-1: oklch(0.88 0.02 260 / 60%);
   --upgrade-bg-2: oklch(0.96 0.01 260 / 50%);
+  --link: oklch(0.5638 0.1198 247.89);
 }
 
 .dark {
@@ -74,6 +75,7 @@
   --sidebar-ring: oklch(0.551 0.027 264.364);
   --upgrade-bg-1: oklch(0.88 0.02 260 / 20%);
   --upgrade-bg-2: oklch(0.96 0.01 260 / 10%);
+  --link: oklch(0.8008 0.0899 249.49);
 }
 
 @theme inline {
@@ -570,11 +572,12 @@ button {
 }
 
 .wiki-link {
-  color: var(--primary);
-  text-decoration: underline;
+  color: var(--link);
   text-underline-offset: 2px;
+  transition: opacity 0.25s;
 
   &:hover {
     opacity: 0.8;
+    text-decoration: underline;
   }
 }
