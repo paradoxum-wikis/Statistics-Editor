@@ -43,4 +43,3 @@ $FNC-ROFBUG$ = Firerate
 |}
 </div>
 </tabber></div>
-​

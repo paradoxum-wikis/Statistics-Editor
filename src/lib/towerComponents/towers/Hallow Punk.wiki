@@ -24,4 +24,3 @@ $DREF$ = <ref>DPS assumes only one enemy is hit and receives full splash damage,
 | 3 || {{Money|$TP$}} || 180 || 4 || 21 || 7.5 || 6 || 45 || 15 || 12 || 7 || 1 || 84 || $DPS$<ref>$NDPS$ Normal DPS + $BDPS$ Burn DPS.</ref> || {{Money|$CE$}}
 |}
 </div>
-​

@@ -23,4 +23,3 @@ $FNC-ROFBUG$ = Firerate
 | 4 || {{Money|$TP$}} || 35 || 0.6 || 18 || $DPS$ || {{Money|$CE$}}
 |}
 </div>
-​
