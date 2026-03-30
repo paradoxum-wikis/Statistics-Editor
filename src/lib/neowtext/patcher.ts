@@ -300,10 +300,27 @@ function escapeRegExp(string: string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-function serializeExtraTable(table: TableData): string {
+function serializeExtraTable(
+  table: TableData & {
+    cellFormulaTokens?: Record<string, Record<string, string>>;
+  },
+): string {
+  const rowsForSerialization = table.rows.map((row) => ({ ...row }));
+  if (table.cellFormulaTokens) {
+    for (const row of rowsForSerialization) {
+      const level = String(row["Level"] ?? 0);
+      const formulas = table.cellFormulaTokens[level];
+      if (formulas) {
+        for (const [col, token] of Object.entries(formulas)) {
+          row[col] = token;
+        }
+      }
+    }
+  }
   return serializeTable({
     Headers: table.headers,
-    RawRows: table.rows,
+    RawHeaders: table.rawHeaders,
+    RawRows: rowsForSerialization,
     MoneyColumns: table.moneyColumns,
     Name: table.name || "",
   });

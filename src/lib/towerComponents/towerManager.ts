@@ -341,22 +341,30 @@ export default class TowerManager {
             ),
           );
 
+          const cellFormulaTokens: Record<string, Record<string, string>> = {};
+
           return {
             ...extra,
             readOnlyColumns: Array.from(extraReadOnly),
+            cellFormulaTokens,
             rows: extra.rows.map((row) => {
               const resRow = { ...row };
-              const level = Number(resRow["Level"] ?? 0);
+              const level = String(resRow["Level"] ?? 0);
+              cellFormulaTokens[level] ??= {};
               for (const key of extraReadOnly) {
-                const stripped = stripRefs(resRow[key] as string).trim();
+                const originalVal = resRow[key] as string;
+                const stripped = stripRefs(originalVal).trim();
                 const result = resolveToken(
                   stripped,
-                  level,
+                  Number(level),
                   resRow,
                   formulaTokens,
                   isPvp,
                 );
-                if (result !== undefined) resRow[key] = result;
+                if (result !== undefined) {
+                  cellFormulaTokens[level][key] = originalVal;
+                  resRow[key] = result;
+                }
               }
               return resRow;
             }),
