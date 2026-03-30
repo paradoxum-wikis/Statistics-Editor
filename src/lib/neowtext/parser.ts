@@ -7,6 +7,7 @@ export interface TableData {
   rows: Record<string, string | number>[];
   moneyColumns: string[];
   readOnlyColumns: string[];
+  cellFormulaTokens?: Record<string, Record<string, string>>;
 }
 
 export interface ParsedWikitext {

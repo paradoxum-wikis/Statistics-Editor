@@ -232,6 +232,9 @@
     moneyColumns: string[];
     readOnlyColumns: string[];
     skinData: SkinData | null;
+    formulaTokens?: Record<string, string>;
+    cellFormulaTokens?: Record<string, Record<string, string>>;
+    isPvp?: boolean;
   }
 
   function isCellEditable(config: TableConfig, header: string): boolean {
@@ -276,17 +279,16 @@
         }
       }
 
-      const tokens = config.skinData?.cellFormulaTokens?.[String(rowIdx)];
+      const cellTokens =
+        config.skinData?.cellFormulaTokens ?? config.cellFormulaTokens;
+      const fTokens =
+        config.skinData?.formulaTokens ?? config.formulaTokens ?? {};
+      const isPvp = config.skinData?.isPvp ?? config.isPvp ?? false;
+      const tokens = cellTokens?.[String(rowIdx)];
       if (tokens) {
         for (let pass = 0; pass < 2; pass++) {
           for (const [col, tok] of Object.entries(tokens)) {
-            const res = resolveToken(
-              tok,
-              rowIdx,
-              cleanRow,
-              config.skinData!.formulaTokens,
-              config.skinData!.isPvp,
-            );
+            const res = resolveToken(tok, rowIdx, cleanRow, fTokens, isPvp);
             if (res != null) cleanRow[stripRefs(col)] = res;
           }
         }
@@ -502,6 +504,9 @@
                   moneyColumns: extraTable.moneyColumns,
                   readOnlyColumns: extraTable.readOnlyColumns,
                   skinData: null,
+                  cellFormulaTokens: extraTable.cellFormulaTokens,
+                  formulaTokens: activeSkinData.skin.formulaTokens,
+                  isPvp: activeSkinData.skin.isPvp,
                 },
                 false,
               )}
