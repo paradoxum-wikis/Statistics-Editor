@@ -1,34 +1,17 @@
 <var>
 $TP$ = $FNC-TOTALPRICE$
-$0Cost$ = 4200
-$1Cost$ = 3950
-$2Cost$ = 11320
-$3Cost$ = 26650
-$4Cost$ = 65000
-$PVP-0Cost$ = 1500
-$PVP-1Cost$ = 1000
-$PVP-2Cost$ = 3500
-$PVP-3Cost$ = 10000
-$PVP-4Cost$ = 40000
-$2Hidden$ = true
-$0Lead$ = true
-$0Flying$ = true
-$PVP-0Lead$ = true
-$PVP-0Flying$ = true
-$PVP-2Hidden$ = true
-$1Upgrade$ = Soul Forge
-$1UpgradeI$ = File:NecromancerLevel1.png
-$2Upgrade$ = Skull Centrifuge
-$2UpgradeI$ = File:NecromancerLevel2.png
-$3Upgrade$ = Graveward
-$3UpgradeI$ = File:NecromancerLevel3.png
-$4Upgrade$ = Apostle Of Hades
-$4UpgradeI$ = File:NecromancerLevel4.png
+$FNC-COST$ = 4200; 3950; 11320; 26650; 65000
+$FNC-PVP-COST$ = 1500; 1000; 3500; 10000; 40000
+$FNC-DETECTION$ = 2; 4; 0
+$FNC-PVP-DETECTION$ = 2; 0; 0
+$FNC-UPGRADE$ = Soul Forge; Skull Centrifuge; Graveward; Apostle Of Hades
+$FNC-UPGRADEICON$ = File:NecromancerLevel1.png; File:NecromancerLevel2.png; File:NecromancerLevel3.png; File:NecromancerLevel4.png
 $NecDPS$ = Damage / Firerate
 $Nec4DPS$ = (Damage * Max Hits) / Firerate
 $UnitDPS$ = Damage / Firerate
 $ExecDPS$ = (Damage / Tick) / Firerate
 $CE$ = Total Price / DPS
+$FNC-ROFBUG$ = Firerate
 </var>
 <div class="mobile-tabber"><tabber>
 |-|Regular =
@@ -57,7 +40,7 @@ $CE$ = Total Price / DPS
 |{{Money|$TP$}}
 |15
 |N/A
-|1.208
+|1.2
 |23
 |N/A
 |1
@@ -74,7 +57,7 @@ $CE$ = Total Price / DPS
 |{{Money|$TP$}}
 |20
 |N/A
-|1.108
+|1.1
 |23
 |N/A
 |1
@@ -91,7 +74,7 @@ $CE$ = Total Price / DPS
 |{{Money|$TP$}}
 |30
 |N/A
-|1.108
+|1.1
 |26
 |N/A
 |1
@@ -108,7 +91,7 @@ $CE$ = Total Price / DPS
 |{{Money|$TP$}}
 |45
 |N/A
-|0.808
+|0.8
 |28
 |N/A
 |1
@@ -125,7 +108,7 @@ $CE$ = Total Price / DPS
 |{{Money|$TP$}}
 |30
 |500
-|0.408
+|0.4
 |36
 |5
 |3
@@ -174,7 +157,7 @@ $CE$ = Total Price / DPS
 |N/A
 |3.3
 |25
-|0.708
+|0.7
 |N/A
 |6
 |Hidden
@@ -198,7 +181,7 @@ $CE$ = Total Price / DPS
 |15%
 |3.3
 |90
-|0.708
+|0.7
 |N/A
 |6
 |Hidden
@@ -222,7 +205,7 @@ $CE$ = Total Price / DPS
 |25%
 |2
 |75
-|6.008
+|6
 |0.1
 |32
 |Flying, Hidden
