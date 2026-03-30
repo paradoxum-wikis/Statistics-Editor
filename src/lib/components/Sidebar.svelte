@@ -25,8 +25,8 @@
   type SummaryLine = {
     kind: "change" | "grant";
     stat: string;
-    from?: string;
-    to?: string;
+    from?: string | number | null;
+    to?: string | number | null;
     icon?: string;
   };
 
@@ -150,8 +150,8 @@
         lines.push({
           kind: "change",
           stat,
-          from: formatValue(displayFrom),
-          to: formatValue(displayTo),
+          from: displayFrom as string | number | null,
+          to: displayTo as string | number | null,
           icon: ICON_BY_STAT[stat],
         });
       }

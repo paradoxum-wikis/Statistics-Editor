@@ -235,11 +235,11 @@
   }
 
   function isCellEditable(config: TableConfig, header: string): boolean {
+    const clean = stripRefs(header);
     return config.skinData
-      ? !config.skinData.readOnlyAttributes.includes(header) &&
-          (stripRefs(header) !== "Cost" ||
-            config.skinData.locator.hasLocation(header))
-      : !config.readOnlyColumns.includes(header);
+      ? !config.skinData.readOnlyAttributes.includes(clean) &&
+          (clean !== "Cost" || config.skinData.locator.hasLocation(header))
+      : !config.readOnlyColumns.includes(clean);
   }
 
   function commitEdit(
@@ -315,7 +315,7 @@
         {#if config.tableName}
           <tr>
             <th colspan={config.headers.length} class="table-name-header">
-              {config.tableName}
+              {@html renderCellHtml(config.tableName, true)}
             </th>
           </tr>
         {/if}
@@ -327,7 +327,7 @@
                 ? "table-header-sticky px-2"
                 : "table-header whitespace-nowrap"}
             >
-              {stripRefs(header)}
+              {@html renderCellHtml(header, true)}
             </th>
           {/each}
         </tr>

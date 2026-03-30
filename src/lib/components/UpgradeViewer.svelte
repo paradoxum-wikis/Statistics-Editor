@@ -4,13 +4,14 @@
   import Separator from "./smol/Separator.svelte";
   import { cubicOut } from "svelte/easing";
   import TDSWLogo from "$lib/assets/tdswbanner.png";
-  import { stripRefs, formatValue } from "$lib/utils/format";
+  import { stripRefs } from "$lib/utils/format";
+  import { renderCellHtml } from "$lib/neowtext/render";
 
   type SummaryLine = {
     kind: "change" | "grant";
     stat: string;
-    from?: string;
-    to?: string;
+    from?: string | number | null;
+    to?: string | number | null;
     icon?: string;
   };
 
@@ -82,7 +83,7 @@
 
           {#if upgradeNames[index]}
             <div class="upgrade-name">
-              {stripRefs(upgradeNames[index])}
+              {@html renderCellHtml(upgradeNames[index], true)}
             </div>
           {/if}
 
@@ -107,11 +108,12 @@
 
                     <span class="upgrade-summary-text">
                       {#if line.kind === "change"}
-                        {stripRefs(line.stat)}: {formatValue(line.from)} → {formatValue(
-                          line.to,
-                        )}
+                        {@html renderCellHtml(line.stat, true)}: {@html renderCellHtml(
+                          line.from,
+                          false,
+                        )} → {@html renderCellHtml(line.to)}
                       {:else}
-                        {stripRefs(line.stat)}
+                        {@html renderCellHtml(line.stat, true)}
                       {/if}
                     </span>
                   </div>

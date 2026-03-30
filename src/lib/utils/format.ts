@@ -63,7 +63,8 @@ export function applyROFBug(seconds: number): number {
     Math.abs(raw_frames - Math.round(raw_frames)) < 1e-9
       ? Math.round(raw_frames) + 1.5
       : Math.ceil(raw_frames) + 1;
-  return frames / 60;
+  // return frames / 60; // look into this later
+  return Math.round((frames / 60) * 1000) / 1000;
 }
 
 /**
