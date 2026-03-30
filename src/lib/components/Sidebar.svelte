@@ -9,7 +9,7 @@
     import { untrack } from "svelte";
     import { SvelteMap } from "svelte/reactivity";
     import { settingsStore } from "$lib/stores/settings.svelte";
-    import { formatValue } from "$lib/utils/format";
+    import { formatValue, applyROFBug, toDisplayNumber } from "$lib/utils/format";
 
     import Separator from "./smol/Separator.svelte";
     import {
@@ -105,6 +105,13 @@
                 ? skin.headers
                 : skin.levels.attributes ?? [];
 
+        const rofCols = new Set(
+            (skin?.formulaTokens?.["$FNC-ROFBUG$"] ?? "")
+                .split(";")
+                .map((s: string) => s.trim())
+                .filter(Boolean),
+        );
+
         for (
             let upgradeIndex = 0;
             upgradeIndex < levels.length - 1;
@@ -121,8 +128,28 @@
                 const fromVal = skin.levels.getCell(fromLevel, stat);
                 const toVal = skin.levels.getCell(toLevel, stat);
 
-                const fromNorm = normalizeForCompare(fromVal);
-                const toNorm = normalizeForCompare(toVal);
+                let cmpFrom: unknown = fromVal;
+                let cmpTo: unknown = toVal;
+                let displayFrom: unknown = fromVal;
+                let displayTo: unknown = toVal;
+
+                if (settingsStore.rofBug && rofCols.has(stat)) {
+                    const fnum = toDisplayNumber(fromVal);
+                    const tnum = toDisplayNumber(toVal);
+                    if (fnum !== null) {
+                        const adj = applyROFBug(fnum);
+                        cmpFrom = adj;
+                        displayFrom = adj;
+                    }
+                    if (tnum !== null) {
+                        const adj = applyROFBug(tnum);
+                        cmpTo = adj;
+                        displayTo = adj;
+                    }
+                }
+
+                const fromNorm = normalizeForCompare(cmpFrom);
+                const toNorm = normalizeForCompare(cmpTo);
 
                 if (fromNorm === toNorm) continue;
                 if (!toNorm && !fromNorm) continue;
@@ -130,8 +157,8 @@
                 lines.push({
                     kind: "change",
                     stat,
-                    from: formatValue(fromVal),
-                    to: formatValue(toVal),
+                    from: formatValue(displayFrom),
+                    to: formatValue(displayTo),
                     icon: ICON_BY_STAT[stat],
                 });
             }
@@ -156,6 +183,7 @@
 
     $effect(() => {
         imageLoader.setDebugMode(settingsStore.debugMode);
+        settingsStore.rofBug;
         towerStore.effectiveWikitext;
 
         const tower = towerStore.selectedData;

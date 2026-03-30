@@ -4,7 +4,7 @@
     import Separator from "./smol/Separator.svelte";
     import { cubicOut } from "svelte/easing";
     import TDSWLogo from "$lib/assets/tdswbanner.png";
-    import { stripRefs, formatReadOnly, parseNumeric } from "$lib/utils/format";
+    import { stripRefs, formatValue } from "$lib/utils/format";
 
     type SummaryLine = {
         kind: "change" | "grant";
@@ -39,7 +39,7 @@
 <div class="mb-3 px-2">
 	<a href="https://tds.fandom.com/wiki/" target="_blank" rel="noopener" class="animate-in fade-in">
 	    <img
-	        src="{TDSWLogo}"
+	        src={TDSWLogo}
 	        alt="TDS Wiki Logo"
 	        class="w-full max-h-14 object-contain drop-shadow-sm transition-transform duration-150 ease-out hover:scale-115"
 	    />
@@ -107,7 +107,7 @@
 
                                         <span class="upgrade-summary-text">
                                             {#if line.kind === "change"}
-                                                {stripRefs(line.stat)}: {formatReadOnly(line.from)} → {formatReadOnly(line.to)}
+                                                {stripRefs(line.stat)}: {formatValue(line.from)} → {formatValue(line.to)}
                                             {:else}
                                                 {stripRefs(line.stat)}
                                             {/if}
