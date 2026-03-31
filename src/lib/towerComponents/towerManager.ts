@@ -198,9 +198,7 @@ export default class TowerManager {
           Flying: false,
         };
 
-        const rows = [...tableData.rows].sort(
-          (a, b) => Number(a["Level"]) - Number(b["Level"]),
-        );
+        const rows = [...tableData.rows];
 
         const formulaTokens = Object.fromEntries(
           Object.entries(parsed.variables).filter(
@@ -260,9 +258,11 @@ export default class TowerManager {
         const cellFormulaTokens: Record<string, Record<string, string>> = {};
         let prevPrice = 0;
 
-        for (const row of rows) {
-          const level = Number(row["Level"]);
-          cellFormulaTokens[level] ??= {};
+        for (let rowIdx = 0; rowIdx < rows.length; rowIdx++) {
+          const row = rows[rowIdx];
+          const numericLevel = Number(row["Level"]);
+          const levelKey = String(rowIdx);
+          cellFormulaTokens[levelKey] ??= {};
           const formulaEntries = (Object.entries(row) as [string, unknown][])
             .map(([k, v]): [string, string, string] | null => {
               if (typeof v !== "string") return null;
@@ -276,14 +276,14 @@ export default class TowerManager {
             for (const [key, val, ogVal] of formulaEntries) {
               const result = resolveToken(
                 val,
-                level,
+                Number.isFinite(numericLevel) ? numericLevel : rowIdx,
                 row,
                 formulaTokens,
                 isPvp,
               );
               if (result !== undefined) {
                 readOnly.add(key);
-                cellFormulaTokens[level][key] = ogVal;
+                cellFormulaTokens[levelKey][key] = ogVal;
                 row[key] = result;
               }
             }
@@ -297,23 +297,31 @@ export default class TowerManager {
 
           const detections: Record<string, boolean> = {};
           for (const type of ["Hidden", "Lead", "Flying"]) {
-            if (level === detLvls[type as keyof typeof detLvls]) {
+            if (
+              Number.isFinite(numericLevel) &&
+              numericLevel === detLvls[type as keyof typeof detLvls]
+            ) {
               if (this.debug())
                 console.log(
-                  `[TowerManager] Found detection var ${type} at level ${level}`,
+                  `[TowerManager] Found detection var ${type} at level ${numericLevel}`,
                 );
               curDetections[type] = true;
             }
             if (curDetections[type]) detections[type] = true;
           }
 
-          if (level === 0) {
+          if (Number.isFinite(numericLevel) && numericLevel === 0) {
             Object.assign(defaults, row, { Price: totalPrice });
             if (Object.keys(detections).length)
               defaults.Detections = detections;
             prevPrice = totalPrice;
           } else {
-            const parsedCost = Number(costs[level]?.replace(/[^0-9.-]+/g, ""));
+            const parsedCost = Number(
+              costs[Number.isFinite(numericLevel) ? numericLevel : 0]?.replace(
+                /[^0-9.-]+/g,
+                "",
+              ),
+            );
             const cost = !isNaN(parsedCost)
               ? parsedCost
               : totalPrice - prevPrice;
@@ -322,8 +330,12 @@ export default class TowerManager {
             const upgrade: any = { Cost: cost, Stats: row };
             if (Object.keys(detections).length)
               upgrade.Stats.Detections = detections;
-            if (upgs[level - 1]) upgrade.Title = upgs[level - 1];
-            if (icons[level - 1]) upgrade.Image = icons[level - 1];
+            const upgIndex = Number.isFinite(numericLevel)
+              ? numericLevel - 1
+              : -1;
+            if (upgIndex >= 0 && upgs[upgIndex]) upgrade.Title = upgs[upgIndex];
+            if (upgIndex >= 0 && icons[upgIndex])
+              upgrade.Image = icons[upgIndex];
 
             upgrades.push(upgrade);
           }
@@ -347,22 +359,23 @@ export default class TowerManager {
             ...extra,
             readOnlyColumns: Array.from(extraReadOnly),
             cellFormulaTokens,
-            rows: extra.rows.map((row) => {
+            rows: extra.rows.map((row, extraIdx) => {
               const resRow = { ...row };
-              const level = String(resRow["Level"] ?? 0);
-              cellFormulaTokens[level] ??= {};
+              const levelKey = String(extraIdx);
+              cellFormulaTokens[levelKey] ??= {};
+              const numericLevel = Number(resRow["Level"]);
               for (const key of extraReadOnly) {
                 const originalVal = resRow[key] as string;
                 const stripped = stripRefs(originalVal).trim();
                 const result = resolveToken(
                   stripped,
-                  Number(level),
+                  Number.isFinite(numericLevel) ? numericLevel : extraIdx,
                   resRow,
                   formulaTokens,
                   isPvp,
                 );
                 if (result !== undefined) {
-                  cellFormulaTokens[level][key] = originalVal;
+                  cellFormulaTokens[levelKey][key] = originalVal;
                   resRow[key] = result;
                 }
               }
