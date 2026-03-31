@@ -7,7 +7,7 @@
       "dependencies": {
         "@lucide/svelte": "^1.7.0",
         "mediawiki-file-url": "^0.3.1",
-        "wikistxr": "^0.1.1",
+        "wikistxr": "^0.1.4",
       },
       "devDependencies": {
         "@internationalized/date": "^3.12.0",
@@ -278,7 +278,7 @@
 
     "vitefu": ["vitefu@1.1.2", "", { "peerDependencies": { "vite": "^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-beta.0" }, "optionalPeers": ["vite"] }, "sha512-zpKATdUbzbsycPFBN71nS2uzBUQiVnFoOrr2rvqv34S1lcAgMKKkjWleLGeiJlZ8lwCXvtWaRn7R3ZC16SYRuw=="],
 
-    "wikistxr": ["wikistxr@0.1.1", "", {}, "sha512-nIUufQ+YcMU4JIENMogccgvgi7QmtZij3u58exxE8Ab57Xco/s+hkcow6Xs1WnmPjOv2X7GIbKLShguyS+FldQ=="],
+    "wikistxr": ["wikistxr@0.1.4", "", {}, "sha512-FdmJg6BppwoGmY6dqipc35XVDL4GXp+wa5l5lqnrVLXddqqv3iQnaUWbDmeIsFRqu5LhWg5ljtV3Fls/CwSfQA=="],
 
     "zimmerframe": ["zimmerframe@1.1.4", "", {}, "sha512-B58NGBEoc8Y9MWWCQGl/gq9xBCe4IiKM0a2x7GZdQKOW5Exr8S1W24J6OgM1njK8xCRGvAJIL/MxXHf6SkmQKQ=="],
 
