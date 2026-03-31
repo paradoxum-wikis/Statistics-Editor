@@ -261,8 +261,6 @@
   function buildDisplayRows(
     config: TableConfig,
   ): Record<string, string | number>[] {
-    if (!settingsStore.rofBug || rofCols.size === 0) return config.rows;
-
     return config.rows.map((r, rowIdx) => {
       const keyMap = new Map<string, string>();
       for (const k of Object.keys(r)) keyMap.set(k, stripRefs(k));
@@ -270,7 +268,7 @@
       const cleanRow: Record<string, string | number> = {};
       for (const [k, v] of Object.entries(r)) {
         const ck = keyMap.get(k)!;
-        if (rofCols.has(ck)) {
+        if (settingsStore.rofBug && rofCols.has(ck)) {
           const n = Number(v);
           cleanRow[ck] =
             !isNaN(n) && n !== 0 ? applyROFBug(n) : (v as string | number);
