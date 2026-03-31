@@ -7,44 +7,37 @@ import { serializeTable, serializeVariables } from "./serializer";
  * Replaces <var> blocks and specific skin tables while preserving other content.
  */
 export function patchWikitext(sourceWikitext: string, tower: Tower): string {
-  let text = sourceWikitext;
-
-  const newVariables = buildVariablesMap(tower);
-  text = patchVariableBlock(text, newVariables);
+  let text = patchVariableBlock(sourceWikitext, buildVariablesMap(tower));
 
   for (const skinName of tower.skinNames) {
     const skin = tower.getSkin(skinName);
     if (!skin) continue;
 
-    const rowsForSerialization = skin.rawRows.map((row) => ({ ...row }));
+    const tokens = skin.cellFormulaTokens;
 
-    if (skin.cellFormulaTokens) {
-      for (const row of rowsForSerialization) {
-        const level = String(row["Level"]);
-        const formulas = skin.cellFormulaTokens[level];
-        if (formulas) {
-          for (const [col, token] of Object.entries(formulas)) {
-            row[col] = token;
-          }
-        }
-      }
-    }
+    const rowsForSerialization = tokens
+      ? skin.rawRows.map((row, i) => {
+          const levelKey = row["Level"]?.toString() ?? "";
+          const formulas = tokens[i] ?? (levelKey && tokens[levelKey]);
+          return formulas ? { ...row, ...formulas } : row;
+        })
+      : skin.rawRows;
 
-    const markups: string[] = [
-      serializeTable({
-        Headers: skin.headers,
-        RawHeaders: skin.rawHeaders,
-        RawRows: rowsForSerialization,
-        MoneyColumns: skin.moneyColumns,
-        Name: skin.tableName || "",
-      }),
-    ];
+    const mainTable = serializeTable({
+      Headers: skin.headers,
+      RawHeaders: skin.rawHeaders,
+      RawRows: rowsForSerialization,
+      MoneyColumns: skin.moneyColumns,
+      Name: skin.tableName || "",
+    });
 
-    for (const table of skin.extraTables ?? []) {
-      markups.push(serializeExtraTable(table));
-    }
-
-    text = patchSkinTable(text, skinName, markups.join("\n"), tower.skinNames);
+    const extraTables = skin.extraTables?.map(serializeExtraTable).join("\n");
+    text = patchSkinTable(
+      text,
+      skinName,
+      extraTables ? `${mainTable}\n${extraTables}` : mainTable,
+      tower.skinNames,
+    );
   }
 
   return text;
@@ -305,22 +298,28 @@ function serializeExtraTable(
     cellFormulaTokens?: Record<string, Record<string, string>>;
   },
 ): string {
-  const rowsForSerialization = table.rows.map((row) => ({ ...row }));
-  if (table.cellFormulaTokens) {
-    for (const row of rowsForSerialization) {
-      const level = String(row["Level"] ?? 0);
-      const formulas = table.cellFormulaTokens[level];
-      if (formulas) {
-        for (const [col, token] of Object.entries(formulas)) {
-          row[col] = token;
-        }
-      }
-    }
+  const tokens = table.cellFormulaTokens;
+
+  if (!tokens) {
+    return serializeTable({
+      Headers: table.headers,
+      RawHeaders: table.rawHeaders,
+      RawRows: table.rows,
+      MoneyColumns: table.moneyColumns,
+      Name: table.name || "",
+    });
   }
+
+  const rows = table.rows.map((row, i) => {
+    const levelKey = row["Level"]?.toString() ?? "";
+    const formulas = tokens[i] ?? (levelKey && tokens[levelKey]);
+    return formulas ? { ...row, ...formulas } : row;
+  });
+
   return serializeTable({
     Headers: table.headers,
     RawHeaders: table.rawHeaders,
-    RawRows: rowsForSerialization,
+    RawRows: rows,
     MoneyColumns: table.moneyColumns,
     Name: table.name || "",
   });
