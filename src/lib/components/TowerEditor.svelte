@@ -80,45 +80,27 @@
     return (inv ? delta < 0 : delta > 0) ? "text-green-500" : "text-red-500";
   }
 
-  function baselineCellKey(
-    skinName: string,
-    levelIndex: number,
-    header: string,
-  ): string {
-    return `${skinName}:${levelIndex}:${header}`;
-  }
-
   function getDeltaForCell(
-    skinData: SkinData,
+    currentValue: unknown,
     skinName: string,
+    tableIdx: number,
     levelIndex: number,
     header: string,
   ): { delta: number | null; className: string } {
     const baseN = toDisplayNumber(
-      towerStore.baseline[baselineCellKey(skinName, levelIndex, header)],
+      towerStore.baseline[mkCellKey(skinName, tableIdx, levelIndex, header)],
     );
-    const currentN = toDisplayNumber(
-      skinData.levels.getCell(levelIndex, header),
-    );
+    const currentN = toDisplayNumber(currentValue);
+
     if (baseN == null || currentN == null)
       return { delta: null, className: "" };
+
     const delta = currentN - baseN;
     return {
       delta: Math.abs(delta) < 1e-9 ? 0 : delta,
       className: computeDeltaClass(header, delta),
     };
   }
-
-  $effect(() => {
-    if (
-      tower &&
-      !availableSkins.includes(untrack(() => towerStore.selectedSkinName))
-    ) {
-      towerStore.selectedSkinName = availableSkins.includes("Regular")
-        ? "Regular"
-        : (availableSkins[0] ?? "");
-    }
-  });
 
   function rebuildBaselineForSkin(t: Tower, skinName: string) {
     if (settingsStore.debugMode) {
@@ -138,9 +120,21 @@
 
     for (let i = 0; i < levels.length; i++) {
       for (const header of headers) {
-        next[baselineCellKey(skinName, i, header)] =
+        next[mkCellKey(skinName, 0, i, header)] =
           header === "Level" ? i : skinData.levels.getCell(i, header);
       }
+    }
+
+    if (skinData.extraTables) {
+      skinData.extraTables.forEach((extTable, idx) => {
+        const tableIdx = idx + 1;
+        for (let i = 0; i < extTable.rows.length; i++) {
+          for (const header of extTable.headers) {
+            next[mkCellKey(skinName, tableIdx, i, header)] =
+              header === "Level" ? i : extTable.rows[i][header];
+          }
+        }
+      });
     }
 
     towerStore.baseline = next;
@@ -342,15 +336,15 @@
                 </td>
               {:else}
                 {@const editable = isCellEditable(config, header)}
-                {@const deltaInfo =
-                  config.skinData && settingsStore.seeValueDifference
-                    ? getDeltaForCell(
-                        config.skinData,
-                        config.skinName,
-                        rowIdx,
-                        header,
-                      )
-                    : { delta: null, className: "" }}
+                {@const deltaInfo = settingsStore.seeValueDifference
+                  ? getDeltaForCell(
+                      config.rows[rowIdx]?.[header],
+                      config.skinName,
+                      config.tableIdx,
+                      rowIdx,
+                      header,
+                    )
+                  : { delta: null, className: "" }}
                 {@const isMoney = config.moneyColumns.includes(header)}
                 {@const ck = mkCellKey(
                   config.skinName,
