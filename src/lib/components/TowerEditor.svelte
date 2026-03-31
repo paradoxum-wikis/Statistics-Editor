@@ -81,7 +81,7 @@
   }
 
   function getDeltaForCell(
-    currentValue: unknown,
+    currentValue: string | number | undefined,
     skinName: string,
     tableIdx: number,
     levelIndex: number,
@@ -115,7 +115,7 @@
       skinData.headers.length > 0
         ? skinData.headers
         : skinData.levels.attributes;
-    const next: Record<string, unknown> = {};
+    const next: Record<string, string | number | boolean> = {};
     const { levels } = skinData.levels;
 
     for (let i = 0; i < levels.length; i++) {
@@ -168,7 +168,7 @@
     value: string,
   ) {
     if (!skinData || disabled) return;
-    let parsedValue: unknown = value;
+    let parsedValue: string | number | boolean = value;
     if (value === "true") parsedValue = true;
     else if (value === "false") parsedValue = false;
     else if (value.trim() !== "" && !isNaN(Number(value)))
