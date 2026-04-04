@@ -1,4 +1,4 @@
-import { applyROFBug, stripRefs, getROFVer } from "$lib/utils/format";
+import { applyRofBug, stripRefs } from "$lib/utils/format";
 
 export interface TableData {
   name: string;
@@ -224,34 +224,4 @@ function parseTable(
     moneyColumns: Array.from(moneyColumns),
     readOnlyColumns: [],
   };
-}
-
-export function applyROFBugToTabs(
-  tabs: Record<string, TableData[]>,
-  variables: Record<string, string>,
-): Record<string, TableData[]> {
-  const rofInfo = getROFVer(variables);
-  if (rofInfo.cols.length === 0) return tabs;
-
-  return Object.fromEntries(
-    Object.entries(tabs).map(([tab, tables]) => [
-      tab,
-      tables.map((t) => ({
-        ...t,
-        rows: t.rows.map((row) => {
-          let r: Record<string, string | number> | null = null;
-          for (const col of Object.keys(row)) {
-            if (rofInfo.cols.includes(stripRefs(col))) {
-              const n = Number(row[col]);
-              if (!isNaN(n) && n !== 0) {
-                if (!r) r = { ...row };
-                r[col] = applyROFBug(n, rofInfo.type);
-              }
-            }
-          }
-          return r ?? row;
-        }),
-      })),
-    ]),
-  );
 }

@@ -115,7 +115,7 @@
 
         <div class="settings-item">
           <div class="settings-label-group">
-            <label for="rof-bug" class="settings-label"> ROF Bug </label>
+            <label for="rof-bug" class="settings-label">ROF Bug</label>
             <p class="settings-help-text">
               Calculate statistics with the infamous Rate of Fire bug.
             </p>

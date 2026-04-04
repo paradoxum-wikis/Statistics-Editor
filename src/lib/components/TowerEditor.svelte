@@ -12,10 +12,10 @@
   import {
     formatNumber,
     formatValue,
-    applyROFBug,
+    applyRofBug,
     stripRefs,
     toDisplayNumber,
-    getROFVer,
+    getRofBugVer,
   } from "$lib/utils/format";
   import { renderCellHtml } from "$lib/neowtext/render";
   import { resolveToken } from "$lib/neowtext/functions";
@@ -47,7 +47,7 @@
 
   let rofInfo = $derived.by(() => {
     const tokens = tower?.getSkin(selectedSkinName)?.formulaTokens;
-    const info = getROFVer(tokens);
+    const info = getRofBugVer(tokens);
     return {
       type: info.type,
       cols: new Set(info.cols),
@@ -267,7 +267,7 @@
           const n = Number(v);
           cleanRow[ck] =
             !isNaN(n) && n !== 0
-              ? applyROFBug(n, rofInfo.type)
+              ? applyRofBug(n, rofInfo.type)
               : (v as string | number);
         } else {
           cleanRow[ck] = v as string | number;
