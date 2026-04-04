@@ -61,6 +61,33 @@ export const ROF_KEYS = [
 ];
 
 /**
+ * Returns the Rate of Fire Bug version and columns from the given tokens.
+ */
+export function getROFVer(tokens: Record<string, string> | undefined | null) {
+  let type = "$FNC-ROFBUG2022$";
+  let colsStr = "";
+
+  if (tokens) {
+    for (const key of Object.keys(tokens)) {
+      if (ROF_KEYS.includes(key)) {
+        colsStr = tokens[key];
+        type = key;
+      }
+    }
+  }
+
+  return {
+    type,
+    cols: colsStr
+      ? colsStr
+          .split(";")
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : [],
+  };
+}
+
+/**
  * Formats with ROF bug into account
  */
 export function applyROFBug(

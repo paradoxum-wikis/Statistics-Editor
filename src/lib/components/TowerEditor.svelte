@@ -15,7 +15,7 @@
     applyROFBug,
     stripRefs,
     toDisplayNumber,
-    ROF_KEYS,
+    getROFVer,
   } from "$lib/utils/format";
   import { renderCellHtml } from "$lib/neowtext/render";
   import { resolveToken } from "$lib/neowtext/functions";
@@ -46,25 +46,11 @@
   });
 
   let rofInfo = $derived.by(() => {
-    let type = "$FNC-ROFBUG2022$";
-    let colsStr = "";
     const tokens = tower?.getSkin(selectedSkinName)?.formulaTokens;
-    if (tokens) {
-      for (const key of Object.keys(tokens)) {
-        if (ROF_KEYS.includes(key)) {
-          colsStr = tokens[key];
-          type = key;
-        }
-      }
-    }
+    const info = getROFVer(tokens);
     return {
-      type,
-      cols: new Set(
-        colsStr
-          .split(";")
-          .map((s: string) => s.trim())
-          .filter(Boolean),
-      ),
+      type: info.type,
+      cols: new Set(info.cols),
     };
   });
 

@@ -9,12 +9,7 @@
   import { untrack } from "svelte";
   import { SvelteMap } from "svelte/reactivity";
   import { settingsStore } from "$lib/stores/settings.svelte";
-  import {
-    formatValue,
-    applyROFBug,
-    toDisplayNumber,
-    ROF_KEYS,
-  } from "$lib/utils/format";
+  import { applyROFBug, toDisplayNumber, getROFVer } from "$lib/utils/format";
 
   import Separator from "./smol/Separator.svelte";
   import { House, Settings, Sun, Moon, SunMoon, Check } from "@lucide/svelte";
@@ -103,23 +98,8 @@
         ? skin.headers
         : (skin.levels.attributes ?? []);
 
-    let rofType = "$FNC-ROFBUG2022$";
-    let rofColsStr = "";
-    if (skin?.formulaTokens) {
-      for (const key of Object.keys(skin.formulaTokens)) {
-        if (ROF_KEYS.includes(key)) {
-          rofColsStr = skin.formulaTokens[key];
-          rofType = key;
-        }
-      }
-    }
-
-    const rofCols = new Set(
-      rofColsStr
-        .split(";")
-        .map((s: string) => s.trim())
-        .filter(Boolean),
-    );
+    const rofInfo = getROFVer(skin?.formulaTokens);
+    const rofCols = new Set(rofInfo.cols);
 
     for (
       let upgradeIndex = 0;
@@ -146,13 +126,13 @@
           const fnum = toDisplayNumber(fromVal);
           const tnum = toDisplayNumber(toVal);
           if (fnum !== null) {
-            const adj = applyROFBug(fnum, rofType);
+            const adj = applyROFBug(fnum, rofInfo.type);
             cmpFrom = adj;
             displayFrom = adj;
           }
 
           if (tnum !== null) {
-            const adj = applyROFBug(tnum, rofType);
+            const adj = applyROFBug(tnum, rofInfo.type);
             cmpTo = adj;
             displayTo = adj;
           }
