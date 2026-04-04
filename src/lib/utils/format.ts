@@ -53,11 +53,30 @@ export function formatValue(v: unknown): string {
   return JSON.stringify(v);
 }
 
+export const ROF_KEYS = [
+  "$FNC-ROFBUG2019$",
+  "$FNC-ROFBUG2020$",
+  "$FNC-ROFBUG2022$",
+  "$FNC-ROFBUG$",
+];
+
 /**
  * Formats with ROF bug into account
  */
-export function applyROFBug(seconds: number): number {
+export function applyROFBug(
+  seconds: number,
+  type: string = "FNC-ROFBUG2022",
+): number {
   if (isNaN(seconds) || seconds <= 0) return seconds;
+
+  if (type === "$FNC-ROFBUG2019$" || type === "FNC-ROFBUG2019") {
+    return Math.round((seconds + 0.05) * 1000) / 1000;
+  }
+
+  if (type === "$FNC-ROFBUG2020$" || type === "FNC-ROFBUG2020") {
+    return Math.round((seconds + 0.03) * 1000) / 1000;
+  }
+
   const raw_frames = seconds * 60;
   const frames =
     Math.abs(raw_frames - Math.round(raw_frames)) < 1e-9

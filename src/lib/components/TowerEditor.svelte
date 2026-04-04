@@ -15,6 +15,7 @@
     applyROFBug,
     stripRefs,
     toDisplayNumber,
+    ROF_KEYS,
   } from "$lib/utils/format";
   import { renderCellHtml } from "$lib/neowtext/render";
   import { resolveToken } from "$lib/neowtext/functions";
@@ -44,14 +45,28 @@
     };
   });
 
-  const rofCols = $derived(
-    new Set(
-      (tower?.getSkin(selectedSkinName)?.formulaTokens?.["$FNC-ROFBUG$"] ?? "")
-        .split(";")
-        .map((s: string) => s.trim())
-        .filter(Boolean),
-    ),
-  );
+  let rofInfo = $derived.by(() => {
+    let type = "$FNC-ROFBUG2022$";
+    let colsStr = "";
+    const tokens = tower?.getSkin(selectedSkinName)?.formulaTokens;
+    if (tokens) {
+      for (const key of Object.keys(tokens)) {
+        if (ROF_KEYS.includes(key)) {
+          colsStr = tokens[key];
+          type = key;
+        }
+      }
+    }
+    return {
+      type,
+      cols: new Set(
+        colsStr
+          .split(";")
+          .map((s: string) => s.trim())
+          .filter(Boolean),
+      ),
+    };
+  });
 
   let focusedCell = $state<string | null>(null);
 
@@ -262,10 +277,12 @@
       const cleanRow: Record<string, string | number> = {};
       for (const [k, v] of Object.entries(r)) {
         const ck = keyMap.get(k)!;
-        if (settingsStore.rofBug && rofCols.has(ck)) {
+        if (settingsStore.rofBug && rofInfo.cols.has(ck)) {
           const n = Number(v);
           cleanRow[ck] =
-            !isNaN(n) && n !== 0 ? applyROFBug(n) : (v as string | number);
+            !isNaN(n) && n !== 0
+              ? applyROFBug(n, rofInfo.type)
+              : (v as string | number);
         } else {
           cleanRow[ck] = v as string | number;
         }

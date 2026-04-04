@@ -9,7 +9,12 @@
   import { untrack } from "svelte";
   import { SvelteMap } from "svelte/reactivity";
   import { settingsStore } from "$lib/stores/settings.svelte";
-  import { formatValue, applyROFBug, toDisplayNumber } from "$lib/utils/format";
+  import {
+    formatValue,
+    applyROFBug,
+    toDisplayNumber,
+    ROF_KEYS,
+  } from "$lib/utils/format";
 
   import Separator from "./smol/Separator.svelte";
   import { House, Settings, Sun, Moon, SunMoon, Check } from "@lucide/svelte";
@@ -98,8 +103,19 @@
         ? skin.headers
         : (skin.levels.attributes ?? []);
 
+    let rofType = "$FNC-ROFBUG2022$";
+    let rofColsStr = "";
+    if (skin?.formulaTokens) {
+      for (const key of Object.keys(skin.formulaTokens)) {
+        if (ROF_KEYS.includes(key)) {
+          rofColsStr = skin.formulaTokens[key];
+          rofType = key;
+        }
+      }
+    }
+
     const rofCols = new Set(
-      (skin?.formulaTokens?.["$FNC-ROFBUG$"] ?? "")
+      rofColsStr
         .split(";")
         .map((s: string) => s.trim())
         .filter(Boolean),
@@ -130,12 +146,13 @@
           const fnum = toDisplayNumber(fromVal);
           const tnum = toDisplayNumber(toVal);
           if (fnum !== null) {
-            const adj = applyROFBug(fnum);
+            const adj = applyROFBug(fnum, rofType);
             cmpFrom = adj;
             displayFrom = adj;
           }
+
           if (tnum !== null) {
-            const adj = applyROFBug(tnum);
+            const adj = applyROFBug(tnum, rofType);
             cmpTo = adj;
             displayTo = adj;
           }

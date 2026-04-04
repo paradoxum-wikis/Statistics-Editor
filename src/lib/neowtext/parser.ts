@@ -1,4 +1,4 @@
-import { applyROFBug, stripRefs } from "$lib/utils/format";
+import { applyROFBug, stripRefs, ROF_KEYS } from "$lib/utils/format";
 
 export interface TableData {
   name: string;
@@ -230,7 +230,16 @@ export function applyROFBugToTabs(
   tabs: Record<string, TableData[]>,
   variables: Record<string, string>,
 ): Record<string, TableData[]> {
-  const cols = variables["$FNC-ROFBUG$"]?.split(";").map((s) => s.trim());
+  let cols: string[] | undefined;
+  let type: string = "FNC-ROFBUG2022";
+
+  for (const key of Object.keys(variables)) {
+    if (ROF_KEYS.includes(key)) {
+      cols = variables[key].split(";").map((s) => s.trim());
+      type = key;
+    }
+  }
+
   if (!cols) return tabs;
 
   return Object.fromEntries(
@@ -241,11 +250,11 @@ export function applyROFBugToTabs(
         rows: t.rows.map((row) => {
           let r: Record<string, string | number> | null = null;
           for (const col of Object.keys(row)) {
-            if (cols.includes(stripRefs(col))) {
+            if (cols!.includes(stripRefs(col))) {
               const n = Number(row[col]);
               if (!isNaN(n) && n !== 0) {
                 if (!r) r = { ...row };
-                r[col] = applyROFBug(n);
+                r[col] = applyROFBug(n, type);
               }
             }
           }
