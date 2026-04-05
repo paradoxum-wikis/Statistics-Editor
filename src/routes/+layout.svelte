@@ -1,7 +1,13 @@
 <script>
+  import { onMount } from "svelte";
+  import { analytics } from "$lib/services/analytics";
   import "./layout.css";
 
   let { children } = $props();
+
+  onMount(() => {
+    analytics.init();
+  });
 </script>
 
 <svelte:head>
