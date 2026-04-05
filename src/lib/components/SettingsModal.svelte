@@ -39,7 +39,7 @@
         </Dialog.Description>
       </div>
 
-      <Tabs.Root value="appearance">
+      <Tabs.Root value="editor">
         <Tabs.List class="settings-tabs-list">
           <Tabs.Trigger value="editor" class="settings-tab-trigger"
             >Editor</Tabs.Trigger
