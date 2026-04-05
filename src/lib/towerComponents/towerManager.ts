@@ -1,5 +1,5 @@
 import Tower from "./tower";
-import { towerNames } from "./towers";
+import { towerNames, fetchTowerWiki } from "./towers";
 import { resolveToken } from "$lib/neowtext/functions";
 import { parseWikitext, type TableData } from "$lib/neowtext/parser";
 import { patchWikitext } from "$lib/neowtext/patcher";
@@ -147,6 +147,22 @@ export default class TowerManager {
 
     try {
       const loadBase = async () => {
+        try {
+          const wikiText = await fetchTowerWiki(name);
+          if (wikiText) {
+            if (this.debug())
+              console.log(
+                `[TowerManager] Fetched wikitext from TDS Wiki for ${name}`,
+              );
+            return wikiText;
+          }
+        } catch (err) {
+          console.warn(
+            `[TowerManager] Failed to fetch from TDS Wiki for ${name}:`,
+            err,
+          );
+        }
+
         try {
           const url = new URL(`./towers/${name}.wiki`, import.meta.url).href;
           if (this.debug())
