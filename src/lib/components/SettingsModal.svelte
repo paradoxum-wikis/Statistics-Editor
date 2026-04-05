@@ -35,11 +35,11 @@
       <div class="settings-header">
         <Dialog.Title class="settings-title">Settings</Dialog.Title>
         <Dialog.Description class="settings-description">
-          Manage your application preferences.
+          Please change them to your heart's content.
         </Dialog.Description>
       </div>
 
-      <Tabs.Root value="appearance" class="mt-4">
+      <Tabs.Root value="appearance">
         <Tabs.List class="settings-tabs-list">
           <Tabs.Trigger value="editor" class="settings-tab-trigger"
             >Editor</Tabs.Trigger
