@@ -154,6 +154,7 @@ export default class TowerManager {
               console.log(
                 `[TowerManager] Fetched wikitext from TDS Wiki for ${name}`,
               );
+            setWikiOverride(this.dataKey ?? "Default", name, wikiText);
             return wikiText;
           }
         } catch (err) {
