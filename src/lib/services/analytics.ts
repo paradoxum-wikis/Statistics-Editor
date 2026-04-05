@@ -10,11 +10,9 @@ export class AnalyticsService {
   public async init() {
     if (typeof window === "undefined" || this.initialized) return;
     this.initialized = true;
-
     this.setupGtag();
 
     const storedConsent = localStorage.getItem(this.consentKey);
-
     if (storedConsent === null) {
       this.setConsent(true);
     } else {
@@ -30,12 +28,8 @@ export class AnalyticsService {
       (window as any).dataLayer.push(arguments);
     };
 
-    // Default consent to granted
     (window as any).gtag("consent", "default", {
       analytics_storage: "granted",
-      ad_storage: "granted",
-      ad_user_data: "granted",
-      ad_personalization: "granted",
     });
 
     const script = document.createElement("script");
@@ -45,9 +39,9 @@ export class AnalyticsService {
 
     (window as any).gtag("js", new Date());
     (window as any).gtag("config", this.trackingId, {
-      anonymize_ip: true,
       allow_google_signals: false,
       allow_ad_personalization_signals: false,
+      cookie_expires: 0,
     });
   }
 
@@ -55,9 +49,6 @@ export class AnalyticsService {
     if (typeof (window as any).gtag === "function") {
       (window as any).gtag("consent", "update", {
         analytics_storage: granted ? "granted" : "denied",
-        ad_storage: granted ? "granted" : "denied",
-        ad_user_data: granted ? "granted" : "denied",
-        ad_personalization: granted ? "granted" : "denied",
       });
     }
   }
@@ -65,7 +56,6 @@ export class AnalyticsService {
   public setConsent(granted: boolean) {
     localStorage.setItem(this.consentKey, granted ? "true" : "false");
     this.updateConsentMode(granted);
-
     document.dispatchEvent(
       new CustomEvent("analyticsConsentChanged", {
         detail: { granted },
