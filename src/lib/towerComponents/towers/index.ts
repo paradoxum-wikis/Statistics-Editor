@@ -11,8 +11,9 @@ export const noFetchTowers = new Set(["Necromancer"]);
 
 export async function fetchTowerWiki(
   towerName: string,
+  force: boolean = false,
 ): Promise<string | null> {
-  if (noFetchTowers.has(towerName)) return null;
+  if (!force && noFetchTowers.has(towerName)) return null;
 
   try {
     const parseRes = await fetch(

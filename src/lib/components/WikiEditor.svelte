@@ -1,9 +1,11 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import { Popover } from "bits-ui";
   import { towerStore } from "$lib/stores/tower.svelte";
   import { profileStore } from "$lib/stores/profile.svelte";
   import { settingsStore } from "$lib/stores/settings.svelte";
   import { setWikiOverride } from "$lib/neowtext/wikiSource";
+  import { noFetchTowers } from "$lib/towerComponents/towers/index";
   import { WikitextEditor } from "wikistxr";
 
   let {
@@ -103,6 +105,32 @@
     }
   }
 
+  let isFetching = $state(false);
+
+  async function handleFetchWiki() {
+    if (!towerName) return;
+
+    isFetching = true;
+    try {
+      const { fetchTowerWiki } =
+        await import("$lib/towerComponents/towers/index");
+      const { setWikiOverride } = await import("$lib/neowtext/wikiSource");
+      const wikitext = await fetchTowerWiki(towerName, true);
+      if (wikitext) {
+        setWikiOverride(profileStore.current, towerName, wikitext);
+        towerStore.isDirty = false;
+        await towerStore.forceReload();
+      } else {
+        alert("Failed to fetch wikitext from the Wiki.");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Error fetching from Wiki.");
+    } finally {
+      isFetching = false;
+    }
+  }
+
   function discardChanges() {
     if (!towerStore.isDirty) return;
 
@@ -182,6 +210,34 @@
     </div>
 
     <div class="wiki-actions-group">
+      {#if !noFetchTowers.has(towerName)}
+        <Popover.Root>
+          <Popover.Trigger
+            class="btn btn-secondary btn-sm"
+            disabled={isFetching || status === "saving"}
+            title="Fetch latest wikitext from the Wiki"
+          >
+            {isFetching ? "Fetching..." : "Fetch Latest Data"}
+          </Popover.Trigger>
+          <Popover.Content class="popover-content">
+            <div class="space-y-2">
+              <h4 class="font-medium leading-none">Confirm Fetch</h4>
+              <p class="text-sm text-muted-foreground">
+                Are you sure you want to replace your current data with the
+                latest from Tower Defense Simulator Wiki? This will overwrite
+                your local changes.
+              </p>
+            </div>
+            <div class="flex justify-end mt-4 gap-2">
+              <Popover.Close class="btn btn-outline">Cancel</Popover.Close>
+              <Popover.Close class="btn btn-primary" onclick={handleFetchWiki}>
+                Confirm
+              </Popover.Close>
+            </div>
+          </Popover.Content>
+        </Popover.Root>
+      {/if}
+
       <button
         class="btn btn-secondary btn-sm"
         onclick={discardChanges}

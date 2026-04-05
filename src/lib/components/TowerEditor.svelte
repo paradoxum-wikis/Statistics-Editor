@@ -1,11 +1,12 @@
 <script lang="ts">
   import { untrack } from "svelte";
-  import { Tabs } from "bits-ui";
+  import { Tabs, Popover } from "bits-ui";
   import Separator from "./smol/Separator.svelte";
   import type Tower from "$lib/towerComponents/tower";
   import type SkinData from "$lib/towerComponents/skinData";
   import { settingsStore } from "$lib/stores/settings.svelte";
   import { towerStore } from "$lib/stores/tower.svelte";
+  import { noFetchTowers } from "$lib/towerComponents/towers/index";
   import { fly } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
   import MoneyIcon from "$lib/assets/Income.png";
@@ -216,6 +217,33 @@
     towerStore.save();
     if (tower && selectedSkinName)
       rebuildBaselineForSkin(tower, selectedSkinName);
+  }
+
+  let isFetching = $state(false);
+
+  async function handleFetchWiki() {
+    if (!tower) return;
+
+    isFetching = true;
+    try {
+      const { fetchTowerWiki } =
+        await import("$lib/towerComponents/towers/index");
+      const { setWikiOverride } = await import("$lib/neowtext/wikiSource");
+      const { profileStore } = await import("$lib/stores/profile.svelte");
+      const wikitext = await fetchTowerWiki(tower.name, true);
+      if (wikitext) {
+        setWikiOverride(profileStore.current, tower.name, wikitext);
+        towerStore.isDirty = false;
+        await towerStore.forceReload();
+      } else {
+        alert("Failed to fetch wikitext from the Wiki.");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Error fetching from Wiki.");
+    } finally {
+      isFetching = false;
+    }
   }
 
   interface TableConfig {
@@ -517,6 +545,29 @@
 
     <Separator class="mt-4" />
     <div class="flex justify-end gap-2">
+      {#if tower && !noFetchTowers.has(tower.name)}
+        <Popover.Root>
+          <Popover.Trigger class="btn btn-secondary" disabled={isFetching}>
+            {isFetching ? "Fetching..." : "Fetch Latest Data"}
+          </Popover.Trigger>
+          <Popover.Content class="popover-content">
+            <div class="space-y-2">
+              <h4 class="font-medium leading-none">Confirm Fetch</h4>
+              <p class="text-sm text-muted-foreground">
+                Are you sure you want to replace your current data with the
+                latest from Tower Defense Simulator Wiki? This will overwrite
+                your local changes.
+              </p>
+            </div>
+            <div class="flex justify-end mt-4 gap-2">
+              <Popover.Close class="btn btn-outline">Cancel</Popover.Close>
+              <Popover.Close class="btn btn-primary" onclick={handleFetchWiki}>
+                Confirm
+              </Popover.Close>
+            </div>
+          </Popover.Content>
+        </Popover.Root>
+      {/if}
       <button
         class="btn btn-secondary"
         onclick={handleDiscard}
