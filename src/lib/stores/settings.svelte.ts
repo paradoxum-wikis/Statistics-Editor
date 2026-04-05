@@ -27,7 +27,7 @@ const SETTINGS: {
   },
   hideCellWrapper: {
     key: "tdse_hcw",
-    default: false,
+    default: true,
   },
   minTableWidth: {
     key: "tdse_mctw",
