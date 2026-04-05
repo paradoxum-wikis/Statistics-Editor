@@ -399,6 +399,25 @@ button {
   @apply grid gap-4 py-2;
 }
 
+.settings-tabs-list {
+  border-radius: var(--radius) 0;
+  @apply flex w-full bg-muted p-1 border border-border mb-4;
+}
+
+.settings-tab-trigger {
+  border-radius: calc(var(--radius) - 0.25rem) 0;
+  @apply flex-1 px-3 py-1.5 text-sm font-medium transition-colors text-muted-foreground hover:text-foreground;
+
+  &[data-state="active"] {
+    @apply bg-background text-foreground shadow-sm;
+  }
+}
+
+.settings-icon-wrapper {
+  border-radius: 50%;
+  @apply flex h-9 w-9 shrink-0 items-center justify-center bg-background border border-border;
+}
+
 .settings-item {
   border-radius: var(--radius) 0;
   @apply flex items-center justify-between space-x-2 p-4 border border-border bg-secondary/10;
