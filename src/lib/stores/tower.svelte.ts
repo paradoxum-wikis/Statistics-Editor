@@ -96,6 +96,7 @@ class TowerStore {
     if (settingsStore.debugMode) console.log(`Starting to load tower: ${name}`);
     if (settingsStore.debugMode) console.time(`Load tower ${name}`);
     this.isLoading = true;
+    this.selectedData = null;
 
     try {
       const tower = await this.manager.getTower(name);
