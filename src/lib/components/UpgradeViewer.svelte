@@ -19,6 +19,7 @@
     upgradeImages,
     upgradeNames = {},
     upgradeSummaries = {},
+    upgradeLevels = [],
     selectedUpgrade = $bindable("0"),
     numUpgrades,
     loadingImages,
@@ -26,6 +27,7 @@
     upgradeImages: { [key: number]: string };
     upgradeNames?: { [key: number]: string };
     upgradeSummaries?: { [key: number]: SummaryLine[] };
+    upgradeLevels?: string[];
     selectedUpgrade: string;
     numUpgrades: number;
     loadingImages: Map<number, boolean>;
@@ -60,7 +62,7 @@
   <Tabs.List class="upgrade-tabs-list">
     {#each Array(numUpgrades) as _, index}
       <Tabs.Trigger value={index.toString()} class="upgrade-tab-trigger">
-        {index + 1}
+        {upgradeLevels[index] ?? index + 1}
       </Tabs.Trigger>
     {/each}
   </Tabs.List>
@@ -110,8 +112,8 @@
                       {#if line.kind === "change"}
                         {@html renderCellHtml(line.stat, true)}: {@html renderCellHtml(
                           line.from,
-                          false,
-                        )} → {@html renderCellHtml(line.to)}
+                          true,
+                        )} → {@html renderCellHtml(line.to, true)}
                       {:else}
                         {@html renderCellHtml(line.stat, true)}
                       {/if}

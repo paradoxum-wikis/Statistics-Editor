@@ -8,6 +8,7 @@ export interface TableData {
   moneyColumns: string[];
   readOnlyColumns: string[];
   cellFormulaTokens?: Record<string, Record<string, string>>;
+  branchSuffix?: string;
 }
 
 export interface ParsedWikitext {

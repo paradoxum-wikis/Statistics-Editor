@@ -231,6 +231,26 @@ export default class TowerManager {
         const getArr = (val?: string) =>
           val ? val.split(";").map((s) => s.trim()) : [];
         const v = parsed.variables;
+        const branchMapping: Record<string, string> = {};
+        const branchNames = (
+          isPvp && v["$FNC-PVP-BRANCH$"]
+            ? getArr(v["$FNC-PVP-BRANCH$"])
+            : getArr(v["$FNC-BRANCH$"])
+        ).filter(Boolean);
+
+        const schemaStr = v["$FNC-SCHEMA$"];
+        const schema = schemaStr ? getArr(schemaStr).filter(Boolean) : null;
+
+        if (schema && schema.length > 0) {
+          const trunkLetter = schema[0] || "N";
+          const uniqueBranches = Array.from(new Set(schema)).filter(
+            (x) => x !== trunkLetter,
+          );
+          branchNames.forEach((name, i) => {
+            if (name && uniqueBranches[i])
+              branchMapping[name] = uniqueBranches[i];
+          });
+        }
 
         const baseCosts = getArr(v["$FNC-COST$"]);
         const baseDetects = getArr(v["$FNC-DETECTION$"]);
@@ -270,6 +290,26 @@ export default class TowerManager {
           Hidden: parseDetectLevel(detects[0]),
           Lead: parseDetectLevel(detects[1]),
           Flying: parseDetectLevel(detects[2]),
+        };
+
+        const getIndex = (lvl: number, branch: string) => {
+          if (!schema) return lvl;
+          const trunkLetter = schema[0] || "N";
+          const tBranch = branch || trunkLetter;
+          let tLvl = 0;
+          const bLvls: Record<string, number> = {};
+          for (let i = 0; i < schema.length; i++) {
+            const letter = schema[i] || trunkLetter;
+            if (letter === trunkLetter) {
+              if (tBranch === trunkLetter && tLvl === lvl) return i;
+              tLvl++;
+            } else {
+              if (bLvls[letter] === undefined) bLvls[letter] = tLvl;
+              if (tBranch === letter && bLvls[letter] === lvl) return i;
+              bLvls[letter]++;
+            }
+          }
+          return -1;
         };
 
         const cellFormulaTokens: Record<string, Record<string, string>> = {};
@@ -333,23 +373,26 @@ export default class TowerManager {
               defaults.Detections = detections;
             prevPrice = totalPrice;
           } else {
-            const parsedCost = Number(
-              costs[Number.isFinite(numericLevel) ? numericLevel : 0]?.replace(
-                /[^0-9.-]+/g,
-                "",
-              ),
-            );
+            const idx = Number.isFinite(numericLevel)
+              ? getIndex(numericLevel, "")
+              : -1;
+            const parsedCost =
+              idx >= 0 ? Number(costs[idx]?.replace(/[^0-9.-]+/g, "")) : NaN;
             const cost = !isNaN(parsedCost)
               ? parsedCost
               : totalPrice - prevPrice;
             prevPrice = totalPrice;
 
-            const upgrade: any = { Cost: cost, Stats: row };
+            const upgrade: any = {
+              Cost: cost,
+              Stats: row,
+              Level: numericLevel,
+            };
             if (Object.keys(detections).length)
               upgrade.Stats.Detections = detections;
-            const upgIndex = Number.isFinite(numericLevel)
-              ? numericLevel - 1
-              : -1;
+
+            const upgIndex = idx >= 0 ? idx - 1 : -1;
+
             if (upgIndex >= 0 && upgs[upgIndex]) upgrade.Title = upgs[upgIndex];
             if (upgIndex >= 0 && icons[upgIndex])
               upgrade.Image = icons[upgIndex];
@@ -370,23 +413,35 @@ export default class TowerManager {
             ),
           );
 
+          if (extra.headers.includes("Total Price")) {
+            extraReadOnly.add("Total Price");
+          }
+
           const cellFormulaTokens: Record<string, Record<string, string>> = {};
+          const bSuffix = branchMapping[extra.name.trim()] || "";
 
           return {
             ...extra,
             readOnlyColumns: Array.from(extraReadOnly),
+            branchSuffix: bSuffix,
             cellFormulaTokens,
             rows: extra.rows.map((row, extraIdx) => {
               const resRow = { ...row };
               const levelKey = String(extraIdx);
               cellFormulaTokens[levelKey] ??= {};
               const numericLevel = Number(resRow["Level"]);
+
+              const levelVal = Number.isFinite(numericLevel)
+                ? String(resRow["Level"]) + (bSuffix ? bSuffix : "")
+                : extraIdx;
+
               for (const key of extraReadOnly) {
                 const originalVal = resRow[key] as string;
+                if (!originalVal) continue;
                 const stripped = stripRefs(originalVal).trim();
                 const result = resolveToken(
                   stripped,
-                  Number.isFinite(numericLevel) ? numericLevel : extraIdx,
+                  levelVal,
                   resRow,
                   formulaTokens,
                   isPvp,
@@ -396,10 +451,41 @@ export default class TowerManager {
                   resRow[key] = result;
                 }
               }
+
               return resRow;
             }),
           };
         });
+
+        for (const extra of resolvedExtraTables) {
+          const bSuffix = extra.branchSuffix;
+          for (const resRow of extra.rows) {
+            const numericLevel = Number(resRow["Level"]);
+            if (Number.isFinite(numericLevel) && numericLevel > 0) {
+              const idx = getIndex(numericLevel, bSuffix);
+              const parsedCost =
+                idx >= 0 ? Number(costs[idx]?.replace(/[^0-9.-]+/g, "")) : NaN;
+              const cost = !isNaN(parsedCost) ? parsedCost : 0;
+              const levelVal =
+                String(resRow["Level"]) + (bSuffix ? bSuffix : "");
+
+              const upgrade: any = {
+                Cost: cost,
+                Stats: resRow,
+                Level: levelVal,
+              };
+
+              const upgIndex = idx >= 0 ? idx - 1 : -1;
+
+              if (upgIndex >= 0 && upgs[upgIndex])
+                upgrade.Title = upgs[upgIndex];
+              if (upgIndex >= 0 && icons[upgIndex])
+                upgrade.Image = icons[upgIndex];
+
+              upgrades.push(upgrade);
+            }
+          }
+        }
 
         return {
           Defaults: defaults,

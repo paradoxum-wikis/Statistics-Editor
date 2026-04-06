@@ -7,20 +7,73 @@ import { parseNumeric, stripRefs } from "$lib/utils/format";
  */
 export function resolveFNC(
   name: string,
-  level: number,
+  level: number | string,
   tokens: Record<string, string>,
   isPvp: boolean,
 ): number | undefined {
   if (name !== "TOTALPRICE") return undefined;
 
-  const key =
+  const baseKey =
     isPvp && tokens["$FNC-PVP-COST$"] ? "$FNC-PVP-COST$" : "$FNC-COST$";
-  const costs = tokens[key]?.split(";") || [];
+  const baseCosts = tokens[baseKey]?.split(";") || [];
 
-  return costs.slice(0, level + 1).reduce((sum, cost) => {
-    const num = parseNumeric(cost);
-    return sum + (isNaN(num) ? 0 : num);
-  }, 0);
+  let numericLevel = typeof level === "number" ? level : parseInt(level, 10);
+  if (isNaN(numericLevel)) numericLevel = 0;
+
+  const branchMatch =
+    typeof level === "string" ? level.match(/[A-Za-z]+$/) : null;
+  const branch = branchMatch ? branchMatch[0] : "";
+
+  let total = 0;
+
+  const schemaStr = tokens["$FNC-SCHEMA$"];
+  if (schemaStr) {
+    const schema = schemaStr
+      .split(";")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    const trunkLetter = schema[0] || "N";
+    const targetBranch = branch || trunkLetter;
+
+    let trunkLevel = 0;
+    const branchLevels: Record<string, number> = {};
+
+    for (let i = 0; i < baseCosts.length; i++) {
+      const letter = schema[i] || trunkLetter;
+
+      if (letter === trunkLetter) {
+        if (targetBranch === trunkLetter) {
+          if (trunkLevel <= numericLevel) {
+            const num = parseNumeric(baseCosts[i]);
+            total += isNaN(num) ? 0 : num;
+          }
+        } else {
+          const num = parseNumeric(baseCosts[i]);
+          total += isNaN(num) ? 0 : num;
+        }
+        trunkLevel++;
+      } else {
+        if (branchLevels[letter] === undefined) {
+          branchLevels[letter] = trunkLevel;
+        }
+
+        if (targetBranch === letter) {
+          if (branchLevels[letter] <= numericLevel) {
+            const num = parseNumeric(baseCosts[i]);
+            total += isNaN(num) ? 0 : num;
+          }
+        }
+        branchLevels[letter]++;
+      }
+    }
+  } else {
+    for (let i = 0; i <= numericLevel && i < baseCosts.length; i++) {
+      const num = parseNumeric(baseCosts[i]);
+      total += isNaN(num) ? 0 : num;
+    }
+  }
+
+  return total;
 }
 
 /**
@@ -29,7 +82,7 @@ export function resolveFNC(
  */
 export function resolveToken(
   token: string,
-  level: number,
+  level: number | string,
   row: Record<string, string | number>,
   tokens: Record<string, string>,
   isPvp: boolean,

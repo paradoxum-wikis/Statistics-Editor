@@ -50,6 +50,7 @@
   let prevTowerRef: object | null = null;
   let upgradeNames = $state<{ [key: number]: string }>({});
   let upgradeSummaries = $state<{ [key: number]: SummaryLine[] }>({});
+  let upgradeLevels = $state<string[]>([]);
   let selectedUpgrade = $state("0");
   let numUpgrades = $state(0);
   let loadingImages = $state(new SvelteMap<number, boolean>());
@@ -67,17 +68,6 @@
   const ICON_BY_STAT: Record<string, string> = Object.fromEntries(
     STATS_BY_ICON.flatMap(([icon, stats]) => stats.map((s) => [s, icon])),
   );
-
-  const IGNORED_STATS = new Set([
-    "Level",
-    "Cost",
-    "Total Price",
-    "Price",
-    "Cost Efficiency",
-    "DPS",
-    "Title",
-    "Image",
-  ]);
 
   function normalizeForCompare(v: unknown): string {
     if (v === undefined || v === null) return "";
@@ -105,18 +95,51 @@
     const rofInfo = getRofBugVer(skin?.formulaTokens);
     const rofCols = new Set(rofInfo.cols);
 
+    const extraReadOnly =
+      skin.extraTables?.flatMap((t: any) => t.readOnlyColumns || []) ?? [];
+    const allReadOnly = new Set([
+      ...(skin.readOnlyAttributes || []),
+      ...extraReadOnly,
+    ]);
+
     for (
       let upgradeIndex = 0;
-      upgradeIndex < levels.length - 1;
+      upgradeIndex < skin.upgrades.length;
       upgradeIndex++
     ) {
-      const fromLevel = upgradeIndex;
       const toLevel = upgradeIndex + 1;
+      let fromLevel = upgradeIndex;
+
+      const upgradeLevel = skin.upgrades[upgradeIndex]?.upgradeData?.Level;
+      if (upgradeLevel !== undefined) {
+        const lvlStr = String(upgradeLevel);
+        const numPart = parseInt(lvlStr, 10);
+        const suffix = lvlStr.replace(/[0-9]/g, "");
+
+        if (numPart > 1) {
+          const prevLvlStr = `${numPart - 1}${suffix}`;
+          const parentLvlStr = `${numPart - 1}`;
+
+          const parentIdx = skin.upgrades.findIndex(
+            (u: any) =>
+              String(u.upgradeData?.Level) === prevLvlStr ||
+              String(u.upgradeData?.Level) === parentLvlStr,
+          );
+          if (parentIdx !== -1) {
+            fromLevel = parentIdx + 1;
+          } else {
+            fromLevel = 0;
+          }
+        } else {
+          fromLevel = 0;
+        }
+      }
+
       const lines: SummaryLine[] = [];
 
       for (const stat of attributes) {
-        if (IGNORED_STATS.has(stat)) continue;
         if (["Hidden", "Flying", "Lead"].includes(stat)) continue;
+        if (allReadOnly.has(stat)) continue;
 
         const fromVal = skin.levels.getCell(fromLevel, stat);
         const toVal = skin.levels.getCell(toLevel, stat);
@@ -221,16 +244,23 @@
       if (skin?.upgrades) {
         numUpgrades = skin.upgrades.length;
         const names: { [key: number]: string } = {};
+        const levels: string[] = [];
         skin.upgrades.forEach((upgrade: any, index: number) => {
           if (upgrade.upgradeData?.Title) {
             names[index] = upgrade.upgradeData.Title;
           }
+          levels[index] =
+            upgrade.upgradeData?.Level != null
+              ? String(upgrade.upgradeData.Level)
+              : String(index + 1);
         });
         upgradeNames = names;
+        upgradeLevels = levels;
         upgradeSummaries = buildUpgradeSummariesForeskin(skin);
       } else {
         numUpgrades = 0;
         upgradeNames = {};
+        upgradeLevels = [];
         upgradeSummaries = {};
       }
     });
@@ -285,6 +315,7 @@
       {upgradeImages}
       {upgradeNames}
       {upgradeSummaries}
+      {upgradeLevels}
       bind:selectedUpgrade
       {loadingImages}
       {numUpgrades}

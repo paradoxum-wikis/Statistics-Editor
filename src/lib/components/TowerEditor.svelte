@@ -40,7 +40,7 @@
     return {
       skin,
       headers: skin.headers.length > 0 ? skin.headers : skin.levels.attributes,
-      rows: [...skin.levels.levels],
+      rows: skin.levels.levels.slice(0, skin.rawRows.length),
       extraTables:
         skin.extraTables?.map((t) => ({ ...t, rows: [...t.rows] })) ?? [],
     };
@@ -258,6 +258,7 @@
     formulaTokens?: Record<string, string>;
     cellFormulaTokens?: Record<string, Record<string, string>>;
     isPvp?: boolean;
+    branchSuffix?: string;
   }
 
   function isCellEditable(config: TableConfig, header: string): boolean {
@@ -311,7 +312,11 @@
       if (tokens) {
         for (let pass = 0; pass < 2; pass++) {
           for (const [col, tok] of Object.entries(tokens)) {
-            const res = resolveToken(tok, rowIdx, cleanRow, fTokens, isPvp);
+            const levelVal =
+              cleanRow["Level"] !== undefined
+                ? String(cleanRow["Level"]) + (config.branchSuffix || "")
+                : String(rowIdx) + (config.branchSuffix || "");
+            const res = resolveToken(tok, levelVal, cleanRow, fTokens, isPvp);
             if (res != null) cleanRow[stripRefs(col)] = res;
           }
         }
@@ -530,6 +535,7 @@
                   cellFormulaTokens: extraTable.cellFormulaTokens,
                   formulaTokens: activeSkinData.skin.formulaTokens,
                   isPvp: activeSkinData.skin.isPvp,
+                  branchSuffix: extraTable.branchSuffix,
                 },
                 false,
               )}
