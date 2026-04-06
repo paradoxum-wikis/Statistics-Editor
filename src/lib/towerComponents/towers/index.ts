@@ -7,7 +7,7 @@ export const towerNames: string[] = Object.keys(wikiModules)
   .map((path) => path.slice(2, -5))
   .sort();
 
-export const noFetchTowers = new Set(["Necromancer", "Pursuit"]);
+export const noFetchTowers = new Set(["Necromancer"]);
 
 export async function fetchTowerWiki(
   towerName: string,
