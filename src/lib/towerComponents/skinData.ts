@@ -169,6 +169,16 @@ class SkinData {
           this.formulaTokens,
           this.isPvp,
         );
+
+        if (result !== undefined) {
+          row[col] = result;
+          if (typeof result === "number" && Number.isFinite(result)) {
+            this.setDerivedValueAtLevel(level, col, result);
+          } else if (typeof result === "string") {
+            this.setDerivedValueAtLevel(level, col, result as any);
+          }
+        }
+
         if (typeof result === "number" && Number.isFinite(result)) {
           row[col] = result;
           this.setDerivedValueAtLevel(level, col, result);

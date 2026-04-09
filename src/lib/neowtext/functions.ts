@@ -1,5 +1,5 @@
 import { evaluateFormula } from "$lib/neowtext/evaluator";
-import { parseNumeric, stripRefs } from "$lib/utils/format";
+import { parseNumeric, stripRefs, formatReadOnly } from "$lib/utils/format";
 
 /**
  * Resolves a $FNC-NAME$ function for the given row level.
@@ -90,6 +90,24 @@ export function resolveToken(
 ): string | number | undefined {
   token = stripRefs(token).trim();
   if (depth > 10) return undefined;
+
+  if (/\$[^$]+\$/.test(token) && !/^\$[^$]+\$$/.test(token)) {
+    return token.replace(/\$([^$\s]+)\$/g, (match) => {
+      const resolved = resolveToken(
+        match,
+        level,
+        row,
+        tokens,
+        isPvp,
+        depth + 1,
+      );
+
+      if (typeof resolved === "number") {
+        return formatReadOnly(resolved);
+      }
+      return resolved !== undefined ? String(resolved) : match;
+    });
+  }
 
   // $FNC-NAME$
   const fncMatch = token.match(/^\$FNC-([A-Z]+)\$$/);

@@ -324,7 +324,7 @@ export default class TowerManager {
             .map(([k, v]): [string, string, string] | null => {
               if (typeof v !== "string") return null;
               const stripped = stripRefs(v).trim();
-              if (!/^\$[^$]+\$$/.test(stripped)) return null;
+              if (!/\$[^$]+\$/.test(stripped)) return null;
               return [k, stripped, v];
             })
             .filter((x): x is [string, string, string] => x !== null);
@@ -407,7 +407,7 @@ export default class TowerManager {
               Object.entries(r)
                 .filter(([, val]) => {
                   if (typeof val !== "string") return false;
-                  return /^\$[^$]+\$$/.test(stripRefs(val).trim());
+                  return /\$[^$]+\$/.test(stripRefs(val).trim());
                 })
                 .map(([k]) => k),
             ),

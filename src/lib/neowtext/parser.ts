@@ -170,7 +170,7 @@ function parseTable(
       val = templateMatch[2].trim();
     }
 
-    if (!/^\$[^$]+\$$/.test(stripRefs(val).trim())) {
+    if (!/\$[^$]+\$/.test(stripRefs(val).trim())) {
       val = applyVariables(val);
     }
 
@@ -180,7 +180,8 @@ function parseTable(
   };
 
   const cleanHeader = (val: string): string => {
-    return applyVariables(stripRefs(String(cleanCell(val, undefined))).trim());
+    const expanded = applyVariables(val);
+    return stripRefs(String(cleanCell(expanded, undefined))).trim();
   };
 
   for (let i = 0; i < lines.length; i++) {
