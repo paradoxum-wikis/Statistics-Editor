@@ -510,7 +510,7 @@ button {
 
 /* upgrade tabs */
 .upgrade-tabs-list {
-  @apply flex space-x-1 mb-4;
+  @apply flex space-x-1 mb-4 overflow-x-auto;
 }
 
 .upgrade-tab-trigger {
