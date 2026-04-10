@@ -154,7 +154,7 @@ function parseTable(
   const headers: string[] = [];
   const rawHeaders: string[] = [];
   const rows: Record<string, string | number>[] = [];
-  const recursionState: Record<string, string> = {};
+  const recursionState: Record<number, string> = {};
 
   let currentRow: Record<string, string | number> = {};
   let colIdx = 0;
@@ -224,14 +224,14 @@ function parseTable(
           }
 
           if (hasRecursion) {
-            if (isOnlyRecursion && recursionState[header] !== undefined) {
-              part = recursionState[header];
+            if (isOnlyRecursion && recursionState[colIdx] !== undefined) {
+              part = recursionState[colIdx];
             } else {
-              recursionState[header] = cleanPart;
+              recursionState[colIdx] = cleanPart;
               part = cleanPart;
             }
           } else {
-            delete recursionState[header];
+            delete recursionState[colIdx];
           }
 
           currentRow[header] = cleanCell(part, header);
