@@ -154,6 +154,7 @@ function parseTable(
   const headers: string[] = [];
   const rawHeaders: string[] = [];
   const rows: Record<string, string | number>[] = [];
+  const recursionState: Record<string, string> = {};
 
   let currentRow: Record<string, string | number> = {};
   let colIdx = 0;
@@ -206,9 +207,35 @@ function parseTable(
 
     if (line.startsWith("|")) {
       if (line.startsWith("|-") || line.startsWith("|}")) continue;
-      for (const part of line.substring(1).split("||")) {
-        if (headers[colIdx])
-          currentRow[headers[colIdx]] = cleanCell(part, headers[colIdx]);
+      for (let part of line.substring(1).split("||")) {
+        const header = headers[colIdx];
+        if (header) {
+          let hasRecursion = false;
+          let isOnlyRecursion = false;
+          let cleanPart = part;
+
+          const tokens = part.match(/\$[^$\s]+\$/g) || [];
+          for (const t of tokens) {
+            if (applyVariables(t).trim() === "$FNC-RECURSION$") {
+              hasRecursion = true;
+              if (part.trim() === t) isOnlyRecursion = true;
+              cleanPart = cleanPart.replace(t, "");
+            }
+          }
+
+          if (hasRecursion) {
+            if (isOnlyRecursion && recursionState[header] !== undefined) {
+              part = recursionState[header];
+            } else {
+              recursionState[header] = cleanPart;
+              part = cleanPart;
+            }
+          } else {
+            delete recursionState[header];
+          }
+
+          currentRow[header] = cleanCell(part, header);
+        }
         colIdx++;
       }
       continue;
