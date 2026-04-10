@@ -279,19 +279,6 @@ export default class TowerManager {
           ? mergeArrays(baseIcons, getArr(v["$FNC-PVP-UPGRADEICON$"]))
           : baseIcons;
 
-        const parseDetectLevel = (t?: string) => {
-          const s = t?.trim();
-          if (!s) return -1;
-          const n = Number(s);
-          return Number.isFinite(n) ? n : -1;
-        };
-
-        const detLvls = {
-          Hidden: parseDetectLevel(detects[0]),
-          Lead: parseDetectLevel(detects[1]),
-          Flying: parseDetectLevel(detects[2]),
-        };
-
         const getIndex = (lvl: number, branch: string) => {
           if (!schema) return lvl;
           const trunkLetter = schema[0] || "N";
@@ -311,6 +298,58 @@ export default class TowerManager {
           }
           return -1;
         };
+
+        const globalDetections = Array.from(
+          { length: schema ? schema.length : rows.length },
+          () => ({ Hidden: false, Lead: false, Flying: false })
+        );
+
+        const branchNamesList = [
+          schema ? schema[0] || "N" : "N",
+          ...(schema ? Array.from(new Set(schema)).filter(x => x !== (schema[0] || "N")) : [])
+        ];
+
+        for (let i = 0; i < detects.length; i++) {
+          const s = detects[i]?.trim();
+          if (!s) continue;
+          const lvl = Number(s);
+          if (!Number.isFinite(lvl)) continue;
+
+          const branchIdx = Math.floor(i / 3);
+          const typeIdx = i % 3;
+
+          const branch = branchNamesList[branchIdx] || branchNamesList[0];
+          const type = ["Hidden", "Lead", "Flying"][typeIdx];
+
+          const globalIdx = getIndex(lvl, branch === branchNamesList[0] ? "" : branch);
+          if (globalIdx >= 0 && globalIdx < globalDetections.length) {
+            globalDetections[globalIdx][type as "Hidden" | "Lead" | "Flying"] = true;
+          }
+        }
+
+        const getParent = (idx: number) => {
+          if (idx <= 0) return -1;
+          if (!schema) return idx - 1;
+          const trunkLetter = schema[0] || "N";
+          const letter = schema[idx];
+          if (letter === trunkLetter) return idx - 1;
+          
+          const firstOccur = schema.indexOf(letter);
+          if (idx === firstOccur) {
+            return schema.lastIndexOf(trunkLetter);
+          } else {
+            return idx - 1;
+          }
+        };
+
+        for (let i = 0; i < globalDetections.length; i++) {
+          const parentIdx = getParent(i);
+          if (parentIdx >= 0) {
+            if (globalDetections[parentIdx].Hidden) globalDetections[i].Hidden = true;
+            if (globalDetections[parentIdx].Lead) globalDetections[i].Lead = true;
+            if (globalDetections[parentIdx].Flying) globalDetections[i].Flying = true;
+          }
+        }
 
         const cellFormulaTokens: Record<string, Record<string, string>> = {};
         let prevPrice = 0;
@@ -353,18 +392,23 @@ export default class TowerManager {
               : Number(tpRaw);
 
           const detections: Record<string, boolean> = {};
-          for (const type of ["Hidden", "Lead", "Flying"]) {
-            if (
-              Number.isFinite(numericLevel) &&
-              numericLevel === detLvls[type as keyof typeof detLvls]
-            ) {
-              if (this.debug())
-                console.log(
-                  `[TowerManager] Found detection var ${type} at level ${numericLevel}`,
-                );
-              curDetections[type] = true;
+          const idx = Number.isFinite(numericLevel) ? getIndex(numericLevel, "") : -1;
+
+          if (idx >= 0 && idx < globalDetections.length) {
+            const gd = globalDetections[idx];
+            const parentIdx = getParent(idx);
+            const parentGd = parentIdx >= 0 ? globalDetections[parentIdx] : { Hidden: false, Lead: false, Flying: false };
+            
+            for (const type of ["Hidden", "Lead", "Flying"] as const) {
+              if (gd[type]) {
+                detections[type] = true;
+                if (!parentGd[type] && this.debug()) {
+                  console.log(
+                    `[TowerManager] Found detection var ${type} at level ${numericLevel}`,
+                  );
+                }
+              }
             }
-            if (curDetections[type]) detections[type] = true;
           }
 
           if (Number.isFinite(numericLevel) && numericLevel === 0) {
@@ -474,6 +518,25 @@ export default class TowerManager {
                 Stats: resRow,
                 Level: levelVal,
               };
+              
+              if (idx >= 0 && idx < globalDetections.length) {
+                const gd = globalDetections[idx];
+                const detections: Record<string, boolean> = {};
+                const parentIdx = getParent(idx);
+                const parentGd = parentIdx >= 0 ? globalDetections[parentIdx] : { Hidden: false, Lead: false, Flying: false };
+                
+                for (const type of ["Hidden", "Lead", "Flying"] as const) {
+                  if (gd[type]) {
+                    detections[type] = true;
+                    if (!parentGd[type] && this.debug()) {
+                      console.log(
+                        `[TowerManager] Found detection var ${type} at level ${numericLevel}`,
+                      );
+                    }
+                  }
+                }
+                if (Object.keys(detections).length) upgrade.Stats.Detections = detections;
+              }
 
               const upgIndex = idx >= 0 ? idx - 1 : -1;
 

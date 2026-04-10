@@ -16,7 +16,11 @@
 
   let levelOptions = $derived([
     { value: "none", label: "∅" },
-    ...levels.map((_, i) => ({ value: i.toString(), label: `Lvl. ${i}` })),
+    ...levels.map((_, i) => {
+      const upg = skinData?.upgrades[i - 1];
+      const displayLvl = i === 0 ? "0" : (upg?.upgradeData?.Level ?? i.toString());
+      return { value: i.toString(), label: `Lvl. ${displayLvl}` };
+    }),
   ]);
 
   const detectionTypes = [
