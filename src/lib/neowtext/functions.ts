@@ -91,7 +91,11 @@ export function resolveToken(
   token = stripRefs(token).trim();
   if (depth > 10) return undefined;
 
-  if (/\$[^$]+\$/.test(token) && !/^\$[^$]+\$$/.test(token)) {
+  if (
+    /\$[^$]+\$/.test(token) &&
+    !/^\$[^$]+\$$/.test(token) &&
+    !/^{{#expr:.*}}$/i.test(token)
+  ) {
     return token.replace(/\$([^$\s]+)\$/g, (match) => {
       const resolved = resolveToken(
         match,
@@ -113,11 +117,14 @@ export function resolveToken(
   const fncMatch = token.match(/^\$FNC-([A-Z]+)\$$/);
   if (fncMatch) return resolveFNC(fncMatch[1], level, tokens, isPvp);
 
-  // $Var$
-  if (token.startsWith("$") && tokens[token] !== undefined) {
-    let val = tokens[token];
+  // #expr or $Var$
+  const isExpr = /^{{#expr:.*}}$/i.test(token);
+  const isVar = token.startsWith("$") && tokens[token] !== undefined;
 
-    if (/^\$[^$]+\$$/.test(val)) {
+  if (isExpr || isVar) {
+    let val = isVar ? tokens[token] : token;
+
+    if (isVar && /^\$[^$]+\$$/.test(val)) {
       return resolveToken(val, level, row, tokens, isPvp, depth + 1);
     }
 

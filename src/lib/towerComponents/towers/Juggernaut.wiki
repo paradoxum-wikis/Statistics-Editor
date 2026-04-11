@@ -1,6 +1,6 @@
 <var>
 $DPS$ = Damage / Firerate
-$BOSS$ = Damage * Boss Multiplier
+$BOSS$ = {{#expr:Damage * Boss Multiplier round 0}}
 $BDPS$ = Boss Damage / Firerate
 $CE$ = Total Price / DPS
 $BCE$ = Total Price / Boss DPS
@@ -51,7 +51,7 @@ $RC$ = $FNC-RECURSION$
 |-
 | 4 || {{Money|$TP$}} || 100 || 1.25 || $BOSS$ || 0.1 || 1.8 || 21 || $DPS$ || $BDPS$ || {{Money|$CE$}} || {{Money|$BCE$}}
 |-
-| 5 || {{Money|$TP$}} || 175 || 1.25 || {{#expr:$BOSS$ round 0}} || 0.1 || 1.8 || 24 || $DPS$ || $BDPS$ || {{Money|$CE$}} || {{Money|$BCE$}}
+| 5 || {{Money|$TP$}} || 175 || 1.25 || $BOSS$ || 0.1 || 1.8 || 24 || $DPS$ || $BDPS$ || {{Money|$CE$}} || {{Money|$BCE$}}
 |-
 | 6 || {{Money|$TP$}} || 260 || 1.5 || $BOSS$ || 0.1 || 1.8 || 26 || $DPS$ || $BDPS$ || {{Money|$CE$}} || {{Money|$BCE$}}
 |-

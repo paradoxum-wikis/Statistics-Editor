@@ -301,12 +301,16 @@ export default class TowerManager {
 
         const globalDetections = Array.from(
           { length: schema ? schema.length : rows.length },
-          () => ({ Hidden: false, Lead: false, Flying: false })
+          () => ({ Hidden: false, Lead: false, Flying: false }),
         );
 
         const branchNamesList = [
           schema ? schema[0] || "N" : "N",
-          ...(schema ? Array.from(new Set(schema)).filter(x => x !== (schema[0] || "N")) : [])
+          ...(schema
+            ? Array.from(new Set(schema)).filter(
+                (x) => x !== (schema[0] || "N"),
+              )
+            : []),
         ];
 
         for (let i = 0; i < detects.length; i++) {
@@ -321,9 +325,13 @@ export default class TowerManager {
           const branch = branchNamesList[branchIdx] || branchNamesList[0];
           const type = ["Hidden", "Lead", "Flying"][typeIdx];
 
-          const globalIdx = getIndex(lvl, branch === branchNamesList[0] ? "" : branch);
+          const globalIdx = getIndex(
+            lvl,
+            branch === branchNamesList[0] ? "" : branch,
+          );
           if (globalIdx >= 0 && globalIdx < globalDetections.length) {
-            globalDetections[globalIdx][type as "Hidden" | "Lead" | "Flying"] = true;
+            globalDetections[globalIdx][type as "Hidden" | "Lead" | "Flying"] =
+              true;
           }
         }
 
@@ -333,7 +341,7 @@ export default class TowerManager {
           const trunkLetter = schema[0] || "N";
           const letter = schema[idx];
           if (letter === trunkLetter) return idx - 1;
-          
+
           const firstOccur = schema.indexOf(letter);
           if (idx === firstOccur) {
             return schema.lastIndexOf(trunkLetter);
@@ -345,9 +353,12 @@ export default class TowerManager {
         for (let i = 0; i < globalDetections.length; i++) {
           const parentIdx = getParent(i);
           if (parentIdx >= 0) {
-            if (globalDetections[parentIdx].Hidden) globalDetections[i].Hidden = true;
-            if (globalDetections[parentIdx].Lead) globalDetections[i].Lead = true;
-            if (globalDetections[parentIdx].Flying) globalDetections[i].Flying = true;
+            if (globalDetections[parentIdx].Hidden)
+              globalDetections[i].Hidden = true;
+            if (globalDetections[parentIdx].Lead)
+              globalDetections[i].Lead = true;
+            if (globalDetections[parentIdx].Flying)
+              globalDetections[i].Flying = true;
           }
         }
 
@@ -363,7 +374,11 @@ export default class TowerManager {
             .map(([k, v]): [string, string, string] | null => {
               if (typeof v !== "string") return null;
               const stripped = stripRefs(v).trim();
-              if (!/\$[^$]+\$/.test(stripped)) return null;
+              if (
+                !/^\$[^$]+\$$/.test(stripped) &&
+                !/^{{#expr:.*}}$/i.test(stripped)
+              )
+                return null;
               return [k, stripped, v];
             })
             .filter((x): x is [string, string, string] => x !== null);
@@ -392,13 +407,18 @@ export default class TowerManager {
               : Number(tpRaw);
 
           const detections: Record<string, boolean> = {};
-          const idx = Number.isFinite(numericLevel) ? getIndex(numericLevel, "") : -1;
+          const idx = Number.isFinite(numericLevel)
+            ? getIndex(numericLevel, "")
+            : -1;
 
           if (idx >= 0 && idx < globalDetections.length) {
             const gd = globalDetections[idx];
             const parentIdx = getParent(idx);
-            const parentGd = parentIdx >= 0 ? globalDetections[parentIdx] : { Hidden: false, Lead: false, Flying: false };
-            
+            const parentGd =
+              parentIdx >= 0
+                ? globalDetections[parentIdx]
+                : { Hidden: false, Lead: false, Flying: false };
+
             for (const type of ["Hidden", "Lead", "Flying"] as const) {
               if (gd[type]) {
                 detections[type] = true;
@@ -451,7 +471,11 @@ export default class TowerManager {
               Object.entries(r)
                 .filter(([, val]) => {
                   if (typeof val !== "string") return false;
-                  return /\$[^$]+\$/.test(stripRefs(val).trim());
+                  const stripped = stripRefs(val).trim();
+                  return (
+                    /^\$[^$]+\$$/.test(stripped) ||
+                    /^{{#expr:.*}}$/i.test(stripped)
+                  );
                 })
                 .map(([k]) => k),
             ),
@@ -518,13 +542,16 @@ export default class TowerManager {
                 Stats: resRow,
                 Level: levelVal,
               };
-              
+
               if (idx >= 0 && idx < globalDetections.length) {
                 const gd = globalDetections[idx];
                 const detections: Record<string, boolean> = {};
                 const parentIdx = getParent(idx);
-                const parentGd = parentIdx >= 0 ? globalDetections[parentIdx] : { Hidden: false, Lead: false, Flying: false };
-                
+                const parentGd =
+                  parentIdx >= 0
+                    ? globalDetections[parentIdx]
+                    : { Hidden: false, Lead: false, Flying: false };
+
                 for (const type of ["Hidden", "Lead", "Flying"] as const) {
                   if (gd[type]) {
                     detections[type] = true;
@@ -535,7 +562,8 @@ export default class TowerManager {
                     }
                   }
                 }
-                if (Object.keys(detections).length) upgrade.Stats.Detections = detections;
+                if (Object.keys(detections).length)
+                  upgrade.Stats.Detections = detections;
               }
 
               const upgIndex = idx >= 0 ? idx - 1 : -1;

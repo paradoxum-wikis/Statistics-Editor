@@ -1,7 +1,7 @@
 import { settingsStore } from "$lib/stores/settings.svelte";
 import { toDisplayNumber, stripRefs } from "$lib/utils/format";
 
-const ARITHMETIC_ALLOWED = /^[\d+\-*/%.()\s]+$/;
+const ARITHMETIC_ALLOWED = /^[\d+\-*/%.()\sMathroundtruncpow,]+$/;
 
 const replacerCache = new Map<
   string,
@@ -39,6 +39,8 @@ export function evaluateFormula(
   formula: string,
   row: Record<string, string | number>,
 ): number {
+  formula = formula.replace(/{{#expr:\s*(.*?)\s*}}/gi, "$1");
+
   // for example "Cost Efficiency" = "Cost_Efficiency"
   const numericContextAliased: Record<string, number> = {};
 
@@ -61,6 +63,15 @@ export function evaluateFormula(
 
   const keys = Object.keys(numericContextAliased);
   expression = getReplacer(keys)(expression, numericContextAliased);
+
+  if (/\bround\b/.test(expression)) {
+    const parts = expression.split(/\bround\b/);
+    let res = parts[0];
+    for (let i = 1; i < parts.length; i++) {
+      res = `(Math.round((${res}) * Math.pow(10, Math.trunc(${parts[i]}))) / Math.pow(10, Math.trunc(${parts[i]})))`;
+    }
+    expression = res;
+  }
 
   if (!ARITHMETIC_ALLOWED.test(expression)) {
     console.error(
