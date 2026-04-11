@@ -2,7 +2,7 @@ import { settingsStore } from "$lib/stores/settings.svelte";
 import { toDisplayNumber, stripRefs } from "$lib/utils/format";
 import { transpileExpr } from "mediawiki-expr";
 
-const ARITHMETIC_ALLOWED = /^[\w\s+\-*/%.(),<>=!&|?:;{}[\]]+$/;
+const ARITHMETIC_ALLOWED = /^[\w\s+\-*/%.(),<>=!&|?:;{}[\]"']+$/;
 
 const replacerCache = new Map<
   string,
@@ -65,16 +65,16 @@ export function evaluateFormula(
   const keys = Object.keys(numericContextAliased);
   expression = getReplacer(keys)(expression, numericContextAliased);
 
-  expression = transpileExpr(expression);
-
-  if (!ARITHMETIC_ALLOWED.test(expression)) {
-    console.error(
-      `[Evaluator] Formula contains disallowed syntax: "${expression}"`,
-    );
-    return NaN;
-  }
-
   try {
+    expression = transpileExpr(expression);
+
+    if (!ARITHMETIC_ALLOWED.test(expression)) {
+      console.error(
+        `[Evaluator] Formula contains disallowed syntax: "${expression}"`,
+      );
+      return NaN;
+    }
+
     const result = new Function(`return ${expression}`)();
 
     if (settingsStore.debugMode) {
