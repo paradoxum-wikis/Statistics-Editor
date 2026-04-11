@@ -187,10 +187,14 @@
           <!-- Editor Mode Toggle -->
           <div class="mode-toggle-group">
             <button
-              class="mode-toggle-btn {editorMode === 'cells'
+              class="mode-toggle-btn {editorMode === 'cells' &&
+              !towerStore.selectedData?.isMalformed
                 ? 'active'
-                : 'inactive'}"
+                : 'inactive'} {towerStore.selectedData?.isMalformed
+                ? 'opacity-50 cursor-not-allowed'
+                : ''}"
               onclick={backToCells}
+              disabled={towerStore.selectedData?.isMalformed}
             >
               <div class="flex items-center gap-1.5">
                 <Table size={16} />
@@ -198,7 +202,8 @@
               </div>
             </button>
             <button
-              class="mode-toggle-btn {editorMode === 'wiki'
+              class="mode-toggle-btn {editorMode === 'wiki' ||
+              towerStore.selectedData?.isMalformed
                 ? 'active'
                 : 'inactive'}"
               onclick={openWikiEditor}
@@ -416,7 +421,7 @@
           {:else if towerStore.selectedData}
             {#key editorMode}
               <div in:fly={{ y: 8, duration: 160, easing: cubicOut }}>
-                {#if editorMode === "cells"}
+                {#if editorMode === "cells" && !towerStore.selectedData.isMalformed}
                   <TowerEditor tower={towerStore.selectedData} />
                 {:else}
                   <WikiEditor towerName={towerStore.selectedName} open={true} />

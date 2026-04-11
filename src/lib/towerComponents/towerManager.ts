@@ -145,6 +145,9 @@ export default class TowerManager {
     const wikitextLoader = wikitextFiles[`./towers/${name}.wiki`];
     if (!wikitextLoader) return null;
 
+    let currentSource = "";
+    let currentText = "";
+
     try {
       const loadBase = async () => {
         try {
@@ -187,6 +190,8 @@ export default class TowerManager {
         name,
         loadBase,
       );
+      currentSource = source;
+      currentText = text;
       if (this.debug())
         console.log(
           `[TowerManager] Loaded effective wikitext from ${source}, length: ${text.length}`,
@@ -616,7 +621,12 @@ export default class TowerManager {
       return (this.towers[name] = towerData);
     } catch (err) {
       console.error("Failed to load wikitext for", name, ":", err);
-      return null;
+      const towerData = new Tower(name, {});
+      Object.assign(towerData, {
+        sourceWikitext: currentText,
+        wikitextSource: currentSource,
+      });
+      return (this.towers[name] = towerData);
     }
   }
 

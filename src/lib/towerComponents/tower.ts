@@ -5,6 +5,7 @@ class Tower {
   name: string;
   skinNames: string[];
   skins: { [skinName: string]: SkinData };
+  isMalformed: boolean;
 
   constructor(name: string, data: any) {
     this.json = {
@@ -14,6 +15,7 @@ class Tower {
     this.name = this.#getName();
     this.skinNames = this.#getSkinNames();
     this.skins = this.#getSkins();
+    this.isMalformed = Object.keys(data || {}).length === 0;
   }
 
   #getName(): string {
