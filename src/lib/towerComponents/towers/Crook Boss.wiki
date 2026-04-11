@@ -8,7 +8,7 @@ $FNC-COST$ = 1600; 1150; 3400; 13500; 47500
 $FNC-PVP-COST$ = 800; 525; 1000; 5000; 16000
 $FNC-DETECTION$ = 2; ;0
 $FNC-PVP-DETECTION$ = 2; ;2
-$FNC-UPGRADE$ = Quick Getaway; N/A; Tommy Goons; The Godfather
+$FNC-UPGRADE$ = Quick Getaway; Double Trouble; Tommy Goons; The Godfather
 $FNC-UPGRADEICON$ = 3032133716; 3444643559; 3838914605; 3444644903
 $FNC-ROFBUG$ = Firerate
 $CREF$ = <ref name=ce>Does not account for unit DPS.</ref>
