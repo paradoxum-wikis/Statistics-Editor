@@ -454,7 +454,7 @@ export default class TowerManager {
 
             const upgrade: any = {
               Cost: cost,
-              Stats: row,
+              Stats: { ...row },
               Level: numericLevel,
             };
             if (Object.keys(detections).length)
@@ -544,7 +544,7 @@ export default class TowerManager {
 
               const upgrade: any = {
                 Cost: cost,
-                Stats: resRow,
+                Stats: { ...resRow },
                 Level: levelVal,
               };
 
