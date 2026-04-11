@@ -69,9 +69,11 @@ export function evaluateFormula(
     expression = transpileExpr(expression);
 
     if (!ARITHMETIC_ALLOWED.test(expression)) {
-      console.error(
-        `[Evaluator] Formula contains disallowed syntax: "${expression}"`,
-      );
+      if (settingsStore.debugMode) {
+        console.error(
+          `[Evaluator] Formula contains disallowed syntax: "${expression}"`,
+        );
+      }
       return NaN;
     }
 
@@ -83,7 +85,9 @@ export function evaluateFormula(
 
     return typeof result === "number" ? result : NaN;
   } catch (e) {
-    console.error(`[Evaluator] Error evaluating "${expression}":`, e);
+    if (settingsStore.debugMode) {
+      console.error(`[Evaluator] Error evaluating "${expression}":`, e);
+    }
     return NaN;
   }
 }

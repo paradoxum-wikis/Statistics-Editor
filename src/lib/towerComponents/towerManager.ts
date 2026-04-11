@@ -380,7 +380,7 @@ export default class TowerManager {
               if (typeof v !== "string") return null;
               const stripped = stripRefs(v).trim();
               if (
-                !/^\$[^$]+\$$/.test(stripped) &&
+                !/\$[^$]+\$/.test(stripped) &&
                 !/^{{#expr:.*}}$/i.test(stripped)
               )
                 return null;
@@ -478,7 +478,7 @@ export default class TowerManager {
                   if (typeof val !== "string") return false;
                   const stripped = stripRefs(val).trim();
                   return (
-                    /^\$[^$]+\$$/.test(stripped) ||
+                    /\$[^$]+\$/.test(stripped) ||
                     /^{{#expr:.*}}$/i.test(stripped)
                   );
                 })
