@@ -532,6 +532,7 @@ export default class TowerManager {
 
         for (const extra of resolvedExtraTables) {
           const bSuffix = extra.branchSuffix;
+          if (!bSuffix) continue;
           for (const resRow of extra.rows) {
             const numericLevel = Number(resRow["Level"]);
             if (Number.isFinite(numericLevel) && numericLevel > 0) {
