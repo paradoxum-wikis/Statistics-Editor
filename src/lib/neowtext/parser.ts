@@ -37,7 +37,15 @@ export function parseWikitext(content: string): ParsedWikitext {
   const tabs: Record<string, TableData[]> = {};
   let text = content.replace(/\r\n/g, "\n");
 
-  const blockVariableRegex = /<var>([\s\S]*?)<\/var>/g;
+  if (!/<var\b/i.test(text) && /<\/var>/i.test(text)) {
+    const closeIdx = text.search(/<\/var>/i);
+    const beforeClose = closeIdx >= 0 ? text.slice(0, closeIdx) : "";
+    if (/\$[^=\n]+\$\s*=/.test(beforeClose)) {
+      text = `<var>\n${text}`;
+    }
+  }
+
+  const blockVariableRegex = /<var\b[^>]*>([\s\S]*?)<\/var>/gi;
   let blockMatch;
   while ((blockMatch = blockVariableRegex.exec(text)) !== null) {
     const blockContent = blockMatch[1];

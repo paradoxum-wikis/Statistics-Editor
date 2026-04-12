@@ -76,6 +76,11 @@ export function resolveFNC(
   return total;
 }
 
+export type TableCache = Record<
+  string,
+  Record<number, Record<string, string | number>>
+>;
+
 /**
  * Resolves a token ($FNC-NAME$, $nVar$, or $Var$) to a value,
  * recursing through token aliases when a $Var$ points to another token.
@@ -87,6 +92,7 @@ export function resolveToken(
   tokens: Record<string, string>,
   isPvp: boolean,
   depth = 0,
+  tableCache?: TableCache,
 ): string | number | undefined {
   token = stripRefs(token).trim();
   if (depth > 10) return undefined;
@@ -142,6 +148,20 @@ export function resolveToken(
 
     const context = Object.fromEntries(
       Object.entries(row).map(([k, v]) => [stripRefs(k), v]),
+    );
+
+    const numLevel =
+      typeof level === "number" ? level : parseInt(String(level));
+    val = val.replace(/^["'](.*)["']$/, "$1");
+
+    val = val.replace(
+      /([a-zA-Z0-9_ ]+)\.([a-zA-Z0-9_ ]+)/g,
+      (match, tname, col) => {
+        const cached = tableCache?.[tname.trim()]?.[numLevel];
+        return cached?.[col.trim()] !== undefined
+          ? String(cached[col.trim()])
+          : match;
+      },
     );
 
     const result = evaluateFormula(val, context);

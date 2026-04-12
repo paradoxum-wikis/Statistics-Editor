@@ -308,6 +308,7 @@
       const fTokens =
         config.skinData?.formulaTokens ?? config.formulaTokens ?? {};
       const isPvp = config.skinData?.isPvp ?? config.isPvp ?? false;
+      const tCache = config.skinData?.tableCache ?? (config as any).tableCache;
       const tokens = cellTokens?.[String(rowIdx)];
       if (tokens) {
         for (let pass = 0; pass < 2; pass++) {
@@ -316,7 +317,15 @@
               cleanRow["Level"] !== undefined
                 ? String(cleanRow["Level"]) + (config.branchSuffix || "")
                 : String(rowIdx) + (config.branchSuffix || "");
-            const res = resolveToken(tok, levelVal, cleanRow, fTokens, isPvp);
+            const res = resolveToken(
+              tok,
+              levelVal,
+              cleanRow,
+              fTokens,
+              isPvp,
+              0,
+              tCache,
+            );
             if (res != null) cleanRow[stripRefs(col)] = res;
           }
         }
@@ -536,7 +545,8 @@
                   formulaTokens: activeSkinData.skin.formulaTokens,
                   isPvp: activeSkinData.skin.isPvp,
                   branchSuffix: extraTable.branchSuffix,
-                },
+                  tableCache: activeSkinData.skin.tableCache,
+                } as any,
                 false,
               )}
             {/each}

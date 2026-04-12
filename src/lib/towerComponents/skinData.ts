@@ -3,7 +3,7 @@ import Defaults from "./defaults";
 import Upgrade from "./upgrade";
 import Levels from "./levels";
 import Locator from "./locator";
-import { resolveToken } from "$lib/neowtext/functions";
+import { resolveToken, type TableCache } from "$lib/neowtext/functions";
 import type { TableData } from "$lib/neowtext/parser";
 
 type FormulaToken = string; // e.g. "$DPS$", "$DPS2$"
@@ -26,6 +26,7 @@ class SkinData {
   isPvp: boolean = false;
   moneyColumns: string[] = [];
   extraTables: TableData[] = [];
+  tableCache: TableCache = {};
 
   /**
    * Detection types that have PVP specific variables in the source.
@@ -127,6 +128,10 @@ class SkinData {
       this.extraTables = this.data.ExtraTables;
     }
 
+    if (this.data.TableCache) {
+      this.tableCache = this.data.TableCache;
+    }
+
     this.createData();
   }
 
@@ -168,6 +173,8 @@ class SkinData {
           row,
           this.formulaTokens,
           this.isPvp,
+          0,
+          this.tableCache,
         );
 
         if (result !== undefined) {

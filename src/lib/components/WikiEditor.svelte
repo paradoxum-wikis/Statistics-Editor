@@ -6,7 +6,11 @@
   import { settingsStore } from "$lib/stores/settings.svelte";
   import { setWikiOverride } from "$lib/neowtext/wikiSource";
   import { noFetchTowers } from "$lib/towerComponents/towers/index";
-  import { WikitextEditor } from "wikistxr";
+  import {
+    WikitextEditor,
+    DEFAULT_EXTENSION_TAGS,
+    DEFAULT_CONTENT_PRESERVING_TAGS,
+  } from "wikistxr";
 
   let {
     towerName,
@@ -37,6 +41,18 @@
       container.querySelectorAll<HTMLElement>(".wt-line"),
     );
 
+    if (settingsStore.debugMode && lineEls.length > 0) {
+      console.log(
+        "[WikiEditor] readEditorTextFromDom -> first lines diagnostics:",
+        lineEls.slice(0, 3).map((el, index) => ({
+          index,
+          textContent: (el.textContent ?? "").replace(/\u200B/g, ""),
+          innerText: (el.innerText ?? "").replace(/\u200B/g, ""),
+          innerHTML: el.innerHTML,
+        })),
+      );
+    }
+
     if (lineEls.length > 0) {
       return lineEls
         .map((el) => (el.textContent ?? "").replace(/\u200B/g, ""))
@@ -64,6 +80,14 @@
         "[WikiEditor] syncFromEditorDom -> effectiveWikitext length:",
         nextText.length,
       );
+      console.log(
+        "[WikiEditor] syncFromEditorDom -> has <var>:",
+        /<var\b/i.test(nextText),
+      );
+      console.log(
+        "[WikiEditor] syncFromEditorDom -> preview:",
+        nextText.slice(0, 200),
+      );
     }
   }
 
@@ -80,6 +104,14 @@
         console.log(
           "[WikiEditor] saving wikitext length:",
           towerStore.effectiveWikitext.length,
+        );
+        console.log(
+          "[WikiEditor] saving wikitext has <var>:",
+          /<var\b/i.test(towerStore.effectiveWikitext),
+        );
+        console.log(
+          "[WikiEditor] saving wikitext preview:",
+          towerStore.effectiveWikitext.slice(0, 200),
         );
       }
 
@@ -156,7 +188,24 @@
         document.head.appendChild(style);
       }
 
-      editor = new WikitextEditor();
+      editor = new WikitextEditor({
+        extensionTags: [...DEFAULT_EXTENSION_TAGS, "var"],
+        contentPreservingTags: [...DEFAULT_CONTENT_PRESERVING_TAGS, "var"],
+      });
+
+      if (settingsStore.debugMode) {
+        editor.debug = (event) => {
+          if (
+            event.type === "attach" ||
+            event.type === "input" ||
+            event.type === "extractLines:done" ||
+            event.type === "warn"
+          ) {
+            console.log("[WikiEditor][wikistxr]", event);
+          }
+        };
+      }
+
       editor.attach(editorContainer);
       editor.update(text);
 

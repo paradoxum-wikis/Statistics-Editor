@@ -1,6 +1,6 @@
 import Tower from "./tower";
 import { towerNames, fetchTowerWiki } from "./towers";
-import { resolveToken } from "$lib/neowtext/functions";
+import { resolveToken, type TableCache } from "$lib/neowtext/functions";
 import { parseWikitext, type TableData } from "$lib/neowtext/parser";
 import { patchWikitext } from "$lib/neowtext/patcher";
 import {
@@ -143,30 +143,16 @@ export default class TowerManager {
       console.log(`[TowerManager] Loading tower ${name} (no cache)`);
 
     const wikitextLoader = wikitextFiles[`./towers/${name}.wiki`];
-    if (!wikitextLoader) return null;
+    if (!wikitextLoader) return null; // look into this later
 
     let currentSource = "";
     let currentText = "";
 
+    const countVarBlocks = (source: string): number =>
+      (source.match(/<var\b[^>]*>[\s\S]*?<\/var>/gi) || []).length;
+
     try {
       const loadBase = async () => {
-        try {
-          const wikiText = await fetchTowerWiki(name);
-          if (wikiText) {
-            if (this.debug())
-              console.log(
-                `[TowerManager] Fetched wikitext from TDS Wiki for ${name}`,
-              );
-            setWikiOverride(this.dataKey ?? "Default", name, wikiText);
-            return wikiText;
-          }
-        } catch (err) {
-          console.warn(
-            `[TowerManager] Failed to fetch from TDS Wiki for ${name}:`,
-            err,
-          );
-        }
-
         try {
           const url = new URL(`./towers/${name}.wiki`, import.meta.url).href;
           if (this.debug())
@@ -181,8 +167,33 @@ export default class TowerManager {
             "[TowerManager] Fetch failed, falling back to loader:",
             e,
           );
-          return (await wikitextLoader()) as string;
+          try {
+            if (wikitextLoader) {
+              const loaded = await wikitextLoader();
+              if (loaded) return loaded as string;
+            }
+          } catch (loaderErr) {
+            console.warn("[TowerManager] Loader failed:", loaderErr);
+          }
         }
+
+        try {
+          const wikiText = await fetchTowerWiki(name);
+          if (wikiText) {
+            if (this.debug())
+              console.log(
+                `[TowerManager] Fetched wikitext from TDS Wiki for ${name} as fallback`,
+              );
+            return wikiText;
+          }
+        } catch (err) {
+          console.warn(
+            `[TowerManager] Failed to fetch from TDS Wiki for ${name}:`,
+            err,
+          );
+        }
+
+        return "";
       };
 
       const { source, text } = await loadEffectiveWikitext(
@@ -198,13 +209,49 @@ export default class TowerManager {
         );
 
       const parsed = parseWikitext(text);
-
       if (this.debug()) {
         console.log(`[TowerManager] Using wikitext source: ${source}`);
+        console.log("[TowerManager] Wikitext diagnostics:", {
+          hasVarOpenTag: /<var\b/i.test(text),
+          hasVarCloseTag: /<\/var>/i.test(text),
+          varBlockCount: countVarBlocks(text),
+          preview: text.slice(0, 300),
+        });
         console.log("[TowerManager] Parsed Variables:", parsed.variables);
       }
 
       const towerJson: any = {};
+
+      function buildTableCache(
+        tables: TableData[],
+        indexOverrides: Record<string, string>,
+      ): TableCache {
+        const cache: TableCache = {};
+        for (const table of tables) {
+          if (!table.name) continue;
+          const cleanName = stripRefs(table.name).trim();
+          const indexCol =
+            indexOverrides[cleanName] ||
+            indexOverrides[table.name] ||
+            table.headers[0];
+          const tCache: Record<number, Record<string, string | number>> = {};
+          for (const row of table.rows) {
+            const s = String(row[indexCol] ?? "");
+            const range = s.match(/^(\d+)[^\d]+(\d+)$/);
+            if (range) {
+              for (let l = parseInt(range[1]); l <= parseInt(range[2]); l++)
+                tCache[l] = row;
+            } else {
+              const n = parseInt(s);
+              if (!isNaN(n)) tCache[n] = row;
+            }
+          }
+          cache[table.name] = tCache;
+          cache[cleanName] = tCache;
+          cache[cleanName.replace(/\s+/g, "")] = tCache;
+        }
+        return cache;
+      }
 
       const buildSkinJson = (
         tableData: TableData,
@@ -236,6 +283,18 @@ export default class TowerManager {
         const getArr = (val?: string) =>
           val ? val.split(";").map((s) => s.trim()) : [];
         const v = parsed.variables;
+        const indexOverrides: Record<string, string> = {};
+        const indexVal = v["$FNC-INDEX$"];
+        if (indexVal) {
+          for (const entry of indexVal.split(";")) {
+            const m = entry.trim().match(/^(.+)\.([^.]+)$/);
+            if (m) indexOverrides[m[1].trim()] = m[2].trim();
+          }
+        }
+        const tableCache = buildTableCache(
+          [tableData, ...extraTables],
+          indexOverrides,
+        );
         const branchMapping: Record<string, string> = {};
         const branchNames = (
           isPvp && v["$FNC-PVP-BRANCH$"]
@@ -396,6 +455,8 @@ export default class TowerManager {
                 row,
                 formulaTokens,
                 isPvp,
+                0,
+                tableCache,
               );
               if (result !== undefined) {
                 readOnly.add(key);
@@ -518,6 +579,8 @@ export default class TowerManager {
                   resRow,
                   formulaTokens,
                   isPvp,
+                  0,
+                  tableCache,
                 );
                 if (result !== undefined) {
                   cellFormulaTokens[levelKey][key] = originalVal;
@@ -597,6 +660,7 @@ export default class TowerManager {
           IsPvp: isPvp,
           MoneyColumns: tableData.moneyColumns ?? [],
           ExtraTables: resolvedExtraTables,
+          TableCache: tableCache,
         };
       };
 
