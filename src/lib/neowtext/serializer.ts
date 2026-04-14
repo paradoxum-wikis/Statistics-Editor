@@ -78,7 +78,7 @@ export function serializeTable(data: SkinDataJSON): string {
     lines.push(serializeRow(row, Headers, MoneyColumns));
   }
 
-  lines.push("|}\n");
+  lines.push("|}");
 
   return lines.join("\n");
 }
