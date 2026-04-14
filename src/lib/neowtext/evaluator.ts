@@ -40,7 +40,7 @@ export function evaluateFormula(
   formula: string,
   row: Record<string, string | number>,
 ): number {
-  formula = formula.replace(/{{#expr:\s*(.*?)\s*}}/gi, "$1");
+  formula = stripRefs(formula).replace(/{{#expr:\s*(.*?)\s*}}/gi, "$1");
 
   // for example "Cost Efficiency" = "Cost_Efficiency"
   const numericContextAliased: Record<string, number> = {};

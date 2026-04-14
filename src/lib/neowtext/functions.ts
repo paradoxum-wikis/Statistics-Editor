@@ -1,5 +1,12 @@
 import { evaluateFormula } from "$lib/neowtext/evaluator";
-import { parseNumeric, stripRefs, formatReadOnly } from "$lib/utils/format";
+import {
+  parseNumeric,
+  stripRefs,
+  formatReadOnly,
+  getRofBugVer,
+  applyRofBug,
+} from "$lib/utils/format";
+import { settingsStore } from "$lib/stores/settings.svelte";
 
 /**
  * Resolves a $FNC-NAME$ function for the given row level.
@@ -158,9 +165,34 @@ export function resolveToken(
       /([a-zA-Z0-9_ ]+)\.([a-zA-Z0-9_ ]+)/g,
       (match, tname, col) => {
         const cached = tableCache?.[tname.trim()]?.[numLevel];
-        return cached?.[col.trim()] !== undefined
-          ? String(cached[col.trim()])
-          : match;
+        const cachedVal = cached?.[col.trim()];
+        if (cachedVal !== undefined && cached) {
+          const rofInfo = getRofBugVer(tokens);
+          const cleanCached: Record<string, string | number> = {};
+          for (const [k, v] of Object.entries(cached)) {
+            const cleanK = stripRefs(k);
+            if (settingsStore.rofBug && rofInfo.cols.includes(cleanK)) {
+              const n = Number(v);
+              cleanCached[k] =
+                !isNaN(n) && n !== 0 ? applyRofBug(n, rofInfo.type) : v;
+            } else {
+              cleanCached[k] = v;
+            }
+          }
+          const resolved = resolveToken(
+            String(cachedVal),
+            level,
+            cleanCached,
+            tokens,
+            isPvp,
+            depth + 1,
+            tableCache,
+          );
+          return resolved !== undefined
+            ? String(resolved)
+            : stripRefs(String(cachedVal));
+        }
+        return match;
       },
     );
 
