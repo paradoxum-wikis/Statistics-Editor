@@ -93,7 +93,9 @@ export function parseWikitext(content: string): ParsedWikitext {
   }
 
   const applyVariables = createVariableReplacer(variables);
-  const tabberMatch = text.match(/<tabber>([\s\S]*?)<\/tabber>/);
+  const tabberMatch = text.match(
+    /<div[^>]*class=["'][^"']*mobile-tabber[^"']*["'][^>]*>\s*<tabber>([\s\S]*?)<\/tabber>/i,
+  );
 
   if (tabberMatch) {
     for (const part of tabberMatch[1].split("|-|")) {

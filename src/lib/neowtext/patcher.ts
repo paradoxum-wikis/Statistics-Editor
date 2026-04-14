@@ -8,6 +8,7 @@ import { serializeTable, serializeVariables } from "./serializer";
  */
 export function patchWikitext(sourceWikitext: string, tower: Tower): string {
   let text = patchVariableBlock(sourceWikitext, buildVariablesMap(tower));
+  const allSerializedTables: string[] = [];
 
   for (const skinName of tower.skinNames) {
     const skin = tower.getSkin(skinName);
@@ -23,22 +24,30 @@ export function patchWikitext(sourceWikitext: string, tower: Tower): string {
         })
       : skin.rawRows;
 
-    const mainTable = serializeTable({
-      Headers: skin.headers,
-      RawHeaders: skin.rawHeaders,
-      RawRows: rowsForSerialization,
-      MoneyColumns: skin.moneyColumns,
-      Name: skin.tableName || "",
-    });
-
-    const extraTables = skin.extraTables?.map(serializeExtraTable).join("\n");
-    text = patchSkinTable(
-      text,
-      skinName,
-      extraTables ? `${mainTable}\n${extraTables}` : mainTable,
-      tower.skinNames,
+    allSerializedTables.push(
+      serializeTable({
+        Headers: skin.headers,
+        RawHeaders: skin.rawHeaders,
+        RawRows: rowsForSerialization,
+        MoneyColumns: skin.moneyColumns,
+        Name: skin.tableName || "",
+      }),
     );
+
+    if (skin.extraTables) {
+      for (const extraTable of skin.extraTables) {
+        allSerializedTables.push(serializeExtraTable(extraTable));
+      }
+    }
   }
+
+  let tableIndex = 0;
+  text = text.replace(/\{\|[\s\S]*?\|\}/g, (match) => {
+    if (tableIndex < allSerializedTables.length) {
+      return allSerializedTables[tableIndex++];
+    }
+    return match;
+  });
 
   return text;
 }
@@ -193,108 +202,6 @@ function patchVariableBlock(
     newBlock +
     text.substring(endIndex + endTag.length)
   );
-}
-
-/**
- * Finds the start of the first table and the end of the last table
- * in a block of content.
- *
- * Returns [startIndex, endIndex] or null.
- */
-function findAllTablesSpan(content: string): [number, number] | null {
-  const firstStart = content.indexOf("{|");
-  if (firstStart === -1) return null;
-
-  let lastEnd = -1;
-  let searchFrom = firstStart;
-  while (true) {
-    const end = content.indexOf("|}", searchFrom);
-    if (end === -1) break;
-    lastEnd = end + 2;
-    searchFrom = end + 2;
-  }
-
-  if (lastEnd === -1) return null;
-  return [firstStart, lastEnd];
-}
-
-/**
- * Replaces tables for a specific skin.
- */
-function patchSkinTable(
-  text: string,
-  skinName: string,
-  newTableMarkup: string,
-  allSkinNames: string[],
-): string {
-  const tabberStart = text.indexOf("<tabber>");
-  const tabberEnd = text.indexOf("</tabber>");
-  const isTabbed = tabberStart !== -1 && tabberEnd !== -1;
-
-  if (!isTabbed) {
-    const span = findAllTablesSpan(text);
-
-    if (span) {
-      return (
-        text.substring(0, span[0]) +
-        newTableMarkup.trim() +
-        text.substring(span[1])
-      );
-    }
-    return text + "\n" + newTableMarkup;
-  }
-
-  const tabberContent = text.substring(tabberStart + 8, tabberEnd);
-  const escapedSkinName = escapeRegExp(skinName);
-  const tabHeaderRegex = new RegExp(
-    `(^|\\|\\-\\|)\\s*${escapedSkinName}\\s*=\\s*`,
-  );
-  const match = tabberContent.match(tabHeaderRegex);
-
-  if (!match) {
-    console.warn(`[Patcher] Could not find tab for skin: ${skinName}`);
-    return text;
-  }
-
-  const matchIndexInContent = match.index! + match[0].length;
-  const restOfContent = tabberContent.substring(matchIndexInContent);
-  const nextDelimiterIndex = restOfContent.indexOf("|-|");
-
-  const tabSection =
-    nextDelimiterIndex === -1
-      ? restOfContent
-      : restOfContent.substring(0, nextDelimiterIndex);
-
-  const endOfTabContentIndex =
-    nextDelimiterIndex === -1
-      ? tabberContent.length
-      : matchIndexInContent + nextDelimiterIndex;
-
-  const span = findAllTablesSpan(tabSection);
-  let newTabContent: string;
-  if (span) {
-    newTabContent =
-      tabSection.substring(0, span[0]) +
-      newTableMarkup.trim() +
-      tabSection.substring(span[1]);
-  } else {
-    newTabContent = "\n" + newTableMarkup + "\n";
-  }
-
-  const newTabberContent =
-    tabberContent.substring(0, matchIndexInContent) +
-    newTabContent +
-    tabberContent.substring(endOfTabContentIndex);
-
-  return (
-    text.substring(0, tabberStart + 8) +
-    newTabberContent +
-    text.substring(tabberEnd)
-  );
-}
-
-function escapeRegExp(string: string) {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 function serializeExtraTable(
