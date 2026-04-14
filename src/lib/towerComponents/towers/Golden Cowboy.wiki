@@ -16,7 +16,6 @@ $IEREF$ = <ref name=ie>Money generated per 1 damage is calculated as (Income + C
 <div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Total Price !! Damage !! Firerate !! Spin Time !! Cash Shot !! Income !! Range !! DPS$DREF$ !! Cost Efficiency || Income Per Second$IREF$ || Income Efficiency$IEREF$
-!Income Efficiency<ref>Money generated per 1 damage is calculated as (Income + Cash Shot × Damage) ÷ (Cash Shot × Damage).</ref>
 |-
 | 0 || {{Money|$TP$}} || 2 || 0.35 || 1.75 || 6 || {{Money|25}} || 15 || $DPS$ || {{Money|$CE$}} || {{Money|$IPS$}} || {{Money|$IE$}}
 |-
