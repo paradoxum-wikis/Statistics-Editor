@@ -208,7 +208,7 @@ function parseTable(
 
     if (line.startsWith("!")) {
       if (/colspan/i.test(line)) continue;
-      for (const part of line.substring(1).split("!!")) {
+      for (const part of line.substring(1).split(/!!|\|\|/)) {
         rawHeaders.push(part.trim());
         headers.push(cleanHeader(part));
       }
