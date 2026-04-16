@@ -56,14 +56,14 @@ export function evaluateFormula(
     }
   }
 
-  let expression = formula
-    .replace(/\+\+\s*([a-zA-Z0-9_\-$]+)/g, "(1 + $1)") // prefix ++
-    .replace(/([a-zA-Z0-9_\-$]+)\s*\+\+/g, "($1 + 1)") // postfix ++
-    .replace(/--\s*([a-zA-Z0-9_\-$]+)/g, "(1 - $1)") // prefix --
-    .replace(/([a-zA-Z0-9_\-$]+)\s*--/g, "($1 - 1)"); // postfix --
-
   const keys = Object.keys(numericContextAliased);
-  expression = getReplacer(keys)(expression, numericContextAliased);
+  let expression = getReplacer(keys)(formula, numericContextAliased);
+
+  expression = expression
+    .replace(/\+\+\s*([a-zA-Z0-9_.\-$]+)/g, "(1 + $1)") // prefix ++
+    .replace(/([a-zA-Z0-9_.\-$]+)\s*\+\+/g, "($1 + 1)") // postfix ++
+    .replace(/--\s*([a-zA-Z0-9_.\-$]+)/g, "(1 - $1)") // prefix --
+    .replace(/([a-zA-Z0-9_.\-$]+)\s*--/g, "($1 - 1)"); // postfix --
 
   try {
     expression = transpileExpr(expression);
