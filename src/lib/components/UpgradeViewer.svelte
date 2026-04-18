@@ -112,8 +112,8 @@
                       {#if line.kind === "change"}
                         {@html renderCellHtml(line.stat, true)}: {@html renderCellHtml(
                           line.from,
-                          true,
-                        )} → {@html renderCellHtml(line.to, true)}
+                          false,
+                        )} → {@html renderCellHtml(line.to, false)}
                       {:else}
                         {@html renderCellHtml(line.stat, true)}
                       {/if}
