@@ -9,11 +9,7 @@
   import { untrack } from "svelte";
   import { SvelteMap } from "svelte/reactivity";
   import { settingsStore } from "$lib/stores/settings.svelte";
-  import {
-    applyRofBug,
-    toDisplayNumber,
-    getRofBugVer,
-  } from "$lib/utils/format";
+  import { applyRofBug, toNumericValue, getRofBugVer } from "$lib/utils/format";
 
   import Separator from "./smol/Separator.svelte";
   import { House, Settings, Sun, Moon, SunMoon, Check } from "@lucide/svelte";
@@ -150,8 +146,8 @@
         let displayTo: unknown = toVal;
 
         if (settingsStore.rofBug && rofCols.has(stat)) {
-          const fnum = toDisplayNumber(fromVal);
-          const tnum = toDisplayNumber(toVal);
+          const fnum = toNumericValue(fromVal);
+          const tnum = toNumericValue(toVal);
           if (fnum !== null) {
             const adj = applyRofBug(fnum, rofInfo.type);
             cmpFrom = adj;

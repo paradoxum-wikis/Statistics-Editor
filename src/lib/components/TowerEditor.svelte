@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { untrack } from "svelte";
   import { Tabs, Popover } from "bits-ui";
   import Separator from "./smol/Separator.svelte";
   import type Tower from "$lib/towerComponents/tower";
@@ -88,11 +87,13 @@
     tableIdx: number,
     levelIndex: number,
     header: string,
+    cellReadOnly: boolean,
   ): { delta: number | null; className: string } {
     const baseN = toDisplayNumber(
       towerStore.baseline[mkCellKey(skinName, tableIdx, levelIndex, header)],
+      cellReadOnly,
     );
-    const currentN = toDisplayNumber(currentValue);
+    const currentN = toDisplayNumber(currentValue, cellReadOnly);
 
     if (baseN == null || currentN == null)
       return { delta: null, className: "" };
@@ -415,6 +416,7 @@
                       config.tableIdx,
                       rowIdx,
                       header,
+                      !editable,
                     )
                   : { delta: null, className: "" }}
                 {@const isMoney = config.moneyColumns.includes(header)}

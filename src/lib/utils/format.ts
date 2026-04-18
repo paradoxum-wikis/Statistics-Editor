@@ -116,11 +116,9 @@ export function applyRofBug(
 }
 
 /**
- * Parses a value to the same as whatever is displayed on the table.
- * This matches formatReadOnly's precision so formulas and deltas
- * use the same values the user sees.
+ * Parses a raw cell value to a number
  */
-export function toDisplayNumber(v: unknown): number | null {
+export function toNumericValue(v: unknown): number | null {
   let n: number;
   if (typeof v === "number") {
     n = v;
@@ -130,5 +128,16 @@ export function toDisplayNumber(v: unknown): number | null {
   } else {
     return null;
   }
+  return Number.isFinite(n) ? n : null;
+}
+
+/**
+ * Same numeric value the cell shows after {@link renderCellHtml}'s formatting
+ */
+export function toDisplayNumber(v: unknown, readOnly: boolean): number | null {
+  if (v === undefined || v === null) return null;
+  const s = readOnly ? formatReadOnly(v) : formatValue(v);
+  if (s === "-" || s === "") return null;
+  const n = parseNumeric(s);
   return Number.isFinite(n) ? n : null;
 }
