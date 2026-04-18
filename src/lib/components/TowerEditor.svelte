@@ -307,11 +307,16 @@
     config: TableConfig,
     applyDisplayRofBug: boolean = true,
   ): Record<string, string | number>[] {
-    return config.rows.map((r, rowIdx) => {
-      const keyMap = new Map<string, string>();
-      for (const k of Object.keys(r)) keyMap.set(k, stripRefs(k));
+    if (config.rows.length === 0) return [];
 
+    const keyMap = new Map<string, string>();
+    for (const k of Object.keys(config.rows[0])) {
+      keyMap.set(k, stripRefs(k));
+    }
+
+    return config.rows.map((r, rowIdx) => {
       const cleanRow: Record<string, string | number> = {};
+
       for (const [k, v] of Object.entries(r)) {
         const ck = keyMap.get(k)!;
         if (
