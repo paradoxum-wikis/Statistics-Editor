@@ -130,10 +130,29 @@
     if (skinData.extraTables) {
       skinData.extraTables.forEach((extTable, idx) => {
         const tableIdx = idx + 1;
-        for (let i = 0; i < extTable.rows.length; i++) {
+        const resolvedRows = buildDisplayRows(
+          {
+            skinName,
+            tableIdx,
+            tableName: extTable.name,
+            headers: extTable.headers,
+            rows: extTable.rows,
+            moneyColumns: extTable.moneyColumns,
+            readOnlyColumns: extTable.readOnlyColumns,
+            skinData: null,
+            cellFormulaTokens: extTable.cellFormulaTokens,
+            formulaTokens: skinData.formulaTokens,
+            isPvp: skinData.isPvp,
+            branchSuffix: extTable.branchSuffix,
+            tableCache: skinData.tableCache,
+          } as any,
+          false,
+        );
+
+        for (let i = 0; i < resolvedRows.length; i++) {
           for (const header of extTable.headers) {
             next[mkCellKey(skinName, tableIdx, i, header)] =
-              header === "Level" ? i : extTable.rows[i][header];
+              header === "Level" ? i : resolvedRows[i][header];
           }
         }
       });
@@ -285,6 +304,7 @@
 
   function buildDisplayRows(
     config: TableConfig,
+    applyDisplayRofBug: boolean = true,
   ): Record<string, string | number>[] {
     return config.rows.map((r, rowIdx) => {
       const keyMap = new Map<string, string>();
@@ -293,7 +313,11 @@
       const cleanRow: Record<string, string | number> = {};
       for (const [k, v] of Object.entries(r)) {
         const ck = keyMap.get(k)!;
-        if (settingsStore.rofBug && rofInfo.cols.has(ck)) {
+        if (
+          applyDisplayRofBug &&
+          settingsStore.rofBug &&
+          rofInfo.cols.has(ck)
+        ) {
           const n = Number(v);
           cleanRow[ck] =
             !isNaN(n) && n !== 0
@@ -326,6 +350,7 @@
               isPvp,
               0,
               tCache,
+              applyDisplayRofBug,
             );
             if (res != null) cleanRow[stripRefs(col)] = res;
           }
@@ -342,6 +367,7 @@
 
 {#snippet dataTable(config: TableConfig, isFirst: boolean)}
   {@const displayRows = buildDisplayRows(config)}
+  {@const compareRows = buildDisplayRows(config, false)}
   <div
     class="table-container {!isFirst
       ? 'extra-table-container'
@@ -384,7 +410,7 @@
                 {@const editable = isCellEditable(config, header)}
                 {@const deltaInfo = settingsStore.seeValueDifference
                   ? getDeltaForCell(
-                      config.rows[rowIdx]?.[header],
+                      compareRows[rowIdx]?.[header],
                       config.skinName,
                       config.tableIdx,
                       rowIdx,

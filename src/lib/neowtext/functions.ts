@@ -100,6 +100,7 @@ export function resolveToken(
   isPvp: boolean,
   depth = 0,
   tableCache?: TableCache,
+  applyRofToCache: boolean = false,
 ): string | number | undefined {
   token = stripRefs(token).trim();
   if (depth > 10) return undefined;
@@ -118,6 +119,7 @@ export function resolveToken(
         isPvp,
         depth + 1,
         tableCache,
+        applyRofToCache,
       );
 
       if (typeof resolved === "number") {
@@ -147,6 +149,7 @@ export function resolveToken(
         isPvp,
         depth + 1,
         tableCache,
+        applyRofToCache,
       );
     }
 
@@ -159,6 +162,7 @@ export function resolveToken(
         isPvp,
         depth + 1,
         tableCache,
+        applyRofToCache,
       );
       return resolved !== undefined ? String(resolved) : "0";
     });
@@ -174,14 +178,30 @@ export function resolveToken(
     val = val.replace(
       /([a-zA-Z0-9_ ]+)\.([a-zA-Z0-9_ ]+)/g,
       (match, tname, col) => {
-        const cached = tableCache?.[tname.trim()]?.[numLevel];
-        const cachedVal = cached?.[col.trim()];
+        const tableName = tname.trim();
+        const columnName = col.trim();
+        const cached = tableCache?.[tableName]?.[numLevel];
+        const cachedVal = cached?.[columnName];
+
+        if (settingsStore.debugMode) {
+          console.log("[resolveToken] cross-table lookup", {
+            token,
+            level,
+            numLevel,
+            tableName,
+            columnName,
+            cacheHit: cached !== undefined,
+            cachedValue: cachedVal,
+            applyRofToCache,
+          });
+        }
+
         if (cachedVal !== undefined && cached) {
           const rofInfo = getRofBugVer(tokens);
           const cleanCached: Record<string, string | number> = {};
           for (const [k, v] of Object.entries(cached)) {
             const cleanK = stripRefs(k);
-            if (settingsStore.rofBug && rofInfo.cols.includes(cleanK)) {
+            if (applyRofToCache && rofInfo.cols.includes(cleanK)) {
               const n = Number(v);
               cleanCached[k] =
                 !isNaN(n) && n !== 0 ? applyRofBug(n, rofInfo.type) : v;
@@ -189,6 +209,16 @@ export function resolveToken(
               cleanCached[k] = v;
             }
           }
+
+          if (settingsStore.debugMode) {
+            console.log("[resolveToken] cross-table cache row", {
+              tableName,
+              columnName,
+              rawCached: cached,
+              cleanCached,
+            });
+          }
+
           const resolved = resolveToken(
             String(cachedVal),
             level,
@@ -197,11 +227,33 @@ export function resolveToken(
             isPvp,
             depth + 1,
             tableCache,
+            applyRofToCache,
           );
+
+          if (settingsStore.debugMode) {
+            console.log("[resolveToken] cross-table resolved", {
+              tableName,
+              columnName,
+              cachedValue: cachedVal,
+              resolved,
+            });
+          }
+
           return resolved !== undefined
             ? String(resolved)
             : stripRefs(String(cachedVal));
         }
+
+        if (settingsStore.debugMode) {
+          console.log("[resolveToken] cross-table miss", {
+            token,
+            level,
+            numLevel,
+            tableName,
+            columnName,
+          });
+        }
+
         return match;
       },
     );

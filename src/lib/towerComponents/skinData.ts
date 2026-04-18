@@ -5,6 +5,8 @@ import Levels from "./levels";
 import Locator from "./locator";
 import { resolveToken, type TableCache } from "$lib/neowtext/functions";
 import type { TableData } from "$lib/neowtext/parser";
+import { settingsStore } from "$lib/stores/settings.svelte";
+import { stripRefs } from "$lib/utils/format";
 
 type FormulaToken = string; // e.g. "$DPS$", "$DPS2$"
 type FormulaTokenMap = Record<string, string>; // token -> expression
@@ -144,9 +146,72 @@ class SkinData {
     }
   }
 
+  private rebuildTableCache(): void {
+    const indexOverrides: Record<string, string> = {};
+    const indexVal = this.formulaTokens["$FNC-INDEX$"];
+    if (indexVal) {
+      for (const entry of indexVal.split(";")) {
+        const m = entry.trim().match(/^(.+)\.([^.]+)$/);
+        if (m) indexOverrides[m[1].trim()] = m[2].trim();
+      }
+    }
+
+    const buildCacheFor = (
+      tableName: string,
+      headers: string[],
+      rows: Record<string, string | number>[],
+    ) => {
+      if (!tableName || !headers.length) return;
+
+      const cleanName = stripRefs(tableName).trim();
+      const indexCol =
+        indexOverrides[cleanName] || indexOverrides[tableName] || headers[0];
+
+      const tCache: Record<number, Record<string, string | number>> = {};
+      for (const row of rows) {
+        const s = String(row[indexCol] ?? "");
+        const range = s.match(/^(\d+)[^\d]+(\d+)$/);
+        if (range) {
+          for (let l = parseInt(range[1]); l <= parseInt(range[2]); l++) {
+            tCache[l] = row;
+          }
+        } else {
+          const n = parseInt(s);
+          if (!isNaN(n)) tCache[n] = row;
+        }
+      }
+
+      this.tableCache[tableName] = tCache;
+      this.tableCache[cleanName] = tCache;
+      this.tableCache[cleanName.replace(/\s+/g, "")] = tCache;
+    };
+
+    this.tableCache = {};
+    buildCacheFor(this.tableName, this.headers, this.rawRows);
+
+    for (const table of this.extraTables) {
+      buildCacheFor(table.name, table.headers, table.rows);
+    }
+  }
+
   refreshDerivedData(): void {
+    if (settingsStore.debugMode) {
+      console.log(
+        `[SkinData] refreshDerivedData start (skin=${this.name}, table=${this.tableName}, rawRows=${this.rawRows?.length ?? 0})`,
+      );
+      console.log("[SkinData] tableCache keys:", Object.keys(this.tableCache));
+    }
+
+    this.rebuildTableCache();
     this.recomputeCalculatedColumns();
+    this.rebuildTableCache();
     this.createData();
+
+    if (settingsStore.debugMode) {
+      console.log(
+        `[SkinData] refreshDerivedData end (skin=${this.name}, levels=${this.levels?.levels?.length ?? 0})`,
+      );
+    }
   }
 
   /**
@@ -159,43 +224,99 @@ class SkinData {
    * - `this.data.Defaults` / `this.data.Upgrades[*].Stats` to match recomputed values
    */
   recomputeCalculatedColumns(onlyLevel?: number): void {
-    if (!this.rawRows?.length) return;
-    if (!Object.keys(this.formulaTokens).length) return;
-    if (!Object.keys(this.cellFormulaTokens).length) return;
+    if (settingsStore.debugMode) {
+      console.log(
+        `[SkinData] recomputeCalculatedColumns start (skin=${this.name}, onlyLevel=${onlyLevel ?? "all"})`,
+      );
+    }
 
-    const start = onlyLevel ?? 0;
-    const end = onlyLevel != null ? onlyLevel + 1 : this.rawRows.length;
+    if (this.extraTables && this.extraTables.length > 0) {
+      let extraTablesChanged = false;
 
-    for (let level = start; level < end; level++) {
-      const row = this.rawRows[level];
-      if (!row || typeof row !== "object") continue;
-      const perLevel = this.cellFormulaTokens[String(level)];
-      if (!perLevel) continue;
-      for (const [col, token] of Object.entries(perLevel)) {
-        const result = resolveToken(
-          token,
-          level,
-          row,
-          this.formulaTokens,
-          this.isPvp,
-          0,
-          this.tableCache,
-        );
+      for (const table of this.extraTables) {
+        if (!table.cellFormulaTokens) continue;
 
-        if (result !== undefined) {
-          row[col] = result;
-          if (typeof result === "number" && Number.isFinite(result)) {
-            this.setDerivedValueAtLevel(level, col, result);
-          } else if (typeof result === "string") {
-            this.setDerivedValueAtLevel(level, col, result as any);
+        for (let level = 0; level < table.rows.length; level++) {
+          const row = table.rows[level];
+          if (!row || typeof row !== "object") continue;
+
+          const perLevel = table.cellFormulaTokens[String(level)];
+          if (!perLevel) continue;
+
+          for (let pass = 0; pass < 2; pass++) {
+            for (const [col, token] of Object.entries(perLevel)) {
+              const levelVal =
+                row["Level"] !== undefined
+                  ? String(row["Level"]) + (table.branchSuffix || "")
+                  : String(level) + (table.branchSuffix || "");
+
+              const result = resolveToken(
+                token,
+                levelVal,
+                row,
+                this.formulaTokens,
+                this.isPvp,
+                0,
+                this.tableCache,
+              );
+
+              if (result !== undefined) {
+                row[col] = result;
+                row[stripRefs(col)] = result;
+                extraTablesChanged = true;
+              }
+            }
           }
         }
+      }
 
-        if (typeof result === "number" && Number.isFinite(result)) {
-          row[col] = result;
-          this.setDerivedValueAtLevel(level, col, result);
+      if (extraTablesChanged) {
+        this.rebuildTableCache();
+      }
+    }
+
+    if (
+      this.rawRows?.length &&
+      Object.keys(this.formulaTokens).length &&
+      Object.keys(this.cellFormulaTokens).length
+    ) {
+      const start = onlyLevel ?? 0;
+      const end = onlyLevel != null ? onlyLevel + 1 : this.rawRows.length;
+
+      for (let level = start; level < end; level++) {
+        const row = this.rawRows[level];
+        if (!row || typeof row !== "object") continue;
+
+        const perLevel = this.cellFormulaTokens[String(level)];
+        if (!perLevel) continue;
+
+        for (const [col, token] of Object.entries(perLevel)) {
+          const result = resolveToken(
+            token,
+            level,
+            row,
+            this.formulaTokens,
+            this.isPvp,
+            0,
+            this.tableCache,
+          );
+
+          if (result !== undefined) {
+            row[col] = result;
+            if (typeof result === "number" && Number.isFinite(result)) {
+              this.setDerivedValueAtLevel(level, col, result);
+            } else if (typeof result === "string") {
+              this.setDerivedValueAtLevel(level, col, result as any);
+            }
+          }
         }
       }
+    }
+
+    if (settingsStore.debugMode) {
+      console.log(
+        `[SkinData] recomputeCalculatedColumns end (skin=${this.name})`,
+      );
     }
   }
 
