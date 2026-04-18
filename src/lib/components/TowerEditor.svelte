@@ -194,6 +194,7 @@
     if (disabled) return;
     const n = Number(value);
     row[header] = value.trim() !== "" && !isNaN(n) ? n : value;
+    activeSkinData?.skin.refreshDerivedData();
     towerStore.refresh();
     towerStore.syncWikitext();
   }

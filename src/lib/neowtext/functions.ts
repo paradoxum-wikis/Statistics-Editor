@@ -117,6 +117,7 @@ export function resolveToken(
         tokens,
         isPvp,
         depth + 1,
+        tableCache,
       );
 
       if (typeof resolved === "number") {
@@ -138,7 +139,15 @@ export function resolveToken(
     let val = isVar ? tokens[token] : token;
 
     if (isVar && /^\$[^$]+\$$/.test(val)) {
-      return resolveToken(val, level, row, tokens, isPvp, depth + 1);
+      return resolveToken(
+        val,
+        level,
+        row,
+        tokens,
+        isPvp,
+        depth + 1,
+        tableCache,
+      );
     }
 
     val = val.replace(/\$([^$\s]+)\$/g, (match) => {
@@ -149,6 +158,7 @@ export function resolveToken(
         tokens,
         isPvp,
         depth + 1,
+        tableCache,
       );
       return resolved !== undefined ? String(resolved) : "0";
     });

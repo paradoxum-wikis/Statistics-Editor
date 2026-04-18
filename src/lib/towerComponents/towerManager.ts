@@ -660,7 +660,10 @@ export default class TowerManager {
           IsPvp: isPvp,
           MoneyColumns: tableData.moneyColumns ?? [],
           ExtraTables: resolvedExtraTables,
-          TableCache: tableCache,
+          TableCache: buildTableCache(
+            [{ ...tableData, rows }, ...resolvedExtraTables],
+            indexOverrides,
+          ),
         };
       };
 

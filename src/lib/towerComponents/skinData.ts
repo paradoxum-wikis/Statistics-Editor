@@ -144,6 +144,11 @@ class SkinData {
     }
   }
 
+  refreshDerivedData(): void {
+    this.recomputeCalculatedColumns();
+    this.createData();
+  }
+
   /**
    * Recompute calculated columns (like DPS) for the current skin using:
    * - `formulaTokens` (token -> expression)
@@ -255,7 +260,7 @@ class SkinData {
       this.rawRows[level][attribute] = newValue;
     }
     this.recomputeCalculatedColumns(level);
-    this.createData();
+    this.refreshDerivedData();
   }
 
   get(level: number, attribute: string) {
