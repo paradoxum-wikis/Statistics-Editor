@@ -6,7 +6,7 @@ on:
 
 jobs:
   notify-discord:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     permissions:
       contents: read
     steps:
@@ -15,7 +15,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Send Discord notification (all commits in push)
+      - name: Send Discord notification
         uses: actions/github-script@v6
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
