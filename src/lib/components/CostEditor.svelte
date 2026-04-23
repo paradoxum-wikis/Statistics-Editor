@@ -5,7 +5,11 @@
   import { CircleDollarSign } from "@lucide/svelte";
   import { parseNumeric } from "$lib/utils/format";
 
-  type CostRow = { level: number; cost: number };
+  type CostRow = {
+    level: number;
+    label: string;
+    cost: number;
+  };
 
   let open = $state(false);
   let skinData = $derived(
@@ -17,6 +21,7 @@
     if (!skinData?.formulaTokens) return [];
 
     const levels = skinData.levels?.levels ?? [];
+    const upgrades = skinData.upgrades ?? [];
     const rows: CostRow[] = [];
 
     const costKey =
@@ -31,7 +36,15 @@
     for (let i = 0; i < levels.length; i++) {
       const costStr = costArr[i];
       const num = parseNumeric(costStr || "0");
-      rows.push({ level: i, cost: isNaN(num) ? 0 : num });
+      const label =
+        i === 0
+          ? "Base"
+          : String(
+              upgrades[i - 1]?.upgradeData?.Level != null
+                ? upgrades[i - 1].upgradeData.Level
+                : i,
+            );
+      rows.push({ level: i, label, cost: isNaN(num) ? 0 : num });
     }
 
     return rows;
@@ -62,8 +75,11 @@
     <div class="grid gap-1.5">
       {#each costRows as row (row.level)}
         <div class="cost-row">
-          <span class="level-label">
-            {row.level === 0 ? "Base" : `Upg. ${row.level}`}
+          <span
+            class="level-label"
+            title={row.level === 0 ? "Base" : `Slot ${row.level}`}
+          >
+            {row.level === 0 ? row.label : `Upg. ${row.label}`}
           </span>
           <input
             type="number"
@@ -103,8 +119,12 @@
   .level-label {
     font-size: 0.7rem;
     color: var(--muted-foreground);
-    width: 2.75rem;
+    min-width: 3.25rem;
+    max-width: 5rem;
     flex-shrink: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .cost-input {
