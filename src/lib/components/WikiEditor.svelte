@@ -27,6 +27,7 @@
   let errorMessage = $state<string | null>(null);
   let editorContainer = $state<HTMLElement>();
   let editor = $state<WikitextEditor>();
+  let pendingDomSyncFrame = $state<number | null>(null);
 
   let profileName = $derived(profileStore.current);
 
@@ -62,6 +63,15 @@
     return (container.innerText ?? "").replace(/\r\n/g, "\n");
   }
 
+  function scheduleSyncFromEditorDom() {
+    if (pendingDomSyncFrame != null) return;
+
+    pendingDomSyncFrame = requestAnimationFrame(() => {
+      pendingDomSyncFrame = null;
+      syncFromEditorDom();
+    });
+  }
+
   function syncFromEditorDom() {
     if (!editorContainer) return;
 
@@ -73,7 +83,7 @@
 
     status = "ready";
     towerStore.effectiveWikitext = nextText;
-    towerStore.isDirty = true;
+    towerStore.isDirty = nextText !== towerStore.originalWikitext;
 
     if (settingsStore.debugMode) {
       console.log(
@@ -209,11 +219,30 @@
       editor.attach(editorContainer);
       editor.update(text);
 
-      const editorInputHandler = () => syncFromEditorDom();
+      const editorInputHandler = () => scheduleSyncFromEditorDom();
+      const observer = new MutationObserver(() => scheduleSyncFromEditorDom());
       editorContainer.addEventListener("input", editorInputHandler);
+      editorContainer.addEventListener("beforeinput", editorInputHandler);
+      editorContainer.addEventListener("paste", editorInputHandler);
+      editorContainer.addEventListener("cut", editorInputHandler);
+      editorContainer.addEventListener("drop", editorInputHandler);
+      observer.observe(editorContainer, {
+        subtree: true,
+        childList: true,
+        characterData: true,
+      });
 
       return () => {
+        observer.disconnect();
         editorContainer?.removeEventListener("input", editorInputHandler);
+        editorContainer?.removeEventListener("beforeinput", editorInputHandler);
+        editorContainer?.removeEventListener("paste", editorInputHandler);
+        editorContainer?.removeEventListener("cut", editorInputHandler);
+        editorContainer?.removeEventListener("drop", editorInputHandler);
+        if (pendingDomSyncFrame != null) {
+          cancelAnimationFrame(pendingDomSyncFrame);
+          pendingDomSyncFrame = null;
+        }
       };
     }
 
