@@ -69,7 +69,13 @@
     return `${skinName}:${tableIdx}:${rowIdx}:${header}`;
   }
 
-  const INVERSE_STATS = new Set(["cooldown", "cost", "price"]);
+  const INVERSE_STATS = new Set([
+    "cooldown",
+    "firerate",
+    "cost",
+    "price",
+    "rev-up time",
+  ]);
 
   function formatDelta(delta: number): string {
     return `${delta > 0 ? "+" : ""}${formatNumber(delta)}`;
