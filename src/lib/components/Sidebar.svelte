@@ -82,11 +82,60 @@
     const result: { [key: number]: SummaryLine[] } = {};
     if (!skin?.levels?.levels) return result;
 
-    const levels = skin.levels.levels;
-    const attributes: string[] =
-      skin.headers && skin.headers.length > 0
-        ? skin.headers
-        : (skin.levels.attributes ?? []);
+    const attributes: string[] = skin.levels.attributes ?? [];
+    const excludedSummaryStats = new Set(["Level"]);
+
+    const parseLevelLabel = (
+      value: unknown,
+    ): { numeric: number | null; suffix: string } => {
+      const raw = String(value ?? "").trim();
+      const match = raw.match(/^(\d+)([A-Za-z]*)$/);
+      if (!match) return { numeric: null, suffix: "" };
+      return {
+        numeric: Number.parseInt(match[1], 10),
+        suffix: (match[2] ?? "").toUpperCase(),
+      };
+    };
+
+    const upgradeLevelLabels: string[] = (skin.upgrades ?? []).map(
+      (upgrade: any, index: number) =>
+        String(upgrade?.upgradeData?.Level ?? index + 1),
+    );
+
+    function resolveFromLevel(upgradeIndex: number): number {
+      const current = parseLevelLabel(upgradeLevelLabels[upgradeIndex]);
+      if (current.numeric == null) {
+        return upgradeIndex > 0 ? upgradeIndex : 0;
+      }
+
+      let parentUpgradeIndex = -1;
+
+      for (let i = upgradeIndex - 1; i >= 0; i--) {
+        const prev = parseLevelLabel(upgradeLevelLabels[i]);
+        if (prev.numeric == null || prev.numeric >= current.numeric) continue;
+        if ((prev.suffix || "") === current.suffix) {
+          parentUpgradeIndex = i;
+          break;
+        }
+      }
+
+      if (parentUpgradeIndex === -1 && current.suffix) {
+        for (let i = upgradeIndex - 1; i >= 0; i--) {
+          const prev = parseLevelLabel(upgradeLevelLabels[i]);
+          if (prev.numeric == null || prev.numeric >= current.numeric) continue;
+          if (!prev.suffix) {
+            parentUpgradeIndex = i;
+            break;
+          }
+        }
+      }
+
+      if (parentUpgradeIndex === -1 && upgradeIndex > 0) {
+        parentUpgradeIndex = upgradeIndex - 1;
+      }
+
+      return parentUpgradeIndex === -1 ? 0 : parentUpgradeIndex + 1;
+    }
 
     const rofInfo = getRofBugVer(skin?.formulaTokens);
     const rofCols = new Set(rofInfo.cols);
@@ -104,37 +153,13 @@
       upgradeIndex++
     ) {
       const toLevel = upgradeIndex + 1;
-      let fromLevel = upgradeIndex;
-
-      const upgradeLevel = skin.upgrades[upgradeIndex]?.upgradeData?.Level;
-      if (upgradeLevel !== undefined) {
-        const lvlStr = String(upgradeLevel);
-        const numPart = parseInt(lvlStr, 10);
-        const suffix = lvlStr.replace(/[0-9]/g, "");
-
-        if (numPart > 1) {
-          const prevLvlStr = `${numPart - 1}${suffix}`;
-          const parentLvlStr = `${numPart - 1}`;
-
-          const parentIdx = skin.upgrades.findIndex(
-            (u: any) =>
-              String(u.upgradeData?.Level) === prevLvlStr ||
-              String(u.upgradeData?.Level) === parentLvlStr,
-          );
-          if (parentIdx !== -1) {
-            fromLevel = parentIdx + 1;
-          } else {
-            fromLevel = 0;
-          }
-        } else {
-          fromLevel = 0;
-        }
-      }
+      const fromLevel = resolveFromLevel(upgradeIndex);
 
       const lines: SummaryLine[] = [];
 
       for (const stat of attributes) {
         if (["Hidden", "Flying", "Lead"].includes(stat)) continue;
+        if (excludedSummaryStats.has(stat)) continue;
         if (allReadOnly.has(stat)) continue;
 
         const fromVal = skin.levels.getCell(fromLevel, stat);
