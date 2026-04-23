@@ -53,7 +53,7 @@
 
   const STATS_BY_ICON: Array<[icon: string, stats: string[]]> = [
     [DamageIcon, ["Damage"]],
-    [CooldownIcon, ["Cooldown", "Tick"]],
+    [CooldownIcon, ["Cooldown", "Tick", "Firerate"]],
     [IncomeIcon, ["Income"]],
     [RangeIcon, ["Range"]],
     [HiddenIcon, ["Hidden"]],
