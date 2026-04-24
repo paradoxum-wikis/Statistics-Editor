@@ -223,6 +223,7 @@
     imageLoader.setDebugMode(settingsStore.debugMode);
     settingsStore.rofBug;
     towerStore.effectiveWikitext;
+    towerStore.refreshTrigger;
 
     const tower = towerStore.selectedData;
     if (!tower) {

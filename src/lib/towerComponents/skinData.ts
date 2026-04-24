@@ -332,6 +332,46 @@ class SkinData {
     this.levels = new Levels(this);
   }
 
+  /**
+   * Maps an extra-table cell to the 1-based level index used by {@link set}.
+   * Primary rows (Level > 0), then `extraTables` with `branchSuffix`.
+   */
+  upgradeLevelForExtraTableCell(
+    extraTableIndex: number,
+    rowIndex: number,
+  ): number | null {
+    const table = this.extraTables[extraTableIndex];
+    if (!table?.branchSuffix) return null;
+
+    let upgradeIdx = 0;
+    for (const row of this.rawRows) {
+      const n = Number(row["Level"]);
+      if (Number.isFinite(n) && n > 0) upgradeIdx++;
+    }
+
+    for (let t = 0; t < this.extraTables.length; t++) {
+      const ext = this.extraTables[t];
+      if (!ext.branchSuffix) continue;
+
+      if (t === extraTableIndex) {
+        for (let r = 0; r < ext.rows.length; r++) {
+          const n = Number(ext.rows[r]["Level"]);
+          if (!Number.isFinite(n) || n <= 0) continue;
+          if (r === rowIndex) return upgradeIdx + 1;
+          upgradeIdx++;
+        }
+        return null;
+      }
+
+      for (const row of ext.rows) {
+        const n = Number(row["Level"]);
+        if (Number.isFinite(n) && n > 0) upgradeIdx++;
+      }
+    }
+
+    return null;
+  }
+
   setCost(level: number, value: number): void {
     const costKey =
       this.isPvp && this.formulaTokens["$FNC-PVP-COST$"] !== undefined
@@ -380,7 +420,9 @@ class SkinData {
     if (this.rawRows?.[level] && typeof this.rawRows[level] === "object") {
       this.rawRows[level][attribute] = newValue;
     }
-    this.recomputeCalculatedColumns(level);
+    const onlyPrimaryLevel =
+      level > 0 && level < this.rawRows.length ? level : undefined;
+    this.recomputeCalculatedColumns(onlyPrimaryLevel);
     this.refreshDerivedData();
   }
 

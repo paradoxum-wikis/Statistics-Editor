@@ -213,14 +213,38 @@
   }
 
   function updateRowStat(
-    row: Record<string, string | number>,
+    skinData: SkinData,
+    extraTableIndex: number,
+    rowIdx: number,
     header: string,
     value: string,
   ) {
     if (disabled) return;
-    const n = Number(value);
-    row[header] = value.trim() !== "" && !isNaN(n) ? n : value;
-    activeSkinData?.skin.refreshDerivedData();
+    const row = skinData.extraTables?.[extraTableIndex]?.rows?.[rowIdx];
+    if (!row) return;
+
+    let parsedValue: string | number | boolean = value;
+    if (value === "true") parsedValue = true;
+    else if (value === "false") parsedValue = false;
+    else if (value.trim() !== "" && !isNaN(Number(value)))
+      parsedValue = Number(value);
+
+    row[header] = parsedValue as string | number;
+
+    const level = skinData.upgradeLevelForExtraTableCell(
+      extraTableIndex,
+      rowIdx,
+    );
+    if (level != null) {
+      const upgradeStats = skinData.data?.Upgrades?.[level - 1]?.Stats;
+      if (upgradeStats && typeof upgradeStats === "object") {
+        upgradeStats[header] = parsedValue;
+      }
+      skinData.set(level, header, parsedValue);
+    } else {
+      skinData.refreshDerivedData();
+    }
+
     towerStore.refresh();
     towerStore.syncWikitext();
   }
@@ -305,7 +329,11 @@
     if (config.skinData) {
       updateStatForSkin(config.skinData, rowIdx, header, value);
     } else {
-      updateRowStat(config.rows[rowIdx], header, value);
+      const skin = activeSkinData?.skin;
+      if (!skin) return;
+      const extraTableIndex = config.tableIdx - 1;
+      if (extraTableIndex < 0) return;
+      updateRowStat(skin, extraTableIndex, rowIdx, header, value);
     }
   }
 
