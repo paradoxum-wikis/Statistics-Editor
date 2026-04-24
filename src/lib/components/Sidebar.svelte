@@ -83,7 +83,7 @@
     if (!skin?.levels?.levels) return result;
 
     const attributes: string[] = skin.levels.attributes ?? [];
-    const excludedSummaryStats = new Set(["Level"]);
+    const excludedSummaryStats = new Set(["Level", "Cost"]);
 
     const parseLevelLabel = (
       value: unknown,
