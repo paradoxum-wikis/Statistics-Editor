@@ -261,11 +261,6 @@ export default class TowerManager {
         const defaults: any = {};
         const upgrades: any[] = [];
         const readOnly = new Set<string>();
-        const curDetections: Record<string, boolean> = {
-          Lead: false,
-          Hidden: false,
-          Flying: false,
-        };
 
         const rows = [...tableData.rows];
 

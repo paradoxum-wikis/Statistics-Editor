@@ -555,6 +555,7 @@ button {
     color: white;
   }
 }
+/* */
 
 /* sections */
 .section-trigger {
@@ -589,6 +590,7 @@ button {
   transition: transform 0.15s ease;
   flex-shrink: 0;
 }
+/* */
 
 .wiki-link {
   color: var(--link);
