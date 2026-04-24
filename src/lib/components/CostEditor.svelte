@@ -60,8 +60,8 @@
       skin.setCost(level, value);
     }
 
-    towerStore.save();
     towerStore.refresh();
+    towerStore.syncWikitext();
   }
 </script>
 
