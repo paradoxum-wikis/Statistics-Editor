@@ -11,7 +11,7 @@
     cost: number;
   };
 
-  let open = $state(false);
+  let open = $state(true);
   let skinData = $derived(
     towerStore.selectedData?.getSkin(towerStore.selectedSkinName),
   );
