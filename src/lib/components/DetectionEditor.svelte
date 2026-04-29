@@ -90,8 +90,8 @@
 >
   {#if skinData}
     <div class="grid gap-2">
-      {#each detectionTypes as detection}
-        <div class="detection-row">
+      {#each detectionTypes as detection (detection.type)}
+        <div class="subtle-row-surface flex items-center justify-between p-1">
           <div class="flex items-center gap-1.5 px-1">
             <img
               src={detection.icon}
@@ -151,17 +151,3 @@
     </p>
   {/if}
 </CollapsibleSection>
-
-<style>
-  @reference "../../routes/layout.css";
-
-  .detection-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.25rem;
-    border-radius: calc(var(--radius) - 0.25rem) 0;
-    border: 1px solid var(--border);
-    @apply bg-secondary/10;
-  }
-</style>

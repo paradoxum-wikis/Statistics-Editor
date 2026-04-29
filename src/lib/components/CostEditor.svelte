@@ -74,16 +74,16 @@
   {#if costRows.length > 0}
     <div class="grid gap-1.5">
       {#each costRows as row (row.level)}
-        <div class="cost-row">
+        <div class="subtle-row-surface flex items-center px-1.5 py-1">
           <span
-            class="level-label"
+            class="text-[0.7rem] text-muted-foreground min-w-13 max-w-20 shrink-0 overflow-hidden text-ellipsis whitespace-nowrap"
             title={row.level === 0 ? "Base" : `Slot ${row.level}`}
           >
             {row.level === 0 ? row.label : `Upg. ${row.label}`}
           </span>
           <input
             type="number"
-            class="cost-input"
+            class="flex-1 text-[0.7rem] bg-background border border-input [border-radius:calc(var(--radius)-0.5rem)_0] px-1.5 py-0.5 text-right text-foreground outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
             value={row.cost}
             min="0"
             step="1"
@@ -103,46 +103,3 @@
     </p>
   {/if}
 </CollapsibleSection>
-
-<style>
-  @reference "../../routes/layout.css";
-
-  .cost-row {
-    display: flex;
-    align-items: center;
-    padding: 0.25rem 0.4rem;
-    border-radius: calc(var(--radius) - 0.25rem) 0;
-    border: 1px solid var(--border);
-    @apply bg-secondary/10;
-  }
-
-  .level-label {
-    font-size: 0.7rem;
-    color: var(--muted-foreground);
-    min-width: 3.25rem;
-    max-width: 5rem;
-    flex-shrink: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .cost-input {
-    flex: 1;
-    font-size: 0.7rem;
-    background: var(--background);
-    border: 1px solid var(--input);
-    border-radius: calc(var(--radius) - 0.5rem) 0;
-    padding: 0.1rem 0.375rem;
-    text-align: right;
-    color: var(--foreground);
-    outline: none;
-
-    &::-webkit-outer-spin-button,
-    &::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-    }
-
-    -moz-appearance: textfield;
-  }
-</style>

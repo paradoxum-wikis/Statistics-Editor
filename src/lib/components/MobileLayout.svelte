@@ -142,7 +142,7 @@
   }
 </script>
 
-<div class="mobile-root">
+<div class="mobile-shell">
   <!-- Sidebar Scrim -->
   {#if sidebarOpen}
     <div
@@ -163,7 +163,7 @@
   </div>
 
   <!-- Header -->
-  <header class="mobile-header">
+  <header class="mobile-topbar">
     <h1 class="text-sm font-bold text-foreground tracking-wide">
       {towerStore.selectedName || "TDS Statistics Editor"}
     </h1>
@@ -252,7 +252,7 @@
   </header>
 
   <!-- Main Content -->
-  <main class="mobile-main">
+  <main class="mobile-content">
     {#key `${isClient}-${towerStore.isLoading}-${towerStore.selectedName ?? ""}-${editorMode}`}
       <div in:fly={{ y: 8, duration: 160, easing: cubicOut }}>
         {#if !isClient}
@@ -285,7 +285,7 @@
   </main>
 
   <!-- Bottom Bar -->
-  <div class="bottom-bar">
+  <div class="mobile-bottom-bar">
     <!-- Sidebar Toggle -->
     <button
       class="icon-btn"
@@ -544,22 +544,3 @@
   </AlertDialog.Portal>
 </AlertDialog.Root>
 
-<style>
-  @reference "../../routes/layout.css";
-
-  .mobile-root {
-    @apply h-screen flex flex-col bg-background;
-  }
-
-  .mobile-header {
-    @apply border-b bg-card px-4 py-1 flex flex-col items-center gap-2 sticky top-0 z-10;
-  }
-
-  .mobile-main {
-    @apply flex-1 p-4 overflow-x-auto pb-16;
-  }
-
-  .bottom-bar {
-    @apply fixed bottom-0 inset-x-0 z-30 h-14 bg-card border-t border-border flex items-center justify-around px-6;
-  }
-</style>

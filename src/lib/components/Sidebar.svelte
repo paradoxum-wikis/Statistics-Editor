@@ -331,8 +331,8 @@
   });
 </script>
 
-<aside class="sidebar-container {className}">
-  <div class="sidebar-scroll">
+<aside class="sidebar-shell {className}">
+  <div class="sidebar-scroll-area">
     <UpgradeViewer
       {upgradeImages}
       {upgradeNames}
@@ -351,7 +351,7 @@
   {#if showFooter}
     <Separator />
 
-    <div class="sidebar-bottom-bar">
+    <div class="sidebar-footer-bar">
       <button class="icon-btn" onclick={() => onHome?.()} title="Home">
         <House size={20} />
       </button>
@@ -418,18 +418,3 @@
   {/if}
 </aside>
 
-<style>
-  @reference "../../routes/layout.css";
-
-  .sidebar-container {
-    @apply bg-card border-r border-border h-full flex flex-col;
-  }
-
-  .sidebar-scroll {
-    @apply flex-1 overflow-y-auto p-4 flex flex-col;
-  }
-
-  .sidebar-bottom-bar {
-    @apply p-2 bg-card flex items-center justify-center gap-2;
-  }
-</style>

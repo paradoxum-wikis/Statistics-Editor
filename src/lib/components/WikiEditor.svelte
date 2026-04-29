@@ -272,9 +272,9 @@
 </script>
 
 {#if open}
-  <div class="wiki-header-row">
-    <div class="wiki-info-group">
-      <p class="wiki-info-text">
+  <div class="flex items-start justify-between gap-4">
+    <div class="space-y-1">
+      <p class="text-sm text-muted-foreground">
         Editing:
         <span class="font-medium text-foreground">
           {towerName}
@@ -287,7 +287,7 @@
       </p>
     </div>
 
-    <div class="wiki-actions-group">
+    <div class="flex items-center gap-2">
       {#if !noFetchTowers.has(towerName)}
         <Popover.Root>
           <Popover.Trigger
@@ -337,17 +337,17 @@
   </div>
 
   {#if errorMessage}
-    <div class="wiki-error-box">
-      <div class="wiki-error-title">Error</div>
-      <div class="wiki-error-body">
+    <div class="[border-radius:var(--radius)_0] border border-red-500/30 bg-red-500/10 p-3">
+      <div class="text-sm font-medium text-red-600">Error</div>
+      <div class="text-xs text-red-600/90 break-words mt-1">
         {errorMessage}
       </div>
     </div>
   {/if}
 
   <div class="space-y-2">
-    <div class="wiki-status-row">
-      <div class="wiki-status-text">
+    <div class="flex items-center justify-between">
+      <div class="text-xs text-muted-foreground">
         {#if status === "saving"}
           Saving...
         {:else if status === "saved"}
@@ -360,19 +360,19 @@
       </div>
 
       {#if settingsStore.debugMode}
-        <div class="wiki-status-text">
+        <div class="text-xs text-muted-foreground">
           Length: {text.length}
         </div>
       {/if}
     </div>
 
     <div
-      class="wiki-textarea"
+      class="[border-radius:var(--radius)_0] border border-input bg-background px-4 py-2 outline-none max-h-[30rem] overflow-auto transition-colors w-full font-mono text-xs leading-5"
       bind:this={editorContainer}
       spellcheck="false"
     ></div>
 
-    <p class="wiki-notes-text">
+    <p class="text-xs text-muted-foreground">
       Notes:
       <br />
       • The source editor uses Neowtext, which includes features such as variables
@@ -394,59 +394,3 @@
   </div>
 {/if}
 
-<style>
-  @reference "../../routes/layout.css";
-
-  .wiki-header-row {
-    @apply flex items-start justify-between gap-4;
-  }
-
-  .wiki-info-group {
-    @apply space-y-1;
-  }
-
-  .wiki-info-text {
-    @apply text-sm text-muted-foreground;
-  }
-
-  .wiki-actions-group {
-    @apply flex items-center gap-2;
-  }
-
-  .wiki-error-box {
-    border-radius: var(--radius) 0;
-    @apply border border-red-500/30 bg-red-500/10 p-3;
-  }
-
-  .wiki-error-title {
-    @apply text-sm font-medium text-red-600;
-  }
-
-  .wiki-error-body {
-    @apply text-xs text-red-600/90 wrap-break-word mt-1;
-  }
-
-  .wiki-status-row {
-    @apply flex items-center justify-between;
-  }
-
-  .wiki-status-text {
-    @apply text-xs text-muted-foreground;
-  }
-
-  .wiki-textarea {
-    border-radius: var(--radius) 0;
-    border: 1px solid var(--input);
-    background: var(--background);
-    padding: 0.5rem 1rem;
-    outline: none;
-    max-height: 30rem;
-    overflow: auto;
-    transition: border-color 0.25s;
-    @apply w-full font-mono text-xs leading-5;
-  }
-
-  .wiki-notes-text {
-    @apply text-xs text-muted-foreground;
-  }
-</style>

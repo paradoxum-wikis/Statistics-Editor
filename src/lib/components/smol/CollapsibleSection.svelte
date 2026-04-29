@@ -56,6 +56,3 @@
   </Col.Content>
 </Col.Root>
 
-<style>
-  @reference "../../../routes/layout.css";
-</style>
