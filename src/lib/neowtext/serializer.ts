@@ -13,6 +13,10 @@ function formatMoneyNumber(n: number): string {
   return s.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
+function normalizeCellLineBreaks(value: string): string {
+  return value.replace(/\r?\n/g, "<br/>");
+}
+
 function serializeRow(
   row: TableRow,
   headers: string[],
@@ -31,7 +35,7 @@ function serializeRow(
       val = JSON.stringify(val);
     }
 
-    let strVal = String(val);
+    let strVal = normalizeCellLineBreaks(String(val));
 
     if (moneyColumns.includes(header)) {
       const s = String(val).trim();
@@ -45,7 +49,7 @@ function serializeRow(
               : Number.isFinite(+s)
                 ? formatMoneyNumber(+s)
                 : s;
-      strVal = `{{Money|${formatted}}}`;
+      strVal = `{{Money|${normalizeCellLineBreaks(formatted)}}}`;
     }
 
     parts.push(strVal);
