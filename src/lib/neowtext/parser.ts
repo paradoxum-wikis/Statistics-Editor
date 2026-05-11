@@ -96,6 +96,7 @@ export function parseWikitext(content: string): ParsedWikitext {
   const tabberMatch = text.match(
     /<div[^>]*class=["'][^"']*mobile-tabber[^"']*["'][^>]*>\s*<tabber>([\s\S]*?)<\/tabber>/i,
   );
+  const luaTabberMatch = extractLuaTabber(text);
 
   if (tabberMatch) {
     for (const part of tabberMatch[1].split("|-|")) {
@@ -111,12 +112,106 @@ export function parseWikitext(content: string): ParsedWikitext {
       );
       if (tables.length > 0) tabs[tabName] = tables;
     }
+  } else if (luaTabberMatch.length > 0) {
+    for (const { tabName, tabContent } of luaTabberMatch) {
+      const resolvedTabName = applyVariables(tabName.trim());
+      const tables = parseTables(tabContent.trim(), applyVariables);
+      if (tables.length > 0) tabs[resolvedTabName] = tables;
+    }
   } else {
     const tables = parseTables(text, applyVariables);
     if (tables.length > 0) tabs["Regular"] = tables;
   }
 
   return { variables, tabs };
+}
+
+function extractLuaTabber(
+  text: string,
+): Array<{ tabName: string; tabContent: string }> {
+  const mobileMatch =
+    /<div[^>]*class=["'][^"']*mobile-tabber[^"']*["'][^>]*>/i.exec(text);
+  if (!mobileMatch || mobileMatch.index === undefined) return [];
+
+  const searchStart = mobileMatch.index + mobileMatch[0].length;
+  const tabberStart = text.slice(searchStart).search(/\{\{\s*Tabber\b/i);
+  if (tabberStart === -1) return [];
+
+  const absoluteStart = searchStart + tabberStart;
+  const template = extractBalancedTemplate(text, absoluteStart);
+  if (!template) return [];
+
+  const content = template
+    .replace(/^\{\{\s*Tabber\b/i, "")
+    .replace(/\}\}\s*$/, "");
+  const lines = content.split("\n");
+  const result: Array<{ tabName: string; tabContent: string }> = [];
+
+  let currentTabName: string | null = null;
+  let currentTabContent: string[] = [];
+
+  const pushCurrentTab = () => {
+    if (!currentTabName) return;
+    const joined = currentTabContent.join("\n").trim();
+    if (!joined) return;
+    result.push({ tabName: currentTabName, tabContent: joined });
+  };
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmed = line.trim();
+    let nextLine = "";
+    for (let j = i + 1; j < lines.length; j++) {
+      if (lines[j].trim()) {
+        nextLine = lines[j].trim();
+        break;
+      }
+    }
+
+    const value = trimmed.startsWith("|") ? trimmed.slice(1).trim() : "";
+    const isTabName =
+      value !== "" &&
+      !value.includes("=") &&
+      !value.startsWith("-") &&
+      !value.startsWith("<") &&
+      !value.startsWith("{|") &&
+      !value.includes("||") &&
+      nextLine.startsWith("|") &&
+      !nextLine.startsWith("|-");
+
+    if (isTabName) {
+      pushCurrentTab();
+      currentTabName = value;
+      currentTabContent = [];
+      continue;
+    }
+
+    if (currentTabName) currentTabContent.push(line);
+  }
+
+  pushCurrentTab();
+  return result;
+}
+
+function extractBalancedTemplate(
+  text: string,
+  startIndex: number,
+): string | null {
+  let depth = 0;
+  for (let i = startIndex; i < text.length - 1; i++) {
+    const pair = text.slice(i, i + 2);
+    if (pair === "{{") {
+      depth++;
+      i++;
+      continue;
+    }
+    if (pair === "}}") {
+      depth--;
+      i++;
+      if (depth === 0) return text.slice(startIndex, i + 1);
+    }
+  }
+  return null;
 }
 
 /**
