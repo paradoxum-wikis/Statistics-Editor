@@ -8,6 +8,120 @@ import {
 } from "$lib/utils/format";
 import { settingsStore } from "$lib/stores/settings.svelte";
 
+function parseLevelNumber(level: number | string): number {
+  const parsed = typeof level === "number" ? level : parseInt(level, 10);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function parseLevelBranch(level: number | string): string {
+  if (typeof level !== "string") return "";
+  return level.match(/[A-Za-z]+$/)?.[0] ?? "";
+}
+
+function buildBranchMap(
+  tokens: Record<string, string>,
+  isPvp: boolean,
+): Record<string, string> {
+  const schemaStr = tokens["$FNC-SCHEMA$"];
+  if (!schemaStr) return {};
+
+  const schema = schemaStr
+    .split(";")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const trunkLetter = schema[0] || "N";
+
+  const seen = new Set<string>();
+  const branchLetters: string[] = [];
+  for (const letter of schema) {
+    if (letter !== trunkLetter && !seen.has(letter)) {
+      seen.add(letter);
+      branchLetters.push(letter);
+    }
+  }
+
+  const branchKey =
+    isPvp && tokens["$FNC-PVP-BRANCH$"] ? "$FNC-PVP-BRANCH$" : "$FNC-BRANCH$";
+
+  const branchMap: Record<string, string> = {};
+  const branchNames = (tokens[branchKey] || "")
+    .split(";")
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  branchNames.forEach((name, i) => {
+    const letter = branchLetters[i];
+    if (!letter) return;
+    branchMap[name] = letter;
+    branchMap[name.replace(/\s+/g, "")] = letter;
+  });
+
+  return branchMap;
+}
+
+function resolveBranchSpec(
+  branchSpec: string,
+  branchMap: Record<string, string>,
+): string {
+  const clean = stripRefs(branchSpec).trim();
+  if (!clean) return "";
+  return branchMap[clean] ?? branchMap[clean.replace(/\s+/g, "")] ?? clean;
+}
+
+function getCachedTableRow(
+  tableCache: TableCache | undefined,
+  tableName: string,
+  level: number,
+): Record<string, string | number> | undefined {
+  if (!tableCache) return undefined;
+
+  const raw = stripRefs(tableName).trim();
+  const noSpace = raw.replace(/\s+/g, "");
+  const keys = [tableName.trim(), raw, noSpace];
+
+  for (const key of keys) {
+    const row = tableCache[key]?.[level];
+    if (row) return row;
+  }
+  return undefined;
+}
+
+function getCachedColumnValue(
+  row: Record<string, string | number>,
+  columnName: string,
+): string | number | undefined {
+  const raw = columnName.trim();
+  const clean = stripRefs(raw).trim();
+  const noSpace = clean.replace(/\s+/g, "");
+  return row[raw] ?? row[clean] ?? row[noSpace];
+}
+
+function maybeApplyRofToCachedRow(
+  row: Record<string, string | number>,
+  tokens: Record<string, string>,
+  applyRofToCache: boolean,
+): Record<string, string | number> {
+  if (!applyRofToCache) return row;
+
+  const rofInfo = getRofBugVer(tokens);
+  if (rofInfo.cols.length === 0) return row;
+
+  const rofCols = new Set(rofInfo.cols.map((c) => stripRefs(c).trim()));
+  const adjusted: Record<string, string | number> = {};
+
+  for (const [k, v] of Object.entries(row)) {
+    const cleanK = stripRefs(k).trim();
+    if (rofCols.has(cleanK)) {
+      const n = Number(v);
+      adjusted[k] = !isNaN(n) && n !== 0 ? applyRofBug(n, rofInfo.type) : v;
+    } else {
+      adjusted[k] = v;
+    }
+  }
+
+  return adjusted;
+}
+
 /**
  * Resolves a $FNC-NAME$ function for the given row level.
  * Returns the computed numeric value, or undefined if the function is unknown.
@@ -17,6 +131,8 @@ export function resolveFNC(
   level: number | string,
   tokens: Record<string, string>,
   isPvp: boolean,
+  branchOverride?: string,
+  branchMap?: Record<string, string>,
 ): number | undefined {
   if (name !== "TOTALPRICE") return undefined;
 
@@ -24,12 +140,10 @@ export function resolveFNC(
     isPvp && tokens["$FNC-PVP-COST$"] ? "$FNC-PVP-COST$" : "$FNC-COST$";
   const baseCosts = tokens[baseKey]?.split(";") || [];
 
-  let numericLevel = typeof level === "number" ? level : parseInt(level, 10);
-  if (isNaN(numericLevel)) numericLevel = 0;
-
-  const branchMatch =
-    typeof level === "string" ? level.match(/[A-Za-z]+$/) : null;
-  const branch = branchMatch ? branchMatch[0] : "";
+  const numericLevel = parseLevelNumber(level);
+  const branch = branchOverride || parseLevelBranch(level);
+  const resolvedBranch =
+    branch && branchMap ? resolveBranchSpec(branch, branchMap) : branch;
 
   let total = 0;
 
@@ -40,7 +154,7 @@ export function resolveFNC(
       .map((s) => s.trim())
       .filter(Boolean);
     const trunkLetter = schema[0] || "N";
-    const targetBranch = branch || trunkLetter;
+    const targetBranch = resolvedBranch || trunkLetter;
 
     let trunkLevel = 0;
     const branchLevels: Record<string, number> = {};
@@ -101,16 +215,65 @@ export function resolveToken(
   depth = 0,
   tableCache?: TableCache,
   applyRofToCache: boolean = false,
+  levelLocked: boolean = false,
+  branchOverride?: string,
+  branchMap?: Record<string, string>,
 ): string | number | undefined {
   token = stripRefs(token).trim();
   if (depth > 10) return undefined;
+
+  const activeBranch = branchOverride || parseLevelBranch(level);
+  let cachedBranchMap = branchMap;
+  const getBranchMap = (): Record<string, string> =>
+    (cachedBranchMap ??= buildBranchMap(tokens, isPvp));
+
+  // $TOKEN@N@Branch$
+  const levelAndBranchPinMatch = token.match(/^\$(.+)@(\d+)@([^$]+)\$$/);
+  if (levelAndBranchPinMatch) {
+    const [, inner, pinLevel, branchSpec] = levelAndBranchPinMatch;
+    const pinnedLevel = levelLocked ? level : Number(pinLevel);
+    const pinnedBranch = resolveBranchSpec(branchSpec, getBranchMap());
+    return resolveToken(
+      `$${inner}$`,
+      pinnedLevel,
+      row,
+      tokens,
+      isPvp,
+      depth + 1,
+      tableCache,
+      applyRofToCache,
+      true,
+      pinnedBranch,
+      cachedBranchMap,
+    );
+  }
+
+  // $TOKEN@N$
+  const levelPinMatch = token.match(/^\$(.+)@(\d+)\$$/);
+  if (levelPinMatch) {
+    const [, inner, pinLevel] = levelPinMatch;
+    const pinnedLevel = levelLocked ? level : Number(pinLevel);
+    return resolveToken(
+      `$${inner}$`,
+      pinnedLevel,
+      row,
+      tokens,
+      isPvp,
+      depth + 1,
+      tableCache,
+      applyRofToCache,
+      true,
+      activeBranch,
+      cachedBranchMap,
+    );
+  }
 
   if (
     /\$[^$]+\$/.test(token) &&
     !/^\$[^$]+\$$/.test(token) &&
     !/^{{#expr:.*}}$/i.test(token)
   ) {
-    return token.replace(/\$([^$\s]+)\$/g, (match) => {
+    return token.replace(/\$[^$]+\$/g, (match) => {
       const resolved = resolveToken(
         match,
         level,
@@ -120,6 +283,9 @@ export function resolveToken(
         depth + 1,
         tableCache,
         applyRofToCache,
+        levelLocked,
+        activeBranch,
+        cachedBranchMap,
       );
 
       if (typeof resolved === "number") {
@@ -131,7 +297,54 @@ export function resolveToken(
 
   // $FNC-NAME$
   const fncMatch = token.match(/^\$FNC-([A-Z]+)\$$/);
-  if (fncMatch) return resolveFNC(fncMatch[1], level, tokens, isPvp);
+  if (fncMatch) {
+    return resolveFNC(
+      fncMatch[1],
+      level,
+      tokens,
+      isPvp,
+      activeBranch,
+      cachedBranchMap,
+    );
+  }
+
+  // $Table.Column$
+  const dotTokenMatch = token.match(/^\$(.+?)\.([^.$]+)\$$/);
+  if (dotTokenMatch) {
+    const [, tableNameRaw, columnNameRaw] = dotTokenMatch;
+    const numLevel = parseLevelNumber(level);
+    const tableName = tableNameRaw.trim();
+    const columnName = columnNameRaw.trim();
+    const cached = getCachedTableRow(tableCache, tableName, numLevel);
+
+    if (cached) {
+      const cacheContext = maybeApplyRofToCachedRow(
+        cached,
+        tokens,
+        applyRofToCache,
+      );
+      const cachedVal = getCachedColumnValue(cacheContext, columnName);
+
+      if (cachedVal !== undefined) {
+        const resolved = resolveToken(
+          String(cachedVal),
+          level,
+          cacheContext,
+          tokens,
+          isPvp,
+          depth + 1,
+          tableCache,
+          applyRofToCache,
+          levelLocked,
+          activeBranch,
+          cachedBranchMap,
+        );
+        return resolved !== undefined ? resolved : stripRefs(String(cachedVal));
+      }
+    }
+
+    return undefined;
+  }
 
   // #expr or $Var$
   const isExpr = /^{{#expr:.*}}$/i.test(token);
@@ -150,10 +363,13 @@ export function resolveToken(
         depth + 1,
         tableCache,
         applyRofToCache,
+        levelLocked,
+        activeBranch,
+        cachedBranchMap,
       );
     }
 
-    val = val.replace(/\$([^$\s]+)\$/g, (match) => {
+    val = val.replace(/\$[^$]+\$/g, (match) => {
       const resolved = resolveToken(
         match,
         level,
@@ -163,6 +379,9 @@ export function resolveToken(
         depth + 1,
         tableCache,
         applyRofToCache,
+        levelLocked,
+        activeBranch,
+        cachedBranchMap,
       );
       return resolved !== undefined ? String(resolved) : "0";
     });
@@ -171,8 +390,7 @@ export function resolveToken(
       Object.entries(row).map(([k, v]) => [stripRefs(k), v]),
     );
 
-    const numLevel =
-      typeof level === "number" ? level : parseInt(String(level));
+    const numLevel = parseLevelNumber(level);
     val = val.replace(/^["'](.*)["']$/, "$1");
 
     val = val.replace(
@@ -180,8 +398,13 @@ export function resolveToken(
       (match, tname, col) => {
         const tableName = tname.trim();
         const columnName = col.trim();
-        const cached = tableCache?.[tableName]?.[numLevel];
-        const cachedVal = cached?.[columnName];
+        const cached = getCachedTableRow(tableCache, tableName, numLevel);
+        const cacheContext = cached
+          ? maybeApplyRofToCachedRow(cached, tokens, applyRofToCache)
+          : undefined;
+        const cachedVal = cacheContext
+          ? getCachedColumnValue(cacheContext, columnName)
+          : undefined;
 
         if (settingsStore.debugMode) {
           console.log("[resolveToken] cross-table lookup", {
@@ -196,38 +419,28 @@ export function resolveToken(
           });
         }
 
-        if (cachedVal !== undefined && cached) {
-          const rofInfo = getRofBugVer(tokens);
-          const cleanCached: Record<string, string | number> = {};
-          for (const [k, v] of Object.entries(cached)) {
-            const cleanK = stripRefs(k);
-            if (applyRofToCache && rofInfo.cols.includes(cleanK)) {
-              const n = Number(v);
-              cleanCached[k] =
-                !isNaN(n) && n !== 0 ? applyRofBug(n, rofInfo.type) : v;
-            } else {
-              cleanCached[k] = v;
-            }
-          }
-
+        if (cachedVal !== undefined && cacheContext) {
           if (settingsStore.debugMode) {
             console.log("[resolveToken] cross-table cache row", {
               tableName,
               columnName,
               rawCached: cached,
-              cleanCached,
+              cleanCached: cacheContext,
             });
           }
 
           const resolved = resolveToken(
             String(cachedVal),
             level,
-            cleanCached,
+            cacheContext,
             tokens,
             isPvp,
             depth + 1,
             tableCache,
             applyRofToCache,
+            levelLocked,
+            activeBranch,
+            cachedBranchMap,
           );
 
           if (settingsStore.debugMode) {
