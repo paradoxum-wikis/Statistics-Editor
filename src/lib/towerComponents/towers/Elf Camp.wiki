@@ -24,7 +24,7 @@ $BDREF$ = <ref>For the [[Bomber Elf (Unit)|Bomber Elf]], the explosion on death 
 |-
 ! Level 0 !! Level 1 !! Level 2 !! Level 3 !! Level 4
 |-
-| {{Money|$FNC-TOTALPRICE@0$}} || {{Money|$FNC-TOTALPRICE@1$}} || {{Money|2$FNC-TOTALPRICE@2$}} || {{Money|$FNC-TOTALPRICE@3$}} || {{Money|$FNC-TOTALPRICE@4$}}
+| {{Money|$FNC-TOTALPRICE@0$}} || {{Money|$FNC-TOTALPRICE@1$}} || {{Money|$FNC-TOTALPRICE@2$}} || {{Money|$FNC-TOTALPRICE@3$}} || {{Money|$FNC-TOTALPRICE@4$}}
 |}
 </div>
 
