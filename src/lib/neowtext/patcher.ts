@@ -24,21 +24,31 @@ export function patchWikitext(sourceWikitext: string, tower: Tower): string {
         })
       : skin.rawRows;
 
-    allSerializedTables.push(
-      serializeTable({
-        Headers: skin.headers,
-        RawHeaders: skin.rawHeaders,
-        RawRows: rowsForSerialization,
-        MoneyColumns: skin.moneyColumns,
-        Name: skin.tableName || "",
-      }),
-    );
+    const primarySerialized = serializeTable({
+      Headers: skin.headers,
+      RawHeaders: skin.rawHeaders,
+      RawRows: rowsForSerialization,
+      MoneyColumns: skin.moneyColumns,
+      Name: skin.tableName || "",
+    });
 
-    if (skin.extraTables) {
-      for (const extraTable of skin.extraTables) {
-        allSerializedTables.push(serializeExtraTable(extraTable));
-      }
+    const ordered = [
+      primarySerialized,
+      ...(skin.extraTables ?? []).map((extraTable: TableData) =>
+        serializeExtraTable(extraTable),
+      ),
+    ];
+
+    const primaryIdx = Number.isFinite(skin.primaryTableIndex)
+      ? Math.max(0, Number(skin.primaryTableIndex))
+      : 0;
+
+    if (primaryIdx > 0 && primaryIdx < ordered.length) {
+      const [primary] = ordered.splice(0, 1);
+      ordered.splice(primaryIdx, 0, primary);
     }
+
+    allSerializedTables.push(...ordered);
   }
 
   let tableIndex = 0;

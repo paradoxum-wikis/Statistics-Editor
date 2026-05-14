@@ -36,12 +36,40 @@
     if (!tower) return null;
     const skin = tower.getSkin(towerStore.selectedSkinName);
     if (!skin) return null;
+    const primaryIdx = Number.isFinite(skin.primaryTableIndex)
+      ? Math.max(0, skin.primaryTableIndex)
+      : 0;
+    const orderedTables = [
+      {
+        name: skin.tableName,
+        headers:
+          skin.headers.length > 0 ? skin.headers : skin.levels.attributes,
+        rows: skin.levels.levels.slice(0, skin.rawRows.length),
+        moneyColumns: skin.moneyColumns,
+        readOnlyColumns: [] as string[],
+        skinData: skin,
+        cellFormulaTokens: undefined,
+        branchSuffix: undefined,
+        internalTableIdx: 0,
+        sourceExtraTableIndex: -1,
+      },
+      ...(skin.extraTables?.map((t, extraIdx) => ({
+        ...t,
+        rows: [...t.rows],
+        skinData: null,
+        internalTableIdx: extraIdx + 1,
+        sourceExtraTableIndex: extraIdx,
+      })) ?? []),
+    ];
+
+    if (primaryIdx > 0 && primaryIdx < orderedTables.length) {
+      const [primaryTable] = orderedTables.splice(0, 1);
+      orderedTables.splice(primaryIdx, 0, primaryTable);
+    }
+
     return {
       skin,
-      headers: skin.headers.length > 0 ? skin.headers : skin.levels.attributes,
-      rows: skin.levels.levels.slice(0, skin.rawRows.length),
-      extraTables:
-        skin.extraTables?.map((t) => ({ ...t, rows: [...t.rows] })) ?? [],
+      orderedTables,
     };
   });
 
@@ -300,6 +328,7 @@
   interface TableConfig {
     skinName: string;
     tableIdx: number;
+    sourceExtraTableIndex?: number;
     tableName: string;
     headers: string[];
     rows: Record<string, string | number>[];
@@ -331,7 +360,7 @@
     } else {
       const skin = activeSkinData?.skin;
       if (!skin) return;
-      const extraTableIndex = config.tableIdx - 1;
+      const extraTableIndex = config.sourceExtraTableIndex ?? -1;
       if (extraTableIndex < 0) return;
       updateRowStat(skin, extraTableIndex, rowIdx, header, value);
     }
@@ -584,38 +613,25 @@
       {#each availableSkins as skinName (skinName)}
         <Tabs.Content value={skinName}>
           {#if activeSkinData}
-            {@render dataTable(
-              {
-                skinName,
-                tableIdx: 0,
-                tableName: activeSkinData.skin.tableName,
-                headers: activeSkinData.headers,
-                rows: activeSkinData.rows,
-                moneyColumns: activeSkinData.skin.moneyColumns,
-                readOnlyColumns: [],
-                skinData: activeSkinData.skin,
-              },
-              true,
-            )}
-
-            {#each activeSkinData.extraTables as extraTable, tableIdx (tableIdx)}
+            {#each activeSkinData.orderedTables as table, orderedIdx (orderedIdx)}
               {@render dataTable(
                 {
                   skinName,
-                  tableIdx: tableIdx + 1,
-                  tableName: extraTable.name,
-                  headers: extraTable.headers,
-                  rows: extraTable.rows,
-                  moneyColumns: extraTable.moneyColumns,
-                  readOnlyColumns: extraTable.readOnlyColumns,
-                  skinData: null,
-                  cellFormulaTokens: extraTable.cellFormulaTokens,
+                  tableIdx: table.internalTableIdx,
+                  sourceExtraTableIndex: table.sourceExtraTableIndex,
+                  tableName: table.name,
+                  headers: table.headers,
+                  rows: table.rows,
+                  moneyColumns: table.moneyColumns,
+                  readOnlyColumns: table.readOnlyColumns,
+                  skinData: table.skinData,
+                  cellFormulaTokens: table.cellFormulaTokens,
                   formulaTokens: activeSkinData.skin.formulaTokens,
                   isPvp: activeSkinData.skin.isPvp,
-                  branchSuffix: extraTable.branchSuffix,
+                  branchSuffix: table.branchSuffix,
                   tableCache: activeSkinData.skin.tableCache,
                 } as any,
-                false,
+                orderedIdx === 0,
               )}
             {/each}
           {:else if towerStore.selectedSkinName === skinName}

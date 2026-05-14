@@ -257,12 +257,45 @@ export default class TowerManager {
         tableData: TableData,
         isPvp: boolean,
         extraTables: TableData[],
+        primaryTableIndex: number,
       ) => {
         const defaults: any = {};
         const upgrades: any[] = [];
         const readOnly = new Set<string>();
 
-        const rows = [...tableData.rows];
+        const expandPrimaryRows = (
+          sourceRows: Record<string, string | number>[],
+        ): Record<string, string | number>[] => {
+          const expanded: Record<string, string | number>[] = [];
+
+          for (const row of sourceRows) {
+            const levelRaw = String(row["Level"] ?? "").trim();
+            const range = levelRaw.match(/^(\d+)\s*-\s*(\d+)$/);
+            if (!range) {
+              expanded.push(row);
+              continue;
+            }
+
+            const start = Number(range[1]);
+            const end = Number(range[2]);
+            if (
+              !Number.isFinite(start) ||
+              !Number.isFinite(end) ||
+              end < start
+            ) {
+              expanded.push(row);
+              continue;
+            }
+
+            for (let lvl = start; lvl <= end; lvl++) {
+              expanded.push({ ...row, Level: lvl });
+            }
+          }
+
+          return expanded;
+        };
+
+        const rows = expandPrimaryRows(tableData.rows);
 
         const formulaTokens = Object.fromEntries(
           Object.entries(parsed.variables).filter(
@@ -659,6 +692,7 @@ export default class TowerManager {
             [{ ...tableData, rows }, ...resolvedExtraTables],
             indexOverrides,
           ),
+          PrimaryTableIndex: primaryTableIndex,
         };
       };
 
@@ -672,7 +706,12 @@ export default class TowerManager {
           (_, i) => i !== Math.max(0, pIdx),
         );
 
-        towerJson[tabName] = buildSkinJson(primaryTable, isPvp, extraTables);
+        towerJson[tabName] = buildSkinJson(
+          primaryTable,
+          isPvp,
+          extraTables,
+          Math.max(0, pIdx),
+        );
       }
 
       const towerData = new Tower(name, towerJson);

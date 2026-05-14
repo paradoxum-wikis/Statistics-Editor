@@ -29,6 +29,7 @@ class SkinData {
   moneyColumns: string[] = [];
   extraTables: TableData[] = [];
   tableCache: TableCache = {};
+  primaryTableIndex: number = 0;
 
   /**
    * Detection types that have PVP specific variables in the source.
@@ -132,6 +133,10 @@ class SkinData {
 
     if (this.data.TableCache) {
       this.tableCache = this.data.TableCache;
+    }
+
+    if (Number.isFinite(this.data.PrimaryTableIndex)) {
+      this.primaryTableIndex = Number(this.data.PrimaryTableIndex);
     }
 
     this.createData();
