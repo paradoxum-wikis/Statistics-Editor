@@ -316,6 +316,10 @@
         setWikiOverride(profileStore.current, tower.name, wikitext);
         towerStore.isDirty = false;
         await towerStore.forceReload();
+
+        const refreshed = towerStore.selectedData;
+        const skin = towerStore.selectedSkinName;
+        if (refreshed && skin) rebuildBaselineForSkin(refreshed, skin);
       } else {
         alert("Failed to fetch wikitext from the Wiki.");
       }
