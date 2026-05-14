@@ -18,9 +18,19 @@ function parseLevelBranch(level: number | string): string {
   return level.match(/[A-Za-z]+$/)?.[0] ?? "";
 }
 
+function getVariantFncKey(
+  tokens: Record<string, string>,
+  variantPrefix: string | undefined,
+  suffix: string,
+): string {
+  const keyed = variantPrefix ? `$FNC-${variantPrefix}-${suffix}$` : "";
+  if (keyed && tokens[keyed] !== undefined) return keyed;
+  return `$FNC-${suffix}$`;
+}
+
 function buildBranchMap(
   tokens: Record<string, string>,
-  isPvp: boolean,
+  variantPrefix?: string,
 ): Record<string, string> {
   const schemaStr = tokens["$FNC-SCHEMA$"];
   if (!schemaStr) return {};
@@ -40,8 +50,7 @@ function buildBranchMap(
     }
   }
 
-  const branchKey =
-    isPvp && tokens["$FNC-PVP-BRANCH$"] ? "$FNC-PVP-BRANCH$" : "$FNC-BRANCH$";
+  const branchKey = getVariantFncKey(tokens, variantPrefix, "BRANCH");
 
   const branchMap: Record<string, string> = {};
   const branchNames = (tokens[branchKey] || "")
@@ -133,11 +142,11 @@ export function resolveFNC(
   isPvp: boolean,
   branchOverride?: string,
   branchMap?: Record<string, string>,
+  variantPrefix?: string,
 ): number | undefined {
   if (name !== "TOTALPRICE") return undefined;
 
-  const baseKey =
-    isPvp && tokens["$FNC-PVP-COST$"] ? "$FNC-PVP-COST$" : "$FNC-COST$";
+  const baseKey = getVariantFncKey(tokens, variantPrefix, "COST");
   const baseCosts = tokens[baseKey]?.split(";") || [];
 
   const numericLevel = parseLevelNumber(level);
@@ -218,6 +227,7 @@ export function resolveToken(
   levelLocked: boolean = false,
   branchOverride?: string,
   branchMap?: Record<string, string>,
+  variantPrefix?: string,
 ): string | number | undefined {
   token = stripRefs(token).trim();
   if (depth > 10) return undefined;
@@ -225,7 +235,7 @@ export function resolveToken(
   const activeBranch = branchOverride || parseLevelBranch(level);
   let cachedBranchMap = branchMap;
   const getBranchMap = (): Record<string, string> =>
-    (cachedBranchMap ??= buildBranchMap(tokens, isPvp));
+    (cachedBranchMap ??= buildBranchMap(tokens, variantPrefix));
 
   // $TOKEN@N@Branch$
   const levelAndBranchPinMatch = token.match(/^\$(.+)@(\d+)@([^$]+)\$$/);
@@ -245,6 +255,7 @@ export function resolveToken(
       true,
       pinnedBranch,
       cachedBranchMap,
+      variantPrefix,
     );
   }
 
@@ -265,6 +276,7 @@ export function resolveToken(
       true,
       activeBranch,
       cachedBranchMap,
+      variantPrefix,
     );
   }
 
@@ -286,6 +298,7 @@ export function resolveToken(
         levelLocked,
         activeBranch,
         cachedBranchMap,
+        variantPrefix,
       );
 
       if (typeof resolved === "number") {
@@ -305,6 +318,7 @@ export function resolveToken(
       isPvp,
       activeBranch,
       cachedBranchMap,
+      variantPrefix,
     );
   }
 
@@ -338,6 +352,7 @@ export function resolveToken(
           levelLocked,
           activeBranch,
           cachedBranchMap,
+          variantPrefix,
         );
         return resolved !== undefined ? resolved : stripRefs(String(cachedVal));
       }
@@ -366,6 +381,7 @@ export function resolveToken(
         levelLocked,
         activeBranch,
         cachedBranchMap,
+        variantPrefix,
       );
     }
 
@@ -382,6 +398,7 @@ export function resolveToken(
         levelLocked,
         activeBranch,
         cachedBranchMap,
+        variantPrefix,
       );
       return resolved !== undefined ? String(resolved) : "0";
     });
@@ -441,6 +458,7 @@ export function resolveToken(
             levelLocked,
             activeBranch,
             cachedBranchMap,
+            variantPrefix,
           );
 
           if (settingsStore.debugMode) {

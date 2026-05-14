@@ -52,6 +52,7 @@
         branchSuffix: undefined,
         internalTableIdx: 0,
         sourceExtraTableIndex: -1,
+        variantPrefix: skin.variantPrefix,
       },
       ...(skin.extraTables?.map((t, extraIdx) => ({
         ...t,
@@ -59,6 +60,7 @@
         skinData: null,
         internalTableIdx: extraIdx + 1,
         sourceExtraTableIndex: extraIdx,
+        variantPrefix: skin.variantPrefix,
       })) ?? []),
     ];
 
@@ -329,6 +331,7 @@
     skinName: string;
     tableIdx: number;
     sourceExtraTableIndex?: number;
+    variantPrefix?: string;
     tableName: string;
     headers: string[];
     rows: Record<string, string | number>[];
@@ -420,6 +423,10 @@
               0,
               tCache,
               applyDisplayRofBug,
+              false,
+              undefined,
+              undefined,
+              config.variantPrefix,
             );
             if (res != null) cleanRow[stripRefs(col)] = res;
           }

@@ -70,6 +70,7 @@ export function patchWikitext(sourceWikitext: string, tower: Tower): string {
  * Automatically diffs PVP against Regular and writes $FNC-PVP-* arrays
  * if the PVP skin deviates from the base tower.
  */
+
 function buildVariablesMap(tower: Tower): Record<string, string> {
   const variables: Record<string, string> = {};
 
@@ -82,7 +83,7 @@ function buildVariablesMap(tower: Tower): Record<string, string> {
     if (!skin?.formulaTokens) return;
     for (const [key, val] of Object.entries(skin.formulaTokens)) {
       if (
-        /^\$FNC-(?:PVP-)?(?:COST|DETECTION|UPGRADE|UPGRADEICON)(?:-[A-Z])?\$$/.test(
+        /^\$FNC-(?:[A-Z0-9]+-)?(?:COST|DETECTION|UPGRADE|UPGRADEICON)(?:-[A-Z])?\$$/.test(
           key,
         )
       )
@@ -156,28 +157,32 @@ function buildVariablesMap(tower: Tower): Record<string, string> {
   }
 
   for (const skinName of tower.skinNames) {
+    if (skinName === baseSkinName) continue;
+
     const skin = tower.getSkin(skinName);
-    if (!skin || !skin.isPvp) continue;
+    if (!skin) continue;
 
     preserveTokens(skin);
 
-    const pvpJson = tower.json[tower.name]?.[skinName];
-    if (!pvpJson) continue;
+    const skinJson = tower.json[tower.name]?.[skinName];
+    if (!skinJson) continue;
 
-    const pvpFnc = extractFncArrays(pvpJson);
-    if (baseFnc) {
-      if (pvpFnc.costStr !== baseFnc.costStr)
-        variables["$FNC-PVP-COST$"] = pvpFnc.costStr;
+    const variant = extractFncArrays(skinJson);
+    const prefix =
+      skin.variantPrefix || skinName.trim().replace(/[^a-zA-Z0-9]+/g, "");
+    if (!prefix || !baseFnc) continue;
 
-      if (pvpFnc.detStr !== baseFnc.detStr && pvpFnc.detStr !== "; ; ")
-        variables["$FNC-PVP-DETECTION$"] = pvpFnc.detStr;
+    if (variant.costStr !== baseFnc.costStr)
+      variables[`$FNC-${prefix}-COST$`] = variant.costStr;
 
-      if (pvpFnc.upgradeStr !== baseFnc.upgradeStr)
-        variables["$FNC-PVP-UPGRADE$"] = pvpFnc.upgradeStr;
+    if (variant.detStr !== baseFnc.detStr && variant.detStr !== "; ; ")
+      variables[`$FNC-${prefix}-DETECTION$`] = variant.detStr;
 
-      if (pvpFnc.iconStr !== baseFnc.iconStr)
-        variables["$FNC-PVP-UPGRADEICON$"] = pvpFnc.iconStr;
-    }
+    if (variant.upgradeStr !== baseFnc.upgradeStr)
+      variables[`$FNC-${prefix}-UPGRADE$`] = variant.upgradeStr;
+
+    if (variant.iconStr !== baseFnc.iconStr)
+      variables[`$FNC-${prefix}-UPGRADEICON$`] = variant.iconStr;
   }
 
   return variables;

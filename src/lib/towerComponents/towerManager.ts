@@ -258,6 +258,7 @@ export default class TowerManager {
         isPvp: boolean,
         extraTables: TableData[],
         primaryTableIndex: number,
+        variantPrefix: string,
       ) => {
         const defaults: any = {};
         const upgrades: any[] = [];
@@ -297,14 +298,13 @@ export default class TowerManager {
 
         const rows = expandPrimaryRows(tableData.rows);
 
-        const formulaTokens = Object.fromEntries(
-          Object.entries(parsed.variables).filter(
-            ([k]) => !k.startsWith("$PVP-"),
-          ),
-        );
-        if (isPvp) {
+        const formulaTokens = { ...parsed.variables };
+        if (variantPrefix) {
+          const prefixToken = `$${variantPrefix}-`;
           Object.entries(parsed.variables).forEach(([k, v]) => {
-            if (k.startsWith("$PVP-")) formulaTokens[`$${k.slice(5)}`] = v;
+            if (k.startsWith(prefixToken)) {
+              formulaTokens[`$${k.slice(prefixToken.length)}`] = v;
+            }
           });
         }
 
@@ -348,6 +348,8 @@ export default class TowerManager {
         const baseDetects = getArr(v["$FNC-DETECTION$"]);
         const baseUpgs = getArr(v["$FNC-UPGRADE$"]);
         const baseIcons = getArr(v["$FNC-UPGRADEICON$"]);
+        const variantFnc = (suffix: string) =>
+          variantPrefix ? `$FNC-${variantPrefix}-${suffix}$` : "";
 
         const mergeArrays = (base: string[], pvp?: string[]) => {
           if (!pvp || pvp.length === 0) return base;
@@ -358,18 +360,25 @@ export default class TowerManager {
           });
         };
 
-        const costs = isPvp
-          ? mergeArrays(baseCosts, getArr(v["$FNC-PVP-COST$"]))
-          : baseCosts;
-        const detects = isPvp
-          ? mergeArrays(baseDetects, getArr(v["$FNC-PVP-DETECTION$"]))
-          : baseDetects;
-        const upgs = isPvp
-          ? mergeArrays(baseUpgs, getArr(v["$FNC-PVP-UPGRADE$"]))
-          : baseUpgs;
-        const icons = isPvp
-          ? mergeArrays(baseIcons, getArr(v["$FNC-PVP-UPGRADEICON$"]))
-          : baseIcons;
+        const costs = mergeArrays(baseCosts, getArr(v[variantFnc("COST")]));
+        const detects = mergeArrays(
+          baseDetects,
+          getArr(v[variantFnc("DETECTION")]),
+        );
+        const upgs = mergeArrays(baseUpgs, getArr(v[variantFnc("UPGRADE")]));
+        const icons = mergeArrays(
+          baseIcons,
+          getArr(v[variantFnc("UPGRADEICON")]),
+        );
+
+        formulaTokens["$FNC-COST$"] = costs.join("; ");
+        formulaTokens["$FNC-DETECTION$"] = detects.join("; ");
+        formulaTokens["$FNC-UPGRADE$"] = upgs.join("; ");
+        formulaTokens["$FNC-UPGRADEICON$"] = icons.join("; ");
+        const variantBranch = v[variantFnc("BRANCH")];
+        if (variantBranch !== undefined) {
+          formulaTokens["$FNC-BRANCH$"] = variantBranch;
+        }
 
         const getIndex = (lvl: number, branch: string) => {
           if (!schema) return lvl;
@@ -485,6 +494,11 @@ export default class TowerManager {
                 isPvp,
                 0,
                 tableCache,
+                false,
+                false,
+                undefined,
+                undefined,
+                variantPrefix,
               );
               if (result !== undefined) {
                 readOnly.add(key);
@@ -609,6 +623,11 @@ export default class TowerManager {
                   isPvp,
                   0,
                   tableCache,
+                  false,
+                  false,
+                  undefined,
+                  undefined,
+                  variantPrefix,
                 );
                 if (result !== undefined) {
                   cellFormulaTokens[levelKey][key] = originalVal;
@@ -693,11 +712,16 @@ export default class TowerManager {
             indexOverrides,
           ),
           PrimaryTableIndex: primaryTableIndex,
+          VariantPrefix: variantPrefix,
         };
       };
 
+      const tabPrefix = (tabName: string) =>
+        tabName.trim().replace(/[^a-zA-Z0-9]+/g, "");
+
       for (const [tabName, tables] of Object.entries(parsed.tabs)) {
         const isPvp = /pvp/i.test(tabName);
+        const variantPrefix = tabPrefix(tabName);
         const pIdx = (tables as TableData[]).findIndex((t) =>
           t.headers.includes("Level"),
         );
@@ -711,6 +735,7 @@ export default class TowerManager {
           isPvp,
           extraTables,
           Math.max(0, pIdx),
+          variantPrefix,
         );
       }
 

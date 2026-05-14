@@ -30,6 +30,7 @@ class SkinData {
   extraTables: TableData[] = [];
   tableCache: TableCache = {};
   primaryTableIndex: number = 0;
+  variantPrefix: string = "";
 
   /**
    * Detection types that have PVP specific variables in the source.
@@ -137,6 +138,10 @@ class SkinData {
 
     if (Number.isFinite(this.data.PrimaryTableIndex)) {
       this.primaryTableIndex = Number(this.data.PrimaryTableIndex);
+    }
+
+    if (typeof this.data.VariantPrefix === "string") {
+      this.variantPrefix = this.data.VariantPrefix;
     }
 
     this.createData();
@@ -263,6 +268,11 @@ class SkinData {
                 this.isPvp,
                 0,
                 this.tableCache,
+                false,
+                false,
+                undefined,
+                undefined,
+                this.variantPrefix,
               );
 
               if (result !== undefined) {
@@ -304,6 +314,11 @@ class SkinData {
             this.isPvp,
             0,
             this.tableCache,
+            false,
+            false,
+            undefined,
+            undefined,
+            this.variantPrefix,
           );
 
           if (result !== undefined) {
@@ -378,9 +393,12 @@ class SkinData {
   }
 
   setCost(level: number, value: number): void {
+    const variantCostKey = this.variantPrefix
+      ? `$FNC-${this.variantPrefix}-COST$`
+      : "";
     const costKey =
-      this.isPvp && this.formulaTokens["$FNC-PVP-COST$"] !== undefined
-        ? "$FNC-PVP-COST$"
+      variantCostKey && this.formulaTokens[variantCostKey] !== undefined
+        ? variantCostKey
         : "$FNC-COST$";
     const costs = (this.formulaTokens[costKey] || "")
       .split(";")
