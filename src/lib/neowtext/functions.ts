@@ -131,6 +131,91 @@ function maybeApplyRofToCachedRow(
   return adjusted;
 }
 
+function splitTopLevelPipes(input: string): string[] {
+  const parts: string[] = [];
+  let start = 0;
+  let depth = 0;
+
+  for (let i = 0; i < input.length; i++) {
+    const two = input.slice(i, i + 2);
+    if (two === "{{") {
+      depth++;
+      i++;
+      continue;
+    }
+    if (two === "}}") {
+      depth = Math.max(0, depth - 1);
+      i++;
+      continue;
+    }
+    if (input[i] === "|" && depth === 0) {
+      parts.push(input.slice(start, i));
+      start = i + 1;
+    }
+  }
+
+  parts.push(input.slice(start));
+  return parts;
+}
+
+function findTemplateEnd(input: string, start: number): number {
+  let depth = 0;
+  for (let i = start; i < input.length - 1; i++) {
+    const two = input.slice(i, i + 2);
+    if (two === "{{") {
+      depth++;
+      i++;
+      continue;
+    }
+    if (two === "}}") {
+      depth--;
+      i++;
+      if (depth === 0) return i + 1;
+    }
+  }
+  return -1;
+}
+
+function normalizeFormatnumModifier(
+  s: string,
+): "rawsuffix" | "nocommafysuffix" | "lossless" | null {
+  const m = s.trim().toLowerCase();
+  if (!m) return null;
+  if (m === "r" || m === "raw" || m === "rawsuffix") return "rawsuffix";
+  if (m === "nosep" || m === "nocommafysuffix") return "nocommafysuffix";
+  if (m === "lossless") return "lossless";
+  return null;
+}
+
+function parseFormattedNumberLike(input: string): string {
+  const s = stripRefs(input).trim();
+  if (!s) return "";
+
+  let cleaned = s.replace(/[\u00A0\u202F\s]/g, "");
+  const hasComma = cleaned.includes(",");
+  const hasDot = cleaned.includes(".");
+
+  if (hasComma && hasDot) {
+    cleaned = cleaned.replace(/,/g, "");
+  } else if (hasComma && !hasDot) {
+    cleaned = cleaned.replace(/,/g, ".");
+  }
+
+  cleaned = cleaned.replace(/[^0-9+\-.eE]/g, "");
+  return cleaned;
+}
+
+function formatNumberLike(input: string, useGrouping: boolean): string {
+  const parsed = parseFormattedNumberLike(input);
+  const n = Number(parsed);
+  if (!Number.isFinite(n)) return stripRefs(input).trim();
+
+  return n.toLocaleString(undefined, {
+    useGrouping,
+    maximumFractionDigits: 20,
+  });
+}
+
 /**
  * Resolves a $FNC-NAME$ function for the given row level.
  * Returns the computed numeric value, or undefined if the function is unknown.
@@ -361,12 +446,98 @@ export function resolveToken(
     return undefined;
   }
 
-  // #expr or $Var$
+  // #expr, {{formatnum:...}} or $Var$
   const isExpr = /^{{#expr:.*}}$/i.test(token);
+  const isFormatNum = /^{{\s*formatnum\s*:[\s\S]*}}$/i.test(token);
   const isVar = token.startsWith("$") && tokens[token] !== undefined;
 
-  if (isExpr || isVar) {
+  if (isExpr || isVar || isFormatNum) {
     let val = isVar ? tokens[token] : token;
+    let hadFormatnum = false;
+
+    const resolveSingleFormatnum = (call: string): string | null => {
+      const trimmed = call.trim();
+      if (!/^{{\s*formatnum\s*:/i.test(trimmed) || !trimmed.endsWith("}}")) {
+        return null;
+      }
+
+      const body = trimmed.slice(2, -2);
+      const m = body.match(/^\s*formatnum\s*:\s*([\s\S]*)$/i);
+      if (!m) return null;
+
+      const parts = splitTopLevelPipes(m[1]);
+      const numPart = parts[0] ?? "";
+      const mod1 = normalizeFormatnumModifier(parts[1] ?? "");
+      const mod2 = normalizeFormatnumModifier(parts[2] ?? "");
+      const modifiers = new Set([mod1, mod2].filter(Boolean));
+
+      const resolvedNum = resolveToken(
+        numPart.trim(),
+        level,
+        row,
+        tokens,
+        isPvp,
+        depth + 1,
+        tableCache,
+        applyRofToCache,
+        levelLocked,
+        activeBranch,
+        cachedBranchMap,
+        variantPrefix,
+      );
+
+      const numStr =
+        resolvedNum !== undefined ? String(resolvedNum).trim() : numPart.trim();
+
+      if (modifiers.has("rawsuffix")) {
+        hadFormatnum = true;
+        return parseFormattedNumberLike(numStr);
+      }
+
+      const potentiallyLossy = modifiers.has("nocommafysuffix")
+        ? formatNumberLike(numStr, false)
+        : formatNumberLike(numStr, true);
+
+      if (modifiers.has("lossless")) {
+        hadFormatnum = true;
+        return parseFormattedNumberLike(potentiallyLossy) === numStr
+          ? potentiallyLossy
+          : numStr;
+      }
+
+      hadFormatnum = true;
+      return potentiallyLossy;
+    };
+
+    const resolveFormatnumTemplates = (input: string): string => {
+      let out = input;
+
+      for (let pass = 0; pass < 20; pass++) {
+        let changed = false;
+
+        for (let i = 0; i < out.length - 1; i++) {
+          if (out[i] !== "{" || out[i + 1] !== "{") continue;
+
+          const slice = out.slice(i);
+          if (!/^{{\s*formatnum\s*:/i.test(slice)) continue;
+
+          const end = findTemplateEnd(out, i);
+          if (end < 0) continue;
+
+          const call = out.slice(i, end);
+          const replacement = resolveSingleFormatnum(call);
+          if (replacement === null) continue;
+
+          out = out.slice(0, i) + replacement + out.slice(end);
+          changed = true;
+          i += replacement.length - 1;
+        }
+
+        if (!changed) break;
+      }
+
+      return out;
+    };
 
     if (isVar && /^\$[^$]+\$$/.test(val)) {
       return resolveToken(
@@ -488,6 +659,16 @@ export function resolveToken(
         return match;
       },
     );
+
+    val = resolveFormatnumTemplates(val);
+
+    if (
+      hadFormatnum &&
+      !/^{{#expr:.*}}$/i.test(val) &&
+      !/\$[^$]+\$/.test(val)
+    ) {
+      return val;
+    }
 
     const result = evaluateFormula(val, context);
     return Number.isNaN(result) ? val : result;
