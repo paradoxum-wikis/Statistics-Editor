@@ -34,16 +34,7 @@
 
   let isClient = $state(false);
   let settingsOpen = $state(false);
-
   let editorMode = $state<EditorMode>("cells");
-
-  function openWikiEditor() {
-    editorMode = "wiki";
-  }
-
-  function backToCells() {
-    editorMode = "cells";
-  }
 
   async function goHome() {
     const url = new URL(page.url);
@@ -192,7 +183,7 @@
                 : 'inactive'} {towerStore.selectedData?.isMalformed
                 ? 'opacity-50 cursor-not-allowed'
                 : ''}"
-              onclick={backToCells}
+              onclick={() => (editorMode = "cells")}
               disabled={towerStore.selectedData?.isMalformed}
             >
               <div class="flex items-center gap-1.5">
@@ -205,7 +196,7 @@
               towerStore.selectedData?.isMalformed
                 ? 'active'
                 : 'inactive'}"
-              onclick={openWikiEditor}
+              onclick={() => (editorMode = "wiki")}
             >
               <div class="flex items-center gap-1.5">
                 <FileBraces size={16} />
