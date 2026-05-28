@@ -1,16 +1,22 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { Popover } from "bits-ui";
+  import { EditorState } from "@codemirror/state";
+  import { lintGutter } from "@codemirror/lint";
+  import { EditorView, keymap, lineNumbers } from "@codemirror/view";
+  import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
+  import {
+    defaultHighlightStyle,
+    syntaxHighlighting,
+  } from "@codemirror/language";
+  import { mediawiki } from "@bhsd/codemirror-wikitext";
+  import parserConfig from "wikiparser-node/config/default.json" with { type: "json" };
+  import type { ConfigData } from "wikiparser-node";
   import { towerStore } from "$lib/stores/tower.svelte";
   import { profileStore } from "$lib/stores/profile.svelte";
   import { settingsStore } from "$lib/stores/settings.svelte";
   import { setWikiOverride } from "$lib/neowtext/wikiSource";
   import { noFetchTowers } from "$lib/towerComponents/towers/index";
-  import {
-    WikitextEditor,
-    DEFAULT_EXTENSION_TAGS,
-    DEFAULT_CONTENT_PRESERVING_TAGS,
-  } from "wikistxr";
 
   let {
     towerName,
@@ -21,13 +27,12 @@
   } = $props();
 
   let isClient = $state(false);
-
   let text = $state(towerStore.effectiveWikitext);
   let status = $state<"ready" | "saving" | "saved" | "error">("ready");
   let errorMessage = $state<string | null>(null);
   let editorContainer = $state<HTMLElement>();
-  let editor = $state<WikitextEditor>();
-  let pendingDomSyncFrame = $state<number | null>(null);
+  let editorView: EditorView | undefined;
+  let syncingFromStore = $state(false);
 
   let profileName = $derived(profileStore.current);
 
@@ -37,68 +42,117 @@
       : "Using loaded wiki",
   );
 
-  function readEditorTextFromDom(container: HTMLElement): string {
-    const lineEls = Array.from(
-      container.querySelectorAll<HTMLElement>(".wt-line"),
-    );
+  const editorTheme = EditorView.theme({
+    "&": {
+      fontSize: ".75rem",
+      lineHeight: "1.25rem",
+      color: "var(--foreground)",
+      backgroundColor: "transparent",
+    },
+    "&.cm-editor": {
+      maxHeight: "30rem",
+      outline: "none",
+      border: "1px solid var(--border)",
+      borderRadius: "var(--radius) 0 0 0",
+      backgroundColor: "var(--background)",
+    },
+    ".cm-scroller": {
+      overflow: "auto",
+    },
+    ".cm-content": {
+      padding: ".5rem .75rem",
+      caretColor: "var(--foreground)",
+    },
+    ".cm-gutters": {
+      backgroundColor: "color-mix(in oklch, var(--muted) 30%, transparent)",
+      color: "var(--muted-foreground)",
+      borderRight: "1px solid var(--border)",
+    },
+    ".cm-lineNumbers .cm-gutterElement": {
+      minWidth: "2.25rem",
+      padding: "0 .35rem 0 .5rem",
+    },
+    ".cm-foldGutter .cm-gutterElement": {
+      width: "0.85rem",
+      padding: "0 .15rem",
+    },
+    ".cm-panel.cm-panel-lint, .cm-panel-status": {
+      borderTop: "1px solid var(--border)",
+      backgroundColor:
+        "color-mix(in oklch, var(--muted) 25%, var(--background))",
+      color: "var(--foreground)",
+      fontSize: ".7rem",
+    },
+    ".cm-panels-bottom, .cm-status-message": {
+      borderColor: "var(--accent)",
+    },
+    ".cm-activeLineGutter": {
+      backgroundColor: "color-mix(in oklch, var(--muted) 50%, transparent)",
+    },
+    ".cm-activeLine": {
+      backgroundColor: "color-mix(in oklch, var(--muted) 35%, transparent)",
+    },
+    "&.cm-focused .cm-selectionBackground, .cm-selectionBackground": {
+      backgroundColor: "color-mix(in oklch, var(--primary) 25%, transparent)",
+    },
+  });
 
-    if (settingsStore.debugMode && lineEls.length > 0) {
-      console.log(
-        "[WikiEditor] readEditorTextFromDom -> first lines diagnostics:",
-        lineEls.slice(0, 3).map((el, index) => ({
-          index,
-          textContent: (el.textContent ?? "").replace(/\u200B/g, ""),
-          innerText: (el.innerText ?? "").replace(/\u200B/g, ""),
-          innerHTML: el.innerHTML,
-        })),
-      );
-    }
+  function syncToStore(doc: string) {
+    if (syncingFromStore) return;
 
-    if (lineEls.length > 0) {
-      return lineEls
-        .map((el) => (el.textContent ?? "").replace(/\u200B/g, ""))
-        .join("\n");
-    }
-
-    return (container.innerText ?? "").replace(/\r\n/g, "\n");
-  }
-
-  function scheduleSyncFromEditorDom() {
-    if (pendingDomSyncFrame != null) return;
-
-    pendingDomSyncFrame = requestAnimationFrame(() => {
-      pendingDomSyncFrame = null;
-      syncFromEditorDom();
-    });
-  }
-
-  function syncFromEditorDom() {
-    if (!editorContainer) return;
-
-    const nextText = readEditorTextFromDom(editorContainer);
-
-    if (nextText !== text) {
-      text = nextText;
-    }
-
+    text = doc;
     status = "ready";
-    towerStore.effectiveWikitext = nextText;
-    towerStore.isDirty = nextText !== towerStore.originalWikitext;
+    towerStore.effectiveWikitext = doc;
+    towerStore.isDirty = doc !== towerStore.originalWikitext;
 
     if (settingsStore.debugMode) {
       console.log(
-        "[WikiEditor] syncFromEditorDom -> effectiveWikitext length:",
-        nextText.length,
+        "[WikiEditor] syncToStore -> effectiveWikitext length:",
+        doc.length,
       );
       console.log(
-        "[WikiEditor] syncFromEditorDom -> has <var>:",
-        /<var\b/i.test(nextText),
+        "[WikiEditor] syncToStore -> has <var>:",
+        /<var\b/i.test(doc),
       );
-      console.log(
-        "[WikiEditor] syncFromEditorDom -> preview:",
-        nextText.slice(0, 200),
-      );
+      console.log("[WikiEditor] syncToStore -> preview:", doc.slice(0, 200));
     }
+  }
+
+  function setEditorDoc(doc: string) {
+    if (!editorView) return;
+
+    const current = editorView.state.doc.toString();
+    if (current === doc) return;
+
+    syncingFromStore = true;
+    editorView.dispatch({
+      changes: { from: 0, to: current.length, insert: doc },
+    });
+    syncingFromStore = false;
+  }
+
+  function createEditor(container: HTMLElement) {
+    return new EditorView({
+      state: EditorState.create({
+        doc: text,
+        extensions: [
+          history(),
+          keymap.of([...defaultKeymap, ...historyKeymap]),
+          lineNumbers(),
+          lintGutter(),
+          mediawiki(parserConfig as unknown as ConfigData),
+          syntaxHighlighting(defaultHighlightStyle),
+          EditorView.lineWrapping,
+          editorTheme,
+          EditorView.updateListener.of((update) => {
+            if (update.docChanged) {
+              syncToStore(update.state.doc.toString());
+            }
+          }),
+        ],
+      }),
+      parent: container,
+    });
   }
 
   function saveOverride() {
@@ -181,68 +235,18 @@
     towerStore.isDirty = false;
     status = "ready";
     errorMessage = null;
-
-    if (editor) {
-      editor.update(text);
-    }
+    setEditorDoc(towerStore.originalWikitext);
   }
 
   onMount(() => {
     isClient = true;
 
-    if (isClient && editorContainer) {
-      if (!document.getElementById("wikistxr-styles")) {
-        const style = document.createElement("style");
-        style.id = "wikistxr-styles";
-        style.textContent = WikitextEditor.getDefaultStyles();
-        document.head.appendChild(style);
-      }
-
-      editor = new WikitextEditor({
-        extensionTags: [...DEFAULT_EXTENSION_TAGS, "var"],
-        contentPreservingTags: [...DEFAULT_CONTENT_PRESERVING_TAGS, "var"],
-      });
-
-      if (settingsStore.debugMode) {
-        editor.debug = (event) => {
-          if (
-            event.type === "attach" ||
-            event.type === "input" ||
-            event.type === "extractLines:done" ||
-            event.type === "warn"
-          ) {
-            console.log("[WikiEditor][wikistxr]", event);
-          }
-        };
-      }
-
-      editor.attach(editorContainer);
-      editor.update(text);
-
-      const editorInputHandler = () => scheduleSyncFromEditorDom();
-      const observer = new MutationObserver(() => scheduleSyncFromEditorDom());
-      editorContainer.addEventListener("input", editorInputHandler);
-      editorContainer.addEventListener("beforeinput", editorInputHandler);
-      editorContainer.addEventListener("paste", editorInputHandler);
-      editorContainer.addEventListener("cut", editorInputHandler);
-      editorContainer.addEventListener("drop", editorInputHandler);
-      observer.observe(editorContainer, {
-        subtree: true,
-        childList: true,
-        characterData: true,
-      });
-
+    if (editorContainer) {
+      editorView = createEditor(editorContainer);
+      setEditorDoc(towerStore.effectiveWikitext);
       return () => {
-        observer.disconnect();
-        editorContainer?.removeEventListener("input", editorInputHandler);
-        editorContainer?.removeEventListener("beforeinput", editorInputHandler);
-        editorContainer?.removeEventListener("paste", editorInputHandler);
-        editorContainer?.removeEventListener("cut", editorInputHandler);
-        editorContainer?.removeEventListener("drop", editorInputHandler);
-        if (pendingDomSyncFrame != null) {
-          cancelAnimationFrame(pendingDomSyncFrame);
-          pendingDomSyncFrame = null;
-        }
+        editorView?.destroy();
+        editorView = undefined;
       };
     }
 
@@ -251,17 +255,15 @@
 
   $effect(() => {
     if (!isClient) return;
-    if (text !== towerStore.effectiveWikitext) {
-      text = towerStore.effectiveWikitext;
-      if (editor) {
-        editor.update(text);
-      }
-    }
+
+    const next = towerStore.effectiveWikitext;
+    if (text !== next) text = next;
+    setEditorDoc(next);
 
     if (settingsStore.debugMode) {
       console.log(
         "[WikiEditor] Effect syncing text from store. Length:",
-        towerStore.effectiveWikitext.length,
+        next.length,
       );
     }
     status = "ready";
@@ -337,7 +339,9 @@
   </div>
 
   {#if errorMessage}
-    <div class="[border-radius:var(--radius)_0] border border-red-500/30 bg-red-500/10 p-3">
+    <div
+      class="[border-radius:var(--radius)_0] border border-red-500/30 bg-red-500/10 p-3"
+    >
       <div class="text-sm font-medium text-red-600">Error</div>
       <div class="text-xs text-red-600/90 break-words mt-1">
         {errorMessage}
@@ -366,11 +370,7 @@
       {/if}
     </div>
 
-    <div
-      class="[border-radius:var(--radius)_0] border border-input bg-background px-4 py-2 outline-none max-h-[30rem] overflow-auto transition-colors w-full font-mono text-xs leading-5"
-      bind:this={editorContainer}
-      spellcheck="false"
-    ></div>
+    <div class="wiki-cm-host w-full" bind:this={editorContainer}></div>
 
     <p class="text-xs text-muted-foreground">
       Notes:
@@ -393,4 +393,3 @@
     </p>
   </div>
 {/if}
-
