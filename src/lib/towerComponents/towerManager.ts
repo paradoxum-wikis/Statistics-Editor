@@ -501,9 +501,24 @@ export default class TowerManager {
                 variantPrefix,
               );
               if (result !== undefined) {
-                readOnly.add(key);
                 cellFormulaTokens[levelKey][key] = ogVal;
                 row[key] = result;
+                const stripped = stripRefs(ogVal).trim();
+                const refSuffix = stripped.match(
+                  /^(-?[\d.,]+)((\$[A-Z0-9_-]+\$)+)$/,
+                );
+                const refOnly =
+                  !!refSuffix &&
+                  (refSuffix[2].match(/\$[A-Z0-9_-]+\$/g) ?? []).every((v) =>
+                    /^<ref\b/i.test((formulaTokens[v] ?? "").trim()),
+                  );
+                if (
+                  !refOnly &&
+                  (/\$[^$]+\$/.test(stripped) ||
+                    /^{{#expr:.*}}$/i.test(stripped))
+                ) {
+                  readOnly.add(key);
+                }
               }
             }
           }
@@ -574,20 +589,28 @@ export default class TowerManager {
         }
 
         const resolvedExtraTables = extraTables.map((extra) => {
-          const extraReadOnly = new Set<string>(
-            extra.rows.flatMap((r) =>
-              Object.entries(r)
-                .filter(([, val]) => {
-                  if (typeof val !== "string") return false;
-                  const stripped = stripRefs(val).trim();
-                  return (
-                    /\$[^$]+\$/.test(stripped) ||
-                    /^{{#expr:.*}}$/i.test(stripped)
-                  );
-                })
-                .map(([k]) => k),
-            ),
-          );
+          const extraReadOnly = new Set<string>();
+          for (const r of extra.rows) {
+            for (const [k, val] of Object.entries(r)) {
+              if (typeof val !== "string") continue;
+              const stripped = stripRefs(val).trim();
+              const refSuffix = stripped.match(
+                /^(-?[\d.,]+)((\$[A-Z0-9_-]+\$)+)$/,
+              );
+              const refOnly =
+                !!refSuffix &&
+                (refSuffix[2].match(/\$[A-Z0-9_-]+\$/g) ?? []).every((v) =>
+                  /^<ref\b/i.test((formulaTokens[v] ?? "").trim()),
+                );
+              if (
+                !refOnly &&
+                (/\$[^$]+\$/.test(stripped) ||
+                  /^{{#expr:.*}}$/i.test(stripped))
+              ) {
+                extraReadOnly.add(k);
+              }
+            }
+          }
 
           if (extra.headers.includes("Total Price")) {
             extraReadOnly.add("Total Price");
@@ -611,27 +634,41 @@ export default class TowerManager {
                 ? String(resRow["Level"]) + (bSuffix ? bSuffix : "")
                 : extraIdx;
 
-              for (const key of extraReadOnly) {
-                const originalVal = resRow[key] as string;
-                if (!originalVal) continue;
-                const stripped = stripRefs(originalVal).trim();
-                const result = resolveToken(
-                  stripped,
-                  levelVal,
-                  resRow,
-                  formulaTokens,
-                  isPvp,
-                  0,
-                  tableCache,
-                  false,
-                  false,
-                  undefined,
-                  undefined,
-                  variantPrefix,
-                );
-                if (result !== undefined) {
-                  cellFormulaTokens[levelKey][key] = originalVal;
-                  resRow[key] = result;
+              const formulaEntries = (
+                Object.entries(resRow) as [string, unknown][]
+              )
+                .map(([k, v]): [string, string, string] | null => {
+                  if (typeof v !== "string") return null;
+                  const stripped = stripRefs(v).trim();
+                  if (
+                    !/\$[^$]+\$/.test(stripped) &&
+                    !/^{{#expr:.*}}$/i.test(stripped)
+                  )
+                    return null;
+                  return [k, stripped, v];
+                })
+                .filter((x): x is [string, string, string] => x !== null);
+
+              for (let pass = 0; pass < 2; pass++) {
+                for (const [key, val, ogVal] of formulaEntries) {
+                  const result = resolveToken(
+                    val,
+                    levelVal,
+                    resRow,
+                    formulaTokens,
+                    isPvp,
+                    0,
+                    tableCache,
+                    false,
+                    false,
+                    undefined,
+                    undefined,
+                    variantPrefix,
+                  );
+                  if (result !== undefined) {
+                    cellFormulaTokens[levelKey][key] = ogVal;
+                    resRow[key] = result;
+                  }
                 }
               }
 

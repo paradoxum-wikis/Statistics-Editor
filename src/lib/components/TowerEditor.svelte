@@ -250,7 +250,8 @@
     value: string,
   ) {
     if (disabled) return;
-    const row = skinData.extraTables?.[extraTableIndex]?.rows?.[rowIdx];
+    const extraTable = skinData.extraTables?.[extraTableIndex];
+    const row = extraTable?.rows?.[rowIdx];
     if (!row) return;
 
     let parsedValue: string | number | boolean = value;
@@ -258,6 +259,26 @@
     else if (value === "false") parsedValue = false;
     else if (value.trim() !== "" && !isNaN(Number(value)))
       parsedValue = Number(value);
+
+    const formulaToken =
+      extraTable?.cellFormulaTokens?.[String(rowIdx)]?.[header];
+    if (typeof formulaToken === "string" && typeof parsedValue !== "boolean") {
+      const m = stripRefs(formulaToken)
+        .trim()
+        .match(/^(-?[\d.,]+)((\$[A-Z0-9_-]+\$)+)$/);
+      if (
+        m &&
+        (m[2].match(/\$[A-Z0-9_-]+\$/g) ?? []).every((v) =>
+          /^<ref\b/i.test((skinData.formulaTokens[v] ?? "").trim()),
+        )
+      ) {
+        const n =
+          typeof parsedValue === "number"
+            ? formatNumber(parsedValue)
+            : String(parsedValue).trim();
+        extraTable.cellFormulaTokens![String(rowIdx)][header] = `${n}${m[2]}`;
+      }
+    }
 
     row[header] = parsedValue as string | number;
 

@@ -6,7 +6,7 @@ import Locator from "./locator";
 import { resolveToken, type TableCache } from "$lib/neowtext/functions";
 import type { TableData } from "$lib/neowtext/parser";
 import { settingsStore } from "$lib/stores/settings.svelte";
-import { stripRefs } from "$lib/utils/format";
+import { formatNumber, stripRefs } from "$lib/utils/format";
 
 type FormulaToken = string; // e.g. "$DPS$", "$DPS2$"
 type FormulaTokenMap = Record<string, string>; // token -> expression
@@ -432,6 +432,30 @@ class SkinData {
   }
 
   set(level: number, attribute: string, newValue: any) {
+    const levelKey = String(level);
+    const formulaToken = this.cellFormulaTokens[levelKey]?.[attribute];
+    if (typeof formulaToken === "string") {
+      const m = stripRefs(formulaToken)
+        .trim()
+        .match(/^(-?[\d.,]+)((\$[A-Z0-9_-]+\$)+)$/);
+      if (
+        m &&
+        (m[2].match(/\$[A-Z0-9_-]+\$/g) ?? []).every((v) =>
+          /^<ref\b/i.test((this.formulaTokens[v] ?? "").trim()),
+        )
+      ) {
+        const n =
+          typeof newValue === "number"
+            ? formatNumber(newValue)
+            : String(newValue).trim();
+        const patched = `${n}${m[2]}`;
+        this.cellFormulaTokens[levelKey][attribute] = patched;
+        if (this.data.CellFormulaTokens) {
+          this.data.CellFormulaTokens[levelKey][attribute] = patched;
+        }
+      }
+    }
+
     if (level === 0) {
       this.defaults.set(attribute, newValue);
     } else {
