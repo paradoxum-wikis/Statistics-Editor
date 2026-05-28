@@ -9,7 +9,6 @@
   import { fly } from "svelte/transition";
 
   import TowerEditor from "$lib/components/TowerEditor.svelte";
-  import WikiEditor from "$lib/components/WikiEditor.svelte";
   import Introduction from "$lib/components/Introduction.svelte";
   import Sidebar from "$lib/components/Sidebar.svelte";
   import SettingsModal from "$lib/components/SettingsModal.svelte";
@@ -424,7 +423,15 @@
                 {#if editorMode === "cells" && !towerStore.selectedData.isMalformed}
                   <TowerEditor tower={towerStore.selectedData} />
                 {:else}
-                  <WikiEditor towerName={towerStore.selectedName} open={true} />
+                  {#await import("$lib/components/WikiEditor.svelte") then { default: WikiEditor }}
+                    <WikiEditor towerName={towerStore.selectedName} open={true} />
+                  {:catch}
+                    <div class="card p-8 text-center">
+                      <p class="text-body text-red-600">
+                        Failed to load the wiki editor.
+                      </p>
+                    </div>
+                  {/await}
                 {/if}
               </div>
             {/key}

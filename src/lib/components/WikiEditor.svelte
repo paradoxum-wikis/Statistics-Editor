@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onMount, untrack } from "svelte";
   import { Popover } from "bits-ui";
-  import { EditorState } from "@codemirror/state";
+  import { Annotation, EditorState } from "@codemirror/state";
   import { lintGutter } from "@codemirror/lint";
   import { EditorView, keymap, lineNumbers } from "@codemirror/view";
   import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
@@ -18,6 +18,8 @@
   import { setWikiOverride } from "$lib/neowtext/wikiSource";
   import { noFetchTowers } from "$lib/towerComponents/towers/index";
 
+  const syncFromStoreAnnotation = Annotation.define<boolean>();
+
   let {
     towerName,
     open = false,
@@ -26,13 +28,11 @@
     open?: boolean;
   } = $props();
 
-  let isClient = $state(false);
-  let text = $state(towerStore.effectiveWikitext);
   let status = $state<"ready" | "saving" | "saved" | "error">("ready");
   let errorMessage = $state<string | null>(null);
   let editorContainer = $state<HTMLElement>();
   let editorView: EditorView | undefined;
-  let syncingFromStore = $state(false);
+  let editorReady = $state(false);
 
   let profileName = $derived(profileStore.current);
 
@@ -98,23 +98,20 @@
   });
 
   function syncToStore(doc: string) {
-    if (syncingFromStore) return;
+    const dirty = doc !== towerStore.originalWikitext;
+    if (doc === towerStore.effectiveWikitext && towerStore.isDirty === dirty) {
+      return;
+    }
 
-    text = doc;
-    status = "ready";
     towerStore.effectiveWikitext = doc;
-    towerStore.isDirty = doc !== towerStore.originalWikitext;
+    towerStore.isDirty = dirty;
+    status = "ready";
 
     if (settingsStore.debugMode) {
       console.log(
         "[WikiEditor] syncToStore -> effectiveWikitext length:",
         doc.length,
       );
-      console.log(
-        "[WikiEditor] syncToStore -> has <var>:",
-        /<var\b/i.test(doc),
-      );
-      console.log("[WikiEditor] syncToStore -> preview:", doc.slice(0, 200));
     }
   }
 
@@ -124,17 +121,16 @@
     const current = editorView.state.doc.toString();
     if (current === doc) return;
 
-    syncingFromStore = true;
     editorView.dispatch({
       changes: { from: 0, to: current.length, insert: doc },
+      annotations: syncFromStoreAnnotation.of(true),
     });
-    syncingFromStore = false;
   }
 
   function createEditor(container: HTMLElement) {
     return new EditorView({
       state: EditorState.create({
-        doc: text,
+        doc: towerStore.effectiveWikitext,
         extensions: [
           history(),
           keymap.of([...defaultKeymap, ...historyKeymap]),
@@ -145,9 +141,15 @@
           EditorView.lineWrapping,
           editorTheme,
           EditorView.updateListener.of((update) => {
-            if (update.docChanged) {
-              syncToStore(update.state.doc.toString());
+            if (
+              !update.docChanged ||
+              update.transactions.some((tr) =>
+                tr.annotation(syncFromStoreAnnotation),
+              )
+            ) {
+              return;
             }
+            syncToStore(update.state.doc.toString());
           }),
         ],
       }),
@@ -155,45 +157,27 @@
     });
   }
 
+  function discardChanges() {
+    if (!towerStore.isDirty) return;
+
+    towerStore.effectiveWikitext = towerStore.originalWikitext;
+    towerStore.isDirty = false;
+    status = "ready";
+    errorMessage = null;
+    setEditorDoc(towerStore.originalWikitext);
+  }
+
   function saveOverride() {
     if (!towerName) return;
 
-    if (settingsStore.debugMode)
-      console.log("[WikiEditor] saveOverride initiated");
     status = "saving";
     errorMessage = null;
 
     try {
-      if (settingsStore.debugMode) {
-        console.log(
-          "[WikiEditor] saving wikitext length:",
-          towerStore.effectiveWikitext.length,
-        );
-        console.log(
-          "[WikiEditor] saving wikitext has <var>:",
-          /<var\b/i.test(towerStore.effectiveWikitext),
-        );
-        console.log(
-          "[WikiEditor] saving wikitext preview:",
-          towerStore.effectiveWikitext.slice(0, 200),
-        );
-      }
-
       setWikiOverride(profileName, towerName, towerStore.effectiveWikitext);
-
-      if (settingsStore.debugMode)
-        console.log("[WikiEditor] setWikiOverride returned");
-
       towerStore.isDirty = false;
       status = "saved";
-
-      if (settingsStore.debugMode)
-        console.log("[WikiEditor] calling forceReload");
-
-      void towerStore.forceReload().then(() => {
-        if (settingsStore.debugMode)
-          console.log("[WikiEditor] forceReload resolved");
-      });
+      void towerStore.forceReload();
     } catch (err) {
       console.error("[WikiEditor] saveOverride error:", err);
       status = "error";
@@ -227,50 +211,33 @@
     }
   }
 
-  function discardChanges() {
-    if (!towerStore.isDirty) return;
-
-    text = towerStore.originalWikitext;
-    towerStore.effectiveWikitext = towerStore.originalWikitext;
-    towerStore.isDirty = false;
-    status = "ready";
-    errorMessage = null;
-    setEditorDoc(towerStore.originalWikitext);
-  }
-
   onMount(() => {
-    isClient = true;
+    if (!editorContainer) return;
 
-    if (editorContainer) {
-      editorView = createEditor(editorContainer);
-      setEditorDoc(towerStore.effectiveWikitext);
-      return () => {
-        editorView?.destroy();
-        editorView = undefined;
-      };
-    }
+    editorView = createEditor(editorContainer);
+    editorReady = true;
 
-    return;
+    return () => {
+      editorView?.destroy();
+      editorView = undefined;
+      editorReady = false;
+    };
   });
 
   $effect(() => {
-    if (!isClient) return;
+    if (!editorReady || !editorView) return;
 
-    const next = towerStore.effectiveWikitext;
-    if (text !== next) text = next;
-    setEditorDoc(next);
-
-    if (settingsStore.debugMode) {
-      console.log(
-        "[WikiEditor] Effect syncing text from store. Length:",
-        next.length,
-      );
-    }
-    status = "ready";
-    errorMessage = null;
+    const doc = towerStore.effectiveWikitext;
+    untrack(() => {
+      setEditorDoc(doc);
+    });
   });
 
-  const canSave = $derived(isClient && !!towerName && text.trim().length > 0);
+  const canSave = $derived(
+    editorReady &&
+      !!towerName &&
+      towerStore.effectiveWikitext.trim().length > 0,
+  );
 </script>
 
 {#if open}
@@ -352,7 +319,9 @@
   <div class="space-y-2">
     <div class="flex items-center justify-between">
       <div class="text-xs text-muted-foreground">
-        {#if status === "saving"}
+        {#if !editorReady}
+          Loading editor…
+        {:else if status === "saving"}
           Saving...
         {:else if status === "saved"}
           Saved override.
@@ -365,7 +334,7 @@
 
       {#if settingsStore.debugMode}
         <div class="text-xs text-muted-foreground">
-          Length: {text.length}
+          Length: {towerStore.effectiveWikitext.length}
         </div>
       {/if}
     </div>
