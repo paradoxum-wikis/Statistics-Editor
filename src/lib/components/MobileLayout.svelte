@@ -10,7 +10,6 @@
 
   import Sidebar from "./Sidebar.svelte";
   import TowerEditor from "./TowerEditor.svelte";
-  import WikiEditor from "./WikiEditor.svelte";
   import Introduction from "./Introduction.svelte";
   import SettingsModal from "./SettingsModal.svelte";
 
@@ -267,7 +266,15 @@
               {#if editorMode === "cells"}
                 <TowerEditor tower={towerStore.selectedData} />
               {:else}
-                <WikiEditor towerName={towerStore.selectedName} open={true} />
+                {#await import("./WikiEditor.svelte") then { default: WikiEditor }}
+                  <WikiEditor towerName={towerStore.selectedName} open={true} />
+                {:catch}
+                  <div class="card p-8 text-center">
+                    <p class="text-body text-red-600">
+                      Failed to load the wiki editor.
+                    </p>
+                  </div>
+                {/await}
               {/if}
             </div>
           {/key}
