@@ -271,7 +271,7 @@
                 {:catch}
                   <div class="card p-8 text-center">
                     <p class="text-body text-red-600">
-                      Failed to load the wiki editor.
+                      Failed to load the source editor.
                     </p>
                   </div>
                 {/await}
@@ -550,4 +550,3 @@
     </AlertDialog.Content>
   </AlertDialog.Portal>
 </AlertDialog.Root>
-

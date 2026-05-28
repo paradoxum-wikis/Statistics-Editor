@@ -424,11 +424,14 @@
                   <TowerEditor tower={towerStore.selectedData} />
                 {:else}
                   {#await import("$lib/components/WikiEditor.svelte") then { default: WikiEditor }}
-                    <WikiEditor towerName={towerStore.selectedName} open={true} />
+                    <WikiEditor
+                      towerName={towerStore.selectedName}
+                      open={true}
+                    />
                   {:catch}
                     <div class="card p-8 text-center">
                       <p class="text-body text-red-600">
-                        Failed to load the wiki editor.
+                        Failed to load the source editor.
                       </p>
                     </div>
                   {/await}
