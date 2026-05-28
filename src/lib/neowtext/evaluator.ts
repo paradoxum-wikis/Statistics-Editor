@@ -40,19 +40,27 @@ export function evaluateFormula(
   formula: string,
   row: Record<string, string | number>,
 ): number {
-  formula = stripRefs(formula).replace(/{{#expr:\s*(.*?)\s*}}/gi, "$1");
+  formula = stripRefs(formula)
+    .replace(/{{#expr:\s*(.*?)\s*}}/gi, "$1")
+    .replace(/\[\[([^|\]]+)(?:\|[^\]]+)?\]\]/g, "$1");
 
   // for example "Cost Efficiency" = "Cost_Efficiency"
   const numericContextAliased: Record<string, number> = {};
 
   for (const [key, value] of Object.entries(row)) {
-    const n = toNumericValue(value);
-    if (n !== null) {
-      const cleanKey = stripRefs(key);
-      numericContextAliased[cleanKey] = n;
-      if (/\s/.test(cleanKey)) {
-        numericContextAliased[cleanKey.replace(/\s+/g, "_")] = n;
-      }
+    const cleanKey = stripRefs(key).replace(
+      /\[\[([^|\]]+)(?:\|[^\]]+)?\]\]/g,
+      "$1",
+    );
+    let n = toNumericValue(value);
+    if (n === null) {
+      const s = stripRefs(value).trim();
+      if (s === "" || s === "-" || /^n\/?a$/i.test(s)) n = 0;
+      else continue;
+    }
+    numericContextAliased[cleanKey] = n;
+    if (/\s/.test(cleanKey)) {
+      numericContextAliased[cleanKey.replace(/\s+/g, "_")] = n;
     }
   }
 

@@ -582,7 +582,7 @@ export function resolveToken(
     val = val.replace(/^["'](.*)["']$/, "$1");
 
     val = val.replace(
-      /([a-zA-Z0-9_ ]+)\.([a-zA-Z0-9_ ]+)/g,
+      /([a-zA-Z_][a-zA-Z0-9_ ]*)\.([a-zA-Z_][a-zA-Z0-9_ ]*)/g,
       (match, tname, col) => {
         const tableName = tname.trim();
         const columnName = col.trim();
@@ -671,7 +671,7 @@ export function resolveToken(
     }
 
     const result = evaluateFormula(val, context);
-    return Number.isNaN(result) ? val : result;
+    return Number.isNaN(result) ? undefined : result;
   }
 
   return undefined;
