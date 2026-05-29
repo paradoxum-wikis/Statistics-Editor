@@ -670,6 +670,18 @@ export function resolveToken(
       return val;
     }
 
+    if (!isExpr) {
+      if (val.includes("**") || val.includes("%")) {
+        // **
+        val = val.replace(/\*\*/g, "^");
+        // %
+        val = val.replace(
+          /([0-9A-Za-z_\)\]])\s*%\s*([0-9A-Za-z_\(\[])/g,
+          "$1 fmod $2",
+        );
+      }
+    }
+
     const result = evaluateFormula(val, context);
     return Number.isNaN(result) ? undefined : result;
   }
