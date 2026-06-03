@@ -33,7 +33,7 @@
     "vite": "^8.0.8"
   },
   "dependencies": {
-    "@bhsd/codemirror-wikitext": "^0.7.0",
+    "@bhsd/codemirror-wikitext": "^0.8.0",
     "@lucide/svelte": "^1.8.0",
     "codemirror": "^6.0.2",
     "mediawiki-expr": "^0.0.2",
