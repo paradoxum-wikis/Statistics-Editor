@@ -51,9 +51,7 @@
 
   <Separator />
 
-  <div class="pt-4">
-    <p class="text-sm text-muted-foreground text-center">
-      Select a tower and get started!
-    </p>
-  </div>
+  <p class="text-sm text-muted-foreground text-center">
+    Select a tower and get started!
+  </p>
 </div>
