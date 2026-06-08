@@ -119,6 +119,8 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary) var(--secondary);
   }
   body {
     @apply bg-background text-foreground;
@@ -299,11 +301,6 @@ h4,
 
 .mobile-bottom-bar {
   @apply fixed bottom-0 inset-x-0 z-30 h-14 bg-card border-t border-border flex items-center justify-around px-6;
-}
-
-.overflow-x-auto {
-  scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 #f1f5f9;
 }
 
 /* Active tab */
