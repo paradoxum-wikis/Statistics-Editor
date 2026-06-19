@@ -302,7 +302,9 @@ function parseTable(
 
   const cleanHeader = (val: string): string => {
     const expanded = applyVariables(val);
-    return stripRefs(String(cleanCell(expanded, undefined))).trim();
+    return stripRefs(
+      String(cleanCell(expanded, undefined)).replace(/\$[A-Z0-9_-]+\$/gi, ""),
+    ).trim();
   };
 
   for (let i = 0; i < lines.length; i++) {
