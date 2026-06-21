@@ -30,8 +30,12 @@
 {/if}
 
 <Col.Root bind:open>
-  <Col.Trigger class="section-trigger">
-    <span class="section-title">
+  <Col.Trigger
+    class="flex w-full cursor-pointer items-center justify-between border-none bg-transparent px-1 py-1.5 hover:[&_.section-title]:text-foreground hover:[&_.section-title]:opacity-80"
+  >
+    <span
+      class="section-title flex items-center gap-1 text-sm font-semibold text-foreground"
+    >
       {#if IconComponent}
         <IconComponent class="inline w-3.5 h-3.5 opacity-70" />
       {/if}
@@ -41,7 +45,7 @@
       {/if}
     </span>
     <ChevronDown
-      class="chevron-icon"
+      class="h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform duration-150 ease-in-out"
       style="transform: rotate({open ? '180deg' : '0deg'})"
     />
   </Col.Trigger>
@@ -55,4 +59,3 @@
     {/snippet}
   </Col.Content>
 </Col.Root>
-

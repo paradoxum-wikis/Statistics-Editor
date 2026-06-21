@@ -2,6 +2,7 @@
   import { towerStore } from "$lib/stores/tower.svelte";
   import { getTargetSkins } from "$lib/utils/towah";
   import CollapsibleSection from "./smol/CollapsibleSection.svelte";
+  import SubtleRow from "./smol/SubtleRow.svelte";
   import { CircleDollarSign } from "@lucide/svelte";
   import { parseNumeric } from "$lib/utils/format";
 
@@ -74,7 +75,7 @@
   {#if costRows.length > 0}
     <div class="grid gap-1.5">
       {#each costRows as row (row.level)}
-        <div class="subtle-row-surface flex items-center px-1.5 py-1">
+        <SubtleRow class="flex items-center px-1.5 py-1">
           <span
             class="text-[0.7rem] text-muted-foreground min-w-13 max-w-20 shrink-0 overflow-hidden text-ellipsis whitespace-nowrap"
             title={row.level === 0 ? "Base" : `Slot ${row.level}`}
@@ -83,7 +84,7 @@
           </span>
           <input
             type="number"
-            class="flex-1 text-[0.7rem] bg-background border border-input [border-radius:calc(var(--radius)-0.5rem)_0] px-1.5 py-0.5 text-right text-foreground outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+            class="flex-1 text-[0.7rem] bg-background border border-input `rounded-[calc(var(--radius)-0.5rem)_0] px-1.5 py-0.5 text-right text-foreground outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
             value={row.cost}
             min="0"
             step="1"
@@ -92,7 +93,7 @@
               if (!isNaN(val) && val >= 0) updateCost(row.level, val);
             }}
           />
-        </div>
+        </SubtleRow>
       {/each}
     </div>
   {:else if skinData}

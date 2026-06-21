@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Tabs, Popover } from "bits-ui";
   import Separator from "./smol/Separator.svelte";
+  import Btn from "./smol/Btn.svelte";
   import type Tower from "$lib/towerComponents/tower";
   import type SkinData from "$lib/towerComponents/skinData";
   import { settingsStore } from "$lib/stores/settings.svelte";
@@ -668,9 +669,13 @@
       value={towerStore.selectedSkinName}
       onValueChange={(v) => (towerStore.selectedSkinName = v)}
     >
-      <Tabs.List class="tabs-list">
+      <Tabs.List
+        class="mb-4 flex gap-2 rounded-[var(--radius)_0] bg-muted p-1 px-2"
+      >
         {#each availableSkins as skinName (skinName)}
-          <Tabs.Trigger value={skinName} class="tab-trigger"
+          <Tabs.Trigger
+            value={skinName}
+            class="rounded-[calc(var(--radius)-0.25rem)_0] border border-input bg-card px-4 py-1 text-sm font-medium text-foreground transition-colors duration-250 hover:bg-accent data-[state=active]:bg-primary data-[state=active]:text-white"
             >{skinName}</Tabs.Trigger
           >
         {/each}
@@ -734,20 +739,20 @@
           </Popover.Content>
         </Popover.Root>
       {/if}
-      <button
-        class="btn btn-secondary"
+      <Btn
+        variant="secondary"
         onclick={handleDiscard}
         disabled={!towerStore.isDirty}
       >
         Clear Changes
-      </button>
-      <button
-        class="btn btn-primary"
+      </Btn>
+      <Btn
+        variant="primary"
         onclick={handleSave}
         disabled={!towerStore.isDirty}
       >
         Save Changes
-      </button>
+      </Btn>
     </div>
   {:else}
     <div class="text-center py-8 text-body">

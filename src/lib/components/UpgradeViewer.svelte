@@ -59,9 +59,12 @@
 <Separator class="mb-4" />
 
 <Tabs.Root bind:value={selectedUpgrade}>
-  <Tabs.List class="upgrade-tabs-list">
+  <Tabs.List class="mb-4 flex space-x-1 overflow-x-auto">
     {#each Array(numUpgrades) as _, index}
-      <Tabs.Trigger value={index.toString()} class="upgrade-tab-trigger">
+      <Tabs.Trigger
+        value={index.toString()}
+        class="w-full rounded-[var(--radius)_0] bg-muted px-2 py-1 text-xs transition-[background-color,color] duration-250 data-[state=active]:cursor-default data-[state=active]:bg-primary data-[state=active]:text-white"
+      >
         {upgradeLevels[index] ?? index + 1}
       </Tabs.Trigger>
     {/each}

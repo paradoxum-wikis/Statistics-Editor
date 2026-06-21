@@ -20,9 +20,12 @@
     AlertDialog,
     Dialog,
   } from "bits-ui";
+  import ModeToggle from "./smol/ModeToggle.svelte";
+  import Card from "./smol/Card.svelte";
+  import Btn from "./smol/Btn.svelte";
+  import IconBtn from "./smol/IconBtn.svelte";
+  import TextInput from "./smol/TextInput.svelte";
   import {
-    Table,
-    FileBraces,
     ChevronsUpDown,
     Check,
     Trash2,
@@ -141,7 +144,7 @@
   }
 </script>
 
-<div class="mobile-shell">
+<div class="flex h-screen flex-col bg-background">
   <!-- Sidebar Scrim -->
   {#if sidebarOpen}
     <div
@@ -162,7 +165,9 @@
   </div>
 
   <!-- Header -->
-  <header class="mobile-topbar">
+  <header
+    class="sticky top-0 z-10 flex flex-col items-center gap-2 border-b bg-card px-4 py-1"
+  >
     <h1 class="text-sm font-bold text-foreground tracking-wide">
       {towerStore.selectedName || "TDS Statistics Editor"}
     </h1>
@@ -223,43 +228,20 @@
         </Combobox.Portal>
       </Combobox.Root>
 
-      <div class="mode-toggle-group">
-        <button
-          class="mode-toggle-btn {editorMode === 'cells'
-            ? 'active'
-            : 'inactive'}"
-          onclick={() => (editorMode = "cells")}
-        >
-          <div class="flex items-center gap-1.5">
-            <Table size={16} />
-            <span>Visual</span>
-          </div>
-        </button>
-        <button
-          class="mode-toggle-btn {editorMode === 'wiki'
-            ? 'active'
-            : 'inactive'}"
-          onclick={() => (editorMode = "wiki")}
-        >
-          <div class="flex items-center gap-1.5">
-            <FileBraces size={16} />
-            <span>Source</span>
-          </div>
-        </button>
-      </div>
+      <ModeToggle bind:mode={editorMode} />
     {/if}
   </header>
 
   <!-- Main Content -->
-  <main class="mobile-content">
+  <main class="flex-1 overflow-x-auto p-4 pb-16">
     {#key `${isClient}-${towerStore.isLoading}-${towerStore.selectedName ?? ""}-${editorMode}`}
       <div in:fly={{ y: 8, duration: 160, easing: cubicOut }}>
         {#if !isClient}
-          <div class="card p-8 text-center">
+          <Card class="p-8 text-center">
             <p class="animate-pulse text-body">
               Engineer is setting up the editor for you...
             </p>
-          </div>
+          </Card>
         {:else if towerStore.selectedData}
           {#key editorMode}
             <div in:fly={{ y: 8, duration: 160, easing: cubicOut }}>
@@ -269,21 +251,21 @@
                 {#await import("./WikiEditor.svelte") then { default: WikiEditor }}
                   <WikiEditor towerName={towerStore.selectedName} open={true} />
                 {:catch}
-                  <div class="card p-8 text-center">
+                  <Card class="p-8 text-center">
                     <p class="text-body text-red-600">
                       Failed to load the source editor.
                     </p>
-                  </div>
+                  </Card>
                 {/await}
               {/if}
             </div>
           {/key}
         {:else if towerStore.isLoading}
-          <div class="card p-8 text-center">
+          <Card class="p-8 text-center">
             <p class="animate-pulse text-body">
               Commander is getting this tower's files ready...
             </p>
-          </div>
+          </Card>
         {:else}
           <Introduction />
         {/if}
@@ -292,16 +274,17 @@
   </main>
 
   <!-- Bottom Bar -->
-  <div class="mobile-bottom-bar">
+  <div
+    class="fixed inset-x-0 bottom-0 z-30 flex h-14 items-center justify-around border-t border-border bg-card px-6"
+  >
     <!-- Sidebar Toggle -->
-    <button
-      class="icon-btn"
+    <IconBtn
       onclick={() => (sidebarOpen = !sidebarOpen)}
       title="Toggle Sidebar"
       aria-label="Toggle sidebar"
     >
       <PanelLeft size={20} />
-    </button>
+    </IconBtn>
 
     <!-- Profile -->
     <DropdownMenu.Root>
@@ -355,8 +338,7 @@
               </Dialog.Description>
 
               <div class="space-y-2">
-                <input
-                  class="input"
+                <TextInput
                   type="text"
                   placeholder="My Profile"
                   bind:value={newProfileName}
@@ -366,13 +348,13 @@
 
               <div class="flex justify-end gap-2">
                 <Dialog.Close class="btn btn-outline">Cancel</Dialog.Close>
-                <button
-                  class="btn btn-primary"
+                <Btn
+                  variant="primary"
                   onclick={confirmCreateProfile}
                   disabled={!newProfileName.trim()}
                 >
                   Create
-                </button>
+                </Btn>
               </div>
 
               <Dialog.Close

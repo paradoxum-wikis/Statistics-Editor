@@ -21,14 +21,11 @@
     AlertDialog,
     Dialog,
   } from "bits-ui";
-  import {
-    Table,
-    FileBraces,
-    Trash2,
-    Check,
-    ChevronsUpDown,
-    X,
-  } from "@lucide/svelte";
+  import ModeToggle from "$lib/components/smol/ModeToggle.svelte";
+  import Card from "$lib/components/smol/Card.svelte";
+  import Btn from "$lib/components/smol/Btn.svelte";
+  import TextInput from "$lib/components/smol/TextInput.svelte";
+  import { Trash2, Check, ChevronsUpDown, X } from "@lucide/svelte";
 
   type EditorMode = "cells" | "wiki";
 
@@ -168,46 +165,24 @@
   />
 
   <div class="ms-[17%] flex flex-col h-full">
-    <header class="header-bar">
-      <h1 class="text-heading unisans">
+    <header
+      class="sticky top-0 z-10 flex items-center justify-between border-b bg-card p-2 px-3"
+    >
+      <h1 class="unisans text-3xl font-black text-foreground">
         {towerStore.selectedName || "TDS Statistics Editor"}
       </h1>
       <div class="flex items-center space-x-4">
         {#if isClient}
-          <!-- Editor Mode Toggle -->
-          <div class="mode-toggle-group">
-            <button
-              class="mode-toggle-btn {editorMode === 'cells' &&
-              !towerStore.selectedData?.isMalformed
-                ? 'active'
-                : 'inactive'} {towerStore.selectedData?.isMalformed
-                ? 'opacity-50 cursor-not-allowed'
-                : ''}"
-              onclick={() => (editorMode = "cells")}
-              disabled={towerStore.selectedData?.isMalformed}
-            >
-              <div class="flex items-center gap-1.5">
-                <Table size={16} />
-                <span>Visual</span>
-              </div>
-            </button>
-            <button
-              class="mode-toggle-btn {editorMode === 'wiki' ||
-              towerStore.selectedData?.isMalformed
-                ? 'active'
-                : 'inactive'}"
-              onclick={() => (editorMode = "wiki")}
-            >
-              <div class="flex items-center gap-1.5">
-                <FileBraces size={16} />
-                <span>Source</span>
-              </div>
-            </button>
-          </div>
+          <ModeToggle
+            bind:mode={editorMode}
+            disableCells={towerStore.selectedData?.isMalformed ?? false}
+          />
 
           <!-- Profile Selector -->
           <DropdownMenu.Root>
-            <DropdownMenu.Trigger class="profile-trigger">
+            <DropdownMenu.Trigger
+              class="inline-flex items-center gap-2 rounded-[var(--radius)_0] border border-border px-3 py-2 text-sm font-medium transition-colors duration-250 hover:bg-muted"
+            >
               <span>{profileStore.current}</span>
               <span class="text-xs text-muted-foreground">(Profile)</span>
             </DropdownMenu.Trigger>
@@ -260,8 +235,7 @@
                     </Dialog.Description>
 
                     <div class="space-y-2">
-                      <input
-                        class="input"
+                      <TextInput
                         type="text"
                         placeholder="My Profile"
                         bind:value={newProfileName}
@@ -273,13 +247,13 @@
                       <Dialog.Close class="btn btn-outline">
                         Cancel
                       </Dialog.Close>
-                      <button
-                        class="btn btn-primary"
+                      <Btn
+                        variant="primary"
                         onclick={confirmCreateProfile}
                         disabled={!newProfileName.trim()}
                       >
                         Create
-                      </button>
+                      </Btn>
                     </div>
 
                     <Dialog.Close
@@ -403,11 +377,11 @@
       {#key mainKey}
         <div in:fly={{ y: 8, duration: 160, easing: cubicOut }}>
           {#if !isClient}
-            <div class="card p-8 text-center">
+            <Card class="p-8 text-center">
               <p class="animate-pulse text-body">
                 Engineer is setting up the editor for you...
               </p>
-            </div>
+            </Card>
           {:else if towerStore.selectedData}
             {#key editorMode}
               <div in:fly={{ y: 8, duration: 160, easing: cubicOut }}>
@@ -420,21 +394,21 @@
                       open={true}
                     />
                   {:catch}
-                    <div class="card p-8 text-center">
+                    <Card class="p-8 text-center">
                       <p class="text-body text-red-600">
                         Failed to load the source editor.
                       </p>
-                    </div>
+                    </Card>
                   {/await}
                 {/if}
               </div>
             {/key}
           {:else if towerStore.isLoading}
-            <div class="card p-8 text-center">
+            <Card class="p-8 text-center">
               <p class="animate-pulse text-body">
                 Commander is getting this tower's files ready...
               </p>
-            </div>
+            </Card>
           {:else}
             <Introduction />
           {/if}

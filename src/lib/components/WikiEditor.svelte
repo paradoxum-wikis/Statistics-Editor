@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount, untrack } from "svelte";
   import { Popover } from "bits-ui";
+  import Btn from "./smol/Btn.svelte";
   import { Annotation, EditorState } from "@codemirror/state";
   import { lintGutter } from "@codemirror/lint";
   import { EditorView, keymap, lineNumbers } from "@codemirror/view";
@@ -285,32 +286,34 @@
         </Popover.Root>
       {/if}
 
-      <button
-        class="btn btn-secondary btn-sm"
+      <Btn
+        variant="secondary"
+        size="sm"
         onclick={discardChanges}
         disabled={!towerStore.isDirty || status === "saving"}
         title="Discard unsaved changes (revert to last loaded effective wiki)"
       >
         Discard
-      </button>
+      </Btn>
 
-      <button
-        class="btn btn-primary btn-sm"
+      <Btn
+        variant="primary"
+        size="sm"
         onclick={saveOverride}
         disabled={!canSave || !towerStore.isDirty || status === "saving"}
         title="Save as profile-specific override and reload tower"
       >
         Save override
-      </button>
+      </Btn>
     </div>
   </div>
 
   {#if errorMessage}
     <div
-      class="[border-radius:var(--radius)_0] border border-red-500/30 bg-red-500/10 p-3"
+      class="rounded-[var(--radius)_0] border border-red-500/30 bg-red-500/10 p-3"
     >
       <div class="text-sm font-medium text-red-600">Error</div>
-      <div class="text-xs text-red-600/90 break-words mt-1">
+      <div class="text-xs text-red-600/90 wrap-break-word mt-1">
         {errorMessage}
       </div>
     </div>

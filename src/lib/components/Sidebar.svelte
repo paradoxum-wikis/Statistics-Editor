@@ -12,6 +12,8 @@
   import { applyRofBug, toNumericValue, getRofBugVer } from "$lib/utils/format";
 
   import Separator from "./smol/Separator.svelte";
+  import IconBtn from "./smol/IconBtn.svelte";
+
   import { House, Settings, Sun, Moon, SunMoon, Check } from "@lucide/svelte";
 
   import DamageIcon from "$lib/assets/Damage.png";
@@ -331,8 +333,8 @@
   });
 </script>
 
-<aside class="sidebar-shell {className}">
-  <div class="sidebar-scroll-area">
+<aside class="flex h-full flex-col border-r border-border bg-card {className}">
+  <div class="flex flex-1 flex-col overflow-y-auto p-4">
     <UpgradeViewer
       {upgradeImages}
       {upgradeNames}
@@ -351,10 +353,10 @@
   {#if showFooter}
     <Separator />
 
-    <div class="sidebar-footer-bar">
-      <button class="icon-btn" onclick={() => onHome?.()} title="Home">
+    <div class="flex items-center justify-center gap-2 bg-card p-2">
+      <IconBtn onclick={() => onHome?.()} title="Home">
         <House size={20} />
-      </button>
+      </IconBtn>
 
       <Popover.Root>
         <Popover.Trigger class="icon-btn" title="Theme">
@@ -407,14 +409,9 @@
         </Popover.Content>
       </Popover.Root>
 
-      <button
-        class="icon-btn"
-        onclick={() => (settingsOpen = true)}
-        title="Settings"
-      >
+      <IconBtn onclick={() => (settingsOpen = true)} title="Settings">
         <Settings size={20} />
-      </button>
+      </IconBtn>
     </div>
   {/if}
 </aside>
-
