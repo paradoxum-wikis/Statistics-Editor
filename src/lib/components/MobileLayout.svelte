@@ -25,6 +25,10 @@
   import Btn from "./smol/Btn.svelte";
   import IconBtn from "./smol/IconBtn.svelte";
   import TextInput from "./smol/TextInput.svelte";
+  import Alert from "./smol/Alert.svelte";
+  import DiscardMessage, {
+    type PendingDiscardAction,
+  } from "./smol/DiscardMessage.svelte";
   import {
     ChevronsUpDown,
     Check,
@@ -64,7 +68,7 @@
         ),
   );
 
-  async function goHome() {
+  async function performGoHome() {
     sidebarOpen = false;
     const url = new URL(page.url);
     const hadTowerParam = url.searchParams.has("tower");
@@ -75,44 +79,111 @@
     await goto(url, { keepFocus: true, noScroll: true });
   }
 
-  async function handleSelect(itemValue: string | undefined) {
-    if (!itemValue) return;
-    const success = await towerStore.load(itemValue);
+  async function performTowerSelect(tower: string) {
+    const success = await towerStore.load(tower);
     if (success) {
       searchValue = "";
       const url = new URL(page.url);
-      url.searchParams.set("tower", itemValue);
+      url.searchParams.set("tower", tower);
       await goto(url, { keepFocus: true, noScroll: true });
       comboboxOpen = false;
     }
+  }
+
+  async function handleSelect(itemValue: string | undefined) {
+    if (!itemValue || itemValue === towerStore.selectedName) return;
+    if (towerStore.isDirty) {
+      requestDiscard({ type: "switch-tower", tower: itemValue });
+      return;
+    }
+    await performTowerSelect(itemValue);
   }
 
   async function confirmReset() {
     await towerStore.reset();
   }
 
-  async function handleProfileChange(newProfile: string) {
-    if (profileStore.switch(newProfile)) {
-      await towerStore.switchProfile(newProfile);
+  let discardOpen = $state(false);
+  let pendingDiscardAction = $state<PendingDiscardAction | null>(null);
+
+  async function performProfileSwitch(profile: string) {
+    if (profileStore.switch(profile)) {
+      await towerStore.switchProfile(profile);
       searchValue = "";
     }
+  }
+
+  function requestDiscard(action: PendingDiscardAction) {
+    pendingDiscardAction = action;
+    discardOpen = true;
+  }
+
+  async function handleProfileChange(newProfile: string) {
+    if (newProfile === profileStore.current) return;
+    if (towerStore.isDirty) {
+      requestDiscard({ type: "switch-profile", profile: newProfile });
+      return;
+    }
+    await performProfileSwitch(newProfile);
+  }
+
+  function cancelDiscard() {
+    pendingDiscardAction = null;
   }
 
   let createProfileOpen = $state(false);
   let newProfileName = $state("");
 
-  function openCreateProfileDialog() {
-    newProfileName = "";
-  }
-
-  async function confirmCreateProfile() {
-    const name = newProfileName.trim();
-    if (!name) return;
+  async function createProfile(name: string) {
     if (profileStore.create(name)) {
       await towerStore.switchProfile(name);
       newProfileName = "";
       createProfileOpen = false;
     }
+  }
+
+  async function confirmDiscard() {
+    const pending = pendingDiscardAction;
+    pendingDiscardAction = null;
+    discardOpen = false;
+    if (!pending) return;
+
+    switch (pending.type) {
+      case "create-profile":
+        await createProfile(pending.name);
+        break;
+      case "switch-profile":
+        await performProfileSwitch(pending.profile);
+        break;
+      case "switch-tower":
+        await performTowerSelect(pending.tower);
+        break;
+      case "go-home":
+        await performGoHome();
+        break;
+    }
+  }
+
+  function openCreateProfileDialog() {
+    newProfileName = "";
+  }
+
+  async function goHome() {
+    if (towerStore.isDirty) {
+      requestDiscard({ type: "go-home" });
+      return;
+    }
+    await performGoHome();
+  }
+
+  async function confirmCreateProfile() {
+    const name = newProfileName.trim();
+    if (!name) return;
+    if (towerStore.isDirty) {
+      requestDiscard({ type: "create-profile", name });
+      return;
+    }
+    await createProfile(name);
   }
 
   function handleCreateProfileInputKeydown(e: KeyboardEvent) {
@@ -500,6 +571,26 @@
 </div>
 
 <SettingsModal bind:open={settingsOpen} />
+
+{#snippet discardBody()}
+  {#if pendingDiscardAction}
+    <DiscardMessage
+      action={pendingDiscardAction}
+      towerName={towerStore.selectedName}
+      profileName={profileStore.current}
+    />
+  {/if}
+{/snippet}
+
+<Alert
+  bind:open={discardOpen}
+  title="Discard unsaved changes?"
+  body={discardBody}
+  confirmLabel="Discard and continue"
+  confirmClass="btn btn-destructive-fill text-white"
+  onConfirm={confirmDiscard}
+  onCancel={cancelDiscard}
+/>
 
 <AlertDialog.Root bind:open={deleteProfileOpen}>
   <AlertDialog.Portal>
