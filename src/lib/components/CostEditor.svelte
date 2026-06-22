@@ -84,7 +84,7 @@
           </span>
           <input
             type="number"
-            class="flex-1 text-[0.7rem] bg-background border border-input `rounded-[calc(var(--radius)-0.5rem)_0] px-1.5 py-0.5 text-right text-foreground outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+            class="flex-1 text-[0.7rem] bg-background border border-input rounded-[calc(var(--radius)-0.5rem)_0] px-1.5 py-0.5 text-right text-foreground outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
             value={row.cost}
             min="0"
             step="1"
