@@ -19,16 +19,15 @@
 </script>
 
 You have unsaved changes {#if towerName}
-  to <span class="font-bold text-foreground">{towerName}</span>{/if}
-on <span class="font-bold text-foreground">{profileName}</span>.
+  to <span class="font-bold">{towerName}</span>{/if}
+on <span class="font-bold">{profileName}</span>.
 {#if action.type === "create-profile"}
-  Creating <span class="font-bold text-foreground">{action.name}</span> will discard
-  them.
+  Creating <span class="font-bold">{action.name}</span> will discard them.
 {:else if action.type === "switch-profile"}
-  Switching to <span class="font-bold text-foreground">{action.profile}</span>
+  Switching to <span class="font-bold">{action.profile}</span>
   will discard them.
 {:else if action.type === "switch-tower"}
-  Switching to <span class="font-bold text-foreground">{action.tower}</span>
+  Switching to <span class="font-bold">{action.tower}</span>
   will discard them.
 {:else}
   Leaving this tower will discard them.
