@@ -255,12 +255,6 @@ h4,
   color: var(--muted-foreground);
 }
 
-.subtle-row-surface {
-  border-radius: calc(var(--radius) - 0.25rem) 0;
-  border: 1px solid var(--border);
-  @apply bg-secondary/10;
-}
-
 .icon-btn {
   display: inline-flex;
   align-items: center;

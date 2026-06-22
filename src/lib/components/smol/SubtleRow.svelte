@@ -12,6 +12,9 @@
   } = $props();
 </script>
 
-<div class="subtle-row-surface {className}" {...restProps}>
+<div
+  class="rounded-[calc(var:(--radius) - 0.25rem) 0)] border border-border bg-secondary/10 {className}"
+  {...restProps}
+>
   {@render children()}
 </div>
