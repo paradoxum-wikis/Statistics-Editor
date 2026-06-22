@@ -1,6 +1,8 @@
 import TowerManager from "$lib/towerComponents/towerManager";
 import { settingsStore } from "$lib/stores/settings.svelte";
 
+const CURRENT_PROFILE_KEY = "tds_current_profile";
+
 /**
  * Reactive user profile manager that hopefully works.
  */
@@ -8,11 +10,12 @@ class ProfileStore {
   current = $state("Default");
   list = $state<string[]>([]);
 
-  /**
-   * Sets up profiles from TowerManager and logs if debug mode is on.
-   */
   init() {
     this.list = TowerManager.getProfiles();
+    const saved = localStorage.getItem(CURRENT_PROFILE_KEY);
+    if (saved && this.list.includes(saved)) {
+      this.current = saved;
+    }
     if (settingsStore.debugMode) {
       console.log(`[ProfileStore] Initialized with profiles:`, this.list);
       console.log(`[ProfileStore] Current profile: ${this.current}`);
@@ -20,26 +23,34 @@ class ProfileStore {
   }
 
   switch(name: string): boolean {
-    if (name && name !== this.current) {
-      if (settingsStore.debugMode) {
-        console.log(
-          `[ProfileStore] Switching profile from "${this.current}" to "${name}"`,
-        );
-      }
-      this.current = name;
-      return true;
+    if (!name || name === this.current || !this.list.includes(name)) {
+      return false;
     }
-    return false;
+
+    if (settingsStore.debugMode) {
+      console.log(
+        `[ProfileStore] Switching profile from "${this.current}" to "${name}"`,
+      );
+    }
+    this.current = name;
+    localStorage.setItem(CURRENT_PROFILE_KEY, name);
+    return true;
   }
 
   create(name: string): boolean {
-    if (!name) return false;
-    if (settingsStore.debugMode) {
-      console.log(`[ProfileStore] Creating new profile: "${name}"`);
+    const trimmed = name.trim();
+    if (!trimmed || trimmed.includes("::") || this.list.includes(trimmed)) {
+      return false;
     }
-    TowerManager.addProfile(name);
+
+    if (settingsStore.debugMode) {
+      console.log(`[ProfileStore] Creating new profile: "${trimmed}"`);
+    }
+
+    TowerManager.addProfile(trimmed);
     this.list = TowerManager.getProfiles();
-    this.current = name;
+    this.current = trimmed;
+    localStorage.setItem(CURRENT_PROFILE_KEY, trimmed);
     return true;
   }
 
@@ -57,6 +68,7 @@ class ProfileStore {
         );
       }
       this.current = "Default";
+      localStorage.setItem(CURRENT_PROFILE_KEY, "Default");
     }
     return true;
   }

@@ -67,6 +67,22 @@ export function clearWikiOverride(
   setWikiOverride(profileName, towerName, null);
 }
 
+export function clearProfileWikiOverrides(profileName: string): void {
+  if (!canUseLocalStorage()) return;
+
+  const prefix = `${WIKI_OVERRIDE_PREFIX}${profileName}::`;
+  const keysToRemove: string[] = [];
+
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key?.startsWith(prefix)) keysToRemove.push(key);
+  }
+
+  for (const key of keysToRemove) {
+    localStorage.removeItem(key);
+  }
+}
+
 export async function loadEffectiveWikitext(
   profileName: string,
   towerName: string,
