@@ -143,12 +143,11 @@
     deleteProfileOpen = true;
   }
 
-  function confirmDeleteProfile() {
+  async function confirmDeleteProfile() {
     if (profileToDelete) {
-      if (profileStore.delete(profileToDelete)) {
-        if (profileStore.current === "Default") {
-          towerStore.switchProfile("Default");
-        }
+      const deletedCurrent = profileToDelete === profileStore.current;
+      if (profileStore.delete(profileToDelete) && deletedCurrent) {
+        await towerStore.switchProfile(profileStore.current);
       }
       profileToDelete = null;
     }
