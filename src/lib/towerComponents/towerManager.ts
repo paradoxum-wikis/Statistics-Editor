@@ -4,6 +4,7 @@ import { resolveToken, type TableCache } from "$lib/neowtext/functions";
 import { parseWikitext, type TableData } from "$lib/neowtext/parser";
 import { patchWikitext } from "$lib/neowtext/patcher";
 import {
+  clearProfileWikiOverrides,
   clearWikiOverride,
   loadEffectiveWikitext,
   setWikiOverride,
@@ -16,7 +17,6 @@ const wikitextFiles = import.meta.glob("./towers/*.wiki", {
 });
 
 export default class TowerManager {
-  towerData: Record<string, any> | null = null;
   towerNames: string[] = [];
   towers: { [name: string]: Tower } = {};
 
@@ -27,7 +27,14 @@ export default class TowerManager {
 
   static getProfiles(): string[] {
     if (typeof localStorage === "undefined") return ["Default"];
-    return JSON.parse(localStorage.getItem("tds_profiles") || '["Default"]');
+    try {
+      const profiles = JSON.parse(
+        localStorage.getItem("tds_profiles") || '["Default"]',
+      );
+      return Array.isArray(profiles) ? profiles : ["Default"];
+    } catch {
+      return ["Default"];
+    }
   }
 
   static addProfile(name: string): void {
@@ -42,7 +49,7 @@ export default class TowerManager {
     if (typeof localStorage === "undefined" || name === "Default") return;
     const profiles = this.getProfiles().filter((p) => p !== name);
     localStorage.setItem("tds_profiles", JSON.stringify(profiles));
-    localStorage.removeItem(name);
+    clearProfileWikiOverrides(name);
   }
 
   /**
@@ -69,17 +76,6 @@ export default class TowerManager {
       console.log(`[TowerManager] saveTower called for ${tower.name}`);
     if (!this.dataKey) return null;
 
-    if (!this.towerData) {
-      if (this.debug())
-        console.log(
-          `[TowerManager] saveTower: Initializing towerData from storage for key: ${this.dataKey}`,
-        );
-      this.towerData = JSON.parse(localStorage.getItem(this.dataKey) || "{}");
-    }
-
-    this.towerData![tower.name] = structuredClone(tower.json[tower.name]);
-    this.save();
-
     const patched = this.generateWikitext(tower);
     if (patched) {
       if (this.debug())
@@ -96,18 +92,6 @@ export default class TowerManager {
     return null;
   }
 
-  save(): void {
-    if (!this.dataKey) return;
-    if (this.debug()) {
-      console.log(`[TowerManager] Saving data to key: ${this.dataKey}`);
-      console.log(`[TowerManager] Data being saved:`, this.towerData);
-    }
-    const stringified = JSON.stringify(this.towerData);
-    if (this.debug())
-      console.log(`[TowerManager] Stringified data:`, stringified);
-    localStorage.setItem(this.dataKey, stringified);
-  }
-
   clearCache(name: string): void {
     if (this.debug()) console.log(`[TowerManager] clearing cache for ${name}`);
     if (this.towers[name]) delete this.towers[name];
@@ -116,18 +100,6 @@ export default class TowerManager {
   resetTower(name: string): void {
     if (!this.dataKey) return;
 
-    if (!this.towerData) {
-      if (this.debug())
-        console.log(
-          `[TowerManager] resetTower: Initializing towerData from storage for key: ${this.dataKey}`,
-        );
-      this.towerData = JSON.parse(localStorage.getItem(this.dataKey) || "{}");
-    }
-
-    if (this.towerData![name]) {
-      delete this.towerData![name];
-      this.save();
-    }
     clearWikiOverride(this.dataKey ?? "Default", name);
     this.clearCache(name);
   }
@@ -604,8 +576,7 @@ export default class TowerManager {
                 );
               if (
                 !refOnly &&
-                (/\$[^$]+\$/.test(stripped) ||
-                  /^{{#expr:.*}}$/i.test(stripped))
+                (/\$[^$]+\$/.test(stripped) || /^{{#expr:.*}}$/i.test(stripped))
               ) {
                 extraReadOnly.add(k);
               }
