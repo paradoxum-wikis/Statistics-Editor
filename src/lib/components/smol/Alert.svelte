@@ -47,7 +47,7 @@
   <Dialog.Portal>
     <Dialog.Overlay class="settings-overlay"></Dialog.Overlay>
     <Dialog.Content class="settings-content">
-      <div class="flex flex-col space-y-2 text-center sm:text-left">
+      <div class="flex flex-col space-y-2 text-center sm:text-start">
         <Dialog.Title class="text-lg font-semibold">
           {title}
         </Dialog.Title>

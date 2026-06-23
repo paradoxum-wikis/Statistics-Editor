@@ -393,7 +393,7 @@
 
         <Dialog.Root bind:open={createProfileOpen}>
           <Dialog.Trigger
-            class="dropdown-item w-full text-left"
+            class="dropdown-item w-full text-start"
             onclick={openCreateProfileDialog}
           >
             <span>+ Create Profile</span>
@@ -596,7 +596,7 @@
   <AlertDialog.Portal>
     <AlertDialog.Overlay class="settings-overlay" />
     <AlertDialog.Content class="settings-content">
-      <div class="flex flex-col space-y-2 text-center sm:text-left">
+      <div class="flex flex-col space-y-2 text-center sm:text-start">
         <AlertDialog.Title class="text-lg font-semibold">
           Are you absolutely sure?
         </AlertDialog.Title>
