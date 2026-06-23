@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Menubar, Tooltip, Popover } from "bits-ui";
+  import { Tooltip, Popover } from "bits-ui";
   import IconBtn from "./smol/IconBtn.svelte";
   import Veperator from "./smol/Veperator.svelte";
   import GlobalModifierPanel from "./smol/GlobalModifierPanel.svelte";
@@ -24,6 +24,7 @@
     onHome?: () => void | Promise<void>;
   } = $props();
 
+  let themeOpen = $state(false);
   let modifierOpen = $state(false);
 
   const activeSettings = $derived(
@@ -35,7 +36,7 @@
   );
 </script>
 
-<Menubar.Root
+<div
   class="flex h-8 shrink-0 items-center gap-0.5 border-t border-border bg-card px-2"
 >
   <div class="flex items-center gap-0.5">
@@ -43,8 +44,8 @@
       <House size={16} />
     </IconBtn>
 
-    <Menubar.Menu>
-      <Menubar.Trigger>
+    <Popover.Root bind:open={themeOpen}>
+      <Popover.Trigger>
         {#snippet child({ props })}
           <IconBtn {...props} class="status-bar-btn" title="Theme">
             {#if settingsStore.theme === "light"}
@@ -56,63 +57,59 @@
             {/if}
           </IconBtn>
         {/snippet}
-      </Menubar.Trigger>
-      <Menubar.Portal>
-        <Menubar.Content
+      </Popover.Trigger>
+      <Popover.Portal>
+        <Popover.Content
           class="dropdown-content w-auto! min-w-42"
           side="top"
           align="start"
           sideOffset={6}
         >
-          <h4 class="mb-1 px-2 text-sm font-medium">Theme</h4>
-          <Menubar.RadioGroup
-            value={settingsStore.theme}
-            onValueChange={(value) => {
-              if (value === "light" || value === "dark" || value === "system") {
-                settingsStore.setTheme(value);
-              }
-            }}
-          >
-            <Menubar.RadioItem
-              value="light"
+          <h4 class="mb-1 px-2 pt-1 text-sm font-medium">Theme</h4>
+          <div class="grid gap-0.5">
+            <button
               class="dropdown-item w-full justify-start!"
+              onclick={() => {
+                settingsStore.setTheme("light");
+                themeOpen = false;
+              }}
             >
-              {#snippet children({ checked })}
-                <Sun class="me-2 h-4 w-4" />
-                <span>Light</span>
-                {#if checked}
-                  <Check class="ms-auto h-4 w-4" />
-                {/if}
-              {/snippet}
-            </Menubar.RadioItem>
-            <Menubar.RadioItem
-              value="dark"
+              <Sun class="me-2 h-4 w-4" />
+              <span>Light</span>
+              {#if settingsStore.theme === "light"}
+                <Check class="ms-auto h-4 w-4" />
+              {/if}
+            </button>
+            <button
               class="dropdown-item w-full justify-start!"
+              onclick={() => {
+                settingsStore.setTheme("dark");
+                themeOpen = false;
+              }}
             >
-              {#snippet children({ checked })}
-                <Moon class="me-2 h-4 w-4" />
-                <span>Dark</span>
-                {#if checked}
-                  <Check class="ms-auto h-4 w-4" />
-                {/if}
-              {/snippet}
-            </Menubar.RadioItem>
-            <Menubar.RadioItem
-              value="system"
+              <Moon class="me-2 h-4 w-4" />
+              <span>Dark</span>
+              {#if settingsStore.theme === "dark"}
+                <Check class="ms-auto h-4 w-4" />
+              {/if}
+            </button>
+            <button
               class="dropdown-item w-full justify-start!"
+              onclick={() => {
+                settingsStore.setTheme("system");
+                themeOpen = false;
+              }}
             >
-              {#snippet children({ checked })}
-                <SunMoon class="me-2 h-4 w-4" />
-                <span>System</span>
-                {#if checked}
-                  <Check class="ms-auto h-4 w-4" />
-                {/if}
-              {/snippet}
-            </Menubar.RadioItem>
-          </Menubar.RadioGroup>
-        </Menubar.Content>
-      </Menubar.Portal>
-    </Menubar.Menu>
+              <SunMoon class="me-2 h-4 w-4" />
+              <span>System</span>
+              {#if settingsStore.theme === "system"}
+                <Check class="ms-auto h-4 w-4" />
+              {/if}
+            </button>
+          </div>
+        </Popover.Content>
+      </Popover.Portal>
+    </Popover.Root>
 
     <IconBtn
       class="status-bar-btn"
@@ -189,4 +186,4 @@
       </span>
     {/if}
   </div>
-</Menubar.Root>
+</div>

@@ -45,7 +45,7 @@
 
   <div class="space-y-1.5">
     <Label.Root for="modifier-column" class="text-xs font-medium">
-      Add column
+      Add Column
     </Label.Root>
     <div class="flex gap-2">
       <TextInput
