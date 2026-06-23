@@ -1,6 +1,7 @@
 import TowerManager from "$lib/towerComponents/towerManager";
 import type Tower from "$lib/towerComponents/tower";
 import { settingsStore } from "$lib/stores/settings.svelte";
+import type { GlobalModifier } from "$lib/utils/globalModifier";
 
 /**
  * Manages tower selection and data reactively.
@@ -40,6 +41,10 @@ class TowerStore {
    * Original wikitext before any unsaved changes.
    */
   originalWikitext = $state<string>("");
+
+  globalModifier = $state<GlobalModifier>({
+    entries: [],
+  });
 
   /**
    * Sets up the tower manager with a profile and loads tower names.

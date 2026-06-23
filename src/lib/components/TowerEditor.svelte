@@ -20,6 +20,7 @@
   } from "$lib/utils/format";
   import { renderCellHtml } from "$lib/neowtext/render";
   import { resolveToken } from "$lib/neowtext/functions";
+  import { applyGlobalModifierDisplay } from "$lib/utils/globalModifier";
 
   let {
     tower = null,
@@ -141,6 +142,17 @@
     "confusion cooldown",
     "missle reload",
   ]);
+
+  function displayCellValue(header: string, value: unknown) {
+    towerStore.globalModifier;
+    const raw =
+      value === undefined || value === null
+        ? value
+        : typeof value === "string" || typeof value === "number"
+          ? value
+          : undefined;
+    return applyGlobalModifierDisplay(towerStore.globalModifier, header, raw);
+  }
 
   function formatDelta(delta: number): string {
     return `${delta > 0 ? "+" : ""}${formatNumber(delta)}`;
@@ -621,7 +633,10 @@
                             focusedCell = ck;
                           }}
                         >
-                          {@html renderCellHtml(row[header], false)}
+                          {@html renderCellHtml(
+                            displayCellValue(header, row[header]),
+                            false,
+                          )}
                         </button>
                       {/if}
                       {#if settingsStore.seeValueDifference && deltaInfo.delta !== null && deltaInfo.delta !== 0}
@@ -639,11 +654,17 @@
                       {#if isMoney}
                         <span class="money-value">
                           <img src={MoneyIcon} alt="" class="money-icon" />
-                          {@html renderCellHtml(row[header], true)}
+                          {@html renderCellHtml(
+                            displayCellValue(header, row[header]),
+                            true,
+                          )}
                         </span>
                       {:else}
                         <span class="cell-multiline">
-                          {@html renderCellHtml(row[header], true)}
+                          {@html renderCellHtml(
+                            displayCellValue(header, row[header]),
+                            true,
+                          )}
                         </span>
                       {/if}
                       {#if settingsStore.seeValueDifference && deltaInfo.delta !== null && deltaInfo.delta !== 0}
