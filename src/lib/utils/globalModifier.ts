@@ -11,6 +11,12 @@ export type GlobalModifier = {
   entries: GlobalModifierEntry[];
 };
 
+export function isGlobalModifierActive(modifier: GlobalModifier): boolean {
+  return modifier.entries.some(
+    (entry) => entry.enabled && (entry.delta !== 0 || entry.percent !== 0),
+  );
+}
+
 export function applyGlobalModifierDisplay(
   modifier: GlobalModifier,
   header: string,

@@ -1,12 +1,11 @@
 <script lang="ts">
-  import { Menubar, Tooltip, Popover, Switch, Label } from "bits-ui";
+  import { Menubar, Tooltip, Popover } from "bits-ui";
   import IconBtn from "./smol/IconBtn.svelte";
   import Veperator from "./smol/Veperator.svelte";
-  import Btn from "./smol/Btn.svelte";
-  import TextInput from "./smol/TextInput.svelte";
+  import GlobalModifierPanel from "./smol/GlobalModifierPanel.svelte";
   import { settingsStore, BOOLEAN_SETTINGS } from "$lib/stores/settings.svelte";
   import { towerStore } from "$lib/stores/tower.svelte";
-  import { parseNumeric } from "$lib/utils/format";
+  import { isGlobalModifierActive } from "$lib/utils/globalModifier";
   import {
     House,
     Settings,
@@ -15,7 +14,6 @@
     SunMoon,
     Check,
     Zap,
-    X,
   } from "@lucide/svelte";
 
   let {
@@ -27,91 +25,14 @@
   } = $props();
 
   let modifierOpen = $state(false);
-  let modifierColumn = $state("");
 
   const activeSettings = $derived(
     BOOLEAN_SETTINGS.filter((setting) => settingsStore.getBoolean(setting.key)),
   );
 
   const modifierActive = $derived(
-    towerStore.globalModifier.entries.some(
-      (entry) => entry.enabled && (entry.delta !== 0 || entry.percent !== 0),
-    ),
+    isGlobalModifierActive(towerStore.globalModifier),
   );
-
-  const switchRootClass =
-    "inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-gray-200";
-  const switchThumbClass =
-    "pointer-events-none block h-4 w-4 rounded-full bg-white shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-4 data-[state=unchecked]:translate-x-0";
-  const modifierFieldClass = "flex min-w-0 flex-1 items-center gap-0.5";
-  const modifierSuffixClass =
-    "w-3 shrink-0 text-center text-[0.6875rem] text-muted-foreground";
-  const modifierInputClass = "h-[1.625rem]! min-w-0 flex-1 px-2 py-0.5 text-xs";
-
-  const canAddColumn = $derived(modifierColumn.trim().length > 0);
-
-  function handleColumnKeydown(e: KeyboardEvent) {
-    if (e.key !== "Enter" || !canAddColumn) return;
-    e.preventDefault();
-    e.stopPropagation();
-    addModifierColumn();
-  }
-
-  function addModifierColumn() {
-    const column = modifierColumn.trim();
-    if (!column) return;
-
-    const key = column.toLowerCase();
-    if (
-      towerStore.globalModifier.entries.some(
-        (entry) => entry.column.toLowerCase() === key,
-      )
-    ) {
-      modifierColumn = "";
-      return;
-    }
-
-    towerStore.globalModifier.entries = [
-      ...towerStore.globalModifier.entries,
-      { column, delta: 0, percent: 0, enabled: true },
-    ];
-    modifierColumn = "";
-  }
-
-  function removeModifierEntry(index: number) {
-    towerStore.globalModifier.entries =
-      towerStore.globalModifier.entries.filter((_, i) => i !== index);
-  }
-
-  function setEntryEnabled(index: number, enabled: boolean) {
-    const entries = [...towerStore.globalModifier.entries];
-    entries[index] = { ...entries[index], enabled };
-    towerStore.globalModifier.entries = entries;
-  }
-
-  function setEntryDelta(index: number, raw: string) {
-    const delta = parseNumeric(raw);
-    const entries = [...towerStore.globalModifier.entries];
-    entries[index] = {
-      ...entries[index],
-      delta: Number.isFinite(delta) ? delta : 0,
-    };
-    towerStore.globalModifier.entries = entries;
-  }
-
-  function setEntryPercent(index: number, raw: string) {
-    const percent = parseNumeric(raw);
-    const entries = [...towerStore.globalModifier.entries];
-    entries[index] = {
-      ...entries[index],
-      percent: Number.isFinite(percent) ? percent : 0,
-    };
-    towerStore.globalModifier.entries = entries;
-  }
-
-  function entryNumericValue(value: number): string {
-    return value === 0 ? "" : String(value);
-  }
 </script>
 
 <Menubar.Root
@@ -215,104 +136,7 @@
           align="start"
           sideOffset={6}
         >
-          <div class="space-y-3">
-            <div class="space-y-1">
-              <h4 class="text-sm font-medium leading-none">Global Modifier</h4>
-              <p class="text-xs text-muted-foreground">
-                This does not change saved data.
-              </p>
-            </div>
-
-            <div class="space-y-1.5">
-              <Label.Root for="modifier-column" class="text-xs font-medium">
-                Add column
-              </Label.Root>
-              <div class="flex gap-2">
-                <TextInput
-                  id="modifier-column"
-                  class="min-w-0 flex-1"
-                  bind:value={modifierColumn}
-                  placeholder="e.g. Damage"
-                  onkeydown={handleColumnKeydown}
-                />
-                <Btn
-                  size="sm"
-                  variant={canAddColumn ? "primary" : "secondary"}
-                  onclick={addModifierColumn}
-                  disabled={!canAddColumn}
-                >
-                  Add
-                </Btn>
-              </div>
-            </div>
-
-            {#if towerStore.globalModifier.entries.length > 0}
-              <div class="grid max-h-60 grid-cols-2 gap-1.5 overflow-y-auto">
-                {#each towerStore.globalModifier.entries as entry, index (entry.column)}
-                  <div
-                    class="rounded-[calc(var(--radius)-0.625rem)_0] border border-border bg-secondary/40 p-1.5"
-                  >
-                    <div class="mb-1 flex items-center justify-between gap-1">
-                      <span class="min-w-0 truncate text-xs font-medium"
-                        >{entry.column}</span
-                      >
-                      <div class="flex items-center gap-1">
-                        <Switch.Root
-                          checked={entry.enabled}
-                          onCheckedChange={(enabled) =>
-                            setEntryEnabled(index, enabled)}
-                          class={switchRootClass}
-                          aria-label="Enable {entry.column} modifier"
-                        >
-                          <Switch.Thumb class={switchThumbClass} />
-                        </Switch.Root>
-                        <button
-                          type="button"
-                          class="inline-flex items-center justify-center rounded-[calc(var(--radius)-0.875rem)_0] p-0.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                          title="Remove"
-                          onclick={() => removeModifierEntry(index)}
-                        >
-                          <X size={12} />
-                        </button>
-                      </div>
-                    </div>
-                    <div class="flex gap-1">
-                      <div class={modifierFieldClass}>
-                        <span class={modifierSuffixClass}>+</span>
-                        <TextInput
-                          inputmode="decimal"
-                          class={modifierInputClass}
-                          value={entryNumericValue(entry.delta)}
-                          oninput={(e: Event) =>
-                            setEntryDelta(
-                              index,
-                              (e.currentTarget as HTMLInputElement).value,
-                            )}
-                          placeholder="0"
-                          aria-label="{entry.column} flat change"
-                        />
-                      </div>
-                      <div class={modifierFieldClass}>
-                        <TextInput
-                          inputmode="decimal"
-                          class={modifierInputClass}
-                          value={entryNumericValue(entry.percent)}
-                          oninput={(e: Event) =>
-                            setEntryPercent(
-                              index,
-                              (e.currentTarget as HTMLInputElement).value,
-                            )}
-                          placeholder="0"
-                          aria-label="{entry.column} percent change"
-                        />
-                        <span class={modifierSuffixClass}>%</span>
-                      </div>
-                    </div>
-                  </div>
-                {/each}
-              </div>
-            {/if}
-          </div>
+          <GlobalModifierPanel />
         </Popover.Content>
       </Popover.Portal>
     </Popover.Root>

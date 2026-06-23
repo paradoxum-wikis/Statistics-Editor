@@ -2,6 +2,7 @@ import TowerManager from "$lib/towerComponents/towerManager";
 import type Tower from "$lib/towerComponents/tower";
 import { settingsStore } from "$lib/stores/settings.svelte";
 import type { GlobalModifier } from "$lib/utils/globalModifier";
+import { parseNumeric } from "$lib/utils/format";
 
 /**
  * Manages tower selection and data reactively.
@@ -255,6 +256,58 @@ class TowerStore {
     this.effectiveWikitextSource = "";
     this.originalWikitext = "";
     this.isDirty = false;
+  }
+
+  addGlobalModifierColumn(column: string): boolean {
+    const trimmed = column.trim();
+    if (!trimmed) return false;
+
+    const key = trimmed.toLowerCase();
+    if (
+      this.globalModifier.entries.some(
+        (entry) => entry.column.toLowerCase() === key,
+      )
+    ) {
+      return false;
+    }
+
+    this.globalModifier.entries = [
+      ...this.globalModifier.entries,
+      { column: trimmed, delta: 0, percent: 0, enabled: true },
+    ];
+    return true;
+  }
+
+  removeGlobalModifierEntry(index: number): void {
+    this.globalModifier.entries = this.globalModifier.entries.filter(
+      (_, i) => i !== index,
+    );
+  }
+
+  setGlobalModifierEnabled(index: number, enabled: boolean): void {
+    const entries = [...this.globalModifier.entries];
+    entries[index] = { ...entries[index], enabled };
+    this.globalModifier.entries = entries;
+  }
+
+  setGlobalModifierDelta(index: number, raw: string): void {
+    const delta = parseNumeric(raw);
+    const entries = [...this.globalModifier.entries];
+    entries[index] = {
+      ...entries[index],
+      delta: Number.isFinite(delta) ? delta : 0,
+    };
+    this.globalModifier.entries = entries;
+  }
+
+  setGlobalModifierPercent(index: number, raw: string): void {
+    const percent = parseNumeric(raw);
+    const entries = [...this.globalModifier.entries];
+    entries[index] = {
+      ...entries[index],
+      percent: Number.isFinite(percent) ? percent : 0,
+    };
+    this.globalModifier.entries = entries;
   }
 }
 

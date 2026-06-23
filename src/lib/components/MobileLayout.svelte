@@ -12,6 +12,7 @@
   import TowerEditor from "./TowerEditor.svelte";
   import Introduction from "./Introduction.svelte";
   import SettingsModal from "./SettingsModal.svelte";
+  import GlobalModifierModal from "./GlobalModifierModal.svelte";
 
   import {
     Combobox,
@@ -25,6 +26,7 @@
   import Btn from "./smol/Btn.svelte";
   import IconBtn from "./smol/IconBtn.svelte";
   import TextInput from "./smol/TextInput.svelte";
+  import { isGlobalModifierActive } from "$lib/utils/globalModifier";
   import Alert from "./smol/Alert.svelte";
   import DiscardMessage, {
     type PendingDiscardAction,
@@ -43,6 +45,7 @@
     Moon,
     SunMoon,
     RotateCcw,
+    Zap,
   } from "@lucide/svelte";
 
   let { isClient }: { isClient: boolean } = $props();
@@ -52,6 +55,8 @@
   let editorMode = $state<EditorMode>("cells");
   let sidebarOpen = $state(false);
   let settingsOpen = $state(false);
+  let toolsOpen = $state(false);
+  let modifierOpen = $state(false);
 
   let searchValue = $state("");
   let comboboxOpen = $state(false);
@@ -66,6 +71,10 @@
       : items.filter((item) =>
           item.label.toLowerCase().includes(searchValue.toLowerCase()),
         ),
+  );
+
+  const modifierActive = $derived(
+    isGlobalModifierActive(towerStore.globalModifier),
   );
 
   async function performGoHome() {
@@ -449,7 +458,7 @@
     </DropdownMenu.Root>
 
     <!-- Tools -->
-    <Popover.Root>
+    <Popover.Root bind:open={toolsOpen}>
       <Popover.Trigger class="icon-btn" title="Tools" aria-label="Tools">
         <Wrench size={20} />
       </Popover.Trigger>
@@ -527,6 +536,19 @@
             <span>Settings</span>
           </button>
 
+          <button
+            class="dropdown-item w-full justify-start! {modifierActive
+              ? 'text-amber-600 dark:text-amber-400'
+              : ''}"
+            onclick={() => {
+              toolsOpen = false;
+              modifierOpen = true;
+            }}
+          >
+            <Zap class="me-2 h-4 w-4" />
+            <span>Global Modifier</span>
+          </button>
+
           {#if towerStore.selectedData}
             <div class="-mx-1 my-1 h-px bg-muted"></div>
             <Popover.Root>
@@ -571,6 +593,7 @@
 </div>
 
 <SettingsModal bind:open={settingsOpen} />
+<GlobalModifierModal bind:open={modifierOpen} />
 
 {#snippet discardBody()}
   {#if pendingDiscardAction}
