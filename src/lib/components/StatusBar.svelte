@@ -44,14 +44,18 @@
     </IconBtn>
 
     <Menubar.Menu>
-      <Menubar.Trigger class="status-bar-btn" title="Theme">
-        {#if settingsStore.theme === "light"}
-          <Sun size={16} />
-        {:else if settingsStore.theme === "dark"}
-          <Moon size={16} />
-        {:else}
-          <SunMoon size={16} />
-        {/if}
+      <Menubar.Trigger>
+        {#snippet child({ props })}
+          <IconBtn {...props} class="status-bar-btn" title="Theme">
+            {#if settingsStore.theme === "light"}
+              <Sun size={16} />
+            {:else if settingsStore.theme === "dark"}
+              <Moon size={16} />
+            {:else}
+              <SunMoon size={16} />
+            {/if}
+          </IconBtn>
+        {/snippet}
       </Menubar.Trigger>
       <Menubar.Portal>
         <Menubar.Content
@@ -121,13 +125,18 @@
     <Veperator />
 
     <Popover.Root bind:open={modifierOpen}>
-      <Popover.Trigger
-        class="icon-btn status-bar-btn {modifierActive
-          ? 'text-amber-600 dark:text-amber-400'
-          : ''}"
-        title="Global Modifier"
-      >
-        <Zap size={16} />
+      <Popover.Trigger>
+        {#snippet child({ props })}
+          <IconBtn
+            {...props}
+            class="status-bar-btn {modifierActive
+              ? 'text-amber-600 dark:text-amber-400'
+              : ''}"
+            title="Global Modifier"
+          >
+            <Zap size={16} />
+          </IconBtn>
+        {/snippet}
       </Popover.Trigger>
       <Popover.Portal>
         <Popover.Content
@@ -148,8 +157,12 @@
         <div class="flex items-center gap-1">
           {#each activeSettings as setting (setting.key)}
             <Tooltip.Root>
-              <Tooltip.Trigger class="icon-btn status-bar-indicator">
-                <setting.icon size={14} />
+              <Tooltip.Trigger>
+                {#snippet child({ props })}
+                  <IconBtn {...props} class="status-bar-indicator">
+                    <setting.icon size={14} />
+                  </IconBtn>
+                {/snippet}
               </Tooltip.Trigger>
               <Tooltip.Portal>
                 <Tooltip.Content
