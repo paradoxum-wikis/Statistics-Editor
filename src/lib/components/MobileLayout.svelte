@@ -231,7 +231,7 @@
       ? 'translate-x-0'
       : '-translate-x-full'}"
   >
-    <Sidebar showFooter={false} class="h-full" />
+    <Sidebar class="h-full" />
   </div>
 
   <!-- Header -->

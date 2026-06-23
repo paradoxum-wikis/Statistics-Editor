@@ -3,18 +3,12 @@
   import UpgradeEditor from "./UpgradeEditor.svelte";
   import DetectionEditor from "./DetectionEditor.svelte";
   import CostEditor from "./CostEditor.svelte";
-  import { Popover } from "bits-ui";
   import { towerStore } from "$lib/stores/tower.svelte";
   import { imageLoader } from "$lib/services/imageLoader";
   import { untrack } from "svelte";
   import { SvelteMap } from "svelte/reactivity";
   import { settingsStore } from "$lib/stores/settings.svelte";
   import { applyRofBug, toNumericValue, getRofBugVer } from "$lib/utils/format";
-
-  import Separator from "./smol/Separator.svelte";
-  import IconBtn from "./smol/IconBtn.svelte";
-
-  import { House, Settings, Sun, Moon, SunMoon, Check } from "@lucide/svelte";
 
   import DamageIcon from "$lib/assets/Damage.png";
   import CooldownIcon from "$lib/assets/Cooldown.png";
@@ -32,17 +26,7 @@
     icon?: string;
   };
 
-  let {
-    class: className = "",
-    settingsOpen = $bindable(false),
-    onHome,
-    showFooter = true,
-  }: {
-    class?: string;
-    settingsOpen?: boolean;
-    onHome?: () => void | Promise<void>;
-    showFooter?: boolean;
-  } = $props();
+  let { class: className = "" }: { class?: string } = $props();
 
   let upgradeImages = $state<{ [key: number]: string }>({});
   let prevTowerRef: object | null = null;
@@ -349,69 +333,4 @@
     <DetectionEditor />
     <CostEditor />
   </div>
-
-  {#if showFooter}
-    <Separator />
-
-    <div class="flex items-center justify-center gap-2 bg-card p-2">
-      <IconBtn onclick={() => onHome?.()} title="Home">
-        <House size={20} />
-      </IconBtn>
-
-      <Popover.Root>
-        <Popover.Trigger class="icon-btn" title="Theme">
-          {#if settingsStore.theme === "light"}
-            <Sun size={20} />
-          {:else if settingsStore.theme === "dark"}
-            <Moon size={20} />
-          {:else}
-            <SunMoon size={20} />
-          {/if}
-        </Popover.Trigger>
-        <Popover.Content
-          class="popover-content w-auto! min-w-42"
-          sideOffset={8}
-          align="center"
-        >
-          <h4 class="font-medium text-sm mb-1">Theme</h4>
-          <div class="grid gap-0.5">
-            <button
-              class="dropdown-item w-full justify-start!"
-              onclick={() => settingsStore.setTheme("light")}
-            >
-              <Sun class="me-2 h-4 w-4" />
-              <span>Light</span>
-              {#if settingsStore.theme === "light"}
-                <Check class="ms-2 h-4 w-4" />
-              {/if}
-            </button>
-            <button
-              class="dropdown-item w-full justify-start!"
-              onclick={() => settingsStore.setTheme("dark")}
-            >
-              <Moon class="me-2 h-4 w-4" />
-              <span>Dark</span>
-              {#if settingsStore.theme === "dark"}
-                <Check class="ms-2 h-4 w-4" />
-              {/if}
-            </button>
-            <button
-              class="dropdown-item w-full justify-start!"
-              onclick={() => settingsStore.setTheme("system")}
-            >
-              <SunMoon class="me-2 h-4 w-4" />
-              <span>System</span>
-              {#if settingsStore.theme === "system"}
-                <Check class="ms-2 h-4 w-4" />
-              {/if}
-            </button>
-          </div>
-        </Popover.Content>
-      </Popover.Root>
-
-      <IconBtn onclick={() => (settingsOpen = true)} title="Settings">
-        <Settings size={20} />
-      </IconBtn>
-    </div>
-  {/if}
 </aside>

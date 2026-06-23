@@ -11,6 +11,7 @@
   import TowerEditor from "$lib/components/TowerEditor.svelte";
   import Introduction from "$lib/components/Introduction.svelte";
   import Sidebar from "$lib/components/Sidebar.svelte";
+  import StatusBar from "$lib/components/StatusBar.svelte";
   import SettingsModal from "$lib/components/SettingsModal.svelte";
   import MobileLayout from "$lib/components/MobileLayout.svelte";
 
@@ -226,265 +227,265 @@
 </script>
 
 <!-- Desktop layout (md and above) -->
-<div class="hidden md:block h-screen bg-background relative">
-  <Sidebar
-    class="absolute left-0 top-0 h-full w-[17%]"
-    bind:settingsOpen
-    onHome={goHome}
-  />
+<div class="hidden md:flex h-screen flex-col bg-background">
+  <div class="flex min-h-0 flex-1">
+    <Sidebar class="h-full w-[17%] shrink-0" />
 
-  <div class="ms-[17%] flex flex-col h-full">
-    <header
-      class="sticky top-0 z-10 flex items-center justify-between border-b bg-card p-2 px-3"
-    >
-      <h1 class="unisans text-3xl font-black text-foreground">
-        {towerStore.selectedName || "TDS Statistics Editor"}
-      </h1>
-      <div class="flex items-center space-x-4">
-        {#if isClient}
-          <ModeToggle
-            bind:mode={editorMode}
-            disableCells={towerStore.selectedData?.isMalformed ?? false}
-          />
+    <div class="flex min-w-0 flex-1 flex-col">
+      <header
+        class="sticky top-0 z-10 flex items-center justify-between border-b bg-card p-2 px-3"
+      >
+        <h1 class="unisans text-3xl font-black text-foreground">
+          {towerStore.selectedName || "TDS Statistics Editor"}
+        </h1>
+        <div class="flex items-center space-x-4">
+          {#if isClient}
+            <ModeToggle
+              bind:mode={editorMode}
+              disableCells={towerStore.selectedData?.isMalformed ?? false}
+            />
 
-          <!-- Profile Selector -->
-          <DropdownMenu.Root>
-            <DropdownMenu.Trigger
-              class="inline-flex items-center gap-2 rounded-[var(--radius)_0] border border-border px-3 py-2 text-sm font-medium transition-colors duration-250 hover:bg-muted"
-            >
-              <span>{profileStore.current}</span>
-              <span class="text-xs text-muted-foreground">(Profile)</span>
-            </DropdownMenu.Trigger>
-            <DropdownMenu.Content align="end" class="dropdown-content">
-              <DropdownMenu.Group>
-                <DropdownMenu.GroupHeading
-                  class="px-2 py-1.5 text-sm font-semibold"
-                >
-                  Profiles
-                </DropdownMenu.GroupHeading>
-                {#each profileStore.list as profile (profile)}
-                  <DropdownMenu.Item
-                    onclick={() => handleProfileChange(profile)}
-                    class="dropdown-item"
+            <!-- Profile Selector -->
+            <DropdownMenu.Root>
+              <DropdownMenu.Trigger
+                class="inline-flex items-center gap-2 rounded-[var(--radius)_0] border border-border px-3 py-2 text-sm font-medium transition-colors duration-250 hover:bg-muted"
+              >
+                <span>{profileStore.current}</span>
+                <span class="text-xs text-muted-foreground">(Profile)</span>
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Content align="end" class="dropdown-content">
+                <DropdownMenu.Group>
+                  <DropdownMenu.GroupHeading
+                    class="px-2 py-1.5 text-sm font-semibold"
                   >
-                    <span>{profile}</span>
-                    {#if profile === profileStore.current}
-                      <span class="ms-auto">
-                        <Check size={14} />
-                      </span>
-                    {:else if profile !== "Default"}
-                      <button
-                        class="ms-2 text-muted-foreground hover:text-destructive opacity-0 transition-opacity"
-                        onclick={(e) => openDeleteProfileDialog(profile, e)}
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    {/if}
-                  </DropdownMenu.Item>
-                {/each}
-              </DropdownMenu.Group>
-              <DropdownMenu.Separator class="-mx-1 my-1 h-px bg-muted" />
-
-              <Dialog.Root bind:open={createProfileOpen}>
-                <Dialog.Trigger
-                  class="dropdown-item w-full text-left"
-                  onclick={openCreateProfileDialog}
-                >
-                  <span>+ Create Profile</span>
-                </Dialog.Trigger>
-
-                <Dialog.Portal>
-                  <Dialog.Overlay class="settings-overlay" />
-                  <Dialog.Content class="settings-content">
-                    <Dialog.Title class="settings-title">
-                      Create Profile
-                    </Dialog.Title>
-                    <Dialog.Description class="settings-description">
-                      Enter a name for the new profile.
-                    </Dialog.Description>
-
-                    <div class="space-y-2">
-                      <TextInput
-                        type="text"
-                        placeholder="My Profile"
-                        bind:value={newProfileName}
-                        onkeydown={handleCreateProfileInputKeydown}
-                      />
-                    </div>
-
-                    <div class="flex justify-end gap-2">
-                      <Dialog.Close class="btn btn-outline">
-                        Cancel
-                      </Dialog.Close>
-                      <Btn
-                        variant="primary"
-                        onclick={confirmCreateProfile}
-                        disabled={!newProfileName.trim()}
-                      >
-                        Create
-                      </Btn>
-                    </div>
-
-                    <Dialog.Close
-                      class="icon-btn absolute right-3 top-3"
-                      aria-label="Close"
+                    Profiles
+                  </DropdownMenu.GroupHeading>
+                  {#each profileStore.list as profile (profile)}
+                    <DropdownMenu.Item
+                      onclick={() => handleProfileChange(profile)}
+                      class="dropdown-item"
                     >
-                      <X size={16} />
-                    </Dialog.Close>
-                  </Dialog.Content>
-                </Dialog.Portal>
-              </Dialog.Root>
+                      <span>{profile}</span>
+                      {#if profile === profileStore.current}
+                        <span class="ms-auto">
+                          <Check size={14} />
+                        </span>
+                      {:else if profile !== "Default"}
+                        <button
+                          class="ms-2 text-muted-foreground hover:text-destructive opacity-0 transition-opacity"
+                          onclick={(e) => openDeleteProfileDialog(profile, e)}
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      {/if}
+                    </DropdownMenu.Item>
+                  {/each}
+                </DropdownMenu.Group>
+                <DropdownMenu.Separator class="-mx-1 my-1 h-px bg-muted" />
 
-              {#if profileStore.current !== "Default"}
-                <DropdownMenu.Item
-                  class="dropdown-item text-destructive focus:text-destructive hover:bg-red-100"
-                  onclick={(e) =>
-                    openDeleteProfileDialog(profileStore.current, e)}
-                >
-                  <span>Delete Current</span>
-                </DropdownMenu.Item>
-              {/if}
-            </DropdownMenu.Content>
-          </DropdownMenu.Root>
-        {/if}
+                <Dialog.Root bind:open={createProfileOpen}>
+                  <Dialog.Trigger
+                    class="dropdown-item w-full text-left"
+                    onclick={openCreateProfileDialog}
+                  >
+                    <span>+ Create Profile</span>
+                  </Dialog.Trigger>
 
-        <!-- Reset Button (Popover) -->
-        {#if towerStore.selectedData}
-          <Popover.Root>
-            <Popover.Trigger class="btn btn-destructive text-white">
-              Reset Tower
-            </Popover.Trigger>
-            <Popover.Content class="popover-content">
-              <div class="space-y-2">
-                <h4 class="font-medium leading-none">Confirm Reset</h4>
-                <p class="text-sm text-muted-foreground">
-                  Are you sure you want to reset all changes for
-                  <span class="font-bold">{towerStore.selectedName}</span>
-                  in profile
-                  <span class="font-bold">{profileStore.current}</span>? This
-                  action cannot be undone.
-                </p>
-              </div>
-              <div class="flex justify-end mt-4 gap-2">
-                <Popover.Close class="btn btn-outline">Cancel</Popover.Close>
-                <Popover.Close
-                  class="btn btn-destructive-fill text-white"
-                  onclick={confirmReset}
-                >
-                  Confirm
-                </Popover.Close>
-              </div>
-            </Popover.Content>
-          </Popover.Root>
-        {/if}
+                  <Dialog.Portal>
+                    <Dialog.Overlay class="settings-overlay" />
+                    <Dialog.Content class="settings-content">
+                      <Dialog.Title class="settings-title">
+                        Create Profile
+                      </Dialog.Title>
+                      <Dialog.Description class="settings-description">
+                        Enter a name for the new profile.
+                      </Dialog.Description>
 
-        <!-- Tower Selector (Combobox) -->
-        {#if isClient}
-          <div class="flex items-center space-x-2">
-            <Combobox.Root
-              type="single"
-              {items}
-              value={towerStore.selectedName}
-              bind:open={comboboxOpen}
-              onValueChange={(v) => handleSelect(v)}
-              onOpenChange={(open) => {
-                if (!open) searchValue = "";
-              }}
-            >
-              <div class="relative">
-                <Combobox.Input
-                  placeholder="Select a tower..."
-                  class="combobox-input"
-                  oninput={(e) => {
-                    searchValue = e.currentTarget.value;
-                    comboboxOpen = true;
-                  }}
-                  onclick={() => (comboboxOpen = true)}
-                />
-                <Combobox.Trigger class="absolute right-3 top-3">
-                  <ChevronsUpDown class="h-4 w-4 opacity-50" />
-                </Combobox.Trigger>
-              </div>
+                      <div class="space-y-2">
+                        <TextInput
+                          type="text"
+                          placeholder="My Profile"
+                          bind:value={newProfileName}
+                          onkeydown={handleCreateProfileInputKeydown}
+                        />
+                      </div>
 
-              <Combobox.Portal>
-                <Combobox.Content class="combobox-content">
-                  <Combobox.Viewport class="p-2 max-h-75 overflow-y-auto">
-                    {#each filteredTowers as item (item.value)}
-                      <Combobox.Item
-                        class="combobox-item"
-                        value={item.value}
-                        label={item.label}
+                      <div class="flex justify-end gap-2">
+                        <Dialog.Close class="btn btn-outline">
+                          Cancel
+                        </Dialog.Close>
+                        <Btn
+                          variant="primary"
+                          onclick={confirmCreateProfile}
+                          disabled={!newProfileName.trim()}
+                        >
+                          Create
+                        </Btn>
+                      </div>
+
+                      <Dialog.Close
+                        class="icon-btn absolute right-3 top-3"
+                        aria-label="Close"
                       >
-                        {#snippet children({ selected })}
-                          {item.label}
-                          {#if selected}
-                            <span
-                              class="absolute right-2 flex h-3.5 w-3.5 items-center justify-center"
-                            >
-                              <Check class="h-4 w-4" />
-                            </span>
-                          {/if}
-                        {/snippet}
-                      </Combobox.Item>
-                    {:else}
-                      <span
-                        class="block px-4 py-2 text-sm text-muted-foreground"
-                      >
-                        No results found
-                      </span>
-                    {/each}
-                  </Combobox.Viewport>
-                </Combobox.Content>
-              </Combobox.Portal>
-            </Combobox.Root>
-          </div>
-        {/if}
-      </div>
-    </header>
+                        <X size={16} />
+                      </Dialog.Close>
+                    </Dialog.Content>
+                  </Dialog.Portal>
+                </Dialog.Root>
 
-    <main class="flex-1 p-5 overflow-x-auto">
-      {#key mainKey}
-        <div in:fly={{ y: 8, duration: 160, easing: cubicOut }}>
-          {#if !isClient}
-            <Card class="p-8 text-center">
-              <p class="animate-pulse text-body">
-                Engineer is setting up the editor for you...
-              </p>
-            </Card>
-          {:else if towerStore.selectedData}
-            {#key editorMode}
-              <div in:fly={{ y: 8, duration: 160, easing: cubicOut }}>
-                {#if editorMode === "cells" && !towerStore.selectedData.isMalformed}
-                  <TowerEditor tower={towerStore.selectedData} />
-                {:else}
-                  {#await import("$lib/components/WikiEditor.svelte") then { default: WikiEditor }}
-                    <WikiEditor
-                      towerName={towerStore.selectedName}
-                      open={true}
-                    />
-                  {:catch}
-                    <Card class="p-8 text-center">
-                      <p class="text-body text-red-600">
-                        Failed to load the source editor.
-                      </p>
-                    </Card>
-                  {/await}
+                {#if profileStore.current !== "Default"}
+                  <DropdownMenu.Item
+                    class="dropdown-item text-destructive focus:text-destructive hover:bg-red-100"
+                    onclick={(e) =>
+                      openDeleteProfileDialog(profileStore.current, e)}
+                  >
+                    <span>Delete Current</span>
+                  </DropdownMenu.Item>
                 {/if}
-              </div>
-            {/key}
-          {:else if towerStore.isLoading}
-            <Card class="p-8 text-center">
-              <p class="animate-pulse text-body">
-                Commander is getting this tower's files ready...
-              </p>
-            </Card>
-          {:else}
-            <Introduction />
+              </DropdownMenu.Content>
+            </DropdownMenu.Root>
+          {/if}
+
+          <!-- Reset Button -->
+          {#if towerStore.selectedData}
+            <Popover.Root>
+              <Popover.Trigger class="btn btn-destructive text-white">
+                Reset Tower
+              </Popover.Trigger>
+              <Popover.Content class="popover-content">
+                <div class="space-y-2">
+                  <h4 class="font-medium leading-none">Confirm Reset</h4>
+                  <p class="text-sm text-muted-foreground">
+                    Are you sure you want to reset all changes for
+                    <span class="font-bold">{towerStore.selectedName}</span>
+                    in profile
+                    <span class="font-bold">{profileStore.current}</span>? This
+                    action cannot be undone.
+                  </p>
+                </div>
+                <div class="flex justify-end mt-4 gap-2">
+                  <Popover.Close class="btn btn-outline">Cancel</Popover.Close>
+                  <Popover.Close
+                    class="btn btn-destructive-fill text-white"
+                    onclick={confirmReset}
+                  >
+                    Confirm
+                  </Popover.Close>
+                </div>
+              </Popover.Content>
+            </Popover.Root>
+          {/if}
+
+          <!-- Tower Selector -->
+          {#if isClient}
+            <div class="flex items-center space-x-2">
+              <Combobox.Root
+                type="single"
+                {items}
+                value={towerStore.selectedName}
+                bind:open={comboboxOpen}
+                onValueChange={(v) => handleSelect(v)}
+                onOpenChange={(open) => {
+                  if (!open) searchValue = "";
+                }}
+              >
+                <div class="relative">
+                  <Combobox.Input
+                    placeholder="Select a tower..."
+                    class="combobox-input"
+                    oninput={(e) => {
+                      searchValue = e.currentTarget.value;
+                      comboboxOpen = true;
+                    }}
+                    onclick={() => (comboboxOpen = true)}
+                  />
+                  <Combobox.Trigger class="absolute right-3 top-3">
+                    <ChevronsUpDown class="h-4 w-4 opacity-50" />
+                  </Combobox.Trigger>
+                </div>
+
+                <Combobox.Portal>
+                  <Combobox.Content class="combobox-content">
+                    <Combobox.Viewport class="p-2 max-h-75 overflow-y-auto">
+                      {#each filteredTowers as item (item.value)}
+                        <Combobox.Item
+                          class="combobox-item"
+                          value={item.value}
+                          label={item.label}
+                        >
+                          {#snippet children({ selected })}
+                            {item.label}
+                            {#if selected}
+                              <span
+                                class="absolute right-2 flex h-3.5 w-3.5 items-center justify-center"
+                              >
+                                <Check class="h-4 w-4" />
+                              </span>
+                            {/if}
+                          {/snippet}
+                        </Combobox.Item>
+                      {:else}
+                        <span
+                          class="block px-4 py-2 text-sm text-muted-foreground"
+                        >
+                          No results found
+                        </span>
+                      {/each}
+                    </Combobox.Viewport>
+                  </Combobox.Content>
+                </Combobox.Portal>
+              </Combobox.Root>
+            </div>
           {/if}
         </div>
-      {/key}
-    </main>
+      </header>
+
+      <main class="flex-1 p-5 overflow-x-auto">
+        {#key mainKey}
+          <div in:fly={{ y: 8, duration: 160, easing: cubicOut }}>
+            {#if !isClient}
+              <Card class="p-8 text-center">
+                <p class="animate-pulse text-body">
+                  Engineer is setting up the editor for you...
+                </p>
+              </Card>
+            {:else if towerStore.selectedData}
+              {#key editorMode}
+                <div in:fly={{ y: 8, duration: 160, easing: cubicOut }}>
+                  {#if editorMode === "cells" && !towerStore.selectedData.isMalformed}
+                    <TowerEditor tower={towerStore.selectedData} />
+                  {:else}
+                    {#await import("$lib/components/WikiEditor.svelte") then { default: WikiEditor }}
+                      <WikiEditor
+                        towerName={towerStore.selectedName}
+                        open={true}
+                      />
+                    {:catch}
+                      <Card class="p-8 text-center">
+                        <p class="text-body text-red-600">
+                          Failed to load the source editor.
+                        </p>
+                      </Card>
+                    {/await}
+                  {/if}
+                </div>
+              {/key}
+            {:else if towerStore.isLoading}
+              <Card class="p-8 text-center">
+                <p class="animate-pulse text-body">
+                  Commander is getting this tower's files ready...
+                </p>
+              </Card>
+            {:else}
+              <Introduction />
+            {/if}
+          </div>
+        {/key}
+      </main>
+    </div>
   </div>
+
+  <StatusBar bind:settingsOpen onHome={goHome} />
 </div>
 
 <!-- Mobile layout (below md) -->

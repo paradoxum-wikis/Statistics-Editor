@@ -1,62 +1,117 @@
-type SettingBoolean = {
-  key: string;
+import type { Component } from "svelte";
+import {
+  Bug,
+  Diff,
+  Eraser,
+  Scaling,
+  Skull,
+  SquareDashedBottom,
+} from "@lucide/svelte";
+
+export type SettingTab = "editor" | "appearance" | "advanced";
+
+type BooleanSettingDef = {
+  storageKey: string;
   default: boolean;
+  id: string;
+  tab: SettingTab;
+  icon: Component;
+  label: string;
+  description: string;
 };
+
+const SETTING_DEFS = {
+  clearOnEdit: {
+    storageKey: "tdse_coe",
+    default: true,
+    id: "clear-on-edit",
+    tab: "editor",
+    icon: Eraser,
+    label: "Clear Cell on Edit",
+    description:
+      "Clears the input box when you click on a cell instead of keeping whatever was already there.",
+  },
+  rofBug: {
+    storageKey: "tdse_rof_bug",
+    default: false,
+    id: "rof-bug",
+    tab: "editor",
+    icon: Skull,
+    label: "ROF Bug",
+    description: "Calculate statistics with the infamous Rate of Fire bug.",
+  },
+  seeValueDifference: {
+    storageKey: "tdse_see_delta",
+    default: true,
+    id: "see-value-difference",
+    tab: "editor",
+    icon: Diff,
+    label: "See Value Difference",
+    description: "Shows how much a value changed compared to the original.",
+  },
+  minTableWidth: {
+    storageKey: "tdse_mctw",
+    default: false,
+    id: "min-content-table-width",
+    tab: "appearance",
+    icon: Scaling,
+    label: "Compact Table Width",
+    description:
+      "Prevents the table from stretching to the full width, keeping it only as wide as necessary.",
+  },
+  hideCellWrapper: {
+    storageKey: "tdse_hcw",
+    default: true,
+    id: "hide-cell-wrapper",
+    tab: "appearance",
+    icon: SquareDashedBottom,
+    label: "Hide Cell Wrapper",
+    description:
+      "Hides the visual wrapper inside table cells, letting the number sit directly in the cell.",
+  },
+  debugMode: {
+    storageKey: "tdse_debug",
+    default: false,
+    id: "debug-mode",
+    tab: "advanced",
+    icon: Bug,
+    label: "Debug Mode",
+    description: "Enables detailed logging in the console.",
+  },
+} as const satisfies Record<string, BooleanSettingDef>;
+
+export type BooleanSettingKey = keyof typeof SETTING_DEFS;
+
+export type BooleanSetting = BooleanSettingDef & { key: BooleanSettingKey };
+
+export const BOOLEAN_SETTINGS: BooleanSetting[] = (
+  Object.entries(SETTING_DEFS) as [BooleanSettingKey, BooleanSettingDef][]
+).map(([key, def]) => ({ key, ...def }));
+
+export function settingsForTab(tab: SettingTab): BooleanSetting[] {
+  return BOOLEAN_SETTINGS.filter((setting) => setting.tab === tab);
+}
 
 type SettingString<T extends string> = {
   key: string;
   default: T;
 };
 
-const SETTINGS: {
-  debugMode: SettingBoolean;
-  seeValueDifference: SettingBoolean;
-  hideCellWrapper: SettingBoolean;
-  minTableWidth: SettingBoolean;
-  clearOnEdit: SettingBoolean;
-  rofBug: SettingBoolean;
-  theme: SettingString<"light" | "dark" | "system">;
-} = {
-  debugMode: {
-    key: "tdse_debug",
-    default: false,
-  },
-  seeValueDifference: {
-    key: "tdse_see_delta",
-    default: true,
-  },
-  hideCellWrapper: {
-    key: "tdse_hcw",
-    default: true,
-  },
-  minTableWidth: {
-    key: "tdse_mctw",
-    default: false,
-  },
-  clearOnEdit: {
-    key: "tdse_coe",
-    default: true,
-  },
-  rofBug: {
-    key: "tdse_rof_bug",
-    default: false,
-  },
-  theme: {
-    key: "tdse_theme",
-    default: "system",
-  },
+const THEME_SETTING: SettingString<"light" | "dark" | "system"> = {
+  key: "tdse_theme",
+  default: "system",
 };
 
-function readBooleanSetting(def: SettingBoolean): boolean {
-  if (typeof localStorage === "undefined") return def.default;
-  const raw = localStorage.getItem(def.key);
-  if (raw == null) return def.default;
+function readBoolean(storageKey: string, defaultValue: boolean): boolean {
+  if (typeof localStorage === "undefined") return defaultValue;
+  const raw = localStorage.getItem(storageKey);
+  if (raw == null) return defaultValue;
   return raw === "true";
 }
 
-function writeBooleanSetting(def: SettingBoolean, value: boolean): void {
+function writeBoolean(storageKey: string, value: boolean): void {
   if (typeof localStorage === "undefined") return;
-  localStorage.setItem(def.key, String(value));
+  localStorage.setItem(storageKey, String(value));
 }
 
 function readStringSetting<T extends string>(def: SettingString<T>): T {
@@ -75,22 +130,43 @@ function writeStringSetting<T extends string>(
 }
 
 class SettingsStore {
-  debugMode = $state(SETTINGS.debugMode.default);
-  seeValueDifference = $state(SETTINGS.seeValueDifference.default);
-  hideCellWrapper = $state(SETTINGS.hideCellWrapper.default);
-  minTableWidth = $state(SETTINGS.minTableWidth.default);
-  clearOnEdit = $state(SETTINGS.clearOnEdit.default);
-  rofBug = $state(SETTINGS.rofBug.default);
-  theme = $state(SETTINGS.theme.default);
+  debugMode = $state<boolean>(SETTING_DEFS.debugMode.default);
+  seeValueDifference = $state<boolean>(SETTING_DEFS.seeValueDifference.default);
+  hideCellWrapper = $state<boolean>(SETTING_DEFS.hideCellWrapper.default);
+  minTableWidth = $state<boolean>(SETTING_DEFS.minTableWidth.default);
+  clearOnEdit = $state<boolean>(SETTING_DEFS.clearOnEdit.default);
+  rofBug = $state<boolean>(SETTING_DEFS.rofBug.default);
+  theme = $state(THEME_SETTING.default);
+
+  private assignBoolean(key: BooleanSettingKey, value: boolean) {
+    switch (key) {
+      case "clearOnEdit":
+        this.clearOnEdit = value;
+        break;
+      case "rofBug":
+        this.rofBug = value;
+        break;
+      case "seeValueDifference":
+        this.seeValueDifference = value;
+        break;
+      case "minTableWidth":
+        this.minTableWidth = value;
+        break;
+      case "hideCellWrapper":
+        this.hideCellWrapper = value;
+        break;
+      case "debugMode":
+        this.debugMode = value;
+        break;
+    }
+  }
 
   constructor() {
-    this.debugMode = readBooleanSetting(SETTINGS.debugMode);
-    this.seeValueDifference = readBooleanSetting(SETTINGS.seeValueDifference);
-    this.hideCellWrapper = readBooleanSetting(SETTINGS.hideCellWrapper);
-    this.minTableWidth = readBooleanSetting(SETTINGS.minTableWidth);
-    this.clearOnEdit = readBooleanSetting(SETTINGS.clearOnEdit);
-    this.rofBug = readBooleanSetting(SETTINGS.rofBug);
-    this.theme = readStringSetting(SETTINGS.theme);
+    for (const key of Object.keys(SETTING_DEFS) as BooleanSettingKey[]) {
+      const def = SETTING_DEFS[key];
+      this.assignBoolean(key, readBoolean(def.storageKey, def.default));
+    }
+    this.theme = readStringSetting(THEME_SETTING);
   }
 
   init() {
@@ -106,39 +182,32 @@ class SettingsStore {
     }
   }
 
-  setDebug(value: boolean) {
-    this.debugMode = value;
-    writeBooleanSetting(SETTINGS.debugMode, value);
+  getBoolean(key: BooleanSettingKey): boolean {
+    switch (key) {
+      case "clearOnEdit":
+        return this.clearOnEdit;
+      case "rofBug":
+        return this.rofBug;
+      case "seeValueDifference":
+        return this.seeValueDifference;
+      case "minTableWidth":
+        return this.minTableWidth;
+      case "hideCellWrapper":
+        return this.hideCellWrapper;
+      case "debugMode":
+        return this.debugMode;
+    }
   }
 
-  setSeeValueDifference(value: boolean) {
-    this.seeValueDifference = value;
-    writeBooleanSetting(SETTINGS.seeValueDifference, value);
-  }
-
-  setHideCellWrapper(value: boolean) {
-    this.hideCellWrapper = value;
-    writeBooleanSetting(SETTINGS.hideCellWrapper, value);
-  }
-
-  setMinTableWidth(value: boolean) {
-    this.minTableWidth = value;
-    writeBooleanSetting(SETTINGS.minTableWidth, value);
-  }
-
-  setClearOnEdit(value: boolean) {
-    this.clearOnEdit = value;
-    writeBooleanSetting(SETTINGS.clearOnEdit, value);
-  }
-
-  setRofBug(value: boolean) {
-    this.rofBug = value;
-    writeBooleanSetting(SETTINGS.rofBug, value);
+  setBoolean(key: BooleanSettingKey, value: boolean): void {
+    this.assignBoolean(key, value);
+    const def = SETTING_DEFS[key];
+    writeBoolean(def.storageKey, value);
   }
 
   setTheme(value: "light" | "dark" | "system") {
     this.theme = value;
-    writeStringSetting(SETTINGS.theme, value);
+    writeStringSetting(THEME_SETTING, value);
     this.applyTheme(value);
   }
 

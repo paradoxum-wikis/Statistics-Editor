@@ -1,0 +1,138 @@
+<script lang="ts">
+  import { Menubar, Tooltip } from "bits-ui";
+  import IconBtn from "./smol/IconBtn.svelte";
+  import { settingsStore, BOOLEAN_SETTINGS } from "$lib/stores/settings.svelte";
+  import { towerStore } from "$lib/stores/tower.svelte";
+  import { House, Settings, Sun, Moon, SunMoon, Check } from "@lucide/svelte";
+
+  let {
+    settingsOpen = $bindable(false),
+    onHome,
+  }: {
+    settingsOpen?: boolean;
+    onHome?: () => void | Promise<void>;
+  } = $props();
+
+  const activeSettings = $derived(
+    BOOLEAN_SETTINGS.filter((setting) => settingsStore.getBoolean(setting.key)),
+  );
+</script>
+
+<Menubar.Root
+  class="flex h-8 shrink-0 items-center gap-0.5 border-t border-border bg-card px-2"
+>
+  <div class="flex items-center gap-0.5">
+    <IconBtn class="status-bar-btn" onclick={() => onHome?.()} title="Home">
+      <House size={16} />
+    </IconBtn>
+
+    <Menubar.Menu>
+      <Menubar.Trigger class="status-bar-btn" title="Theme">
+        {#if settingsStore.theme === "light"}
+          <Sun size={16} />
+        {:else if settingsStore.theme === "dark"}
+          <Moon size={16} />
+        {:else}
+          <SunMoon size={16} />
+        {/if}
+      </Menubar.Trigger>
+      <Menubar.Portal>
+        <Menubar.Content
+          class="dropdown-content w-auto! min-w-42"
+          side="top"
+          align="start"
+          sideOffset={6}
+        >
+          <h4 class="mb-1 px-2 text-sm font-medium">Theme</h4>
+          <Menubar.RadioGroup
+            value={settingsStore.theme}
+            onValueChange={(value) => {
+              if (value === "light" || value === "dark" || value === "system") {
+                settingsStore.setTheme(value);
+              }
+            }}
+          >
+            <Menubar.RadioItem
+              value="light"
+              class="dropdown-item w-full justify-start!"
+            >
+              {#snippet children({ checked })}
+                <Sun class="me-2 h-4 w-4" />
+                <span>Light</span>
+                {#if checked}
+                  <Check class="ms-auto h-4 w-4" />
+                {/if}
+              {/snippet}
+            </Menubar.RadioItem>
+            <Menubar.RadioItem
+              value="dark"
+              class="dropdown-item w-full justify-start!"
+            >
+              {#snippet children({ checked })}
+                <Moon class="me-2 h-4 w-4" />
+                <span>Dark</span>
+                {#if checked}
+                  <Check class="ms-auto h-4 w-4" />
+                {/if}
+              {/snippet}
+            </Menubar.RadioItem>
+            <Menubar.RadioItem
+              value="system"
+              class="dropdown-item w-full justify-start!"
+            >
+              {#snippet children({ checked })}
+                <SunMoon class="me-2 h-4 w-4" />
+                <span>System</span>
+                {#if checked}
+                  <Check class="ms-auto h-4 w-4" />
+                {/if}
+              {/snippet}
+            </Menubar.RadioItem>
+          </Menubar.RadioGroup>
+        </Menubar.Content>
+      </Menubar.Portal>
+    </Menubar.Menu>
+
+    <IconBtn
+      class="status-bar-btn"
+      onclick={() => (settingsOpen = true)}
+      title="Settings"
+    >
+      <Settings size={16} />
+    </IconBtn>
+  </div>
+
+  <div class="ms-auto flex min-w-0 items-center gap-2 px-2">
+    {#if activeSettings.length > 0}
+      <Tooltip.Provider delayDuration={200}>
+        <div class="flex items-center gap-1">
+          {#each activeSettings as setting (setting.key)}
+            <Tooltip.Root>
+              <Tooltip.Trigger class="icon-btn status-bar-indicator">
+                <setting.icon size={14} />
+              </Tooltip.Trigger>
+              <Tooltip.Portal>
+                <Tooltip.Content
+                  class="tooltip-content"
+                  side="top"
+                  sideOffset={6}
+                >
+                  <p class="text-sm font-medium">{setting.label}</p>
+                  <p class="text-xs text-muted-foreground">
+                    {setting.description}
+                  </p>
+                </Tooltip.Content>
+              </Tooltip.Portal>
+            </Tooltip.Root>
+          {/each}
+        </div>
+      </Tooltip.Provider>
+    {/if}
+
+    {#if towerStore.isDirty}
+      <span class="shrink-0 text-xs text-amber-600 dark:text-amber-400">
+        Unsaved
+      </span>
+    {/if}
+  </div>
+</Menubar.Root>

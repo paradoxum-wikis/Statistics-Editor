@@ -1,16 +1,14 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { Dialog, Switch, Tabs } from "bits-ui";
+  import { ChartLine } from "@lucide/svelte";
   import {
-    Bug,
-    Diff,
-    SquareDashedBottom,
-    Scaling,
-    Eraser,
-    Skull,
-    ChartLine,
-  } from "@lucide/svelte";
-  import { settingsStore } from "$lib/stores/settings.svelte";
+    settingsStore,
+    settingsForTab,
+    type SettingTab,
+  } from "$lib/stores/settings.svelte";
+
+  const SETTING_TABS: SettingTab[] = ["editor", "appearance", "advanced"];
   import { analytics } from "$lib/services/analytics";
 
   let { open = $bindable(false) } = $props();
@@ -67,218 +65,74 @@
           >
         </Tabs.List>
 
-        <Tabs.Content value="editor">
-          <div class="grid gap-4 py-2">
-            <div class={settingsItemClass}>
-              <div class="flex items-center gap-3">
-                <div
-                  class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border bg-background"
-                >
-                  <Eraser class="h-5 w-5 text-foreground" />
-                </div>
-                <div class="space-y-1">
-                  <label
-                    for="clear-on-edit"
-                    class="text-sm font-medium leading-none"
+        {#each SETTING_TABS as tab (tab)}
+          <Tabs.Content value={tab}>
+            <div class="grid gap-4 py-2">
+              {#each settingsForTab(tab) as setting (setting.key)}
+                <div class={settingsItemClass}>
+                  <div class="flex items-center gap-3">
+                    <div
+                      class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border bg-background"
+                    >
+                      <setting.icon class="h-5 w-5 text-foreground" />
+                    </div>
+                    <div class="space-y-1">
+                      <label
+                        for={setting.id}
+                        class="text-sm font-medium leading-none"
+                      >
+                        {setting.label}
+                      </label>
+                      <p class="text-xs text-muted-foreground">
+                        {setting.description}
+                      </p>
+                    </div>
+                  </div>
+                  <Switch.Root
+                    id={setting.id}
+                    checked={settingsStore.getBoolean(setting.key)}
+                    onCheckedChange={(v) =>
+                      settingsStore.setBoolean(setting.key, v)}
+                    class={switchRootClass}
                   >
-                    Clear Cell on Edit
-                  </label>
-                  <p class="text-xs text-muted-foreground">
-                    Clears the input box when you click on a cell instead of
-                    keeping whatever was already there.
-                  </p>
+                    <Switch.Thumb class={switchThumbClass}></Switch.Thumb>
+                  </Switch.Root>
                 </div>
-              </div>
-              <Switch.Root
-                id="clear-on-edit"
-                checked={settingsStore.clearOnEdit}
-                onCheckedChange={(v) => settingsStore.setClearOnEdit(v)}
-                class={switchRootClass}
-              >
-                <Switch.Thumb class={switchThumbClass}></Switch.Thumb>
-              </Switch.Root>
-            </div>
+              {/each}
 
-            <div class={settingsItemClass}>
-              <div class="flex items-center gap-3">
-                <div
-                  class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border bg-background"
-                >
-                  <Skull class="h-5 w-5 text-foreground" />
-                </div>
-                <div class="space-y-1">
-                  <label for="rof-bug" class="text-sm font-medium leading-none"
-                    >ROF Bug</label
+              {#if tab === "advanced"}
+                <div class={settingsItemClass}>
+                  <div class="flex items-center gap-3">
+                    <div
+                      class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border bg-background"
+                    >
+                      <ChartLine class="h-5 w-5 text-foreground" />
+                    </div>
+                    <div class="space-y-1">
+                      <label
+                        for="analytics-toggle"
+                        class="text-sm font-medium leading-none"
+                      >
+                        Analytics
+                      </label>
+                      <p class="text-xs text-muted-foreground">
+                        Help us improve by sharing anonymous usage data.
+                      </p>
+                    </div>
+                  </div>
+                  <Switch.Root
+                    id="analytics-toggle"
+                    checked={analyticsEnabled}
+                    onCheckedChange={(v) => analytics.setConsent(v)}
+                    class={switchRootClass}
                   >
-                  <p class="text-xs text-muted-foreground">
-                    Calculate statistics with the infamous Rate of Fire bug.
-                  </p>
+                    <Switch.Thumb class={switchThumbClass}></Switch.Thumb>
+                  </Switch.Root>
                 </div>
-              </div>
-              <Switch.Root
-                id="rof-bug"
-                checked={settingsStore.rofBug}
-                onCheckedChange={(v) => settingsStore.setRofBug(v)}
-                class={switchRootClass}
-              >
-                <Switch.Thumb class={switchThumbClass}></Switch.Thumb>
-              </Switch.Root>
+              {/if}
             </div>
-
-            <div class={settingsItemClass}>
-              <div class="flex items-center gap-3">
-                <div
-                  class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border bg-background"
-                >
-                  <Diff class="h-5 w-5 text-foreground" />
-                </div>
-                <div class="space-y-1">
-                  <label
-                    for="see-value-difference"
-                    class="text-sm font-medium leading-none"
-                  >
-                    See Value Difference
-                  </label>
-                  <p class="text-xs text-muted-foreground">
-                    Shows how much a value changed compared to the original.
-                  </p>
-                </div>
-              </div>
-              <Switch.Root
-                id="see-value-difference"
-                checked={settingsStore.seeValueDifference}
-                onCheckedChange={(v) => settingsStore.setSeeValueDifference(v)}
-                class={switchRootClass}
-              >
-                <Switch.Thumb class={switchThumbClass}></Switch.Thumb>
-              </Switch.Root>
-            </div>
-          </div>
-        </Tabs.Content>
-
-        <Tabs.Content value="appearance">
-          <div class="grid gap-4 py-2">
-            <div class={settingsItemClass}>
-              <div class="flex items-center gap-3">
-                <div
-                  class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border bg-background"
-                >
-                  <Scaling class="h-5 w-5 text-foreground" />
-                </div>
-                <div class="space-y-1">
-                  <label
-                    for="min-content-table-width"
-                    class="text-sm font-medium leading-none"
-                  >
-                    Compact Table Width
-                  </label>
-                  <p class="text-xs text-muted-foreground">
-                    Prevents the table from stretching to the full width,
-                    keeping it only as wide as necessary.
-                  </p>
-                </div>
-              </div>
-              <Switch.Root
-                id="min-content-table-width"
-                checked={settingsStore.minTableWidth}
-                onCheckedChange={(v) => settingsStore.setMinTableWidth(v)}
-                class={switchRootClass}
-              >
-                <Switch.Thumb class={switchThumbClass}></Switch.Thumb>
-              </Switch.Root>
-            </div>
-
-            <div class={settingsItemClass}>
-              <div class="flex items-center gap-3">
-                <div
-                  class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border bg-background"
-                >
-                  <SquareDashedBottom class="h-5 w-5 text-foreground" />
-                </div>
-                <div class="space-y-1">
-                  <label
-                    for="hide-cell-wrapper"
-                    class="text-sm font-medium leading-none"
-                  >
-                    Hide Cell Wrapper
-                  </label>
-                  <p class="text-xs text-muted-foreground">
-                    Hides the visual wrapper inside table cells, letting the
-                    number sit directly in the cell.
-                  </p>
-                </div>
-              </div>
-              <Switch.Root
-                id="hide-cell-wrapper"
-                checked={settingsStore.hideCellWrapper}
-                onCheckedChange={(v) => settingsStore.setHideCellWrapper(v)}
-                class={switchRootClass}
-              >
-                <Switch.Thumb class={switchThumbClass}></Switch.Thumb>
-              </Switch.Root>
-            </div>
-          </div>
-        </Tabs.Content>
-
-        <Tabs.Content value="advanced">
-          <div class="grid gap-4 py-2">
-            <div class={settingsItemClass}>
-              <div class="flex items-center gap-3">
-                <div
-                  class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border bg-background"
-                >
-                  <ChartLine class="h-5 w-5 text-foreground" />
-                </div>
-                <div class="space-y-1">
-                  <label
-                    for="analytics-toggle"
-                    class="text-sm font-medium leading-none">Analytics</label
-                  >
-                  <p class="text-xs text-muted-foreground">
-                    Help us improve by sharing anonymous usage data.
-                  </p>
-                </div>
-              </div>
-              <Switch.Root
-                id="analytics-toggle"
-                checked={analyticsEnabled}
-                onCheckedChange={(v) => analytics.setConsent(v)}
-                class={switchRootClass}
-              >
-                <Switch.Thumb class={switchThumbClass}></Switch.Thumb>
-              </Switch.Root>
-            </div>
-
-            <div class={settingsItemClass}>
-              <div class="flex items-center gap-3">
-                <div
-                  class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border bg-background"
-                >
-                  <Bug class="h-5 w-5 text-foreground" />
-                </div>
-                <div class="space-y-1">
-                  <label
-                    for="debug-mode"
-                    class="text-sm font-medium leading-none"
-                  >
-                    Debug Mode
-                  </label>
-                  <p class="text-xs text-muted-foreground">
-                    Enables detailed logging in the console.
-                  </p>
-                </div>
-              </div>
-              <Switch.Root
-                id="debug-mode"
-                checked={settingsStore.debugMode}
-                onCheckedChange={(v) => settingsStore.setDebug(v)}
-                class={switchRootClass}
-              >
-                <Switch.Thumb class={switchThumbClass}></Switch.Thumb>
-              </Switch.Root>
-            </div>
-          </div>
-        </Tabs.Content>
+          </Tabs.Content>
+        {/each}
       </Tabs.Root>
 
       <div class="flex items-center justify-end">
