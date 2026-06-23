@@ -334,7 +334,7 @@
 </script>
 
 <aside class="flex h-full flex-col border-r border-border bg-card {className}">
-  <div class="flex flex-1 flex-col overflow-y-auto p-4">
+  <div class="flex flex-1 flex-col overflow-y-auto p-3.5">
     <UpgradeViewer
       {upgradeImages}
       {upgradeNames}
