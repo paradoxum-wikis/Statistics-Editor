@@ -84,6 +84,9 @@
       color: "var(--foreground)",
       fontSize: ".7rem",
     },
+    ".cm-panels": {
+      zIndex: "49",
+    },
     ".cm-panels-bottom, .cm-status-message": {
       borderColor: "var(--accent)",
     },
