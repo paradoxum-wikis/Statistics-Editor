@@ -1,0 +1,30 @@
+name: Sync Tower Neowtext Files
+
+on:
+  schedule:
+    - cron: "0 0 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-slim
+    steps:
+      - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+      - name: Sync .wiki files from TDS Wiki
+        run: bun .github/scripts/sync-wiki.js
+
+      - name: Commit and push
+        run: |
+          git add src/lib/towerComponents/towers/*.wiki
+          if git diff --staged --quiet; then
+            echo "Neowtext files already up to date"
+            exit 0
+          fi
+          git -c user.name="github-actions[bot]" \
+              -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+              commit -m "chore: sync tower neowtext files"
+          git push
