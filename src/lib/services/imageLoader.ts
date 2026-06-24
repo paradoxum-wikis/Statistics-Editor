@@ -2,8 +2,8 @@
  * Handles loading and caching images for tower upgrades from Roblox asset delivery.
  *
  * This service has two layers of caching:
- * 1) In-memory per tower/index (fast UI updates while one browses)
- * 2) Persistent Cache API for Roblox asset IDs (survives reloads)
+ * 1) In-memory per tower/index
+ * 2) Persistent Cache API for Roblox asset IDs
  * This was ported from the old Statistics Editor
  */
 import { mwWikiFileUrl, mwSetBaseUrl } from "mediawiki-file-url";
@@ -18,10 +18,6 @@ type CacheConfig = {
   cacheName: string;
   keyPrefix: string;
   enableDebug: boolean;
-  /**
-   * How long to keep an entry in the Cache API (ms). When exceeded, it will be refetched.
-   * Because Cache API doesn't enforce TTLs so we store metadata to implement this ourselves.
-   */
   ttlMs: number;
 };
 
@@ -128,7 +124,6 @@ class ImageLoaderService {
             return null;
           }
         } catch {
-          // If metadata is corrupt, treat as a miss and just refetch
           await cache.delete(cacheKey);
           await cache.delete(metaKey);
           return null;
@@ -262,7 +257,6 @@ class ImageLoaderService {
   async clearAllCache(): Promise<void> {
     if (!this.canUseCacheApi()) return;
 
-    // Revoke any outstanding blob URLs we created.
     for (const url of this.objectUrlsByKey.values()) {
       URL.revokeObjectURL(url);
     }
