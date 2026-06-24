@@ -2,12 +2,12 @@
 $DPS$ = Damage / Firerate
 $CE$ = Total Price / DPS
 $TP$ = $FNC-TOTALPRICE$
+$EXP$ = {{#expr:floor(50 * 1.09^(Level - 1))}}
 $FNC-COST$ = 125; 50; 375; 1350; 2200
 $FNC-PVP-COST$ = 300; 100; 650; 1800; 3250
 $FNC-DETECTION$ = 2; ;
 $FNC-UPGRADE$ = Faster Reloading; Precise Aiming; Stronger Equipment; Akimbo Handguns
 $FNC-UPGRADEICON$ = 3278746120; 3278749117; 3278741672; 3279537687
-$FNC-ROFBUG$ = Firerate
 </var>
 <div class="mobile-tabber"><tabber>
 |-|Regular =
@@ -19,11 +19,11 @@ $FNC-ROFBUG$ = Firerate
 |-
 | 1 || {{Money|$TP$}} || 1 || 0.75 || 12 || $DPS$ || {{Money|$CE$}}
 |-
-| 2 || {{Money|$TP$}} || 2 || 0.75 || 14 || $DPS$ || {{Money|$CE$}}
+| 2 || {{Money|$TP$}} || 3 || 0.75 || 14 || $DPS$ || {{Money|$CE$}}
 |-
-| 3 || {{Money|$TP$}} || 6 || 0.6 || 14 || $DPS$ || {{Money|$CE$}}
+| 3 || {{Money|$TP$}} || 8 || 0.65 || 16 || $DPS$ || {{Money|$CE$}}
 |-
-| 4 || {{Money|$TP$}} || 8 || 0.3 || 16 || $DPS$ || {{Money|$CE$}}
+| 4 || {{Money|$TP$}} || 8 || 0.325 || 16 || $DPS$ || {{Money|$CE$}}
 |}
 </div>
 |-|PVP =
@@ -37,9 +37,59 @@ $FNC-ROFBUG$ = Firerate
 |-
 | 2 || {{Money|$TP$}} || 8 || 0.75 || 16 || $DPS$ || {{Money|$CE$}}
 |-
-| 3 || {{Money|$TP$}} || 12 || 0.5 || 17 || $DPS$ || {{Money|$CE$}}
+| 3 || {{Money|$TP$}} || 10 || 0.5 || 17 || $DPS$ || {{Money|$CE$}}
 |-
-| 4 || {{Money|$TP$}} || 14 || 0.3 || 17 || $DPS$ || {{Money|$CE$}}
+| 4 || {{Money|$TP$}} || 13 || 0.3 || 17 || $DPS$ || {{Money|$CE$}}
 |}
 </div>
+<!-- @se-ignore -->
+|-|Level =
+<div class="overflow-box">
+{| class="wikitable stats-table"
+! Level !! Exp !! Total Exp
+|-
+| 0 || {{Exp|0}} || {{Exp|0}} 
+|-
+| 1 || {{Exp|$EXP$}} || {{Exp|50}} 
+|-
+| 2 || {{Exp|$EXP$}} || {{Exp|105}}
+|-
+| 3 || {{Exp|$EXP$}} || {{Exp|164}}
+|-
+| 4 || {{Exp|$EXP$}} || {{Exp|228}}
+|-
+| 5 || {{Exp|$EXP$}} || {{Exp|298}}
+|-
+| 6 || {{Exp|$EXP$}} || {{Exp|374}}
+|-
+| 7 || {{Exp|$EXP$}} || {{Exp|457}}
+|-
+| 8 || {{Exp|$EXP$}} || {{Exp|550}}
+|-
+| 9 || {{Exp|$EXP$}} || {{Exp|653}}
+|-
+| 10 || {{Exp|$EXP$}} || {{Exp|766}}
+|-
+| 11 || {{Exp|$EXP$}} || {{Exp|889}}
+|-
+| 12 || {{Exp|$EXP$}} || {{Exp|1,022}}
+|-
+| 13 || {{Exp|$EXP$}} || {{Exp|1,165}}
+|-
+| 14 || {{Exp|$EXP$}} || {{Exp|1,318}}
+|-
+| 15 || {{Exp|$EXP$}} || {{Exp|1,485}}
+|-
+| 16 || {{Exp|$EXP$}} || {{Exp|1,667}}
+|-
+| 17 || {{Exp|$EXP$}} || {{Exp|1,865}}
+|-
+| 18 || {{Exp|$EXP$}} || {{Exp|2,081}}
+|-
+| 19 || {{Exp|$EXP$}} || {{Exp|2,316}} 
+|-
+| 20 || {{Exp|$EXP$}} || {{Exp|2,573}} 
+|}
+</div>
+<!-- @/se-ignore -->
 </tabber></div>

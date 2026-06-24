@@ -16,15 +16,15 @@ $FNC-ROFBUG$ = Firerate
 {| class="wikitable stats-table"
 ! Level !! Total Price !! Damage !! Firerate !! Range !! DPS !! Cost Efficiency
 |-
-| 0 || {{Money|$TP$}} || 1 || 0.2 || 14 || $DPS$ || {{Money|$CE$}}
+| 0 || {{Money|$TP$}} || 1 || 0.225 || 14 || $DPS$ || {{Money|$CE$}}
 |-
-| 1 || {{Money|$TP$}} || 1 || 0.15 || 17 || $DPS$ || {{Money|$CE$}}
+| 1 || {{Money|$TP$}} || 1 || 0.175 || 17 || $DPS$ || {{Money|$CE$}}
 |-
-| 2 || {{Money|$TP$}} || 2 || 0.15 || 17 || $DPS$ || {{Money|$CE$}}
+| 2 || {{Money|$TP$}} || 2 || 0.175 || 17 || $DPS$ || {{Money|$CE$}}
 |-
-| 3 || {{Money|$TP$}} || 5 || 0.15 || 17 || $DPS$ || {{Money|$CE$}}
+| 3 || {{Money|$TP$}} || 5 || 0.175 || 17 || $DPS$ || {{Money|$CE$}}
 |-
-| 4 || {{Money|$TP$}} || 12 || 0.15 || 20 || $DPS$ || {{Money|$CE$}}
+| 4 || {{Money|$TP$}} || 12 || 0.175 || 20 || $DPS$ || {{Money|$CE$}}
 |}
 </div>
 |-|PVP =
@@ -36,11 +36,11 @@ $FNC-ROFBUG$ = Firerate
 |-
 | 1 || {{Money|$TP$}} || 2 || 0.15 || 17 || $DPS$ || {{Money|$CE$}}
 |-
-| 2 || {{Money|$TP$}} || 3 || 0.1 || 17 || $DPS$ || {{Money|$CE$}}
+| 2 || {{Money|$TP$}} || 2 || 0.1 || 17 || $DPS$ || {{Money|$CE$}}
 |-
-| 3 || {{Money|$TP$}} || 6 || 0.1 || 20 || $DPS$ || {{Money|$CE$}}
+| 3 || {{Money|$TP$}} || 5 || 0.1 || 20 || $DPS$ || {{Money|$CE$}}
 |-
-| 4 || {{Money|$TP$}} || 12 || 0.1 || 20 || $DPS$ || {{Money|$CE$}}
+| 4 || {{Money|$TP$}} || 10 || 0.1 || 20 || $DPS$ || {{Money|$CE$}}
 |}
 </div>
 </tabber></div>
