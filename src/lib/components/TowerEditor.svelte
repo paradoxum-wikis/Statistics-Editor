@@ -6,7 +6,7 @@
   import type SkinData from "$lib/towerComponents/skinData";
   import { settingsStore } from "$lib/stores/settings.svelte";
   import { towerStore } from "$lib/stores/tower.svelte";
-  import { noFetchTowers } from "$lib/towerComponents/towers/index";
+  import { noFetchTowers } from "$lib/services/fetchTowerWiki";
   import { fly } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
   import MoneyIcon from "$lib/assets/Income.png";
@@ -375,8 +375,7 @@
 
     isFetching = true;
     try {
-      const { fetchTowerWiki } =
-        await import("$lib/towerComponents/towers/index");
+      const { fetchTowerWiki } = await import("$lib/services/fetchTowerWiki");
       const { setWikiOverride } = await import("$lib/neowtext/wikiSource");
       const { profileStore } = await import("$lib/stores/profile.svelte");
       const wikitext = await fetchTowerWiki(tower.name, true);

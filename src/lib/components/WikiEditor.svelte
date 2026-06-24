@@ -17,7 +17,7 @@
   import { profileStore } from "$lib/stores/profile.svelte";
   import { settingsStore } from "$lib/stores/settings.svelte";
   import { setWikiOverride } from "$lib/neowtext/wikiSource";
-  import { noFetchTowers } from "$lib/towerComponents/towers/index";
+  import { noFetchTowers } from "$lib/services/fetchTowerWiki";
 
   const syncFromStoreAnnotation = Annotation.define<boolean>();
 
@@ -196,8 +196,7 @@
 
     isFetching = true;
     try {
-      const { fetchTowerWiki } =
-        await import("$lib/towerComponents/towers/index");
+      const { fetchTowerWiki } = await import("$lib/services/fetchTowerWiki");
       const { setWikiOverride } = await import("$lib/neowtext/wikiSource");
       const wikitext = await fetchTowerWiki(towerName, true);
       if (wikitext) {

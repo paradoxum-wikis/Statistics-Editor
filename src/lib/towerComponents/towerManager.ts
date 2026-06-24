@@ -1,5 +1,6 @@
 import Tower from "./tower";
-import { towerNames, fetchTowerWiki } from "./towers";
+import { towerNames } from "./towers";
+import { fetchTowerWiki } from "$lib/services/fetchTowerWiki";
 import { resolveToken, type TableCache } from "$lib/neowtext/functions";
 import { parseWikitext, type TableData } from "$lib/neowtext/parser";
 import { patchWikitext } from "$lib/neowtext/patcher";

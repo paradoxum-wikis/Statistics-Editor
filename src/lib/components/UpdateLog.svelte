@@ -31,8 +31,7 @@
     documentation: "bg-sky-500/15 text-sky-700 dark:text-sky-400",
     chore: "bg-zinc-500/15 text-zinc-600 dark:text-zinc-400",
     performance: "bg-violet-500/15 text-violet-700 dark:text-violet-400",
-    "continuous integration":
-      "bg-indigo-500/15 text-indigo-700 dark:text-indigo-400",
+    "continuous integration": "bg-teal-300/15 text-teal-500 dark:text-teal-200",
   };
 
   let cache: UpdateLogCache | null = null;
