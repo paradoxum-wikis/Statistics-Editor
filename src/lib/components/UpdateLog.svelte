@@ -19,6 +19,7 @@
     feat: "feature",
     doc: "documentation",
     perf: "performance",
+    ci: "continuous integration",
   };
 
   const TYPE_COLORS: Record<string, string> = {
@@ -30,6 +31,8 @@
     documentation: "bg-sky-500/15 text-sky-700 dark:text-sky-400",
     chore: "bg-zinc-500/15 text-zinc-600 dark:text-zinc-400",
     performance: "bg-violet-500/15 text-violet-700 dark:text-violet-400",
+    "continuous integration":
+      "bg-indigo-500/15 text-indigo-700 dark:text-indigo-400",
   };
 
   let cache: UpdateLogCache | null = null;
@@ -37,7 +40,10 @@
 
   function commitBadge(type: string, scope: string | null) {
     const name = TYPE_LABELS[type] ?? type;
-    const badgeType = name.charAt(0).toUpperCase() + name.slice(1);
+    const badgeType = name
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
     const color = TYPE_COLORS[name] ?? TYPE_COLORS.chore;
     return { badgeType, badgeScope: scope, color };
   }
