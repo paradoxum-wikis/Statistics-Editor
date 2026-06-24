@@ -46,3 +46,17 @@ export function applyGlobalModifierDisplay(
 
   return changed ? result : value;
 }
+
+export function applyGlobalModifierToRow(
+  modifier: GlobalModifier,
+  row: Record<string, string | number>,
+): Record<string, string | number> {
+  if (!isGlobalModifierActive(modifier)) return row;
+
+  const out = { ...row };
+  for (const [key, value] of Object.entries(row)) {
+    const modified = applyGlobalModifierDisplay(modifier, key, value);
+    if (modified !== value) out[key] = modified as string | number;
+  }
+  return out;
+}

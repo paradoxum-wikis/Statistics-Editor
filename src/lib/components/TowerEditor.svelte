@@ -20,7 +20,10 @@
   } from "$lib/utils/format";
   import { renderCellHtml } from "$lib/neowtext/render";
   import { resolveToken } from "$lib/neowtext/functions";
-  import { applyGlobalModifierDisplay } from "$lib/utils/globalModifier";
+  import {
+    applyGlobalModifierDisplay,
+    applyGlobalModifierToRow,
+  } from "$lib/utils/globalModifier";
 
   let {
     tower = null,
@@ -230,6 +233,7 @@
             branchSuffix: extTable.branchSuffix,
             tableCache: skinData.tableCache,
           } as any,
+          false,
           false,
         );
 
@@ -443,8 +447,11 @@
   function buildDisplayRows(
     config: TableConfig,
     applyDisplayRofBug: boolean = true,
+    applyGlobalModifier: boolean = true,
   ): Record<string, string | number>[] {
     if (config.rows.length === 0) return [];
+
+    if (applyGlobalModifier) towerStore.globalModifier;
 
     const keyMap = new Map<string, string>();
     for (const k of Object.keys(config.rows[0])) {
@@ -478,6 +485,10 @@
       const isPvp = config.skinData?.isPvp ?? config.isPvp ?? false;
       const tCache = config.skinData?.tableCache ?? (config as any).tableCache;
       const tokens = cellTokens?.[String(rowIdx)];
+      let evalContext =
+        applyGlobalModifier
+          ? applyGlobalModifierToRow(towerStore.globalModifier, cleanRow)
+          : cleanRow;
       if (tokens) {
         for (let pass = 0; pass < 2; pass++) {
           for (const [col, tok] of Object.entries(tokens)) {
@@ -488,7 +499,7 @@
             const res = resolveToken(
               tok,
               levelVal,
-              cleanRow,
+              evalContext,
               fTokens,
               isPvp,
               0,
@@ -499,7 +510,11 @@
               undefined,
               config.variantPrefix,
             );
-            if (res != null) cleanRow[stripRefs(col)] = res;
+            if (res != null) {
+              const colKey = stripRefs(col);
+              cleanRow[colKey] = res;
+              evalContext[colKey] = res;
+            }
           }
         }
       }
@@ -514,7 +529,7 @@
 
 {#snippet dataTable(config: TableConfig, isFirst: boolean)}
   {@const displayRows = buildDisplayRows(config)}
-  {@const compareRows = buildDisplayRows(config, false)}
+  {@const compareRows = buildDisplayRows(config, false, false)}
   <div
     class="table-container {!isFirst
       ? 'extra-table-container'
