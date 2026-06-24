@@ -9,6 +9,24 @@ export function stripRefs(s: unknown): string {
 }
 
 /**
+ * Normalizes a column key by stripping refs and wikilinks, and removing $refs$.
+ */
+export function normalizeColumnKey(s: unknown): string {
+  if (s === undefined || s === null) return "";
+  return stripRefs(String(s))
+    .replace(/\[\[([^|\]]+)(?:\|[^\]]+)?\]\]/g, "$1")
+    .replace(/\$[A-Z0-9_-]+\$/gi, "")
+    .trim();
+}
+
+export function columnKeysEqual(a: string, b: string): boolean {
+  const na = normalizeColumnKey(a);
+  const nb = normalizeColumnKey(b);
+  if (na === nb) return true;
+  return na.replace(/\s+/g, "") === nb.replace(/\s+/g, "");
+}
+
+/**
  * Parses a string or number into a number.
  * Commas are stripped before conversion.
  */

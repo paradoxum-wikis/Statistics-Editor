@@ -2,6 +2,7 @@ import TowerManager from "$lib/towerComponents/towerManager";
 import type Tower from "$lib/towerComponents/tower";
 import { settingsStore } from "$lib/stores/settings.svelte";
 import type { GlobalModifier } from "$lib/utils/globalModifier";
+import { columnKeysEqual } from "$lib/utils/format";
 import { parseNumeric } from "$lib/utils/format";
 
 /**
@@ -262,10 +263,9 @@ class TowerStore {
     const trimmed = column.trim();
     if (!trimmed) return false;
 
-    const key = trimmed.toLowerCase();
     if (
-      this.globalModifier.entries.some(
-        (entry) => entry.column.toLowerCase() === key,
+      this.globalModifier.entries.some((entry) =>
+        columnKeysEqual(entry.column, trimmed),
       )
     ) {
       return false;

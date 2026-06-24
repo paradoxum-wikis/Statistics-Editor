@@ -5,6 +5,8 @@ import {
   formatReadOnly,
   getRofBugVer,
   applyRofBug,
+  normalizeColumnKey,
+  columnKeysEqual,
 } from "$lib/utils/format";
 import { settingsStore } from "$lib/stores/settings.svelte";
 
@@ -99,10 +101,17 @@ function getCachedColumnValue(
   row: Record<string, string | number>,
   columnName: string,
 ): string | number | undefined {
-  const raw = columnName.trim();
-  const clean = stripRefs(raw).trim();
-  const noSpace = clean.replace(/\s+/g, "");
-  return row[raw] ?? row[clean] ?? row[noSpace];
+  const norm = normalizeColumnKey(columnName);
+  const noSpace = norm.replace(/\s+/g, "");
+
+  if (row[columnName.trim()] !== undefined) return row[columnName.trim()];
+  if (row[norm] !== undefined) return row[norm];
+  if (row[noSpace] !== undefined) return row[noSpace];
+
+  for (const [k, v] of Object.entries(row)) {
+    if (columnKeysEqual(k, columnName)) return v;
+  }
+  return undefined;
 }
 
 function maybeApplyRofToCachedRow(

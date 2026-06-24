@@ -1,5 +1,5 @@
 import { settingsStore } from "$lib/stores/settings.svelte";
-import { toNumericValue, stripRefs } from "$lib/utils/format";
+import { toNumericValue, stripRefs, normalizeColumnKey } from "$lib/utils/format";
 import { transpileExpr } from "mediawiki-expr";
 
 const ARITHMETIC_ALLOWED = /^[\w\s+\-*/%.(),<>=!&|?:;{}[\]"']+$/;
@@ -48,10 +48,7 @@ export function evaluateFormula(
   const numericContextAliased: Record<string, number> = {};
 
   for (const [key, value] of Object.entries(row)) {
-    const cleanKey = stripRefs(key).replace(
-      /\[\[([^|\]]+)(?:\|[^\]]+)?\]\]/g,
-      "$1",
-    );
+    const cleanKey = normalizeColumnKey(key);
     let n = toNumericValue(value);
     if (n === null) {
       const s = stripRefs(value).trim();

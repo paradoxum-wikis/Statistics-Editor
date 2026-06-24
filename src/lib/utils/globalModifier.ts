@@ -1,4 +1,4 @@
-import { stripRefs, toNumericValue } from "$lib/utils/format";
+import { columnKeysEqual, toNumericValue } from "$lib/utils/format";
 
 export type GlobalModifierEntry = {
   column: string;
@@ -24,7 +24,6 @@ export function applyGlobalModifierDisplay(
 ): string | number | null | undefined {
   if (modifier.entries.length === 0) return value;
 
-  const cleanHeader = stripRefs(header).toLowerCase();
   let result = toNumericValue(value);
   if (result === null) return value;
 
@@ -33,7 +32,7 @@ export function applyGlobalModifierDisplay(
   for (const entry of modifier.entries) {
     if (!entry.enabled || !entry.column.trim()) continue;
     if (entry.delta === 0 && entry.percent === 0) continue;
-    if (stripRefs(entry.column).toLowerCase() !== cleanHeader) continue;
+    if (!columnKeysEqual(entry.column, header)) continue;
 
     if (entry.percent !== 0) {
       result *= 1 + entry.percent / 100;
