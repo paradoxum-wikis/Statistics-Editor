@@ -18,7 +18,7 @@ function wikilinkToAnchor(link: string, text: string): string {
  */
 export function renderCellHtml(
   val: string | number | null | undefined,
-  readOnly = false,
+  readOnly: boolean,
 ): string {
   let s = readOnly ? formatReadOnly(val as any) : formatValue(val as any);
 

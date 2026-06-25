@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Tabs, Popover } from "bits-ui";
+  import { Tabs, Popover, Tooltip } from "bits-ui";
   import Separator from "./smol/Separator.svelte";
   import Btn from "./smol/Btn.svelte";
   import type Tower from "$lib/towerComponents/tower";
@@ -44,11 +44,15 @@
     const primaryIdx = Number.isFinite(skin.primaryTableIndex)
       ? Math.max(0, skin.primaryTableIndex)
       : 0;
+    const headers =
+      skin.headers.length > 0 ? skin.headers : skin.levels.attributes;
+    const rawHeaders =
+      skin.rawHeaders?.length === headers.length ? skin.rawHeaders : headers;
     const orderedTables = [
       {
         name: skin.tableName,
-        headers:
-          skin.headers.length > 0 ? skin.headers : skin.levels.attributes,
+        headers,
+        rawHeaders,
         rows: skin.levels.levels.slice(0, skin.rawRows.length),
         moneyColumns: skin.moneyColumns,
         readOnlyColumns: [] as string[],
@@ -189,6 +193,82 @@
       delta: Math.abs(delta) < 1e-9 ? 0 : delta,
       className: computeDeltaClass(header, delta),
     };
+  }
+
+  function extractRefEntries(
+    s1: string,
+    s2: string,
+    formulaTokens: Record<string, string>,
+  ): Array<{ content: string; name: string | null }> {
+    const sources = [s1, s2].filter(Boolean) as string[];
+    const entries: Array<{ content: string; name: string | null }> = [];
+    const refRe = /<ref\b([^>]*)>([\s\S]*?)<\/ref>|<ref\b([^>]*)\/>/gi;
+    const tokRe = /\$[A-Z0-9_-]+\$/g;
+
+    const add = (content: string, name: string | null) => {
+      const t = content.trim();
+      if (t) entries.push({ content: t, name });
+    };
+
+    function handleSrc(src: string) {
+      let m: RegExpExecArray | null;
+      refRe.lastIndex = 0;
+      while ((m = refRe.exec(src)) !== null) {
+        const attrs = m[1] || m[3] || "";
+        const content = m[2];
+        let name: string | null = null;
+        const nm = attrs.match(/name\s*=\s*["']?([^"'\s>]+)/i);
+        if (nm) name = nm[1];
+        if (content !== undefined) add(content, name);
+        else if (name) {
+          for (const def of Object.values(formulaTokens)) {
+            if (typeof def !== "string") continue;
+            const defNameM = def.match(
+              /<ref\b[^>]*name\s*=\s*["']?([^"'\s>]+)/i,
+            );
+            if (defNameM && defNameM[1] === name) {
+              const cm = def.match(/<ref\b[^>]*>([\s\S]*?)<\/ref>/i);
+              if (cm) add(cm[1], name);
+              break;
+            }
+          }
+        }
+      }
+    }
+
+    for (const src of sources) {
+      handleSrc(src);
+      tokRe.lastIndex = 0;
+      let t: RegExpExecArray | null;
+      while ((t = tokRe.exec(src)) !== null) {
+        const def = formulaTokens[t[0]];
+        if (typeof def === "string" && /^<ref\b/i.test(def.trim()))
+          handleSrc(def);
+      }
+    }
+    return entries;
+  }
+
+  function getCellRefs(
+    header: string,
+    sourceVal: unknown,
+    config: TableConfig,
+    rowIdx: number,
+  ) {
+    const ct = config.cellFormulaTokens?.[String(rowIdx)] ?? {};
+    let cellTok = ct[header] ?? ct[stripRefs(header)];
+    if (!cellTok)
+      for (const [k, v] of Object.entries(ct))
+        if (stripRefs(k) === stripRefs(header)) {
+          cellTok = v;
+          break;
+        }
+    const fTokens = (config.skinData?.formulaTokens ??
+      config.formulaTokens ??
+      {}) as Record<string, string>;
+    const srcStr = typeof sourceVal === "string" ? sourceVal : "";
+    const tokStr = typeof cellTok === "string" ? cellTok : "";
+    return extractRefEntries(srcStr, tokStr, fTokens);
   }
 
   function rebuildBaselineForSkin(t: Tower, skinName: string) {
@@ -409,6 +489,7 @@
     variantPrefix?: string;
     tableName: string;
     headers: string[];
+    rawHeaders?: string[];
     rows: Record<string, string | number>[];
     moneyColumns: string[];
     readOnlyColumns: string[];
@@ -485,10 +566,9 @@
       const isPvp = config.skinData?.isPvp ?? config.isPvp ?? false;
       const tCache = config.skinData?.tableCache ?? (config as any).tableCache;
       const tokens = cellTokens?.[String(rowIdx)];
-      let evalContext =
-        applyGlobalModifier
-          ? applyGlobalModifierToRow(towerStore.globalModifier, cleanRow)
-          : cleanRow;
+      let evalContext = applyGlobalModifier
+        ? applyGlobalModifierToRow(towerStore.globalModifier, cleanRow)
+        : cleanRow;
       if (tokens) {
         for (let pass = 0; pass < 2; pass++) {
           for (const [col, tok] of Object.entries(tokens)) {
@@ -527,175 +607,256 @@
   }
 </script>
 
+{#snippet refIndicator(content: string, num: number)}
+  <Tooltip.Root>
+    <Tooltip.Trigger>
+      {#snippet child({ props })}
+        <sup class="ref-sup" {...props}>[{num}]</sup>
+      {/snippet}
+    </Tooltip.Trigger>
+    <Tooltip.Portal>
+      <Tooltip.Content
+        class="tooltip-content max-w-72! text-sm"
+        side="top"
+        sideOffset={4}
+      >
+        {@html renderCellHtml(content, true)}
+      </Tooltip.Content>
+    </Tooltip.Portal>
+  </Tooltip.Root>
+{/snippet}
+
 {#snippet dataTable(config: TableConfig, isFirst: boolean)}
   {@const displayRows = buildDisplayRows(config)}
   {@const compareRows = buildDisplayRows(config, false, false)}
-  <div
-    class="table-container {!isFirst
-      ? 'extra-table-container'
-      : ''} {settingsStore.minTableWidth ? 'min-content' : ''}"
-    in:fly={isFirst
-      ? { y: 8, duration: 160, easing: cubicOut }
-      : { duration: 0 }}
-  >
-    <table class="table {settingsStore.minTableWidth ? 'min-content' : ''}">
-      <thead class="table-head">
-        {#if config.tableName}
+
+  {@const fTokens = (config.formulaTokens ?? {}) as Record<string, string>}
+  {@const cft = config.cellFormulaTokens ?? {}}
+  {@const refNumberMap = (() => {
+    const map = new Map<string, number>();
+    let next = 1;
+    const register = (src: unknown) => {
+      const s = typeof src === "string" ? src : "";
+      if (!s.includes("<ref") && !/\$[A-Z]/.test(s)) return;
+      for (const e of extractRefEntries(s, "", fTokens)) {
+        const key = e.name ? `n:${e.name}` : `c:${e.content}`;
+        if (!map.has(key)) map.set(key, next++);
+      }
+    };
+    for (let i = 0; i < config.headers.length; i++) {
+      register(config.rawHeaders?.[i] ?? config.headers[i]);
+    }
+    for (let r = 0; r < displayRows.length; r++) {
+      const row = displayRows[r];
+      for (const h of config.headers) {
+        register(cft[String(r)]?.[h] ?? cft[String(r)]?.[stripRefs(h)]);
+        const rv = row[h];
+        if (typeof rv === "string" && rv.includes("<ref")) register(rv);
+      }
+    }
+    return map;
+  })()}
+  {@const getRefNum = (content: string, name?: string | null) =>
+    refNumberMap.get(name ? `n:${name}` : `c:${content}`) ?? 1}
+
+  {#snippet cellRefs(val: any, readOnly: boolean, entries: any[])}
+    {@html renderCellHtml(
+      val,
+      readOnly,
+    )}{#each entries as entry (entry.name ?? entry.content)}{@const n =
+        getRefNum(entry.content, entry.name)}{@render refIndicator(
+        entry.content,
+        n,
+      )}{/each}
+  {/snippet}
+
+  <Tooltip.Provider delayDuration={150}>
+    <div
+      class="table-container {!isFirst
+        ? 'extra-table-container'
+        : ''} {settingsStore.minTableWidth ? 'min-content' : ''}"
+      in:fly={isFirst
+        ? { y: 8, duration: 160, easing: cubicOut }
+        : { duration: 0 }}
+    >
+      <table class="table {settingsStore.minTableWidth ? 'min-content' : ''}">
+        <thead class="table-head">
+          {#if config.tableName}
+            <tr>
+              <th colspan={config.headers.length} class="table-name-header">
+                {@html renderCellHtml(config.tableName, true)}
+              </th>
+            </tr>
+          {/if}
           <tr>
-            <th colspan={config.headers.length} class="table-name-header">
-              {@html renderCellHtml(config.tableName, true)}
-            </th>
-          </tr>
-        {/if}
-        <tr>
-          {#each config.headers as header (header)}
-            <th
-              scope="col"
-              class={header === "Level"
-                ? "table-header-sticky px-2"
-                : "table-header whitespace-nowrap"}
-            >
-              {@html renderCellHtml(header, true)}
-            </th>
-          {/each}
-        </tr>
-      </thead>
-      <tbody class="table-body">
-        {#each displayRows as row, rowIdx (rowIdx)}
-          <tr class="table-row">
-            {#each config.headers as header (header)}
-              {#if header === "Level"}
-                <td class="table-cell-sticky">
-                  {row[header] ?? rowIdx}
-                </td>
-              {:else}
-                {@const editable = isCellEditable(config, header)}
-                {@const deltaInfo = settingsStore.seeValueDifference
-                  ? getDeltaForCell(
-                      compareRows[rowIdx]?.[header],
-                      config.skinName,
-                      config.tableIdx,
-                      rowIdx,
-                      header,
-                      !editable,
-                    )
-                  : { delta: null, className: "" }}
-                {@const isMoney = config.moneyColumns.includes(header)}
-                {@const ck = mkCellKey(
-                  config.skinName,
-                  config.tableIdx,
-                  rowIdx,
+            {#each config.headers as header, hIdx (header)}
+              <th
+                scope="col"
+                class={header === "Level"
+                  ? "table-header-sticky px-2"
+                  : "table-header whitespace-nowrap"}
+                >{@render cellRefs(
                   header,
-                )}
-                {@const isFocused = focusedCell === ck}
-                <td class="table-data">
-                  {#if editable}
-                    <div
-                      class="cell-wrapper {isMoney
-                        ? 'money-wrapper'
-                        : ''} {settingsStore.hideCellWrapper
-                        ? 'hide-wrapper'
-                        : ''}"
-                    >
-                      {#if isMoney}
-                        <img
-                          src={MoneyIcon}
-                          alt=""
-                          class="money-icon money-icon-input"
-                        />
-                      {/if}
-                      {#if isFocused}
-                        <input
-                          use:focusOnMount
-                          type="text"
-                          size="1"
-                          class="table-input"
-                          value={formatValue(config.rows[rowIdx]?.[header])}
-                          {disabled}
-                          onfocus={(e) => {
-                            e.currentTarget.dataset.original =
-                              e.currentTarget.value;
-                            if (settingsStore.clearOnEdit)
-                              e.currentTarget.value = "";
-                          }}
-                          onblur={(e) => {
-                            focusedCell = null;
-                            const next = e.currentTarget.value;
-                            const original =
-                              e.currentTarget.dataset.original ?? "";
-                            if (next === "") {
-                              e.currentTarget.value = original;
-                            } else if (next !== original) {
-                              commitEdit(config, rowIdx, header, next);
-                            }
-                          }}
-                          onkeydown={(e) => {
-                            if (e.key === "Enter") e.currentTarget.blur();
-                            if (e.key === "Escape") {
-                              e.currentTarget.value =
-                                e.currentTarget.dataset.original ?? "";
-                              focusedCell = null;
-                            }
-                          }}
-                        />
-                      {:else}
-                        <button
-                          type="button"
-                          class="cell-display"
-                          {disabled}
-                          onclick={() => {
-                            focusedCell = ck;
-                          }}
-                        >
-                          {@html renderCellHtml(
-                            displayCellValue(header, row[header]),
-                            false,
-                          )}
-                        </button>
-                      {/if}
-                      {#if settingsStore.seeValueDifference && deltaInfo.delta !== null && deltaInfo.delta !== 0}
-                        <span class="delta-text {deltaInfo.className}">
-                          ({formatDelta(deltaInfo.delta)})
-                        </span>
-                      {/if}
-                    </div>
-                  {:else}
-                    <div
-                      class="table-cell-readonly flex items-center justify-between gap-2 {settingsStore.hideCellWrapper
-                        ? 'hide-wrapper'
-                        : ''}"
-                    >
-                      {#if isMoney}
-                        <span class="money-value">
-                          <img src={MoneyIcon} alt="" class="money-icon" />
-                          {@html renderCellHtml(
-                            displayCellValue(header, row[header]),
-                            true,
-                          )}
-                        </span>
-                      {:else}
-                        <span class="cell-multiline">
-                          {@html renderCellHtml(
-                            displayCellValue(header, row[header]),
-                            true,
-                          )}
-                        </span>
-                      {/if}
-                      {#if settingsStore.seeValueDifference && deltaInfo.delta !== null && deltaInfo.delta !== 0}
-                        <span class="delta-text text-xs {deltaInfo.className}">
-                          ({formatDelta(deltaInfo.delta)})
-                        </span>
-                      {/if}
-                    </div>
-                  {/if}
-                </td>
-              {/if}
+                  true,
+                  extractRefEntries(
+                    config.rawHeaders?.[hIdx] || header,
+                    "",
+                    fTokens,
+                  ),
+                )}</th
+              >
             {/each}
           </tr>
-        {/each}
-      </tbody>
-    </table>
-  </div>
+        </thead>
+        <tbody class="table-body">
+          {#each displayRows as row, rowIdx (rowIdx)}
+            <tr class="table-row">
+              {#each config.headers as header (header)}
+                {#if header === "Level"}
+                  <td class="table-cell-sticky">
+                    {row[header] ?? rowIdx}
+                  </td>
+                {:else}
+                  {@const editable = isCellEditable(config, header)}
+                  {@const deltaInfo = settingsStore.seeValueDifference
+                    ? getDeltaForCell(
+                        compareRows[rowIdx]?.[header],
+                        config.skinName,
+                        config.tableIdx,
+                        rowIdx,
+                        header,
+                        !editable,
+                      )
+                    : { delta: null, className: "" }}
+                  {@const isMoney = config.moneyColumns.includes(header)}
+                  {@const ck = mkCellKey(
+                    config.skinName,
+                    config.tableIdx,
+                    rowIdx,
+                    header,
+                  )}
+                  {@const isFocused = focusedCell === ck}
+                  {@const cellRefEntries = getCellRefs(
+                    header,
+                    row[header],
+                    config,
+                    rowIdx,
+                  )}
+                  <td class="table-data">
+                    {#if editable}
+                      <div
+                        class="cell-wrapper {isMoney
+                          ? 'money-wrapper'
+                          : ''} {settingsStore.hideCellWrapper
+                          ? 'hide-wrapper'
+                          : ''}"
+                      >
+                        {#if isMoney}
+                          <img
+                            src={MoneyIcon}
+                            alt=""
+                            class="money-icon money-icon-input"
+                          />
+                        {/if}
+                        {#if isFocused}
+                          <input
+                            use:focusOnMount
+                            type="text"
+                            size="1"
+                            class="table-input"
+                            value={formatValue(config.rows[rowIdx]?.[header])}
+                            {disabled}
+                            onfocus={(e) => {
+                              e.currentTarget.dataset.original =
+                                e.currentTarget.value;
+                              if (settingsStore.clearOnEdit)
+                                e.currentTarget.value = "";
+                            }}
+                            onblur={(e) => {
+                              focusedCell = null;
+                              const next = e.currentTarget.value;
+                              const original =
+                                e.currentTarget.dataset.original ?? "";
+                              if (next === "") {
+                                e.currentTarget.value = original;
+                              } else if (next !== original) {
+                                commitEdit(config, rowIdx, header, next);
+                              }
+                            }}
+                            onkeydown={(e) => {
+                              if (e.key === "Enter") e.currentTarget.blur();
+                              if (e.key === "Escape") {
+                                e.currentTarget.value =
+                                  e.currentTarget.dataset.original ?? "";
+                                focusedCell = null;
+                              }
+                            }}
+                          />
+                        {:else}
+                          <button
+                            type="button"
+                            class="cell-display"
+                            {disabled}
+                            onclick={() => {
+                              focusedCell = ck;
+                            }}
+                            >{@render cellRefs(
+                              displayCellValue(header, row[header]),
+                              false,
+                              cellRefEntries,
+                            )}</button
+                          >
+                        {/if}
+                        {#if settingsStore.seeValueDifference && deltaInfo.delta !== null && deltaInfo.delta !== 0}
+                          <span class="delta-text {deltaInfo.className}">
+                            ({formatDelta(deltaInfo.delta)})
+                          </span>
+                        {/if}
+                      </div>
+                    {:else}
+                      <div
+                        class="table-cell-readonly flex items-center justify-between gap-2 {settingsStore.hideCellWrapper
+                          ? 'hide-wrapper'
+                          : ''}"
+                      >
+                        {#if isMoney}
+                          <span class="money-value">
+                            <img src={MoneyIcon} alt="" class="money-icon" />
+                            <span
+                              >{@render cellRefs(
+                                displayCellValue(header, row[header]),
+                                true,
+                                cellRefEntries,
+                              )}</span
+                            >
+                          </span>
+                        {:else}
+                          <span class="cell-multiline"
+                            >{@render cellRefs(
+                              displayCellValue(header, row[header]),
+                              true,
+                              cellRefEntries,
+                            )}</span
+                          >
+                        {/if}
+                        {#if settingsStore.seeValueDifference && deltaInfo.delta !== null && deltaInfo.delta !== 0}
+                          <span
+                            class="delta-text text-xs {deltaInfo.className}"
+                          >
+                            ({formatDelta(deltaInfo.delta)})
+                          </span>
+                        {/if}
+                      </div>
+                    {/if}
+                  </td>
+                {/if}
+              {/each}
+            </tr>
+          {/each}
+        </tbody>
+      </table>
+    </div>
+  </Tooltip.Provider>
 {/snippet}
 
 <div class="space-y-4">
@@ -727,6 +888,7 @@
                   sourceExtraTableIndex: table.sourceExtraTableIndex,
                   tableName: table.name,
                   headers: table.headers,
+                  rawHeaders: table.rawHeaders,
                   rows: table.rows,
                   moneyColumns: table.moneyColumns,
                   readOnlyColumns: table.readOnlyColumns,
@@ -1013,5 +1175,20 @@
     display: flex;
     align-items: center;
     gap: 0.25rem;
+  }
+
+  .ref-sup {
+    font-size: 0.6em;
+    line-height: 1;
+    vertical-align: super;
+    padding-inline: 0.08em;
+    color: var(--muted-foreground);
+    cursor: help;
+    user-select: none;
+    font-weight: 500;
+  }
+
+  .ref-sup:hover {
+    color: var(--foreground);
   }
 </style>
