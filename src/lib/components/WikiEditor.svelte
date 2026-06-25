@@ -305,7 +305,7 @@
         disabled={!canSave || !towerStore.isDirty || status === "saving"}
         title="Save as profile-specific override and reload tower"
       >
-        Save override
+        Save Override
       </Btn>
     </div>
   </div>
