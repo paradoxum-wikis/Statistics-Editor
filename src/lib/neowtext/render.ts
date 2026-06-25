@@ -22,6 +22,10 @@ export function renderCellHtml(
 ): string {
   let s = readOnly ? formatReadOnly(val as any) : formatValue(val as any);
 
+  s = s
+    .replace(/'''([^']+?)'''/g, "<strong>$1</strong>")
+    .replace(/''([^']+?)''/g, "<em>$1</em>");
+
   if (!/[&\n\[]/.test(s)) return s;
 
   s = s.replace(RE_CHAR_HEX, (_, hex) =>
