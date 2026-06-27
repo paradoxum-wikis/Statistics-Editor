@@ -46,6 +46,7 @@
     SunMoon,
     RotateCcw,
     Zap,
+    FilePlus,
   } from "@lucide/svelte";
 
   let { isClient }: { isClient: boolean } = $props();
@@ -57,6 +58,9 @@
   let settingsOpen = $state(false);
   let toolsOpen = $state(false);
   let modifierOpen = $state(false);
+  let createOpen = $state(false);
+  let newTowerName = $state("");
+  let createError = $state("");
 
   let searchValue = $state("");
   let comboboxOpen = $state(false);
@@ -110,6 +114,19 @@
 
   async function confirmReset() {
     await towerStore.reset();
+  }
+
+  async function submitCreateTower() {
+    createError = "";
+    const created = await towerStore.createTower(newTowerName);
+    if (!created) {
+      createError = "Name already exists or is invalid.";
+      return;
+    }
+    newTowerName = "";
+    createOpen = false;
+    toolsOpen = false;
+    await performTowerSelect(created);
   }
 
   let discardOpen = $state(false);
@@ -548,6 +565,52 @@
             <Zap class="me-2 h-4 w-4" />
             <span>Global Modifier</span>
           </button>
+
+          <Popover.Root
+            bind:open={createOpen}
+            onOpenChange={(open) => {
+              if (!open) {
+                newTowerName = "";
+                createError = "";
+              }
+            }}
+          >
+            <Popover.Trigger class="dropdown-item w-full justify-start!">
+              <FilePlus class="me-2 h-4 w-4" />
+              <span>Create Tower</span>
+            </Popover.Trigger>
+            <Popover.Content
+              class="popover-content w-64!"
+              side="top"
+              align="start"
+              sideOffset={8}
+            >
+              <h4 class="mb-2 text-sm font-medium">Create Tower</h4>
+              <form
+                class="space-y-2"
+                onsubmit={(e) => {
+                  e.preventDefault();
+                  submitCreateTower();
+                }}
+              >
+                <TextInput
+                  bind:value={newTowerName}
+                  placeholder="Tower name"
+                  autofocus
+                />
+                {#if createError}
+                  <p class="text-xs text-destructive">{createError}</p>
+                {/if}
+                <button
+                  type="submit"
+                  class="btn btn-primary w-full"
+                  disabled={!newTowerName.trim()}
+                >
+                  Create
+                </button>
+              </form>
+            </Popover.Content>
+          </Popover.Root>
 
           {#if towerStore.selectedData}
             <div class="-mx-1 my-1 h-px bg-muted"></div>

@@ -30,9 +30,9 @@
 
   let themeOpen = $state(false);
   let modifierOpen = $state(false);
-  let createOpen = $state(false);
-  let newTowerName = $state("");
-  let createError = $state("");
+  let createOpen = $state(false),
+    newTowerName = $state(""),
+    createError = $state("");
 
   async function submitCreateTower() {
     createError = "";
