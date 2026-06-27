@@ -631,7 +631,7 @@
               </Popover.Trigger>
               <Popover.Content
                 class="popover-content"
-                side="left"
+                side="top"
                 align="start"
                 sideOffset={8}
               >
