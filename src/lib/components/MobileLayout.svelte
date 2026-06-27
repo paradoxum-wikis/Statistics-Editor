@@ -324,7 +324,10 @@
         </Combobox.Portal>
       </Combobox.Root>
 
-      <ModeToggle bind:mode={editorMode} />
+      <ModeToggle
+        bind:mode={editorMode}
+        disableCells={towerStore.selectedData?.isMalformed ?? false}
+      />
     {/if}
   </header>
 
@@ -341,7 +344,7 @@
         {:else if towerStore.selectedData}
           {#key editorMode}
             <div in:fly={{ y: 8, duration: 160, easing: cubicOut }}>
-              {#if editorMode === "cells"}
+              {#if editorMode === "cells" && !towerStore.selectedData.isMalformed}
                 <TowerEditor tower={towerStore.selectedData} />
               {:else}
                 {#await import("./WikiEditor.svelte") then { default: WikiEditor }}
