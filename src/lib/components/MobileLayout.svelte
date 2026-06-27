@@ -555,8 +555,13 @@
               <Popover.Trigger
                 class="dropdown-item w-full justify-start! text-destructive hover:text-destructive!"
               >
-                <RotateCcw class="me-2 h-4 w-4" />
-                <span>Reset Tower</span>
+                {#if towerStore.isCustomSelected()}
+                  <Trash2 class="me-2 h-4 w-4" />
+                  <span>Delete Tower</span>
+                {:else}
+                  <RotateCcw class="me-2 h-4 w-4" />
+                  <span>Reset Tower</span>
+                {/if}
               </Popover.Trigger>
               <Popover.Content
                 class="popover-content"
@@ -565,20 +570,33 @@
                 sideOffset={8}
               >
                 <div class="space-y-2">
-                  <h4 class="font-medium leading-none">Confirm Reset</h4>
+                  <h4 class="font-medium leading-none">
+                    {towerStore.isCustomSelected()
+                      ? "Confirm Delete"
+                      : "Confirm Reset"}
+                  </h4>
                   <p class="text-sm text-muted-foreground">
-                    Are you sure you want to reset all changes for
-                    <span class="font-bold">{towerStore.selectedName}</span>
-                    in profile
-                    <span class="font-bold">{profileStore.current}</span>? This
-                    action cannot be undone.
+                    {#if towerStore.isCustomSelected()}
+                      Are you sure you want to permanently delete
+                      <span class="font-bold">{towerStore.selectedName}</span>?
+                      This removes the tower and all saved data across every
+                      profile.
+                    {:else}
+                      Are you sure you want to reset all changes for
+                      <span class="font-bold">{towerStore.selectedName}</span>
+                      in profile
+                      <span class="font-bold">{profileStore.current}</span>?
+                      This action cannot be undone.
+                    {/if}
                   </p>
                 </div>
                 <div class="flex justify-end mt-4 gap-2">
                   <Popover.Close class="btn btn-outline">Cancel</Popover.Close>
                   <Popover.Close
                     class="btn btn-destructive-fill text-white"
-                    onclick={confirmReset}
+                    onclick={towerStore.isCustomSelected()
+                      ? () => towerStore.confirmDeleteTower()
+                      : confirmReset}
                   >
                     Confirm
                   </Popover.Close>

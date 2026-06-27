@@ -18,6 +18,7 @@
   import { settingsStore } from "$lib/stores/settings.svelte";
   import { setWikiOverride } from "$lib/neowtext/wikiSource";
   import { noFetchTowers } from "$lib/services/fetchTowerWiki";
+  import { isCustomTower } from "$lib/towerComponents/customTowers";
 
   const syncFromStoreAnnotation = Annotation.define<boolean>();
 
@@ -260,7 +261,7 @@
     </div>
 
     <div class="flex items-center gap-2">
-      {#if !noFetchTowers.has(towerName)}
+      {#if !noFetchTowers.has(towerName) && !isCustomTower(towerName)}
         <Popover.Root>
           <Popover.Trigger
             class="btn btn-secondary btn-sm"

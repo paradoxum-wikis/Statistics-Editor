@@ -334,24 +334,37 @@
           {#if towerStore.selectedData}
             <Popover.Root>
               <Popover.Trigger class="btn btn-destructive text-white">
-                Reset Tower
+                {towerStore.isCustomSelected() ? "Delete Tower" : "Reset Tower"}
               </Popover.Trigger>
               <Popover.Content class="popover-content">
                 <div class="space-y-2">
-                  <h4 class="font-medium leading-none">Confirm Reset</h4>
+                  <h4 class="font-medium leading-none">
+                    {towerStore.isCustomSelected()
+                      ? "Confirm Delete"
+                      : "Confirm Reset"}
+                  </h4>
                   <p class="text-sm text-muted-foreground">
-                    Are you sure you want to reset all changes for
-                    <span class="font-bold">{towerStore.selectedName}</span>
-                    in profile
-                    <span class="font-bold">{profileStore.current}</span>? This
-                    action cannot be undone.
+                    {#if towerStore.isCustomSelected()}
+                      Are you sure you want to permanently delete
+                      <span class="font-bold">{towerStore.selectedName}</span>?
+                      This removes the tower and all saved data across every
+                      profile.
+                    {:else}
+                      Are you sure you want to reset all changes for
+                      <span class="font-bold">{towerStore.selectedName}</span>
+                      in profile
+                      <span class="font-bold">{profileStore.current}</span>?
+                      This action cannot be undone.
+                    {/if}
                   </p>
                 </div>
                 <div class="flex justify-end mt-4 gap-2">
                   <Popover.Close class="btn btn-outline">Cancel</Popover.Close>
                   <Popover.Close
                     class="btn btn-destructive-fill text-white"
-                    onclick={confirmReset}
+                    onclick={towerStore.isCustomSelected()
+                      ? () => towerStore.confirmDeleteTower()
+                      : confirmReset}
                   >
                     Confirm
                   </Popover.Close>
@@ -468,7 +481,11 @@
     </div>
   </div>
 
-  <StatusBar bind:settingsOpen onHome={goHome} />
+  <StatusBar
+    bind:settingsOpen
+    onHome={goHome}
+    onTowerCreated={performTowerSelect}
+  />
 </div>
 
 <SettingsModal bind:open={settingsOpen} />
@@ -502,8 +519,7 @@
           Are you absolutely sure?
         </AlertDialog.Title>
         <AlertDialog.Description class="text-sm text-muted-foreground">
-          This action cannot be undone. This will permanently delete the
-          profile
+          This action cannot be undone. This will permanently delete the profile
           <span class="font-bold text-foreground">{profileToDelete}</span>
           and remove all data associated with it.
         </AlertDialog.Description>

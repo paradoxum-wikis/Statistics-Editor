@@ -1,9 +1,12 @@
+import { goto } from "$app/navigation";
+import { page } from "$app/state";
 import TowerManager from "$lib/towerComponents/towerManager";
 import type Tower from "$lib/towerComponents/tower";
 import { settingsStore } from "$lib/stores/settings.svelte";
 import type { GlobalModifier } from "$lib/utils/globalModifier";
 import { columnKeysEqual } from "$lib/utils/format";
 import { parseNumeric } from "$lib/utils/format";
+import { addCustomTower, isCustomTower } from "$lib/towerComponents/customTowers";
 
 /**
  * Manages tower selection and data reactively.
@@ -200,6 +203,40 @@ class TowerStore {
     this.effectiveWikitext = this.originalWikitext;
     this.isDirty = false;
     return await this.forceReload();
+  }
+
+  isCustomSelected(): boolean {
+    return isCustomTower(this.selectedName);
+  }
+
+  async createTower(name: string): Promise<string | null> {
+    if (!this.manager) return null;
+    const trimmed = name.trim();
+    if (!trimmed) return null;
+
+    if (!addCustomTower(trimmed, this.names)) return null;
+    this.names = await this.manager.getTowerNames(true);
+    return trimmed;
+  }
+
+  async deleteTower(): Promise<boolean> {
+    if (!this.manager || !this.selectedData) return false;
+    const name = this.selectedData.name;
+    if (!isCustomTower(name)) return false;
+
+    this.manager.deleteTower(name);
+    this.names = await this.manager.getTowerNames(true);
+    this.unload();
+    return true;
+  }
+
+  async confirmDeleteTower(): Promise<boolean> {
+    if (!(await this.deleteTower())) return false;
+
+    const url = new URL(page.url);
+    url.searchParams.delete("tower");
+    await goto(url, { keepFocus: true, noScroll: true });
+    return true;
   }
 
   /**

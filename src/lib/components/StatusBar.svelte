@@ -3,6 +3,7 @@
   import IconBtn from "./smol/IconBtn.svelte";
   import Veperator from "./smol/Veperator.svelte";
   import GlobalModifierPanel from "./smol/GlobalModifierPanel.svelte";
+  import TextInput from "./smol/TextInput.svelte";
   import { settingsStore, BOOLEAN_SETTINGS } from "$lib/stores/settings.svelte";
   import { towerStore } from "$lib/stores/tower.svelte";
   import { isGlobalModifierActive } from "$lib/utils/globalModifier";
@@ -14,18 +15,36 @@
     SunMoon,
     Check,
     Zap,
+    FilePlus,
   } from "@lucide/svelte";
 
   let {
     settingsOpen = $bindable(false),
     onHome,
+    onTowerCreated,
   }: {
     settingsOpen?: boolean;
     onHome?: () => void | Promise<void>;
+    onTowerCreated?: (name: string) => void | Promise<void>;
   } = $props();
 
   let themeOpen = $state(false);
   let modifierOpen = $state(false);
+  let createOpen = $state(false);
+  let newTowerName = $state("");
+  let createError = $state("");
+
+  async function submitCreateTower() {
+    createError = "";
+    const created = await towerStore.createTower(newTowerName);
+    if (!created) {
+      createError = "Name already exists or is invalid.";
+      return;
+    }
+    newTowerName = "";
+    createOpen = false;
+    await onTowerCreated?.(created);
+  }
 
   const activeSettings = $derived(
     BOOLEAN_SETTINGS.filter((setting) => settingsStore.getBoolean(setting.key)),
@@ -143,6 +162,57 @@
           sideOffset={6}
         >
           <GlobalModifierPanel />
+        </Popover.Content>
+      </Popover.Portal>
+    </Popover.Root>
+
+    <Popover.Root
+      bind:open={createOpen}
+      onOpenChange={(open) => {
+        if (!open) {
+          newTowerName = "";
+          createError = "";
+        }
+      }}
+    >
+      <Popover.Trigger>
+        {#snippet child({ props })}
+          <IconBtn {...props} class="status-bar-btn" title="Create Tower">
+            <FilePlus size={16} />
+          </IconBtn>
+        {/snippet}
+      </Popover.Trigger>
+      <Popover.Portal>
+        <Popover.Content
+          class="popover-content w-64!"
+          side="top"
+          align="start"
+          sideOffset={6}
+        >
+          <h4 class="mb-2 text-sm font-medium">Create Tower</h4>
+          <form
+            class="space-y-2"
+            onsubmit={(e) => {
+              e.preventDefault();
+              submitCreateTower();
+            }}
+          >
+            <TextInput
+              bind:value={newTowerName}
+              placeholder="Tower name"
+              autofocus
+            />
+            {#if createError}
+              <p class="text-xs text-destructive">{createError}</p>
+            {/if}
+            <button
+              type="submit"
+              class="btn btn-primary w-full"
+              disabled={!newTowerName.trim()}
+            >
+              Create
+            </button>
+          </form>
         </Popover.Content>
       </Popover.Portal>
     </Popover.Root>

@@ -6,10 +6,16 @@ import { parseWikitext, type TableData } from "$lib/neowtext/parser";
 import { patchWikitext } from "$lib/neowtext/patcher";
 import {
   clearProfileWikiOverrides,
+  clearTowerWikiOverrides,
   clearWikiOverride,
   loadEffectiveWikitext,
   setWikiOverride,
 } from "$lib/neowtext/wikiSource";
+import {
+  getCustomTowers,
+  isCustomTower,
+  removeCustomTower,
+} from "./customTowers";
 import { stripRefs } from "$lib/utils/format";
 
 const wikitextFiles = import.meta.glob("./towers/*.wiki", {
@@ -105,6 +111,15 @@ export default class TowerManager {
     this.clearCache(name);
   }
 
+  deleteTower(name: string): void {
+    if (!isCustomTower(name)) return;
+
+    removeCustomTower(name);
+    clearTowerWikiOverrides(name);
+    this.clearCache(name);
+    this.towerNames = this.towerNames.filter((n) => n !== name);
+  }
+
   async getTower(name: string): Promise<Tower | null> {
     if (this.towers[name]) {
       if (this.debug())
@@ -116,7 +131,8 @@ export default class TowerManager {
       console.log(`[TowerManager] Loading tower ${name} (no cache)`);
 
     const wikitextLoader = wikitextFiles[`./towers/${name}.wiki`];
-    if (!wikitextLoader) return null; // look into this later
+    const custom = isCustomTower(name);
+    if (!wikitextLoader && !custom) return null;
 
     let currentSource = "";
     let currentText = "";
@@ -126,6 +142,8 @@ export default class TowerManager {
 
     try {
       const loadBase = async () => {
+        if (custom) return "";
+
         try {
           const url = new URL(`./towers/${name}.wiki`, import.meta.url).href;
           if (this.debug())
@@ -766,9 +784,9 @@ export default class TowerManager {
     }
   }
 
-  async getTowerNames(): Promise<string[]> {
-    return this.towerNames.length
-      ? this.towerNames
-      : (this.towerNames = [...towerNames]);
+  async getTowerNames(refresh = false): Promise<string[]> {
+    if (!refresh && this.towerNames.length) return this.towerNames;
+    const custom = getCustomTowers();
+    return (this.towerNames = [...new Set([...towerNames, ...custom])].sort());
   }
 }

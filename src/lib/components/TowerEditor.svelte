@@ -7,6 +7,7 @@
   import { settingsStore } from "$lib/stores/settings.svelte";
   import { towerStore } from "$lib/stores/tower.svelte";
   import { noFetchTowers } from "$lib/services/fetchTowerWiki";
+  import { isCustomTower } from "$lib/towerComponents/customTowers";
   import { fly } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
   import MoneyIcon from "$lib/assets/Income.png";
@@ -913,7 +914,7 @@
 
     <Separator class="mt-4" />
     <div class="flex justify-end gap-2">
-      {#if tower && !noFetchTowers.has(tower.name)}
+      {#if tower && !noFetchTowers.has(tower.name) && !isCustomTower(tower.name)}
         <Popover.Root>
           <Popover.Trigger class="btn btn-secondary" disabled={isFetching}>
             {isFetching ? "Fetching..." : "Fetch Latest Data"}
