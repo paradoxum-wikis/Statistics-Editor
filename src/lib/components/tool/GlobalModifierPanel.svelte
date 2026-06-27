@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Switch, Label } from "bits-ui";
-  import Btn from "./Btn.svelte";
-  import TextInput from "./TextInput.svelte";
+  import Btn from "../smol/Btn.svelte";
+  import TextInput from "../smol/TextInput.svelte";
   import { towerStore } from "$lib/stores/tower.svelte";
   import { X } from "@lucide/svelte";
 

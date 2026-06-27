@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Dialog } from "bits-ui";
   import { X } from "@lucide/svelte";
-  import GlobalModifierPanel from "./smol/GlobalModifierPanel.svelte";
+  import GlobalModifierPanel from "./GlobalModifierPanel.svelte";
 
   let { open = $bindable(false) } = $props();
 </script>

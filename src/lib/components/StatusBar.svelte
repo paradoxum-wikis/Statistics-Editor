@@ -2,21 +2,11 @@
   import { Tooltip, Popover } from "bits-ui";
   import IconBtn from "./smol/IconBtn.svelte";
   import Veperator from "./smol/Veperator.svelte";
-  import GlobalModifierPanel from "./smol/GlobalModifierPanel.svelte";
-  import TextInput from "./smol/TextInput.svelte";
+  import GlobalModifier from "./tool/GlobalModifier.svelte";
+  import CreateTower from "./tool/CreateTower.svelte";
   import { settingsStore, BOOLEAN_SETTINGS } from "$lib/stores/settings.svelte";
   import { towerStore } from "$lib/stores/tower.svelte";
-  import { isGlobalModifierActive } from "$lib/utils/globalModifier";
-  import {
-    House,
-    Settings,
-    Sun,
-    Moon,
-    SunMoon,
-    Check,
-    Zap,
-    FilePlus,
-  } from "@lucide/svelte";
+  import { House, Settings, Sun, Moon, SunMoon, Check } from "@lucide/svelte";
 
   let {
     settingsOpen = $bindable(false),
@@ -29,29 +19,9 @@
   } = $props();
 
   let themeOpen = $state(false);
-  let modifierOpen = $state(false);
-  let createOpen = $state(false),
-    newTowerName = $state(""),
-    createError = $state("");
-
-  async function submitCreateTower() {
-    createError = "";
-    const created = await towerStore.createTower(newTowerName);
-    if (!created) {
-      createError = "Name already exists or is invalid.";
-      return;
-    }
-    newTowerName = "";
-    createOpen = false;
-    await onTowerCreated?.(created);
-  }
 
   const activeSettings = $derived(
     BOOLEAN_SETTINGS.filter((setting) => settingsStore.getBoolean(setting.key)),
-  );
-
-  const modifierActive = $derived(
-    isGlobalModifierActive(towerStore.globalModifier),
   );
 </script>
 
@@ -140,82 +110,8 @@
 
     <Veperator />
 
-    <Popover.Root bind:open={modifierOpen}>
-      <Popover.Trigger>
-        {#snippet child({ props })}
-          <IconBtn
-            {...props}
-            class="status-bar-btn {modifierActive
-              ? 'text-amber-600 dark:text-amber-400'
-              : ''}"
-            title="Global Modifier"
-          >
-            <Zap size={16} />
-          </IconBtn>
-        {/snippet}
-      </Popover.Trigger>
-      <Popover.Portal>
-        <Popover.Content
-          class="popover-content w-[min(36rem,calc(100vw-2rem))]!"
-          side="top"
-          align="start"
-          sideOffset={6}
-        >
-          <GlobalModifierPanel />
-        </Popover.Content>
-      </Popover.Portal>
-    </Popover.Root>
-
-    <Popover.Root
-      bind:open={createOpen}
-      onOpenChange={(open) => {
-        if (!open) {
-          newTowerName = "";
-          createError = "";
-        }
-      }}
-    >
-      <Popover.Trigger>
-        {#snippet child({ props })}
-          <IconBtn {...props} class="status-bar-btn" title="Create Tower">
-            <FilePlus size={16} />
-          </IconBtn>
-        {/snippet}
-      </Popover.Trigger>
-      <Popover.Portal>
-        <Popover.Content
-          class="popover-content w-64!"
-          side="top"
-          align="start"
-          sideOffset={6}
-        >
-          <h4 class="mb-2 text-sm font-medium">Create Tower</h4>
-          <form
-            class="space-y-2"
-            onsubmit={(e) => {
-              e.preventDefault();
-              submitCreateTower();
-            }}
-          >
-            <TextInput
-              bind:value={newTowerName}
-              placeholder="Tower name"
-              autofocus
-            />
-            {#if createError}
-              <p class="text-xs text-destructive">{createError}</p>
-            {/if}
-            <button
-              type="submit"
-              class="btn btn-primary w-full"
-              disabled={!newTowerName.trim()}
-            >
-              Create
-            </button>
-          </form>
-        </Popover.Content>
-      </Popover.Portal>
-    </Popover.Root>
+    <GlobalModifier variant="icon" />
+    <CreateTower onCreated={onTowerCreated} />
   </div>
 
   <div class="ms-auto flex min-w-0 items-center gap-2 px-2">
