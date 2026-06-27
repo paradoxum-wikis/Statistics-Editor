@@ -23,8 +23,8 @@ export function renderCellHtml(
   let s = readOnly ? formatReadOnly(val as any) : formatValue(val as any);
 
   s = s
-    .replace(/'''([^']+?)'''/g, "<strong>$1</strong>")
-    .replace(/''([^']+?)''/g, "<em>$1</em>");
+    .replace(/'''([^']+?)'''/g, '<span class="font-bold">$1</span>')
+    .replace(/''([^']+?)''/g, '<span class="italic">$1</span>');
 
   if (!/[&\n\[]/.test(s)) return s;
 
