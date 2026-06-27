@@ -2,6 +2,8 @@
   type Entry = {
     sha: string;
     date: string;
+    author: string;
+    authorUrl: string;
     badgeType: string | null;
     badgeScope: string | null;
     color: string | null;
@@ -59,6 +61,7 @@
         const data = (await res.json()) as {
           sha: string;
           html_url: string;
+          author: { login: string; html_url: string };
           commit: { message: string; author: { date: string } };
         }[];
 
@@ -74,6 +77,8 @@
             return {
               sha: item.sha.slice(0, 7),
               date: item.commit.author.date,
+              author: item.author.login,
+              authorUrl: item.author.html_url,
               badgeType: badge.badgeType,
               badgeScope: badge.badgeScope,
               color: badge.color,
@@ -172,7 +177,9 @@
           </h4>
           <ul class="space-y-1.5">
             {#each group.entries as entry (entry.sha)}
-              <li class="flex items-start gap-2 text-sm">
+              <li
+                class="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-sm"
+              >
                 {#if entry.badgeType}
                   <span
                     class="rounded px-1.5 py-0.5 text-xs font-medium {entry.color}"
@@ -192,6 +199,17 @@
                 >
                   {entry.message}
                 </a>
+                <span class="text-xs text-muted-foreground">
+                  by
+                  <a
+                    href={entry.authorUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-link hover:underline"
+                  >
+                    {entry.author}
+                  </a>
+                </span>
               </li>
             {/each}
           </ul>
