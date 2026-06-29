@@ -21,7 +21,7 @@ $DREF$ = <ref name="DPS">DPS assumes only one enemy is hit by a single trap and 
 $TREF$ = <ref name="TED">Total Elapsed Damage is calculated as Burn Damage × (Burn Time ÷ Tick).</ref>
 $MDREF$ = <ref name="MineDPS">DPS assumes only one enemy is hit by a single trap and receives full damage.<br/>DPS is calculated as Landmine DPS + Burn DPS.<br/>Burn DPS is calculated as Burn Damage ÷ Firerate for burn times shorter or equal to one second, while for burn times longer than one second it is calculated as Burn Damage ÷ Tick.</ref>
 </var>
-{{Tabber
+<div class="mobile-tabber">{{Tabber
 |Regular
 |<tabber>
 |-|Spike =
@@ -112,4 +112,4 @@ $MDREF$ = <ref name="MineDPS">DPS assumes only one enemy is hit by a single trap
 |}
 </div>
 </tabber>
-}}
+}}</div>

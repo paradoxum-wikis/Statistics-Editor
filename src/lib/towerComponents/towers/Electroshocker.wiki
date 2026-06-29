@@ -15,7 +15,7 @@ $MREF$ = <ref>Calculated as DPS × Max Hits.</ref>
 {| class="wikitable stats-table"
 ! Level !! Total Price !! Damage !! Firerate !! Range !! Chain Range !! Max Hits !! Shock Time !! Defense Melt !! DPS$DREF$ !! Max DPS$MREF$ !! Cost Efficiency !! Max Cost Efficiency
 |-
-| 0 || {{Money|$TP$}} || 4 || 1.35 || 18 || 10 || 2 || 0.1 || 0% || $DPS$ || $MDPS$ || {{Money|$CE$}} || {{Money|$MCE$}}
+| 0 || {{Money|$TP$}} || 4 || 1.35 || 10 || 10 || 2 || 0.1 || 0% || $DPS$ || $MDPS$ || {{Money|$CE$}} || {{Money|$MCE$}}
 |-
 | 1 || {{Money|$TP$}} || 6 || 1.15 || 12 || 10 || 2 || 0.1 || 0% || $DPS$ || $MDPS$ || {{Money|$CE$}} || {{Money|$MCE$}}
 |-

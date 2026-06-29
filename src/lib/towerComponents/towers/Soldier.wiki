@@ -9,7 +9,6 @@ $FNC-PVP-DETECTION$ = 2; ; 0
 $FNC-UPGRADE$ = Barracks Training; Better Aiming; Equipment Upgrades; Deadliest Soldier
 $FNC-PVP-UPGRADE$ = Better Vision; Better Aiming; Equipment Upgrades; Deadliest Soldier
 $FNC-UPGRADEICON$ = 5523192002; 5523193619; 5523195646; 5523196519
-$FNC-ROFBUG$ = Firerate
 $FREF$ = <ref name=firerate>Firerate only applies to the burst and is not the time between bursts.</ref>
 $DREF$ = <ref name=dps>Calculated as (Damage × Burst Count) ÷ (Cooldown + (Firerate × Burst Count)).</ref>
 </var>
