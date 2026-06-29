@@ -19,9 +19,9 @@
     sideOffset?: number;
   } = $props();
 
-  let open = $state(false),
-    newTowerName = $state(""),
-    createError = $state("");
+  let open = $state(false);
+  let newTowerName = $state("");
+  let createError = $state("");
 
   function reset() {
     newTowerName = "";
