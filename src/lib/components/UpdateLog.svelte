@@ -151,7 +151,7 @@
   </div>
 
   {#if loading}
-    <p class="text-sm text-muted-foreground animate-pulse">
+    <p class="text-sm text-muted-foreground text-center animate-pulse">
       Loading updates...
     </p>
   {:else if failed}
