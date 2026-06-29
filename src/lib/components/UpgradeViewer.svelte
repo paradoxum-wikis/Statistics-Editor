@@ -186,7 +186,7 @@
   }
 
   .upgrade-image-container {
-    @apply w-full h-32 bg-muted rounded flex items-center justify-center text-muted-foreground;
+    @apply w-full aspect-square bg-muted rounded flex items-center justify-center text-muted-foreground;
   }
 
   .upgrade-name {
