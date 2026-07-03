@@ -576,11 +576,6 @@
       }
       const id = await createShare(neowtext, tower.name);
       shareLink = sharePageUrl(id);
-      try {
-        await navigator.clipboard.writeText(shareLink);
-      } catch {
-        // clipboard may be blocked; link is still shown in the popover
-      }
     } catch (e) {
       shareError = e instanceof Error ? e.message : "Share failed.";
     } finally {
