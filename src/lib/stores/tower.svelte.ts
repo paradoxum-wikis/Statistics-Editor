@@ -8,6 +8,7 @@ import { columnKeysEqual } from "$lib/utils/format";
 import { parseNumeric } from "$lib/utils/format";
 import {
   addCustomTower,
+  guaraCustomTower,
   isCustomTower,
 } from "$lib/towerComponents/customTowers";
 import { mergeBaselineOnTowerDiff } from "$lib/utils/towah";
@@ -247,7 +248,9 @@ class TowerStore {
    * Persists changes to storage.
    * @param diffBaseline Changed-cell baseline snapshot for @se-diff (empty removes block).
    */
-  buildShareNeowtext(diffBaseline: Record<string, unknown> = {}): string | null {
+  buildShareNeowtext(
+    diffBaseline: Record<string, unknown> = {},
+  ): string | null {
     if (!this.manager || !this.selectedData) return null;
     const patched = this.manager.generateWikitext(this.selectedData);
     if (!patched) return null;
@@ -261,9 +264,6 @@ class TowerStore {
     const towerName = share.tower_name?.trim();
     if (!towerName) {
       throw new Error("This share link has no tower name.");
-    }
-    if (!this.names.includes(towerName)) {
-      throw new Error(`Tower "${towerName}" is not available in this editor.`);
     }
 
     const shareId = parseShareRef(shareRef) ?? share.id;
@@ -322,13 +322,19 @@ class TowerStore {
 
   async exitSharePreview(): Promise<boolean> {
     if (!this.sharePreviewId) return false;
+
+    const name = this.selectedName;
     this.sharePreviewId = null;
     this.#shareSnapshotWikitext = "";
-    const name = this.selectedName;
     this.#lastLoadedName = null;
     this.manager?.clearCache(name);
-    if (name) return await this.load(name);
-    return false;
+
+    if (name && this.names.includes(name)) {
+      return await this.load(name);
+    } else {
+      this.unload();
+      return true;
+    }
   }
 
   async #reloadShareSnapshot(): Promise<boolean> {
@@ -369,6 +375,19 @@ class TowerStore {
 
   save(diffBaseline: Record<string, unknown> = {}): void {
     if (this.manager && this.selectedData) {
+      const name = this.selectedData.name;
+
+      if (this.sharePreviewId && name) {
+        const lower = name.toLowerCase();
+        const isKnown = this.names.some((n) => n.toLowerCase() === lower);
+        if (!isKnown) {
+          guaraCustomTower(name);
+          if (!this.names.some((n) => n.toLowerCase() === lower)) {
+            this.names = [...this.names, name].sort();
+          }
+        }
+      }
+
       const newText = this.manager.saveTower(this.selectedData, diffBaseline);
       if (newText) {
         this.effectiveWikitext = newText;
@@ -386,6 +405,12 @@ class TowerStore {
           this.sharePreviewId = null;
           this.#shareSnapshotWikitext = "";
           this.#lastLoadedName = this.selectedData.name;
+        }
+
+        if (name) {
+          this.manager.getTowerNames(true).then((updated) => {
+            this.names = updated;
+          });
         }
       }
     }
@@ -432,7 +457,7 @@ class TowerStore {
 
     const url = new URL(page.url);
     url.searchParams.delete("tower");
-    await goto(url, { keepFocus: true, noScroll: true });
+    goto(url, { keepFocus: true, noScroll: true });
     return true;
   }
 

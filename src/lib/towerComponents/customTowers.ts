@@ -46,3 +46,18 @@ export function removeCustomTower(name: string): void {
   const next = getCustomTowers().filter((n) => n !== name);
   localStorage.setItem(CUSTOM_TOWERS_KEY, JSON.stringify(next));
 }
+
+/**
+ * Loading custom tower towers received via share that didn't exist locally.
+ */
+export function guaraCustomTower(name: string): void {
+  const trimmed = name.trim();
+  if (!trimmed || !canUseLocalStorage()) return;
+
+  const lower = trimmed.toLowerCase();
+  const customs = getCustomTowers();
+  if (!customs.some((n) => n.toLowerCase() === lower)) {
+    const next = [...customs, trimmed].sort();
+    localStorage.setItem(CUSTOM_TOWERS_KEY, JSON.stringify(next));
+  }
+}
