@@ -1,5 +1,6 @@
 <script lang="ts">
   import { FileBraces, Table } from "@lucide/svelte";
+  import { towerStore } from "$lib/stores/tower.svelte";
 
   let {
     mode = $bindable<"cells" | "wiki">("cells"),
@@ -17,7 +18,10 @@
     class="mode-toggle-btn {mode === 'cells' && !disableCells
       ? 'active'
       : 'inactive'} {disableCells ? 'opacity-50 cursor-not-allowed' : ''}"
-    onclick={() => (mode = "cells")}
+    onclick={() => {
+      void towerStore.applyWikiWikitext();
+      mode = "cells";
+    }}
     disabled={disableCells}
   >
     <div class="flex items-center gap-1.5">

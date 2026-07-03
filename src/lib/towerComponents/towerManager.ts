@@ -128,8 +128,12 @@ export default class TowerManager {
     this.towerNames = this.towerNames.filter((n) => n !== name);
   }
 
-  async getTower(name: string): Promise<Tower | null> {
-    if (this.towers[name]) {
+  async getTower(
+    name: string,
+    opts?: { wikitext?: string; ephemeral?: boolean },
+  ): Promise<Tower | null> {
+    const ephemeral = opts?.ephemeral === true;
+    if (!ephemeral && this.towers[name]) {
       if (this.debug())
         console.log(`[TowerManager] Returning cached tower for ${name}`);
       return this.towers[name];
@@ -140,7 +144,7 @@ export default class TowerManager {
 
     const wikitextLoader = wikitextFiles[`./towers/${name}.wiki`];
     const custom = isCustomTower(name);
-    if (!wikitextLoader && !custom) return null;
+    if (!wikitextLoader && !custom && opts?.wikitext === undefined) return null;
 
     let currentSource = "";
     let currentText = "";
@@ -195,27 +199,32 @@ export default class TowerManager {
         return "";
       };
 
-      const { source, text } = await loadEffectiveWikitext(
-        this.dataKey ?? "Default",
-        name,
-        loadBase,
-      );
-      currentSource = source;
-      const { text: parseText, baseline: diffBaseline } = extractDirectives(text);
-      currentText = text;
+      if (opts?.wikitext !== undefined) {
+        currentSource = "override";
+        currentText = opts.wikitext;
+      } else {
+        const { source, text } = await loadEffectiveWikitext(
+          this.dataKey ?? "Default",
+          name,
+          loadBase,
+        );
+        currentSource = source;
+        currentText = text;
+      }
+      const { text: parseText, baseline: diffBaseline } = extractDirectives(currentText);
       if (this.debug())
         console.log(
-          `[TowerManager] Loaded effective wikitext from ${source}, length: ${text.length}, se-diff cells: ${Object.keys(diffBaseline).length}`,
+          `[TowerManager] Loaded effective wikitext from ${currentSource}, length: ${currentText.length}, se-diff cells: ${Object.keys(diffBaseline).length}`,
         );
 
       const parsed = parseWikitext(parseText);
       if (this.debug()) {
-        console.log(`[TowerManager] Using wikitext source: ${source}`);
+        console.log(`[TowerManager] Using wikitext source: ${currentSource}`);
         console.log("[TowerManager] Wikitext diagnostics:", {
-          hasVarOpenTag: /<var\b/i.test(text),
-          hasVarCloseTag: /<\/var>/i.test(text),
-          varBlockCount: countVarBlocks(text),
-          preview: text.slice(0, 300),
+          hasVarOpenTag: /<var\b/i.test(currentText),
+          hasVarCloseTag: /<\/var>/i.test(currentText),
+          varBlockCount: countVarBlocks(currentText),
+          preview: currentText.slice(0, 300),
         });
         console.log("[TowerManager] Parsed Variables:", parsed.variables);
       }
@@ -777,11 +786,12 @@ export default class TowerManager {
 
       const towerData = new Tower(name, towerJson);
       Object.assign(towerData, {
-        sourceWikitext: text,
-        wikitextSource: source,
+        sourceWikitext: currentText,
+        wikitextSource: currentSource,
         diffBaseline,
       });
 
+      if (ephemeral) return towerData;
       return (this.towers[name] = towerData);
     } catch (err) {
       console.error("Failed to load wikitext for", name, ":", err);
@@ -792,6 +802,7 @@ export default class TowerManager {
         wikitextSource: currentSource,
         diffBaseline,
       });
+      if (ephemeral) return towerData;
       return (this.towers[name] = towerData);
     }
   }

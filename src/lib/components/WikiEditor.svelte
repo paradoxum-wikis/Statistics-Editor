@@ -299,15 +299,31 @@
         Discard
       </Btn>
 
-      <Btn
-        variant="primary"
-        size="sm"
-        onclick={saveOverride}
-        disabled={!canSave || !towerStore.isDirty || status === "saving"}
-        title="Save as profile-specific override and reload tower"
-      >
-        Save Override
-      </Btn>
+      <Popover.Root>
+        <Popover.Trigger
+          class="btn btn-primary btn-sm"
+          disabled={!canSave || !towerStore.isDirty || status === "saving"}
+          title="Save source as profile-specific override"
+        >
+          {status === "saving" ? "Saving..." : "Save Override"}
+        </Popover.Trigger>
+        <Popover.Content class="popover-content">
+          <div class="space-y-2">
+            <h4 class="font-medium leading-none">Confirm Override</h4>
+            <p class="text-sm text-muted-foreground">
+              This writes the source neowtext directly to your profile and
+              reloads the tower, effectively setting a new baseline. This means
+              no new delta difference will be taken into account, for example.
+            </p>
+          </div>
+          <div class="flex justify-end mt-4 gap-2">
+            <Popover.Close class="btn btn-outline">Cancel</Popover.Close>
+            <Popover.Close class="btn btn-primary" onclick={saveOverride}>
+              Confirm
+            </Popover.Close>
+          </div>
+        </Popover.Content>
+      </Popover.Root>
     </div>
   </div>
 

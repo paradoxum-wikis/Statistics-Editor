@@ -10,6 +10,7 @@ import {
   addCustomTower,
   isCustomTower,
 } from "$lib/towerComponents/customTowers";
+import { mergeBaselineOnTowerDiff } from "$lib/utils/towah";
 
 /**
  * Manages tower selection and data reactively.
@@ -196,6 +197,27 @@ class TowerStore {
         this.isDirty = true;
       }
     }
+  }
+
+  async applyWikiWikitext(): Promise<void> {
+    if (!this.manager || !this.selectedData || !this.isDirty) return;
+    const text = this.effectiveWikitext;
+    if (!text.trim()) return;
+
+    const old = this.selectedData;
+    const next = await this.manager.getTower(this.selectedName, {
+      wikitext: text,
+      ephemeral: true,
+    });
+    if (!next) return;
+
+    this.baseline = mergeBaselineOnTowerDiff(old, next, this.baseline);
+    Object.assign(next, {
+      sourceWikitext: text,
+      wikitextSource: this.effectiveWikitextSource || "override",
+    });
+    this.selectedData = next;
+    this.refresh();
   }
 
   captureBaselineCell(key: string, value: unknown): void {
