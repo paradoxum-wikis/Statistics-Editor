@@ -46,8 +46,8 @@ const SETTING_DEFS = {
     id: "see-value-difference",
     tab: "editor",
     icon: Diff,
-    label: "See Value Difference",
-    description: "Shows how much a value changed compared to the original.",
+    label: "See Difference by Default",
+    description: "Always compare value differences when you open a tower.",
   },
   minTableWidth: {
     storageKey: "tdse_mctw",

@@ -1,4 +1,5 @@
-import { applyRofBug, stripRefs } from "$lib/utils/format";
+import { stripRefs } from "$lib/utils/format";
+import { stripDirectives } from "./directives";
 
 export interface TableData {
   name: string;
@@ -30,27 +31,12 @@ function createVariableReplacer(variables: Record<string, string>) {
 }
 
 /**
- * Strips ignore directives:
- *
- * - `<!-- \@se-ignore -->` for opening
- * - `<!-- \@/se-ignore -->` for closing
- * - `<!-- \@se-ignore/ -->` for self-closing
- */
-function stripSeIgnore(text: string): string {
-  return text
-    .replace(/<!--\s*@se-ignore\s*-->[\s\S]*?<!--\s*@\/se-ignore\s*-->/gi, "")
-    .split("\n")
-    .filter((line) => !/<!--\s*@se-ignore\/\s*-->/.test(line))
-    .join("\n");
-}
-
-/**
  * Parses wikitext content into variables and tabbed tables.
  */
 export function parseWikitext(content: string): ParsedWikitext {
   const variables: Record<string, string> = {};
   const tabs: Record<string, TableData[]> = {};
-  let text = stripSeIgnore(content.replace(/\r\n/g, "\n"));
+  let text = stripDirectives(content.replace(/\r\n/g, "\n"));
 
   if (!/<var\b/i.test(text) && /<\/var>/i.test(text)) {
     const closeIdx = text.search(/<\/var>/i);

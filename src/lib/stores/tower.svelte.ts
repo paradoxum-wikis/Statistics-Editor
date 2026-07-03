@@ -6,7 +6,10 @@ import { settingsStore } from "$lib/stores/settings.svelte";
 import type { GlobalModifier } from "$lib/utils/globalModifier";
 import { columnKeysEqual } from "$lib/utils/format";
 import { parseNumeric } from "$lib/utils/format";
-import { addCustomTower, isCustomTower } from "$lib/towerComponents/customTowers";
+import {
+  addCustomTower,
+  isCustomTower,
+} from "$lib/towerComponents/customTowers";
 
 /**
  * Manages tower selection and data reactively.
@@ -25,6 +28,7 @@ class TowerStore {
   baseline = $state.raw<Record<string, unknown>>({});
   baselineTowerId = $state<string | null>(null);
   baselineSkinName = $state<string | null>(null);
+  baselineLocked = $state(false);
 
   /**
    * Canonical source of truth for what the UI should be editing/viewing.
@@ -74,6 +78,7 @@ class TowerStore {
     this.baseline = {};
     this.baselineTowerId = null;
     this.baselineSkinName = null;
+    this.baselineLocked = false;
     const previousSelection = this.selectedName;
     this.selectedName = "";
     this.isLoading = true;
@@ -131,14 +136,23 @@ class TowerStore {
         this.originalWikitext = this.effectiveWikitext;
         this.isDirty = false;
 
-        if (this.baselineTowerId !== name) {
+        const savedDiff = (
+          tower as unknown as { diffBaseline?: Record<string, unknown> }
+        ).diffBaseline;
+        if (savedDiff && Object.keys(savedDiff).length > 0) {
+          this.baseline = savedDiff;
+          this.baselineTowerId = name;
+          this.baselineSkinName = null;
+          this.baselineLocked = true;
           if (settingsStore.debugMode)
             console.log(
-              `[TowerStore] Clearing baseline (new tower loaded: ${name}, old: ${this.baselineTowerId})`,
+              `[TowerStore] Loaded @se-diff baseline (${Object.keys(savedDiff).length} cells)`,
             );
+        } else {
           this.baseline = {};
           this.baselineTowerId = null;
           this.baselineSkinName = null;
+          this.baselineLocked = false;
         }
 
         if (settingsStore.debugMode)
@@ -184,17 +198,30 @@ class TowerStore {
     }
   }
 
+  captureBaselineCell(key: string, value: unknown): void {
+    if (key in this.baseline) return;
+    this.baseline = { ...this.baseline, [key]: value };
+  }
+
   /**
    * Persists changes to storage.
+   * @param diffBaseline Changed-cell baseline snapshot for @se-diff (empty removes block).
    */
-  save(): void {
+  save(diffBaseline: Record<string, unknown> = {}): void {
     if (this.manager && this.selectedData) {
-      const newText = this.manager.saveTower(this.selectedData);
+      const newText = this.manager.saveTower(this.selectedData, diffBaseline);
       if (newText) {
         this.effectiveWikitext = newText;
         this.originalWikitext = newText;
         this.effectiveWikitextSource = "override";
         this.isDirty = false;
+        if (Object.keys(diffBaseline).length > 0) {
+          this.baselineTowerId = this.selectedData.name;
+          this.baselineSkinName = null;
+          this.baselineLocked = true;
+        } else {
+          this.baselineLocked = false;
+        }
       }
     }
   }
@@ -259,6 +286,7 @@ class TowerStore {
     this.baseline = {};
     this.baselineTowerId = null;
     this.baselineSkinName = null;
+    this.baselineLocked = false;
 
     if (settingsStore.debugMode)
       console.log(`[TowerStore] Baseline cleared for reset.`);

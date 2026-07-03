@@ -10,6 +10,8 @@
   import { isCustomTower } from "$lib/towerComponents/customTowers";
   import { fly } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
+  import { Diff } from "@lucide/svelte";
+  import { mkCellKey, parseCellKey } from "$lib/neowtext/directives";
   import MoneyIcon from "$lib/assets/Income.png";
   import {
     formatNumber,
@@ -95,18 +97,14 @@
   });
 
   let focusedCell = $state<string | null>(null);
+  let showDiff = $state(settingsStore.seeValueDifference);
+
+  $effect(() => {
+    if (tower?.name) showDiff = settingsStore.seeValueDifference;
+  });
 
   function focusOnMount(node: HTMLElement) {
     node.focus();
-  }
-
-  function mkCellKey(
-    skinName: string,
-    tableIdx: number,
-    rowIdx: number,
-    header: string,
-  ): string {
-    return `${skinName}:${tableIdx}:${rowIdx}:${header}`;
   }
 
   const INVERSE_STATS = new Set([
@@ -149,6 +147,7 @@
     "aftershock delay",
     "confusion cooldown",
     "missle reload",
+    "charge-up",
   ]);
 
   function displayCellValue(header: string, value: unknown) {
@@ -335,7 +334,103 @@
     towerStore.baseline = next;
     towerStore.baselineTowerId = t.name;
     towerStore.baselineSkinName = skinName;
+    towerStore.baselineLocked = false;
   }
+
+  function buildTableConfigForSkin(
+    t: Tower,
+    skinName: string,
+    tableIdx: number,
+    sourceExtraTableIndex: number,
+  ): TableConfig | null {
+    const skin = t.getSkin(skinName);
+    if (!skin) return null;
+
+    if (tableIdx === 0) {
+      const headers =
+        skin.headers.length > 0 ? skin.headers : skin.levels.attributes;
+      const rawHeaders =
+        skin.rawHeaders?.length === headers.length ? skin.rawHeaders : headers;
+      return {
+        skinName,
+        tableIdx: 0,
+        sourceExtraTableIndex: -1,
+        variantPrefix: skin.variantPrefix,
+        tableName: skin.tableName,
+        headers,
+        rawHeaders,
+        rows: skin.levels.levels.slice(0, skin.rawRows.length),
+        moneyColumns: skin.moneyColumns,
+        readOnlyColumns: [] as string[],
+        skinData: skin,
+        cellFormulaTokens: undefined,
+        branchSuffix: undefined,
+      };
+    }
+
+    const extra = skin.extraTables?.[sourceExtraTableIndex];
+    if (!extra) return null;
+    return {
+      skinName,
+      tableIdx,
+      sourceExtraTableIndex,
+      variantPrefix: skin.variantPrefix,
+      tableName: extra.name,
+      headers: extra.headers,
+      rawHeaders: extra.rawHeaders,
+      rows: [...extra.rows],
+      moneyColumns: extra.moneyColumns,
+      readOnlyColumns: extra.readOnlyColumns,
+      skinData: null,
+      cellFormulaTokens: extra.cellFormulaTokens,
+      formulaTokens: skin.formulaTokens,
+      isPvp: skin.isPvp,
+      branchSuffix: extra.branchSuffix,
+    };
+  }
+
+  function getCompareValueForKey(
+    t: Tower,
+    key: string,
+  ): string | number | undefined {
+    const parsed = parseCellKey(key);
+    if (!parsed) return undefined;
+    const { skin, tableIdx, rowIdx, header } = parsed;
+    const config = buildTableConfigForSkin(t, skin, tableIdx, tableIdx - 1);
+    if (!config) return undefined;
+    const compareRows = buildDisplayRows(config, false, false);
+    const row = compareRows[rowIdx];
+    if (!row) return undefined;
+    if (header === "Level") return rowIdx;
+    return row[header];
+  }
+
+  function collectChangedBaseline(): Record<string, unknown> {
+    if (!tower) return {};
+    const out: Record<string, unknown> = {};
+    for (const [key, baseVal] of Object.entries(towerStore.baseline)) {
+      const current = getCompareValueForKey(tower, key);
+      const baseN = toDisplayNumber(baseVal, false);
+      const currentN = toDisplayNumber(current, false);
+      if (baseN == null || currentN == null) continue;
+      const delta = currentN - baseN;
+      if (Math.abs(delta) >= 1e-9) out[key] = baseVal;
+    }
+    return out;
+  }
+
+  const hasDiffData = $derived.by(() => {
+    towerStore.refreshTrigger;
+    if (!tower || Object.keys(towerStore.baseline).length === 0) return false;
+    for (const [key, baseVal] of Object.entries(towerStore.baseline)) {
+      const current = getCompareValueForKey(tower, key);
+      const baseN = toDisplayNumber(baseVal, false);
+      const currentN = toDisplayNumber(current, false);
+      if (baseN == null || currentN == null) continue;
+      if (Math.abs(currentN - baseN) >= 1e-9) return true;
+    }
+    return false;
+  });
 
   $effect(() => {
     const t = tower;
@@ -346,8 +441,9 @@
       return;
     }
     if (
-      towerStore.baselineTowerId !== t.name ||
-      towerStore.baselineSkinName == null
+      !towerStore.baselineLocked &&
+      (towerStore.baselineTowerId !== t.name ||
+        towerStore.baselineSkinName == null)
     ) {
       const skin = availableSkins.includes("Regular")
         ? "Regular"
@@ -447,15 +543,13 @@
     if (settingsStore.debugMode) {
       console.log(`[TowerEditor] Discard complete; rebuilding baseline...`);
     }
-    if (tower && selectedSkinName)
+    if (tower && selectedSkinName && !towerStore.baselineLocked)
       rebuildBaselineForSkin(tower, selectedSkinName);
     towerStore.refresh();
   }
 
   function handleSave() {
-    towerStore.save();
-    if (tower && selectedSkinName)
-      rebuildBaselineForSkin(tower, selectedSkinName);
+    towerStore.save(collectChangedBaseline());
   }
 
   let isFetching = $state(false);
@@ -476,7 +570,8 @@
 
         const refreshed = towerStore.selectedData;
         const skin = towerStore.selectedSkinName;
-        if (refreshed && skin) rebuildBaselineForSkin(refreshed, skin);
+        if (refreshed && skin && !towerStore.baselineLocked)
+          rebuildBaselineForSkin(refreshed, skin);
       } else {
         alert("Failed to fetch wikitext from the Wiki.");
       }
@@ -514,12 +609,27 @@
       : !config.readOnlyColumns.includes(clean);
   }
 
+  function captureBaselineIfMissing(
+    config: TableConfig,
+    rowIdx: number,
+    header: string,
+  ): void {
+    const key = mkCellKey(config.skinName, config.tableIdx, rowIdx, header);
+    if (key in towerStore.baseline) return;
+    const compareRows = buildDisplayRows(config, false, false);
+    const row = compareRows[rowIdx];
+    if (!row) return;
+    const val = header === "Level" ? rowIdx : row[header];
+    towerStore.captureBaselineCell(key, val);
+  }
+
   function commitEdit(
     config: TableConfig,
     rowIdx: number,
     header: string,
     value: string,
   ) {
+    captureBaselineIfMissing(config, rowIdx, header);
     if (config.skinData) {
       updateStatForSkin(config.skinData, rowIdx, header, value);
     } else {
@@ -724,7 +834,7 @@
                   </td>
                 {:else}
                   {@const editable = isCellEditable(config, header)}
-                  {@const deltaInfo = settingsStore.seeValueDifference
+                  {@const deltaInfo = showDiff
                     ? getDeltaForCell(
                         compareRows[rowIdx]?.[header],
                         config.skinName,
@@ -813,7 +923,7 @@
                             )}</button
                           >
                         {/if}
-                        {#if settingsStore.seeValueDifference && deltaInfo.delta !== null && deltaInfo.delta !== 0}
+                        {#if showDiff && deltaInfo.delta !== null && deltaInfo.delta !== 0}
                           <span class="delta-text {deltaInfo.className}">
                             ({formatDelta(deltaInfo.delta)})
                           </span>
@@ -845,7 +955,7 @@
                             )}</span
                           >
                         {/if}
-                        {#if settingsStore.seeValueDifference && deltaInfo.delta !== null && deltaInfo.delta !== 0}
+                        {#if showDiff && deltaInfo.delta !== null && deltaInfo.delta !== 0}
                           <span
                             class="delta-text text-xs {deltaInfo.className}"
                           >
@@ -942,6 +1052,21 @@
           </Popover.Content>
         </Popover.Root>
       {/if}
+      <Btn
+        variant={showDiff ? "primary" : "secondary"}
+        onclick={() => (showDiff = !showDiff)}
+        disabled={!hasDiffData}
+        title={hasDiffData
+          ? showDiff
+            ? "Hide value differences"
+            : "Show value differences"
+          : "No differences to display"}
+      >
+        <span class="inline-flex items-center gap-1.5">
+          <Diff class="size-4" />
+          {showDiff ? "Hide Difference" : "View Difference"}
+        </span>
+      </Btn>
       <Btn
         variant="secondary"
         onclick={handleDiscard}
