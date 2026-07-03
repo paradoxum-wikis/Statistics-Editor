@@ -206,9 +206,14 @@
     const refRe = /<ref\b([^>]*)>([\s\S]*?)<\/ref>|<ref\b([^>]*)\/>/gi;
     const tokRe = /\$[A-Z0-9_-]+\$/g;
 
+    const seen = new Set<string>();
     const add = (content: string, name: string | null) => {
       const t = content.trim();
-      if (t) entries.push({ content: t, name });
+      if (!t) return;
+      const key = name ? `n:${name}` : `c:${t}`;
+      if (seen.has(key)) return;
+      seen.add(key);
+      entries.push({ content: t, name });
     };
 
     function handleSrc(src: string) {
@@ -664,7 +669,7 @@
     {@html renderCellHtml(
       val,
       readOnly,
-    )}{#each entries as entry (entry.name ?? entry.content)}{@const n =
+    )}{#each entries as entry (entry.name ? `n:${entry.name}` : `c:${entry.content}`)}{@const n =
         getRefNum(entry.content, entry.name)}{@render refIndicator(
         entry.content,
         n,
