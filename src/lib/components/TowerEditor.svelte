@@ -1181,7 +1181,7 @@
             <div class="space-y-2">
               <h4 class="font-medium leading-none">Apply to Profile?</h4>
               <p class="text-sm text-muted-foreground">
-                This saves the shared stats (and any edits you made) to your
+                This saves the shared stats (and any edits you've made) to your
                 profile for this tower, replacing your existing tower in this
                 profile.
               </p>

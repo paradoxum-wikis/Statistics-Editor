@@ -148,7 +148,7 @@
     {#if towerStore.sharePreviewId}
       <Veperator />
       <span class="shrink-0 text-xs text-sky-600 dark:text-sky-400">
-        Shared
+        Sandboxed
       </span>
     {:else if towerStore.isDirty}
       <Veperator />
