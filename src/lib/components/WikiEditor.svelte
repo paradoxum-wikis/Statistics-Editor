@@ -164,14 +164,13 @@
     });
   }
 
-  function discardChanges() {
+  async function discardChanges() {
     if (!towerStore.isDirty) return;
 
-    towerStore.effectiveWikitext = towerStore.originalWikitext;
-    towerStore.isDirty = false;
+    await towerStore.discardChanges();
     status = "ready";
     errorMessage = null;
-    setEditorDoc(towerStore.originalWikitext);
+    setEditorDoc(towerStore.effectiveWikitext);
   }
 
   function saveOverride() {
@@ -294,7 +293,7 @@
       <Btn
         variant="secondary"
         size="sm"
-        onclick={discardChanges}
+        onclick={() => void discardChanges()}
         disabled={!towerStore.isDirty || status === "saving"}
         title="Discard unsaved changes (revert to last loaded effective wiki)"
       >
