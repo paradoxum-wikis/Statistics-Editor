@@ -7,6 +7,7 @@
   import { settingsStore } from "$lib/stores/settings.svelte";
   import { towerStore } from "$lib/stores/tower.svelte";
   import { noFetchTowers } from "$lib/services/fetchTowerWiki";
+  import { createShare, sharePageUrl } from "$lib/services/shareTower";
   import { isCustomTower } from "$lib/towerComponents/customTowers";
   import { fly } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
@@ -552,6 +553,50 @@
   }
 
   let isFetching = $state(false);
+  let shareOpen = $state(false);
+  let isSharing = $state(false);
+  let shareLink = $state<string | null>(null);
+  let shareError = $state<string | null>(null);
+
+  function resetShareState() {
+    shareLink = null;
+    shareError = null;
+  }
+
+  async function handleShare() {
+    if (!tower || isSharing) return;
+    isSharing = true;
+    shareError = null;
+    shareLink = null;
+    try {
+      const neowtext = towerStore.buildShareNeowtext(collectChangedBaseline());
+      if (!neowtext?.trim()) {
+        shareError = "Nothing to share for this tower.";
+        return;
+      }
+      const id = await createShare(neowtext, tower.name);
+      shareLink = sharePageUrl(id);
+      try {
+        await navigator.clipboard.writeText(shareLink);
+      } catch {
+        // clipboard may be blocked; link is still shown in the popover
+      }
+    } catch (e) {
+      shareError = e instanceof Error ? e.message : "Share failed.";
+    } finally {
+      isSharing = false;
+    }
+  }
+
+  function onShareOpenChange(open: boolean) {
+    if (!open) resetShareState();
+    else if (!shareLink && !shareError && !isSharing) void handleShare();
+  }
+
+  async function copyShareLink() {
+    if (!shareLink) return;
+    await navigator.clipboard.writeText(shareLink);
+  }
 
   async function handleFetchWiki() {
     if (!tower) return;
@@ -976,6 +1021,23 @@
 
 <div class="space-y-4">
   {#if tower}
+    {#if towerStore.sharePreviewId}
+      <div
+        class="flex flex-wrap items-center justify-between gap-2 rounded-[var(--radius)_0] border border-sky-500/30 bg-sky-500/10 px-3 py-2"
+      >
+        <p class="text-sm text-sky-950 dark:text-sky-100">
+          You are viewing a shared tower, your data stays unchanged until you
+          explicitly apply.
+        </p>
+        <Btn
+          variant="outline"
+          size="sm"
+          onclick={() => void towerStore.exitSharePreview()}
+        >
+          Back to My Stats
+        </Btn>
+      </div>
+    {/if}
     <Tabs.Root
       value={towerStore.selectedSkinName}
       onValueChange={(v) => (towerStore.selectedSkinName = v)}
@@ -1065,6 +1127,45 @@
           {showDiff ? "Hide Difference" : "View Difference"}
         </span>
       </Btn>
+      <Popover.Root bind:open={shareOpen} onOpenChange={onShareOpenChange}>
+        <Popover.Trigger
+          class="btn btn-secondary"
+          title="Create a short link to share this tower's stats"
+        >
+          Share URL
+        </Popover.Trigger>
+        <Popover.Content class="popover-content w-80">
+          <div class="space-y-3">
+            <p class="text-sm text-muted-foreground">
+              Share this lovely tower with a short link! Anyone who opens it can
+              view these stats in the editor.
+            </p>
+            {#if isSharing}
+              <p class="text-sm text-muted-foreground">Creating link…</p>
+            {:else if shareError}
+              <p class="text-sm text-destructive">{shareError}</p>
+              <div class="flex justify-end">
+                <Popover.Close class="btn btn-outline btn-sm"
+                  >Close</Popover.Close
+                >
+              </div>
+            {:else if shareLink}
+              <input
+                class="input input-sm w-full font-mono text-xs"
+                readonly
+                value={shareLink}
+                onclick={(e) => (e.currentTarget as HTMLInputElement).select()}
+              />
+              <div class="flex justify-end gap-2">
+                <Popover.Close class="btn btn-outline btn-sm"
+                  >Close</Popover.Close
+                >
+                <Btn size="sm" onclick={copyShareLink}>Copy</Btn>
+              </div>
+            {/if}
+          </div>
+        </Popover.Content>
+      </Popover.Root>
       <Btn
         variant="secondary"
         onclick={handleDiscard}
@@ -1072,13 +1173,41 @@
       >
         Clear Changes
       </Btn>
-      <Btn
-        variant="primary"
-        onclick={handleSave}
-        disabled={!towerStore.isDirty}
-      >
-        Save Changes
-      </Btn>
+      {#if towerStore.sharePreviewId}
+        <Popover.Root>
+          <Popover.Trigger
+            class="btn btn-primary"
+            disabled={!towerStore.isDirty}
+            title="Write these stats to your current profile"
+          >
+            Apply to Profile
+          </Popover.Trigger>
+          <Popover.Content class="popover-content">
+            <div class="space-y-2">
+              <h4 class="font-medium leading-none">Apply to Profile?</h4>
+              <p class="text-sm text-muted-foreground">
+                This saves the shared stats (and any edits you made) to your
+                profile for this tower, replacing your existing tower in this
+                profile.
+              </p>
+            </div>
+            <div class="flex justify-end mt-4 gap-2">
+              <Popover.Close class="btn btn-outline">Cancel</Popover.Close>
+              <Popover.Close class="btn btn-primary" onclick={handleSave}>
+                Confirm
+              </Popover.Close>
+            </div>
+          </Popover.Content>
+        </Popover.Root>
+      {:else}
+        <Btn
+          variant="primary"
+          onclick={handleSave}
+          disabled={!towerStore.isDirty}
+        >
+          Save Changes
+        </Btn>
+      {/if}
     </div>
   {:else}
     <div class="text-center py-8 text-body">

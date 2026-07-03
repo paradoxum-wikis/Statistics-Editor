@@ -11,6 +11,8 @@ import {
   isCustomTower,
 } from "$lib/towerComponents/customTowers";
 import { mergeBaselineOnTowerDiff } from "$lib/utils/towah";
+import { embedSeDiff } from "$lib/neowtext/directives";
+import { fetchShare, parseShareRef } from "$lib/services/shareTower";
 
 /**
  * Manages tower selection and data reactively.
@@ -45,7 +47,10 @@ class TowerStore {
   /**
    * Where the effective wikitext came from.
    */
-  effectiveWikitextSource = $state<"override" | "base" | "">("");
+  effectiveWikitextSource = $state<"override" | "base" | "share" | "">("");
+
+  sharePreviewId = $state<string | null>(null);
+  #shareSnapshotWikitext = "";
 
   /**
    * Original wikitext before any unsaved changes.
@@ -80,6 +85,8 @@ class TowerStore {
     this.baselineTowerId = null;
     this.baselineSkinName = null;
     this.baselineLocked = false;
+    this.sharePreviewId = null;
+    this.#shareSnapshotWikitext = "";
     const previousSelection = this.selectedName;
     this.selectedName = "";
     this.isLoading = true;
@@ -102,7 +109,14 @@ class TowerStore {
       this.effectiveWikitextSource = "";
       this.originalWikitext = "";
       this.isDirty = false;
+      this.sharePreviewId = null;
+      this.#shareSnapshotWikitext = "";
       return false;
+    }
+
+    if (this.sharePreviewId) {
+      this.sharePreviewId = null;
+      this.#shareSnapshotWikitext = "";
     }
 
     if (name === this.#lastLoadedName) {
@@ -229,6 +243,126 @@ class TowerStore {
    * Persists changes to storage.
    * @param diffBaseline Changed-cell baseline snapshot for @se-diff (empty removes block).
    */
+  buildShareNeowtext(diffBaseline: Record<string, unknown> = {}): string | null {
+    if (!this.manager || !this.selectedData) return null;
+    const patched = this.manager.generateWikitext(this.selectedData);
+    if (!patched) return null;
+    return embedSeDiff(patched, diffBaseline);
+  }
+
+  async importFromShare(shareRef: string): Promise<boolean> {
+    if (!this.manager) return false;
+
+    const share = await fetchShare(shareRef);
+    const towerName = share.tower_name?.trim();
+    if (!towerName) {
+      throw new Error("This share link has no tower name.");
+    }
+    if (!this.names.includes(towerName)) {
+      throw new Error(`Tower "${towerName}" is not available in this editor.`);
+    }
+
+    const shareId = parseShareRef(shareRef) ?? share.id;
+    this.isLoading = true;
+    this.selectedData = null;
+    this.sharePreviewId = null;
+    this.#shareSnapshotWikitext = "";
+
+    try {
+      const tower = await this.manager.getTower(towerName, {
+        wikitext: share.neowtext,
+        ephemeral: true,
+      });
+      if (!tower) return false;
+
+      this.selectedData = tower;
+      this.selectedName = towerName;
+      this.#lastLoadedName = `share:${towerName}:${shareId}`;
+      this.#shareSnapshotWikitext = share.neowtext;
+      this.sharePreviewId = shareId;
+
+      const anyTower = tower as unknown as {
+        sourceWikitext?: string;
+        diffBaseline?: Record<string, unknown>;
+      };
+      this.effectiveWikitext = anyTower.sourceWikitext ?? share.neowtext;
+      this.effectiveWikitextSource = "share";
+      this.originalWikitext = this.effectiveWikitext;
+      this.isDirty = false;
+
+      const savedDiff = anyTower.diffBaseline;
+      if (savedDiff && Object.keys(savedDiff).length > 0) {
+        this.baseline = savedDiff;
+        this.baselineTowerId = towerName;
+        this.baselineSkinName = null;
+        this.baselineLocked = true;
+      } else {
+        this.baseline = {};
+        this.baselineTowerId = null;
+        this.baselineSkinName = null;
+        this.baselineLocked = false;
+      }
+
+      const skins = tower.skinNames;
+      if (!skins.includes(this.selectedSkinName)) {
+        this.selectedSkinName = skins.includes("Regular")
+          ? "Regular"
+          : skins[0] || "";
+      }
+
+      return true;
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  async exitSharePreview(): Promise<boolean> {
+    if (!this.sharePreviewId) return false;
+    this.sharePreviewId = null;
+    this.#shareSnapshotWikitext = "";
+    const name = this.selectedName;
+    this.#lastLoadedName = null;
+    this.manager?.clearCache(name);
+    if (name) return await this.load(name);
+    return false;
+  }
+
+  async #reloadShareSnapshot(): Promise<boolean> {
+    if (!this.manager || !this.selectedName || !this.#shareSnapshotWikitext) {
+      return false;
+    }
+
+    const tower = await this.manager.getTower(this.selectedName, {
+      wikitext: this.#shareSnapshotWikitext,
+      ephemeral: true,
+    });
+    if (!tower) return false;
+
+    this.selectedData = tower;
+    this.effectiveWikitext = this.#shareSnapshotWikitext;
+    this.originalWikitext = this.#shareSnapshotWikitext;
+    this.effectiveWikitextSource = "share";
+    this.isDirty = false;
+
+    const savedDiff = (
+      tower as unknown as { diffBaseline?: Record<string, unknown> }
+    ).diffBaseline;
+    if (savedDiff && Object.keys(savedDiff).length > 0) {
+      this.baseline = savedDiff;
+      this.baselineTowerId = this.selectedName;
+      this.baselineSkinName = null;
+      this.baselineLocked = true;
+    } else {
+      this.baseline = {};
+      this.baselineTowerId = null;
+      this.baselineSkinName = null;
+      this.baselineLocked = false;
+    }
+
+    this.refresh();
+    return true;
+  }
+
   save(diffBaseline: Record<string, unknown> = {}): void {
     if (this.manager && this.selectedData) {
       const newText = this.manager.saveTower(this.selectedData, diffBaseline);
@@ -244,11 +378,21 @@ class TowerStore {
         } else {
           this.baselineLocked = false;
         }
+        if (this.sharePreviewId) {
+          this.sharePreviewId = null;
+          this.#shareSnapshotWikitext = "";
+          this.#lastLoadedName = this.selectedData.name;
+        }
       }
     }
   }
 
   async discardChanges(): Promise<boolean> {
+    if (this.sharePreviewId) {
+      if (this.isDirty) return await this.#reloadShareSnapshot();
+      return await this.exitSharePreview();
+    }
+
     this.effectiveWikitext = this.originalWikitext;
     this.isDirty = false;
     return await this.forceReload();
@@ -344,6 +488,8 @@ class TowerStore {
     this.effectiveWikitextSource = "";
     this.originalWikitext = "";
     this.isDirty = false;
+    this.sharePreviewId = null;
+    this.#shareSnapshotWikitext = "";
   }
 
   addGlobalModifierColumn(column: string): boolean {

@@ -39,9 +39,11 @@
   let profileName = $derived(profileStore.current);
 
   let sourceLabel = $derived(
-    towerStore.effectiveWikitextSource
-      ? `Using ${towerStore.effectiveWikitextSource} wiki`
-      : "Using loaded wiki",
+    towerStore.sharePreviewId
+      ? "Previewing shared stats (not saved to profile)"
+      : towerStore.effectiveWikitextSource
+        ? `Using ${towerStore.effectiveWikitextSource} wiki`
+        : "Using loaded wiki",
   );
 
   const editorTheme = EditorView.theme({
@@ -302,8 +304,10 @@
       <Popover.Root>
         <Popover.Trigger
           class="btn btn-primary btn-sm"
-          disabled={!canSave || !towerStore.isDirty || status === "saving"}
-          title="Save source as profile-specific override"
+          disabled={!canSave || !towerStore.isDirty || status === "saving" || !!towerStore.sharePreviewId}
+          title={towerStore.sharePreviewId
+            ? "Exit share preview or apply from the visual editor first"
+            : "Save source as profile-specific override"}
         >
           {status === "saving" ? "Saving..." : "Save Override"}
         </Popover.Trigger>
