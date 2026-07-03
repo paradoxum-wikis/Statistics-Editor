@@ -217,6 +217,10 @@ class TowerStore {
     if (!this.manager || !this.selectedData || !this.isDirty) return;
     const text = this.effectiveWikitext;
     if (!text.trim()) return;
+    if (
+      (this.selectedData as { sourceWikitext?: string }).sourceWikitext === text
+    )
+      return;
 
     const old = this.selectedData;
     const next = await this.manager.getTower(this.selectedName, {

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tick } from "svelte";
   import { FileBraces, Table } from "@lucide/svelte";
   import { towerStore } from "$lib/stores/tower.svelte";
 
@@ -11,6 +12,13 @@
     disableCells?: boolean;
     class?: string;
   } = $props();
+
+  async function switchToCells() {
+    mode = "cells";
+    await tick();
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+    await towerStore.applyWikiWikitext();
+  }
 </script>
 
 <div class="mode-toggle-group {className}">
@@ -18,10 +26,7 @@
     class="mode-toggle-btn {mode === 'cells' && !disableCells
       ? 'active'
       : 'inactive'} {disableCells ? 'opacity-50 cursor-not-allowed' : ''}"
-    onclick={() => {
-      void towerStore.applyWikiWikitext();
-      mode = "cells";
-    }}
+    onclick={() => void switchToCells()}
     disabled={disableCells}
   >
     <div class="flex items-center gap-1.5">
