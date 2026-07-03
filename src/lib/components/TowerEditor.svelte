@@ -10,7 +10,6 @@
   import { isCustomTower } from "$lib/towerComponents/customTowers";
   import { fly } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
-  import { Diff } from "@lucide/svelte";
   import { mkCellKey, parseCellKey } from "$lib/neowtext/directives";
   import MoneyIcon from "$lib/assets/Income.png";
   import {
@@ -1063,7 +1062,6 @@
           : "No differences to display"}
       >
         <span class="inline-flex items-center gap-1.5">
-          <Diff class="size-4" />
           {showDiff ? "Hide Difference" : "View Difference"}
         </span>
       </Btn>
