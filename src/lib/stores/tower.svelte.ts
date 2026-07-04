@@ -83,6 +83,9 @@ class TowerStore {
     this.effectiveWikitextSource = "";
     this.originalWikitext = "";
     this.isDirty = false;
+    this.baseline = {};
+    this.baselineTowerId = null;
+    this.baselineSkinName = null;
     this.#wikitextStale = false;
     this.baseline = {};
     this.baselineTowerId = null;
@@ -115,6 +118,9 @@ class TowerStore {
       this.#wikitextStale = false;
       this.sharePreviewId = null;
       this.#shareSnapshotWikitext = "";
+      this.baseline = {};
+      this.baselineTowerId = null;
+      this.baselineSkinName = null;
       return false;
     }
 
@@ -186,6 +192,9 @@ class TowerStore {
         this.originalWikitext = "";
         this.isDirty = false;
         this.#wikitextStale = false;
+        this.baseline = {};
+        this.baselineTowerId = null;
+        this.baselineSkinName = null;
         return false;
       }
     } finally {
@@ -289,6 +298,9 @@ class TowerStore {
     this.selectedData = null;
     this.sharePreviewId = null;
     this.#shareSnapshotWikitext = "";
+    this.baseline = {};
+    this.baselineTowerId = null;
+    this.baselineSkinName = null;
 
     try {
       const tower = await this.manager.getTower(towerName, {
@@ -542,6 +554,9 @@ class TowerStore {
     this.#wikitextStale = false;
     this.sharePreviewId = null;
     this.#shareSnapshotWikitext = "";
+    this.baseline = {};
+    this.baselineTowerId = null;
+    this.baselineSkinName = null;
   }
 
   addGlobalModifierColumn(column: string): boolean {

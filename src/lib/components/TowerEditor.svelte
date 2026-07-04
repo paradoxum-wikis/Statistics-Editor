@@ -411,26 +411,6 @@
     };
   }
 
-  $effect(() => {
-    const t = tower;
-    if (!t) {
-      towerStore.baseline = {};
-      towerStore.baselineTowerId = null;
-      towerStore.baselineSkinName = null;
-      return;
-    }
-    if (
-      !towerStore.baselineLocked &&
-      (towerStore.baselineTowerId !== t.name ||
-        towerStore.baselineSkinName == null)
-    ) {
-      const skin = availableSkins.includes("Regular")
-        ? "Regular"
-        : (availableSkins[0] ?? "");
-      if (skin) untrack(() => rebuildBaselineForSkin(t, skin));
-    }
-  });
-
   function updateStatForSkin(
     skinData: SkinData,
     levelIndex: number,
@@ -650,7 +630,7 @@
 
     if (applyGlobalModifier) towerStore.globalModifier;
 
-    const keyMap = new Map<string, string>();
+    const keyMap = new SvelteMap<string, string>();
     for (const k of Object.keys(config.rows[0])) {
       keyMap.set(k, stripRefs(k));
     }
@@ -723,9 +703,9 @@
   }
 
   const compareRowsCache = $derived.by(
-    (): Map<string, Record<string, string | number>[]> => {
+    (): SvelteMap<string, Record<string, string | number>[]> => {
       towerStore.refreshTrigger;
-      const cache = new Map<string, Record<string, string | number>[]>();
+      const cache = new SvelteMap<string, Record<string, string | number>[]>();
       const t = tower;
       if (!t) return cache;
       for (const skinName of t.skinNames) {
@@ -751,11 +731,11 @@
   );
 
   const displayRowsCache = $derived.by(
-    (): Map<string, Record<string, string | number>[]> => {
+    (): SvelteMap<string, Record<string, string | number>[]> => {
       towerStore.refreshTrigger;
       settingsStore.rofBug;
       towerStore.globalModifier;
-      const cache = new Map<string, Record<string, string | number>[]>();
+      const cache = new SvelteMap<string, Record<string, string | number>[]>();
       const data = activeSkinData;
       const skinName = towerStore.selectedSkinName;
       if (!data) return cache;
@@ -788,9 +768,7 @@
     },
   );
 
-  function getCompareValueForKey(
-    key: string,
-  ): string | number | undefined {
+  function getCompareValueForKey(key: string): string | number | undefined {
     const parsed = parseCellKey(key);
     if (!parsed) return undefined;
     const { skin, tableIdx, rowIdx, header } = parsed;
