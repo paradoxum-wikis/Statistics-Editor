@@ -6,6 +6,11 @@
   import TDSWLogo from "$lib/assets/tdswbanner.png";
   import { stripRefs } from "$lib/utils/format";
   import { renderCellHtml } from "$lib/neowtext/render";
+  import { towerStore } from "$lib/stores/tower.svelte";
+  import { imageLoader } from "$lib/services/imageLoader";
+  import { untrack } from "svelte";
+  import { SvelteMap, SvelteSet } from "svelte/reactivity";
+  import { settingsStore } from "$lib/stores/settings.svelte";
 
   type SummaryLine = {
     kind: "change" | "grant";
@@ -16,23 +21,17 @@
   };
 
   let {
-    upgradeImages,
     upgradeNames = {},
     upgradeSummaries = {},
     upgradeLevels = [],
     selectedUpgrade = $bindable("0"),
     numUpgrades,
-    loadingImages,
-    failedImages,
   }: {
-    upgradeImages: { [key: number]: string };
     upgradeNames?: { [key: number]: string };
     upgradeSummaries?: { [key: number]: SummaryLine[] };
     upgradeLevels?: string[];
     selectedUpgrade: string;
     numUpgrades: number;
-    loadingImages: Map<number, boolean>;
-    failedImages: Set<number>;
   } = $props();
 
   function isDetectionStat(stat: string): boolean {
@@ -41,6 +40,61 @@
       cleanStat === "Hidden" || cleanStat === "Flying" || cleanStat === "Lead"
     );
   }
+
+  let upgradeImages = new SvelteMap<number, string>();
+  let loadingImages = new SvelteMap<number, boolean>();
+  let failedImages = new SvelteSet<number>();
+
+  let selectedUpgradeIndex = $derived.by(() => {
+    const i = parseInt(selectedUpgrade);
+    return Number.isNaN(i) ? -1 : i;
+  });
+
+  $effect(() => {
+    imageLoader.setDebugMode(settingsStore.debugMode);
+  });
+
+  $effect(() => {
+    const tower = towerStore.selectedData;
+    const index = selectedUpgradeIndex;
+    towerStore.refreshTrigger;
+
+    if (!tower || index < 0) return;
+
+    const skin = tower.getSkin(towerStore.selectedSkinName);
+    if (!skin?.upgrades?.[index]) return;
+
+    const upgradeData = skin.upgrades[index];
+    const imageId = upgradeData.upgradeData.Image;
+    const towerName = tower.name;
+
+    const hasImage = untrack(() => upgradeImages.get(index));
+    const isCurrentlyLoading = imageLoader.isLoading(index);
+    const hasFailed = imageLoader.hasFailed(towerName, index);
+
+    if (!imageId || hasImage || isCurrentlyLoading || hasFailed) return;
+
+    // start loading
+    untrack(() => {
+      loadingImages.set(index, true);
+      failedImages.delete(index);
+    });
+
+    imageLoader.loadImage(towerName, index, imageId).then((url) => {
+      const currentTower = untrack(() => towerStore.selectedData);
+      if (currentTower?.name !== towerName) return;
+
+      untrack(() => {
+        if (url) {
+          upgradeImages.set(index, url);
+          failedImages.delete(index);
+        } else {
+          failedImages.add(index);
+        }
+        loadingImages.set(index, false);
+      });
+    });
+  });
 </script>
 
 <div class="mb-3 px-2">
@@ -78,9 +132,9 @@
         <div in:fade={{ duration: 250, easing: cubicOut }}>
           {#if loadingImages.get(index)}
             <div class="upgrade-image-container">Loading...</div>
-          {:else if upgradeImages[index]}
+          {:else if upgradeImages.get(index)}
             <img
-              src={upgradeImages[index]}
+              src={upgradeImages.get(index)}
               alt={`Upgrade ${index + 1}`}
               class="upgrade-bg"
             />

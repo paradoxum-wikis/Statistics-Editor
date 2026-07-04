@@ -4,9 +4,6 @@
   import DetectionEditor from "./DetectionEditor.svelte";
   import CostEditor from "./CostEditor.svelte";
   import { towerStore } from "$lib/stores/tower.svelte";
-  import { imageLoader } from "$lib/services/imageLoader";
-  import { untrack } from "svelte";
-import { SvelteMap, SvelteSet } from "svelte/reactivity";
   import { settingsStore } from "$lib/stores/settings.svelte";
   import { applyRofBug, toNumericValue, getRofBugVer } from "$lib/utils/format";
 
@@ -28,11 +25,7 @@ import { SvelteMap, SvelteSet } from "svelte/reactivity";
 
   let { class: className = "" }: { class?: string } = $props();
 
-  let upgradeImages = $state<{ [key: number]: string }>({});
-  let prevTowerRef: object | null = null;
   let selectedUpgrade = $state("0");
-  let loadingImages = new SvelteMap<number, boolean>();
-  let failedImages = new SvelteSet<number>();
 
   let currentSkin = $derived(
     towerStore.selectedData?.getSkin(towerStore.selectedSkinName),
@@ -63,6 +56,12 @@ import { SvelteMap, SvelteSet } from "svelte/reactivity";
     if (!currentSkin) return {};
     return buildUpgradeSummariesForeskin(currentSkin);
   });
+
+  let towerKey = $derived(
+    towerStore.selectedData
+      ? `${towerStore.selectedData.name}:${towerStore.selectedSkinName}`
+      : "none",
+  );
 
   const STATS_BY_ICON: Array<[icon: string, stats: string[]]> = [
     [DamageIcon, ["Damage"]],
@@ -231,107 +230,19 @@ import { SvelteMap, SvelteSet } from "svelte/reactivity";
 
     return result;
   }
-
-  $effect(() => {
-    imageLoader.setDebugMode(settingsStore.debugMode);
-    settingsStore.rofBug;
-    towerStore.refreshTrigger;
-
-    const tower = towerStore.selectedData;
-    if (!tower) {
-      untrack(() => {
-        upgradeImages = {};
-        loadingImages.clear();
-        failedImages.clear();
-        imageLoader.resetState();
-        prevTowerRef = null;
-      });
-      return;
-    }
-
-    const towerChanged = tower !== prevTowerRef;
-    if (towerChanged) {
-      imageLoader.clearTowerImageCache(tower.name);
-      prevTowerRef = tower;
-    }
-
-    const cachedImages = imageLoader.getCachedImages(tower.name);
-
-    untrack(() => {
-      upgradeImages = cachedImages ? { ...cachedImages } : {};
-
-      if (settingsStore.debugMode && cachedImages) {
-        console.log(`[Sidebar] Using cached images for ${tower.name}`);
-      }
-
-      if (towerChanged) {
-        selectedUpgrade = "0";
-      }
-      imageLoader.resetState();
-      loadingImages.clear();
-      failedImages.clear();
-    });
-  });
-
-  // loading upgrade images
-  $effect(() => {
-    const tower = towerStore.selectedData;
-    const upgrade = selectedUpgrade;
-    towerStore.refreshTrigger;
-
-    if (!tower) return;
-
-    const index = parseInt(upgrade);
-    if (isNaN(index)) return;
-
-    const skin = tower.getSkin(towerStore.selectedSkinName);
-    if (!skin?.upgrades?.[index]) return;
-
-    const upgradeData = skin.upgrades[index];
-    const imageId = upgradeData.upgradeData.Image;
-    const towerName = tower.name;
-
-    // check prevent duplicate calls
-    const hasImage = untrack(() => upgradeImages[index]);
-    const isCurrentlyLoading = imageLoader.isLoading(index);
-    const hasFailed = imageLoader.hasFailed(towerName, index);
-
-    if (!imageId || hasImage || isCurrentlyLoading || hasFailed) return;
-
-    untrack(() => {
-      loadingImages.set(index, true);
-      failedImages.delete(index);
-    });
-
-    imageLoader.loadImage(towerName, index, imageId).then((url) => {
-      const currentTower = untrack(() => towerStore.selectedData);
-      if (currentTower?.name !== towerName) return;
-
-      untrack(() => {
-        if (url) {
-          upgradeImages = { ...upgradeImages, [index]: url };
-          failedImages.delete(index);
-        } else {
-          failedImages.add(index);
-        }
-        loadingImages.set(index, false);
-      });
-    });
-  });
 </script>
 
 <aside class="flex h-full flex-col border-r border-border bg-card {className}">
   <div class="flex flex-1 flex-col overflow-y-auto p-3.5">
-    <UpgradeViewer
-      {upgradeImages}
-      {upgradeNames}
-      {upgradeSummaries}
-      {upgradeLevels}
-      bind:selectedUpgrade
-      {loadingImages}
-      {failedImages}
-      {numUpgrades}
-    />
+    {#key towerKey}
+      <UpgradeViewer
+        {upgradeNames}
+        {upgradeSummaries}
+        {upgradeLevels}
+        bind:selectedUpgrade
+        {numUpgrades}
+      />
+    {/key}
 
     <UpgradeEditor />
     <DetectionEditor />
