@@ -99,6 +99,29 @@
     };
   });
 
+  interface TableConfig {
+    skinName: string;
+    tableIdx: number;
+    sourceExtraTableIndex?: number;
+    variantPrefix?: string;
+    tableName: string;
+    headers: string[];
+    rawHeaders?: string[];
+    rows: Record<string, string | number>[];
+    moneyColumns: string[];
+    readOnlyColumns: string[];
+    skinData: SkinData | null;
+    formulaTokens?: Record<string, string>;
+    cellFormulaTokens?: Record<string, Record<string, string>>;
+    isPvp?: boolean;
+    branchSuffix?: string;
+    tableCache?: unknown;
+  }
+
+  function tableCacheKey(skinName: string, tableIdx: number): string {
+    return `${skinName}:${tableIdx}`;
+  }
+
   let focusedCell = $state<string | null>(null);
   let showDiff = $state(settingsStore.seeValueDifference);
 
@@ -301,7 +324,7 @@
     if (skinData.extraTables) {
       skinData.extraTables.forEach((extTable, idx) => {
         const tableIdx = idx + 1;
-        const resolvedRows = buildDisplayRows(
+        const resolvedRows = buildDisplayRowsInner(
           {
             skinName,
             tableIdx,
@@ -387,49 +410,6 @@
       branchSuffix: extra.branchSuffix,
     };
   }
-
-  function getCompareValueForKey(
-    t: Tower,
-    key: string,
-  ): string | number | undefined {
-    const parsed = parseCellKey(key);
-    if (!parsed) return undefined;
-    const { skin, tableIdx, rowIdx, header } = parsed;
-    const config = buildTableConfigForSkin(t, skin, tableIdx, tableIdx - 1);
-    if (!config) return undefined;
-    const compareRows = buildDisplayRows(config, false, false);
-    const row = compareRows[rowIdx];
-    if (!row) return undefined;
-    if (header === "Level") return rowIdx;
-    return row[header];
-  }
-
-  function collectChangedBaseline(): Record<string, unknown> {
-    if (!tower) return {};
-    const out: Record<string, unknown> = {};
-    for (const [key, baseVal] of Object.entries(towerStore.baseline)) {
-      const current = getCompareValueForKey(tower, key);
-      const baseN = toDisplayNumber(baseVal, false);
-      const currentN = toDisplayNumber(current, false);
-      if (baseN == null || currentN == null) continue;
-      const delta = currentN - baseN;
-      if (Math.abs(delta) >= 1e-9) out[key] = baseVal;
-    }
-    return out;
-  }
-
-  const hasDiffData = $derived.by(() => {
-    towerStore.refreshTrigger;
-    if (!tower || Object.keys(towerStore.baseline).length === 0) return false;
-    for (const [key, baseVal] of Object.entries(towerStore.baseline)) {
-      const current = getCompareValueForKey(tower, key);
-      const baseN = toDisplayNumber(baseVal, false);
-      const currentN = toDisplayNumber(current, false);
-      if (baseN == null || currentN == null) continue;
-      if (Math.abs(currentN - baseN) >= 1e-9) return true;
-    }
-    return false;
-  });
 
   $effect(() => {
     const t = tower;
@@ -619,24 +599,6 @@
     }
   }
 
-  interface TableConfig {
-    skinName: string;
-    tableIdx: number;
-    sourceExtraTableIndex?: number;
-    variantPrefix?: string;
-    tableName: string;
-    headers: string[];
-    rawHeaders?: string[];
-    rows: Record<string, string | number>[];
-    moneyColumns: string[];
-    readOnlyColumns: string[];
-    skinData: SkinData | null;
-    formulaTokens?: Record<string, string>;
-    cellFormulaTokens?: Record<string, Record<string, string>>;
-    isPvp?: boolean;
-    branchSuffix?: string;
-  }
-
   function isCellEditable(config: TableConfig, header: string): boolean {
     const clean = stripRefs(header);
     return config.skinData
@@ -652,7 +614,9 @@
   ): void {
     const key = mkCellKey(config.skinName, config.tableIdx, rowIdx, header);
     if (key in towerStore.baseline) return;
-    const compareRows = buildDisplayRows(config, false, false);
+    const compareRows =
+      compareRowsCache.get(tableCacheKey(config.skinName, config.tableIdx)) ??
+      [];
     const row = compareRows[rowIdx];
     if (!row) return;
     const val = header === "Level" ? rowIdx : row[header];
@@ -677,7 +641,7 @@
     }
   }
 
-  function buildDisplayRows(
+  function buildDisplayRowsInner(
     config: TableConfig,
     applyDisplayRofBug: boolean = true,
     applyGlobalModifier: boolean = true,
@@ -757,6 +721,113 @@
       return outRow;
     });
   }
+
+  const compareRowsCache = $derived.by(
+    (): Map<string, Record<string, string | number>[]> => {
+      towerStore.refreshTrigger;
+      const cache = new Map<string, Record<string, string | number>[]>();
+      const t = tower;
+      if (!t) return cache;
+      for (const skinName of t.skinNames) {
+        const skin = t.getSkin(skinName);
+        if (!skin) continue;
+        const extraCount = skin.extraTables?.length ?? 0;
+        for (let tableIdx = 0; tableIdx <= extraCount; tableIdx++) {
+          const config = buildTableConfigForSkin(
+            t,
+            skinName,
+            tableIdx,
+            tableIdx - 1,
+          );
+          if (!config || config.rows.length === 0) continue;
+          cache.set(
+            tableCacheKey(skinName, tableIdx),
+            buildDisplayRowsInner(config, false, false),
+          );
+        }
+      }
+      return cache;
+    },
+  );
+
+  const displayRowsCache = $derived.by(
+    (): Map<string, Record<string, string | number>[]> => {
+      towerStore.refreshTrigger;
+      settingsStore.rofBug;
+      towerStore.globalModifier;
+      const cache = new Map<string, Record<string, string | number>[]>();
+      const data = activeSkinData;
+      const skinName = towerStore.selectedSkinName;
+      if (!data) return cache;
+      for (const table of data.orderedTables) {
+        if (table.rows.length === 0) continue;
+        const config: TableConfig = {
+          skinName,
+          tableIdx: table.internalTableIdx,
+          sourceExtraTableIndex: table.sourceExtraTableIndex,
+          variantPrefix: table.variantPrefix,
+          tableName: table.name,
+          headers: table.headers,
+          rawHeaders: table.rawHeaders,
+          rows: table.rows,
+          moneyColumns: table.moneyColumns,
+          readOnlyColumns: table.readOnlyColumns,
+          skinData: table.skinData,
+          cellFormulaTokens: table.cellFormulaTokens,
+          formulaTokens: data.skin.formulaTokens,
+          isPvp: data.skin.isPvp,
+          branchSuffix: table.branchSuffix,
+          tableCache: data.skin.tableCache,
+        };
+        cache.set(
+          tableCacheKey(skinName, table.internalTableIdx),
+          buildDisplayRowsInner(config, true, true),
+        );
+      }
+      return cache;
+    },
+  );
+
+  function getCompareValueForKey(
+    key: string,
+  ): string | number | undefined {
+    const parsed = parseCellKey(key);
+    if (!parsed) return undefined;
+    const { skin, tableIdx, rowIdx, header } = parsed;
+    const compareRows = compareRowsCache.get(tableCacheKey(skin, tableIdx));
+    if (!compareRows) return undefined;
+    const row = compareRows[rowIdx];
+    if (!row) return undefined;
+    if (header === "Level") return rowIdx;
+    return row[header];
+  }
+
+  function collectChangedBaseline(): Record<string, unknown> {
+    if (!tower) return {};
+    const out: Record<string, unknown> = {};
+    for (const [key, baseVal] of Object.entries(towerStore.baseline)) {
+      const current = getCompareValueForKey(key);
+      const baseN = toDisplayNumber(baseVal, false);
+      const currentN = toDisplayNumber(current, false);
+      if (baseN == null || currentN == null) continue;
+      const delta = currentN - baseN;
+      if (Math.abs(delta) >= 1e-9) out[key] = baseVal;
+    }
+    return out;
+  }
+
+  const hasDiffData = $derived.by(() => {
+    compareRowsCache;
+    if (!tower || Object.keys(towerStore.baseline).length === 0) return false;
+    for (const [key, baseVal] of Object.entries(towerStore.baseline)) {
+      const current = getCompareValueForKey(key);
+      const baseN = toDisplayNumber(baseVal, false);
+      const currentN = toDisplayNumber(current, false);
+      if (baseN == null || currentN == null) continue;
+      if (Math.abs(currentN - baseN) >= 1e-9) return true;
+    }
+    return false;
+  });
 </script>
 
 {#snippet refIndicator(content: string, num: number)}
@@ -779,8 +850,10 @@
 {/snippet}
 
 {#snippet dataTable(config: TableConfig, isFirst: boolean)}
-  {@const displayRows = buildDisplayRows(config)}
-  {@const compareRows = buildDisplayRows(config, false, false)}
+  {@const displayRows =
+    displayRowsCache.get(tableCacheKey(config.skinName, config.tableIdx)) ?? []}
+  {@const compareRows =
+    compareRowsCache.get(tableCacheKey(config.skinName, config.tableIdx)) ?? []}
 
   {@const fTokens = (config.formulaTokens ?? {}) as Record<string, string>}
   {@const cft = config.cellFormulaTokens ?? {}}
@@ -1046,38 +1119,36 @@
         {/each}
       </Tabs.List>
 
-      {#each availableSkins as skinName (skinName)}
-        <Tabs.Content value={skinName}>
-          {#if activeSkinData}
-            {#each activeSkinData.orderedTables as table, orderedIdx (orderedIdx)}
-              {@render dataTable(
-                {
-                  skinName,
-                  tableIdx: table.internalTableIdx,
-                  sourceExtraTableIndex: table.sourceExtraTableIndex,
-                  tableName: table.name,
-                  headers: table.headers,
-                  rawHeaders: table.rawHeaders,
-                  rows: table.rows,
-                  moneyColumns: table.moneyColumns,
-                  readOnlyColumns: table.readOnlyColumns,
-                  skinData: table.skinData,
-                  cellFormulaTokens: table.cellFormulaTokens,
-                  formulaTokens: activeSkinData.skin.formulaTokens,
-                  isPvp: activeSkinData.skin.isPvp,
-                  branchSuffix: table.branchSuffix,
-                  tableCache: activeSkinData.skin.tableCache,
-                } as any,
-                orderedIdx === 0,
-              )}
-            {/each}
-          {:else if towerStore.selectedSkinName === skinName}
-            <div class="text-center py-4 text-muted-foreground">
-              No skin data available.
-            </div>
-          {/if}
-        </Tabs.Content>
-      {/each}
+      <Tabs.Content value={selectedSkinName}>
+        {#if activeSkinData}
+          {#each activeSkinData.orderedTables as table, orderedIdx (orderedIdx)}
+            {@render dataTable(
+              {
+                skinName: selectedSkinName,
+                tableIdx: table.internalTableIdx,
+                sourceExtraTableIndex: table.sourceExtraTableIndex,
+                tableName: table.name,
+                headers: table.headers,
+                rawHeaders: table.rawHeaders,
+                rows: table.rows,
+                moneyColumns: table.moneyColumns,
+                readOnlyColumns: table.readOnlyColumns,
+                skinData: table.skinData,
+                cellFormulaTokens: table.cellFormulaTokens,
+                formulaTokens: activeSkinData.skin.formulaTokens,
+                isPvp: activeSkinData.skin.isPvp,
+                branchSuffix: table.branchSuffix,
+                tableCache: activeSkinData.skin.tableCache,
+              } as any,
+              orderedIdx === 0,
+            )}
+          {/each}
+        {:else}
+          <div class="text-center py-4 text-muted-foreground">
+            No skin data available.
+          </div>
+        {/if}
+      </Tabs.Content>
     </Tabs.Root>
 
     <Separator class="mt-4" />

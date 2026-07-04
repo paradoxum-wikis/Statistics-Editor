@@ -237,8 +237,9 @@ class TowerStore {
     if (!text.trim()) return;
     if (
       (this.selectedData as { sourceWikitext?: string }).sourceWikitext === text
-    )
+    ) {
       return;
+    }
 
     const old = this.selectedData;
     const next = await this.manager.getTower(this.selectedName, {
