@@ -79,8 +79,8 @@
       skin.createData();
     }
 
-    towerStore.save();
     towerStore.refresh();
+    towerStore.syncWikitext();
   }
 </script>
 

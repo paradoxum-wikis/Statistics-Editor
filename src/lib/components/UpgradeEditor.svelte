@@ -32,8 +32,8 @@
       skin.upgrades[index].upgradeData.Title = value;
     }
 
-    towerStore.save();
     towerStore.refresh();
+    towerStore.syncWikitext();
   }
 
   function updateImage(index: number, value: string) {
@@ -47,8 +47,8 @@
     }
 
     imageLoader.clearUpgradeImageCache(tower.name, index);
-    towerStore.save();
     towerStore.refresh();
+    towerStore.syncWikitext();
   }
 </script>
 
