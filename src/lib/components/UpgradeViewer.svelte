@@ -60,7 +60,7 @@
 
 <Tabs.Root bind:value={selectedUpgrade}>
   <Tabs.List class="mb-4 flex space-x-1 overflow-x-auto">
-    {#each Array(numUpgrades) as _, index}
+    {#each Array(numUpgrades) as _, index (index)}
       <Tabs.Trigger
         value={index.toString()}
         class="w-full rounded-[var(--radius)_0] bg-muted px-2 py-1 text-xs transition-[background-color,color] duration-250 data-[state=active]:cursor-default data-[state=active]:bg-primary data-[state=active]:text-white"
@@ -70,7 +70,7 @@
     {/each}
   </Tabs.List>
 
-  {#each Array(numUpgrades) as _, index}
+  {#each Array(numUpgrades) as _, index (index)}
     <Tabs.Content value={index.toString()}>
       {#if selectedUpgrade === index.toString()}
         <div in:fade={{ duration: 250, easing: cubicOut }}>
@@ -95,7 +95,7 @@
           {#if upgradeSummaries[index]?.length}
             <div class="upgrade-summary-box">
               <div class="upgrade-summary-list">
-                {#each upgradeSummaries[index] as line}
+                {#each upgradeSummaries[index] as line, i (i)}
                   <div class="upgrade-summary-line">
                     <span class="upgrade-summary-marker">
                       {#if line.icon}

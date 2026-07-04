@@ -31,20 +31,10 @@
     { type: "Flying" as const, icon: FlyingIcon },
   ];
 
-  let selectedDetectionStart = $state<
-    Record<"Hidden" | "Lead" | "Flying", string>
-  >({
-    Hidden: "none",
-    Lead: "none",
-    Flying: "none",
-  });
-
-  $effect(() => {
-    selectedDetectionStart = {
-      Hidden: getDetectionStartLevel("Hidden")?.toString() ?? "none",
-      Lead: getDetectionStartLevel("Lead")?.toString() ?? "none",
-      Flying: getDetectionStartLevel("Flying")?.toString() ?? "none",
-    };
+  let selectedDetectionStart = $derived({
+    Hidden: getDetectionStartLevel("Hidden")?.toString() ?? "none",
+    Lead: getDetectionStartLevel("Lead")?.toString() ?? "none",
+    Flying: getDetectionStartLevel("Flying")?.toString() ?? "none",
   });
 
   function getDetectionStartLevel(
@@ -61,9 +51,6 @@
     type: "Hidden" | "Lead" | "Flying",
     startLevel: number | null,
   ) {
-    selectedDetectionStart[type] =
-      startLevel === null ? "none" : startLevel.toString();
-
     const tower = towerStore.selectedData;
     if (!tower) return;
 

@@ -30,12 +30,38 @@
 
   let upgradeImages = $state<{ [key: number]: string }>({});
   let prevTowerRef: object | null = null;
-  let upgradeNames = $state<{ [key: number]: string }>({});
-  let upgradeSummaries = $state<{ [key: number]: SummaryLine[] }>({});
-  let upgradeLevels = $state<string[]>([]);
   let selectedUpgrade = $state("0");
-  let numUpgrades = $state(0);
-  let loadingImages = $state(new SvelteMap<number, boolean>());
+  let loadingImages = new SvelteMap<number, boolean>();
+
+  let currentSkin = $derived(
+    towerStore.selectedData?.getSkin(towerStore.selectedSkinName),
+  );
+  let numUpgrades = $derived(currentSkin?.upgrades?.length ?? 0);
+
+  let upgradeNames = $derived.by(() => {
+    if (!currentSkin?.upgrades) return {};
+    const names: { [key: number]: string } = {};
+    currentSkin.upgrades.forEach((upgrade: any, index: number) => {
+      if (upgrade.upgradeData?.Title) {
+        names[index] = upgrade.upgradeData.Title;
+      }
+    });
+    return names;
+  });
+
+  let upgradeLevels = $derived.by(() => {
+    if (!currentSkin?.upgrades) return [];
+    return currentSkin.upgrades.map((upgrade: any, index: number) =>
+      upgrade.upgradeData?.Level != null
+        ? String(upgrade.upgradeData.Level)
+        : String(index + 1),
+    );
+  });
+
+  let upgradeSummaries = $derived.by(() => {
+    if (!currentSkin) return {};
+    return buildUpgradeSummariesForeskin(currentSkin);
+  });
 
   const STATS_BY_ICON: Array<[icon: string, stats: string[]]> = [
     [DamageIcon, ["Damage"]],
@@ -215,17 +241,13 @@
     if (!tower) {
       untrack(() => {
         upgradeImages = {};
-        upgradeNames = {};
-        upgradeSummaries = {};
-        numUpgrades = 0;
-        loadingImages = new SvelteMap();
+        loadingImages.clear();
         imageLoader.resetState();
         prevTowerRef = null;
       });
       return;
     }
 
-    const skin = tower.getSkin(towerStore.selectedSkinName);
     const towerChanged = tower !== prevTowerRef;
     if (towerChanged) {
       imageLoader.clearTowerImageCache(tower.name);
@@ -245,32 +267,7 @@
         selectedUpgrade = "0";
       }
       imageLoader.resetState();
-      loadingImages = new SvelteMap();
-    });
-
-    untrack(() => {
-      if (skin?.upgrades) {
-        numUpgrades = skin.upgrades.length;
-        const names: { [key: number]: string } = {};
-        const levels: string[] = [];
-        skin.upgrades.forEach((upgrade: any, index: number) => {
-          if (upgrade.upgradeData?.Title) {
-            names[index] = upgrade.upgradeData.Title;
-          }
-          levels[index] =
-            upgrade.upgradeData?.Level != null
-              ? String(upgrade.upgradeData.Level)
-              : String(index + 1);
-        });
-        upgradeNames = names;
-        upgradeLevels = levels;
-        upgradeSummaries = buildUpgradeSummariesForeskin(skin);
-      } else {
-        numUpgrades = 0;
-        upgradeNames = {};
-        upgradeLevels = [];
-        upgradeSummaries = {};
-      }
+      loadingImages.clear();
     });
   });
 

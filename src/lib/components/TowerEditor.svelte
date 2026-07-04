@@ -11,8 +11,11 @@
   import { isCustomTower } from "$lib/towerComponents/customTowers";
   import { fly } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
+  import { untrack } from "svelte";
   import { mkCellKey, parseCellKey } from "$lib/neowtext/directives";
   import MoneyIcon from "$lib/assets/Income.png";
+  import { SvelteSet, SvelteMap } from "svelte/reactivity";
+  import type { Attachment } from "svelte/attachments";
   import {
     formatNumber,
     formatValue,
@@ -92,22 +95,18 @@
     const info = getRofBugVer(tokens);
     return {
       type: info.type,
-      cols: new Set(info.cols),
+      cols: new SvelteSet(info.cols),
     };
   });
 
   let focusedCell = $state<string | null>(null);
   let showDiff = $state(settingsStore.seeValueDifference);
 
-  $effect(() => {
-    if (tower?.name) showDiff = settingsStore.seeValueDifference;
-  });
-
-  function focusOnMount(node: HTMLElement) {
+  const focusOnMount: Attachment<HTMLElement> = (node) => {
     node.focus();
-  }
+  };
 
-  const INVERSE_STATS = new Set([
+  const INVERSE_STATS = new SvelteSet([
     "cooldown",
     "firerate",
     "cost",
@@ -205,7 +204,7 @@
     const refRe = /<ref\b([^>]*)>([\s\S]*?)<\/ref>|<ref\b([^>]*)\/>/gi;
     const tokRe = /\$[A-Z0-9_-]+\$/g;
 
-    const seen = new Set<string>();
+    const seen = new SvelteSet<string>();
     const add = (content: string, name: string | null) => {
       const t = content.trim();
       if (!t) return;
@@ -448,7 +447,7 @@
       const skin = availableSkins.includes("Regular")
         ? "Regular"
         : (availableSkins[0] ?? "");
-      if (skin) rebuildBaselineForSkin(t, skin);
+      if (skin) untrack(() => rebuildBaselineForSkin(t, skin));
     }
   });
 
@@ -689,7 +688,7 @@
 
     if (applyGlobalModifier) towerStore.globalModifier;
 
-    const keyMap = new Map<string, string>();
+    const keyMap = new SvelteMap<string, string>();
     for (const k of Object.keys(config.rows[0])) {
       keyMap.set(k, stripRefs(k));
     }
@@ -788,7 +787,7 @@
   {@const fTokens = (config.formulaTokens ?? {}) as Record<string, string>}
   {@const cft = config.cellFormulaTokens ?? {}}
   {@const refNumberMap = (() => {
-    const map = new Map<string, number>();
+    const map = new SvelteMap<string, number>();
     let next = 1;
     const register = (src: unknown) => {
       const s = typeof src === "string" ? src : "";
@@ -915,7 +914,7 @@
                         {/if}
                         {#if isFocused}
                           <input
-                            use:focusOnMount
+                            {@attach focusOnMount}
                             type="text"
                             size="1"
                             class="table-input"
