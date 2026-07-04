@@ -6,7 +6,7 @@
   import { towerStore } from "$lib/stores/tower.svelte";
   import { imageLoader } from "$lib/services/imageLoader";
   import { untrack } from "svelte";
-  import { SvelteMap } from "svelte/reactivity";
+import { SvelteMap, SvelteSet } from "svelte/reactivity";
   import { settingsStore } from "$lib/stores/settings.svelte";
   import { applyRofBug, toNumericValue, getRofBugVer } from "$lib/utils/format";
 
@@ -32,6 +32,7 @@
   let prevTowerRef: object | null = null;
   let selectedUpgrade = $state("0");
   let loadingImages = new SvelteMap<number, boolean>();
+  let failedImages = new SvelteSet<number>();
 
   let currentSkin = $derived(
     towerStore.selectedData?.getSkin(towerStore.selectedSkinName),
@@ -234,7 +235,6 @@
   $effect(() => {
     imageLoader.setDebugMode(settingsStore.debugMode);
     settingsStore.rofBug;
-    towerStore.effectiveWikitext;
     towerStore.refreshTrigger;
 
     const tower = towerStore.selectedData;
@@ -242,6 +242,7 @@
       untrack(() => {
         upgradeImages = {};
         loadingImages.clear();
+        failedImages.clear();
         imageLoader.resetState();
         prevTowerRef = null;
       });
@@ -268,6 +269,7 @@
       }
       imageLoader.resetState();
       loadingImages.clear();
+      failedImages.clear();
     });
   });
 
@@ -298,6 +300,7 @@
 
     untrack(() => {
       loadingImages.set(index, true);
+      failedImages.delete(index);
     });
 
     imageLoader.loadImage(towerName, index, imageId).then((url) => {
@@ -307,6 +310,9 @@
       untrack(() => {
         if (url) {
           upgradeImages = { ...upgradeImages, [index]: url };
+          failedImages.delete(index);
+        } else {
+          failedImages.add(index);
         }
         loadingImages.set(index, false);
       });
@@ -323,6 +329,7 @@
       {upgradeLevels}
       bind:selectedUpgrade
       {loadingImages}
+      {failedImages}
       {numUpgrades}
     />
 

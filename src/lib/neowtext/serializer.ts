@@ -73,9 +73,9 @@ export function serializeTable(data: SkinDataJSON): string {
 
   lines.push(`! ${(RawHeaders?.length ? RawHeaders : Headers).join(" !! ")}`);
 
-  const sortedRows = [...RawRows].sort((a, b) => {
-    return Number(a["Level"]) - Number(b["Level"]);
-  });
+  const sortedRows = rowsAreLevelSorted(RawRows)
+    ? RawRows
+    : [...RawRows].sort((a, b) => Number(a["Level"]) - Number(b["Level"]));
 
   for (const row of sortedRows) {
     lines.push("|-");
@@ -85,6 +85,16 @@ export function serializeTable(data: SkinDataJSON): string {
   lines.push("|}");
 
   return lines.join("\n");
+}
+
+function rowsAreLevelSorted(rows: TableRow[]): boolean {
+  let previous = -Infinity;
+  for (const row of rows) {
+    const current = Number(row["Level"]);
+    if (!Number.isFinite(current) || current < previous) return false;
+    previous = current;
+  }
+  return true;
 }
 
 export function serializeVariables(variables: Record<string, string>): string {

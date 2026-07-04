@@ -44,6 +44,7 @@ class TowerStore {
    */
   refreshTrigger = $state(0);
   effectiveWikitext = $state<string>("");
+  #wikitextStale = false;
 
   /**
    * Where the effective wikitext came from.
@@ -82,6 +83,7 @@ class TowerStore {
     this.effectiveWikitextSource = "";
     this.originalWikitext = "";
     this.isDirty = false;
+    this.#wikitextStale = false;
     this.baseline = {};
     this.baselineTowerId = null;
     this.baselineSkinName = null;
@@ -110,6 +112,7 @@ class TowerStore {
       this.effectiveWikitextSource = "";
       this.originalWikitext = "";
       this.isDirty = false;
+      this.#wikitextStale = false;
       this.sharePreviewId = null;
       this.#shareSnapshotWikitext = "";
       return false;
@@ -151,6 +154,7 @@ class TowerStore {
         this.effectiveWikitextSource = anyTower.wikitextSource ?? "";
         this.originalWikitext = this.effectiveWikitext;
         this.isDirty = false;
+        this.#wikitextStale = false;
 
         const savedDiff = (
           tower as unknown as { diffBaseline?: Record<string, unknown> }
@@ -181,6 +185,7 @@ class TowerStore {
         this.effectiveWikitextSource = "";
         this.originalWikitext = "";
         this.isDirty = false;
+        this.#wikitextStale = false;
         return false;
       }
     } finally {
@@ -204,14 +209,26 @@ class TowerStore {
     this.refreshTrigger++;
   }
 
-  syncWikitext(): void {
-    if (this.manager && this.selectedData) {
-      const generated = this.manager.generateWikitext(this.selectedData);
-      if (generated) {
-        this.effectiveWikitext = generated;
-        this.isDirty = true;
-      }
+  markDirty(): void {
+    this.isDirty = true;
+    this.#wikitextStale = true;
+    this.refresh();
+  }
+
+  guaraWikitextSynced(): void {
+    if (!this.#wikitextStale) return;
+    if (!this.manager || !this.selectedData) return;
+    const generated = this.manager.generateWikitext(this.selectedData);
+    if (generated) {
+      this.effectiveWikitext = generated;
+      this.#wikitextStale = false;
     }
+  }
+
+  updateSourceWikitext(doc: string): void {
+    this.effectiveWikitext = doc;
+    this.isDirty = doc !== this.originalWikitext;
+    this.#wikitextStale = false;
   }
 
   async applyWikiWikitext(): Promise<void> {
@@ -252,9 +269,9 @@ class TowerStore {
     diffBaseline: Record<string, unknown> = {},
   ): string | null {
     if (!this.manager || !this.selectedData) return null;
-    const patched = this.manager.generateWikitext(this.selectedData);
-    if (!patched) return null;
-    return embedSeDiff(patched, diffBaseline);
+    this.guaraWikitextSynced();
+    if (!this.effectiveWikitext) return null;
+    return embedSeDiff(this.effectiveWikitext, diffBaseline);
   }
 
   async importFromShare(shareRef: string): Promise<boolean> {
@@ -293,6 +310,7 @@ class TowerStore {
       this.effectiveWikitextSource = "share";
       this.originalWikitext = this.effectiveWikitext;
       this.isDirty = false;
+      this.#wikitextStale = false;
 
       const savedDiff = anyTower.diffBaseline;
       if (savedDiff && Object.keys(savedDiff).length > 0) {
@@ -353,6 +371,7 @@ class TowerStore {
     this.originalWikitext = this.#shareSnapshotWikitext;
     this.effectiveWikitextSource = "share";
     this.isDirty = false;
+    this.#wikitextStale = false;
 
     const savedDiff = (
       tower as unknown as { diffBaseline?: Record<string, unknown> }
@@ -394,6 +413,7 @@ class TowerStore {
         this.originalWikitext = newText;
         this.effectiveWikitextSource = "override";
         this.isDirty = false;
+        this.#wikitextStale = false;
         if (Object.keys(diffBaseline).length > 0) {
           this.baselineTowerId = this.selectedData.name;
           this.baselineSkinName = null;
@@ -424,6 +444,7 @@ class TowerStore {
 
     this.effectiveWikitext = this.originalWikitext;
     this.isDirty = false;
+    this.#wikitextStale = false;
     return await this.forceReload();
   }
 
@@ -517,6 +538,7 @@ class TowerStore {
     this.effectiveWikitextSource = "";
     this.originalWikitext = "";
     this.isDirty = false;
+    this.#wikitextStale = false;
     this.sharePreviewId = null;
     this.#shareSnapshotWikitext = "";
   }

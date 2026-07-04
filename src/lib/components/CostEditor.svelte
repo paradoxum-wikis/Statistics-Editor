@@ -18,7 +18,7 @@
   );
 
   let costRows = $derived.by((): CostRow[] => {
-    towerStore.effectiveWikitext;
+    towerStore.refreshTrigger;
     if (!skinData?.formulaTokens) return [];
 
     const levels = skinData.levels?.levels ?? [];
@@ -61,8 +61,7 @@
       skin.setCost(level, value);
     }
 
-    towerStore.refresh();
-    towerStore.syncWikitext();
+    towerStore.markDirty();
   }
 </script>
 

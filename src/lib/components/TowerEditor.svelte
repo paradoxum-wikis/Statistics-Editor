@@ -470,8 +470,7 @@
       );
     }
     skinData.set(levelIndex, attribute, parsedValue);
-    towerStore.refresh();
-    towerStore.syncWikitext();
+    towerStore.markDirty();
   }
 
   function updateRowStat(
@@ -528,8 +527,7 @@
       skinData.refreshDerivedData();
     }
 
-    towerStore.refresh();
-    towerStore.syncWikitext();
+    towerStore.markDirty();
   }
 
   async function handleDiscard() {
@@ -688,7 +686,7 @@
 
     if (applyGlobalModifier) towerStore.globalModifier;
 
-    const keyMap = new SvelteMap<string, string>();
+    const keyMap = new Map<string, string>();
     for (const k of Object.keys(config.rows[0])) {
       keyMap.set(k, stripRefs(k));
     }

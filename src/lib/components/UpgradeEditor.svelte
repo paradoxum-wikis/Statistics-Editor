@@ -13,7 +13,7 @@
   );
 
   let upgradeRows = $derived.by((): UpgradeRow[] => {
-    towerStore.effectiveWikitext;
+    towerStore.refreshTrigger;
     if (!skinData?.upgrades?.length) return [];
     return skinData.upgrades.map((upgrade: any, index: number) => ({
       index,
@@ -32,8 +32,7 @@
       skin.upgrades[index].upgradeData.Title = value;
     }
 
-    towerStore.refresh();
-    towerStore.syncWikitext();
+    towerStore.markDirty();
   }
 
   function updateImage(index: number, value: string) {
@@ -47,8 +46,7 @@
     }
 
     imageLoader.clearUpgradeImageCache(tower.name, index);
-    towerStore.refresh();
-    towerStore.syncWikitext();
+    towerStore.markDirty();
   }
 </script>
 

@@ -23,6 +23,7 @@
     selectedUpgrade = $bindable("0"),
     numUpgrades,
     loadingImages,
+    failedImages,
   }: {
     upgradeImages: { [key: number]: string };
     upgradeNames?: { [key: number]: string };
@@ -31,6 +32,7 @@
     selectedUpgrade: string;
     numUpgrades: number;
     loadingImages: Map<number, boolean>;
+    failedImages: Set<number>;
   } = $props();
 
   function isDetectionStat(stat: string): boolean {
@@ -82,6 +84,8 @@
               alt={`Upgrade ${index + 1}`}
               class="upgrade-bg"
             />
+          {:else if failedImages.has(index)}
+            <div class="upgrade-image-container">Failed to load image</div>
           {:else}
             <div class="upgrade-image-container">No image available</div>
           {/if}

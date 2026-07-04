@@ -110,8 +110,7 @@
       return;
     }
 
-    towerStore.effectiveWikitext = doc;
-    towerStore.isDirty = dirty;
+    towerStore.updateSourceWikitext(doc);
     status = "ready";
 
     if (settingsStore.debugMode) {
@@ -135,6 +134,7 @@
   }
 
   function createEditor(container: HTMLElement) {
+    towerStore.guaraWikitextSynced();
     return new EditorView({
       state: EditorState.create({
         doc: towerStore.effectiveWikitext,
@@ -180,6 +180,7 @@
     errorMessage = null;
 
     try {
+      towerStore.guaraWikitextSynced();
       setWikiOverride(profileName, towerName, towerStore.effectiveWikitext);
       towerStore.isDirty = false;
       status = "saved";
@@ -232,9 +233,10 @@
   $effect(() => {
     if (!editorReady || !editorView) return;
 
-    const doc = towerStore.effectiveWikitext;
+    towerStore.refreshTrigger;
     untrack(() => {
-      setEditorDoc(doc);
+      towerStore.guaraWikitextSynced();
+      setEditorDoc(towerStore.effectiveWikitext);
     });
   });
 
@@ -303,7 +305,10 @@
       <Popover.Root>
         <Popover.Trigger
           class="btn btn-primary btn-sm"
-          disabled={!canSave || !towerStore.isDirty || status === "saving" || !!towerStore.sharePreviewId}
+          disabled={!canSave ||
+            !towerStore.isDirty ||
+            status === "saving" ||
+            !!towerStore.sharePreviewId}
           title={towerStore.sharePreviewId
             ? "Exit share preview or apply from the visual editor first"
             : "Save source as profile-specific override"}

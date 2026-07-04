@@ -66,8 +66,7 @@
       skin.createData();
     }
 
-    towerStore.refresh();
-    towerStore.syncWikitext();
+    towerStore.markDirty();
   }
 </script>
 

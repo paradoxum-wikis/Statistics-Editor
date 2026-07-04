@@ -16,8 +16,15 @@
   async function switchToCells() {
     mode = "cells";
     await tick();
-    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+    await new Promise<void>((resolve) =>
+      requestAnimationFrame(() => resolve()),
+    );
     await towerStore.applyWikiWikitext();
+  }
+
+  function switchToWiki() {
+    towerStore.guaraWikitextSynced();
+    mode = "wiki";
   }
 </script>
 
@@ -38,7 +45,7 @@
     class="mode-toggle-btn {mode === 'wiki' || disableCells
       ? 'active'
       : 'inactive'}"
-    onclick={() => (mode = "wiki")}
+    onclick={switchToWiki}
   >
     <div class="flex items-center gap-1.5">
       <FileBraces size={16} />
