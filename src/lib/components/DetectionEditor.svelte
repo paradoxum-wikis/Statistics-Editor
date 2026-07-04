@@ -13,17 +13,24 @@
   let skinData = $derived(
     towerStore.selectedData?.getSkin(towerStore.selectedSkinName),
   );
-  let levels = $derived(skinData?.levels.levels ?? []);
 
-  let levelOptions = $derived([
-    { value: "none", label: "∅" },
-    ...levels.map((_, i) => {
-      const upg = skinData?.upgrades[i - 1];
-      const displayLvl =
-        i === 0 ? "0" : (upg?.upgradeData?.Level ?? i.toString());
-      return { value: i.toString(), label: `Lvl. ${displayLvl}` };
-    }),
-  ]);
+  let levels = $derived.by(() => {
+    towerStore.refreshTrigger;
+    return skinData?.levels.levels ?? [];
+  });
+
+  let levelOptions = $derived.by(() => {
+    towerStore.refreshTrigger;
+    return [
+      { value: "none", label: "∅" },
+      ...levels.map((_, i) => {
+        const upg = skinData?.upgrades[i - 1];
+        const displayLvl =
+          i === 0 ? "0" : (upg?.upgradeData?.Level ?? i.toString());
+        return { value: i.toString(), label: `Lvl. ${displayLvl}` };
+      }),
+    ];
+  });
 
   const detectionTypes = [
     { type: "Hidden" as const, icon: HiddenIcon },
@@ -31,10 +38,13 @@
     { type: "Flying" as const, icon: FlyingIcon },
   ];
 
-  let selectedDetectionStart = $derived({
-    Hidden: getDetectionStartLevel("Hidden")?.toString() ?? "none",
-    Lead: getDetectionStartLevel("Lead")?.toString() ?? "none",
-    Flying: getDetectionStartLevel("Flying")?.toString() ?? "none",
+  let selectedDetectionStart = $derived.by(() => {
+    towerStore.refreshTrigger;
+    return {
+      Hidden: getDetectionStartLevel("Hidden")?.toString() ?? "none",
+      Lead: getDetectionStartLevel("Lead")?.toString() ?? "none",
+      Flying: getDetectionStartLevel("Flying")?.toString() ?? "none",
+    };
   });
 
   function getDetectionStartLevel(
