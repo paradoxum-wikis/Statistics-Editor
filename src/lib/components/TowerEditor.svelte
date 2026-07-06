@@ -191,10 +191,16 @@
     return `${delta > 0 ? "+" : ""}${formatNumber(delta)}`;
   }
 
-  function computeDeltaClass(header: string, delta: number): string {
-    if (delta === 0) return "";
+  function getDeltaClasses(header: string, delta: number) {
+    if (delta === 0) return { text: "", cell: "" };
+
     const inv = INVERSE_STATS.has(stripRefs(header).trim().toLowerCase());
-    return (inv ? delta < 0 : delta > 0) ? "text-green-500" : "text-red-500";
+    const isGood = inv ? delta < 0 : delta > 0;
+
+    return {
+      text: isGood ? "text-green-500" : "text-red-500",
+      cell: isGood ? "diff-positive" : "diff-negative",
+    };
   }
 
   function getDeltaForCell(
@@ -204,7 +210,7 @@
     levelIndex: number,
     header: string,
     cellReadOnly: boolean,
-  ): { delta: number | null; className: string } {
+  ): { delta: number | null; className: string; cellClass: string } {
     const baseN = toDisplayNumber(
       towerStore.baseline[mkCellKey(skinName, tableIdx, levelIndex, header)],
       cellReadOnly,
@@ -212,12 +218,15 @@
     const currentN = toDisplayNumber(currentValue, cellReadOnly);
 
     if (baseN == null || currentN == null)
-      return { delta: null, className: "" };
+      return { delta: null, className: "", cellClass: "" };
 
     const delta = currentN - baseN;
+    const classes = getDeltaClasses(header, delta);
+
     return {
       delta: Math.abs(delta) < 1e-9 ? 0 : delta,
-      className: computeDeltaClass(header, delta),
+      className: classes.text,
+      cellClass: classes.cell,
     };
   }
 
@@ -950,7 +959,7 @@
                         header,
                         !editable,
                       )
-                    : { delta: null, className: "" }}
+                    : { delta: null, className: "", cellClass: "" }}
                   {@const isMoney = config.moneyColumns.includes(header)}
                   {@const ck = mkCellKey(
                     config.skinName,
@@ -965,14 +974,14 @@
                     config,
                     rowIdx,
                   )}
-                  <td class="table-data">
+                  <td class="table-data {deltaInfo.cellClass}">
                     {#if editable}
                       <div
                         class="cell-wrapper {isMoney
                           ? 'money-wrapper'
                           : ''} {settingsStore.hideCellWrapper
                           ? 'hide-wrapper'
-                          : ''}"
+                          : ''} {deltaInfo.cellClass}"
                       >
                         {#if isMoney}
                           <img
@@ -1040,7 +1049,7 @@
                       <div
                         class="table-cell-readonly flex items-center justify-between gap-2 {settingsStore.hideCellWrapper
                           ? 'hide-wrapper'
-                          : ''}"
+                          : ''} {deltaInfo.cellClass}"
                       >
                         {#if isMoney}
                           <span class="money-value">
@@ -1395,7 +1404,7 @@
     width: 100%;
     border-radius: var(--radius) 0;
     border: 1px solid var(--input);
-    background: transparent;
+    background: transparent !important;
     padding: 0.25rem 0.75rem;
     transition: border-color 0.25s;
 
@@ -1467,6 +1476,54 @@
     font-size: 0.75rem;
     line-height: 1rem;
     white-space: nowrap;
+  }
+
+  .diff-positive {
+    .table-data&,
+    .cell-wrapper&,
+    .table-cell-readonly& {
+      background-color: color-mix(
+        in oklch,
+        transparent,
+        oklch(0.6 0.12 145 / 0.16)
+      ) !important;
+    }
+  }
+
+  .diff-negative {
+    .table-data&,
+    .cell-wrapper&,
+    .table-cell-readonly& {
+      background-color: color-mix(
+        in oklch,
+        transparent,
+        oklch(0.58 0.14 25 / 0.16)
+      ) !important;
+    }
+  }
+
+  tr.table-row:hover {
+    .diff-positive {
+      .cell-wrapper&,
+      .table-cell-readonly& {
+        background-color: color-mix(
+          in oklch,
+          transparent,
+          oklch(0.6 0.12 145 / 0.22)
+        ) !important;
+      }
+    }
+
+    .diff-negative {
+      .cell-wrapper&,
+      .table-cell-readonly& {
+        background-color: color-mix(
+          in oklch,
+          transparent,
+          oklch(0.58 0.14 25 / 0.22)
+        ) !important;
+      }
+    }
   }
 
   .money-icon {
