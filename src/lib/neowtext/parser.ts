@@ -93,6 +93,26 @@ export function parseWikitext(content: string): ParsedWikitext {
     }
   }
 
+  // $FNC-* and Table.Col refs are intentionally left for per row resolution
+  const keys = Object.keys(variables);
+  if (keys.length > 0) {
+    const replacer = createVariableReplacer(variables);
+    for (let pass = 0; pass < 4; pass++) {
+      let changed = false;
+      for (const k of keys) {
+        const v = variables[k];
+        if (v.includes("$")) {
+          const next = replacer(v);
+          if (next !== v) {
+            variables[k] = next;
+            changed = true;
+          }
+        }
+      }
+      if (!changed) break;
+    }
+  }
+
   const applyVariables = createVariableReplacer(variables);
   const tabberMatch = text.match(
     /<div[^>]*class=["'][^"']*mobile-tabber[^"']*["'][^>]*>\s*<tabber>([\s\S]*?)<\/tabber>/i,
