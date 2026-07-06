@@ -35,7 +35,7 @@
   const focusOnMount: Attachment<HTMLElement> = (node) => node.focus();
 </script>
 
-<div class="cell-body {editable || isMoney ? 'cell-flex' : ''}">
+{#snippet body()}
   {#if isMoney}
     <img
       src={MoneyIcon}
@@ -102,7 +102,15 @@
       ({formatDelta(deltaInfo.delta)})
     </span>
   {/if}
-</div>
+{/snippet}
+
+{#if settingsStore.hideCellWrapper}
+  <div class="cell-body {editable || isMoney ? 'cell-flex' : ''}">
+    {@render body()}
+  </div>
+{:else}
+  {@render body()}
+{/if}
 
 <style>
   .cell-flex {
@@ -136,10 +144,10 @@
     text-align: left;
     font: inherit;
     color: inherit;
-  }
 
-  .cell-display:disabled {
-    cursor: default;
+    &:disabled {
+      cursor: default;
+    }
   }
 
   .cell-multiline {

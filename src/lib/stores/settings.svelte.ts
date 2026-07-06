@@ -62,12 +62,11 @@ const SETTING_DEFS = {
   hideCellWrapper: {
     storageKey: "tdse_hcw",
     default: true,
-    id: "hide-cell-wrapper",
+    id: "compact-cell",
     tab: "appearance",
     icon: SquareDashedBottom,
-    label: "Hide Cell Wrapper",
-    description:
-      "Hides the visual wrapper inside table cells, letting the number sit directly in the cell.",
+    label: "Compact Cell",
+    description: "Uses tighter table cells, making tables leaner in general.",
   },
   debugMode: {
     storageKey: "tdse_debug",

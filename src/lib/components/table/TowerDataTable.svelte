@@ -123,8 +123,8 @@
                   class="table-data {deltaInfo.cellClass} {editable
                     ? 'editable-cell'
                     : 'readonly-cell'} {settingsStore.hideCellWrapper
-                    ? 'flat-cell'
-                    : 'boxed-cell'}"
+                    ? 'compact-cell'
+                    : 'spacious-cell'}"
                 >
                   <TowerTableCell
                     value={displayCellValue(
@@ -254,34 +254,22 @@
   }
 
   .table-data {
-    padding: 0.35rem;
     min-width: 100px;
     vertical-align: top;
   }
 
-  .flat-cell {
-    background: transparent;
+  .compact-cell {
+    padding: 0.35rem;
   }
 
-  .boxed-cell {
-    border: 1px solid var(--input);
-    border-radius: var(--radius) 0;
-    padding: 0.5rem 0.75rem;
-
-    &:focus-within {
-      border-color: var(--ring);
-    }
+  .spacious-cell {
+    padding: 0.5rem 1rem;
+    min-width: 120px;
   }
 
   .readonly-cell {
     color: var(--muted-foreground);
     font-style: italic;
-
-    &.boxed-cell {
-      background: var(--muted);
-      border-color: var(--border);
-      cursor: not-allowed;
-    }
   }
 
   .diff-positive {
