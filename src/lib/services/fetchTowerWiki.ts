@@ -15,7 +15,7 @@ export async function fetchTowerWiki(
     if (!sections) return null;
 
     const statsSection = sections.find(
-      (s: { anchor?: string }) => s.anchor === "Stats_Table",
+      (s: { anchor?: string }) => s.anchor === "Statistics",
     );
     if (!statsSection) return null;
 
