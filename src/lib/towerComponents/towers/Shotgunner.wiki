@@ -2,7 +2,7 @@
 $DPS$ = Damage * Bullet Count / Firerate
 $CE$ = Total Price / DPS
 $TP$ = $FNC-TOTALPRICE$
-$FNC-COST$ = 1125; 640; 1550; 6000; 18500
+$FNC-COST$ = 1225; 640; 1550; 6000; 18500
 $FNC-PVP-COST$ = 400; 150; 1050; 3000; 8500
 $FNC-DETECTION$ = 1; ; 2
 $FNC-PVP-DETECTION$ = 2; 2;
