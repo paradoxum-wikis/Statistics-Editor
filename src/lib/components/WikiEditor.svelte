@@ -30,21 +30,11 @@
     open?: boolean;
   } = $props();
 
-  let status = $state<"ready" | "saving" | "saved" | "error">("ready");
+  let saving = $state(false);
   let errorMessage = $state<string | null>(null);
   let editorContainer = $state<HTMLElement>();
   let editorView: EditorView | undefined;
   let editorReady = $state(false);
-
-  let profileName = $derived(profileStore.current);
-
-  let sourceLabel = $derived(
-    towerStore.sharePreviewId
-      ? "Previewing shared stats (not saved to profile)"
-      : towerStore.effectiveWikitextSource
-        ? `Using ${towerStore.effectiveWikitextSource} wiki`
-        : "Using loaded wiki",
-  );
 
   const editorTheme = EditorView.theme({
     "&": {
@@ -111,7 +101,6 @@
     }
 
     towerStore.updateSourceWikitext(doc);
-    status = "ready";
 
     if (settingsStore.debugMode) {
       console.log(
@@ -168,7 +157,6 @@
     if (!towerStore.isDirty) return;
 
     await towerStore.discardChanges();
-    status = "ready";
     errorMessage = null;
     setEditorDoc(towerStore.effectiveWikitext);
   }
@@ -176,19 +164,23 @@
   function saveOverride() {
     if (!towerName) return;
 
-    status = "saving";
+    saving = true;
     errorMessage = null;
 
     try {
       towerStore.guaraWikitextSynced();
-      setWikiOverride(profileName, towerName, towerStore.effectiveWikitext);
+      setWikiOverride(
+        profileStore.current,
+        towerName,
+        towerStore.effectiveWikitext,
+      );
       towerStore.isDirty = false;
-      status = "saved";
       void towerStore.forceReload();
     } catch (err) {
       console.error("[WikiEditor] saveOverride error:", err);
-      status = "error";
       errorMessage = err instanceof Error ? err.message : String(err);
+    } finally {
+      saving = false;
     }
   }
 
@@ -248,91 +240,75 @@
 </script>
 
 {#if open}
-  <div class="flex items-start justify-between gap-4">
-    <div class="space-y-1">
-      <p class="text-sm text-muted-foreground">
-        Editing:
-        <span class="font-medium text-foreground">
-          {towerName}
-        </span>
-        · Profile:
-        <span class="font-medium text-foreground">
-          {profileName}
-        </span>
-        · <span class="text-muted-foreground">{sourceLabel}</span>
-      </p>
-    </div>
-
-    <div class="flex items-center gap-2">
-      {#if !noFetchTowers.has(towerName) && !isCustomTower(towerName)}
-        <Popover.Root>
-          <Popover.Trigger
-            class="btn btn-secondary btn-sm"
-            disabled={isFetching || status === "saving"}
-            title="Fetch latest wikitext from the Wiki"
-          >
-            {isFetching ? "Fetching..." : "Fetch Latest Data"}
-          </Popover.Trigger>
-          <Popover.Content class="popover-content">
-            <div class="space-y-2">
-              <h4 class="font-medium leading-none">Confirm Fetch</h4>
-              <p class="text-sm text-muted-foreground">
-                Are you sure you want to replace your current data with the
-                latest from Tower Defense Simulator Wiki? This will overwrite
-                your local changes.
-              </p>
-            </div>
-            <div class="flex justify-end mt-4 gap-2">
-              <Popover.Close class="btn btn-outline">Cancel</Popover.Close>
-              <Popover.Close class="btn btn-primary" onclick={handleFetchWiki}>
-                Confirm
-              </Popover.Close>
-            </div>
-          </Popover.Content>
-        </Popover.Root>
-      {/if}
-
-      <Btn
-        variant="secondary"
-        size="sm"
-        onclick={() => void discardChanges()}
-        disabled={!towerStore.isDirty || status === "saving"}
-        title="Discard unsaved changes (revert to last loaded effective wiki)"
-      >
-        Discard
-      </Btn>
-
+  <div class="flex justify-end gap-2 mb-4">
+    {#if !noFetchTowers.has(towerName) && !isCustomTower(towerName)}
       <Popover.Root>
         <Popover.Trigger
-          class="btn btn-primary btn-sm"
-          disabled={!canSave ||
-            !towerStore.isDirty ||
-            status === "saving" ||
-            !!towerStore.sharePreviewId}
-          title={towerStore.sharePreviewId
-            ? "Exit share preview or apply from the visual editor first"
-            : "Save source as profile-specific override"}
+          class="btn btn-secondary btn-sm"
+          disabled={isFetching || saving}
+          title="Fetch latest wikitext from the Wiki"
         >
-          {status === "saving" ? "Saving..." : "Save Override"}
+          {isFetching ? "Fetching..." : "Fetch Latest Data"}
         </Popover.Trigger>
         <Popover.Content class="popover-content">
           <div class="space-y-2">
-            <h4 class="font-medium leading-none">Confirm Override</h4>
+            <h4 class="font-medium leading-none">Confirm Fetch</h4>
             <p class="text-sm text-muted-foreground">
-              This writes the source neowtext directly to your profile and
-              reloads the tower, effectively setting a new baseline. This means
-              no new delta difference will be taken into account, for example.
+              Are you sure you want to replace your current data with the latest
+              from Tower Defense Simulator Wiki? This will overwrite your local
+              changes.
             </p>
           </div>
           <div class="flex justify-end mt-4 gap-2">
             <Popover.Close class="btn btn-outline">Cancel</Popover.Close>
-            <Popover.Close class="btn btn-primary" onclick={saveOverride}>
+            <Popover.Close class="btn btn-primary" onclick={handleFetchWiki}>
               Confirm
             </Popover.Close>
           </div>
         </Popover.Content>
       </Popover.Root>
-    </div>
+    {/if}
+
+    <Btn
+      variant="secondary"
+      size="sm"
+      onclick={() => void discardChanges()}
+      disabled={!towerStore.isDirty || saving}
+      title="Discard unsaved changes (revert to last loaded effective wiki)"
+    >
+      Discard
+    </Btn>
+
+    <Popover.Root>
+      <Popover.Trigger
+        class="btn btn-primary btn-sm"
+        disabled={!canSave ||
+          !towerStore.isDirty ||
+          saving ||
+          !!towerStore.sharePreviewId}
+        title={towerStore.sharePreviewId
+          ? "Exit share preview or apply from the visual editor first"
+          : "Save source as profile-specific override"}
+      >
+        {saving ? "Saving..." : "Save Override"}
+      </Popover.Trigger>
+      <Popover.Content class="popover-content">
+        <div class="space-y-2">
+          <h4 class="font-medium leading-none">Confirm Override</h4>
+          <p class="text-sm text-muted-foreground">
+            This writes the source neowtext directly to your profile and reloads
+            the tower, effectively setting a new baseline. This means no new
+            delta difference will be taken into account, for example.
+          </p>
+        </div>
+        <div class="flex justify-end mt-4 gap-2">
+          <Popover.Close class="btn btn-outline">Cancel</Popover.Close>
+          <Popover.Close class="btn btn-primary" onclick={saveOverride}>
+            Confirm
+          </Popover.Close>
+        </div>
+      </Popover.Content>
+    </Popover.Root>
   </div>
 
   {#if errorMessage}
@@ -347,28 +323,6 @@
   {/if}
 
   <div class="space-y-2">
-    <div class="flex items-center justify-between">
-      <div class="text-xs text-muted-foreground">
-        {#if !editorReady}
-          Loading editor…
-        {:else if status === "saving"}
-          Saving...
-        {:else if status === "saved"}
-          Saved override.
-        {:else if towerStore.isDirty}
-          Unsaved changes
-        {:else}
-          Ready
-        {/if}
-      </div>
-
-      {#if settingsStore.debugMode}
-        <div class="text-xs text-muted-foreground">
-          Length: {towerStore.effectiveWikitext.length}
-        </div>
-      {/if}
-    </div>
-
     <div class="wiki-cm-host w-full" bind:this={editorContainer}></div>
 
     <p class="text-xs text-muted-foreground">
