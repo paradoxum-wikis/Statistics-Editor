@@ -6,9 +6,9 @@
   import type { GlobalModifier } from "$lib/utils/globalModifier";
   import {
     displayCellValue,
-    extractRefEntries,
     getCellRefs,
     getDeltaForCell,
+    getRefsFromSources,
     isCellEditable,
     type RefTokenRegistry,
     type TableConfig,
@@ -87,9 +87,13 @@
               <CellRefs
                 value={header}
                 readOnly={true}
-                entries={extractRefEntries(
+                entries={getRefsFromSources(
                   config.rawHeaders?.[hIdx] || header,
                   "",
+                  config,
+                  0,
+                  displayRows[0] ?? {},
+                  globalModifier,
                   fTokens,
                   refTokenRegistry,
                 )}
@@ -144,6 +148,8 @@
                       row[header],
                       config,
                       rowIdx,
+                      displayRows[rowIdx],
+                      globalModifier,
                       refTokenRegistry,
                     )}
                     {deltaInfo}

@@ -2,8 +2,8 @@ import { mkCellKey, parseCellKey } from "$lib/neowtext/directives";
 import { resolveToken, type TableCache } from "$lib/neowtext/functions";
 import type { GlobalModifier } from "$lib/utils/globalModifier";
 import {
-  applyGlobalModifierDisplay,
   applyGlobalModifierToRow,
+  applyGlobalModifierDisplay,
 } from "$lib/utils/globalModifier";
 import {
   applyRofBug,
@@ -429,7 +429,7 @@ export function extractRefEntries(
   const add = (content: string, name: string | null) => {
     const t = content.trim();
     if (!t) return;
-    const key = refEntryKey({ content: t, name });
+    const key = refEntryKey(t, name);
     if (!seen.has(key)) {
       seen.add(key);
       entries.push({ content: t, name });
@@ -512,7 +512,12 @@ function refNameFromToken(tok: string, attrs: string): string {
 function forEachSkinRefSource(
   activeSkin: ActiveSkinTables | null,
   displayRowsCache: Map<string, TableRow[]>,
-  fn: (src: string, tokens: Record<string, string>) => void,
+  fn: (
+    src: string,
+    config: TableConfig,
+    rowIdx: number,
+    tokens: Record<string, string>,
+  ) => void,
 ): void {
   if (!activeSkin) return;
 
@@ -523,35 +528,88 @@ function forEachSkinRefSource(
       displayRowsCache.get(tableCacheKey(config.skinName, config.tableIdx)) ??
       [];
 
-    const register = (src: unknown) => {
+    const register = (src: unknown, rowIdx: number) => {
       const s = typeof src === "string" ? src : "";
       if (!s.includes("<ref") && !/\$[A-Z]/.test(s)) return;
-      fn(s, tokens);
+      fn(s, config, rowIdx, tokens);
     };
 
     for (let i = 0; i < config.headers.length; i++) {
-      register(config.rawHeaders?.[i] ?? config.headers[i]);
+      register(config.rawHeaders?.[i] ?? config.headers[i], 0);
     }
 
     for (let r = 0; r < displayRows.length; r++) {
       const row = displayRows[r];
       for (const h of config.headers) {
-        register(cft[String(r)]?.[h] ?? cft[String(r)]?.[stripRefs(h)]);
+        register(cft[String(r)]?.[h] ?? cft[String(r)]?.[stripRefs(h)], r);
         const rv = row[h];
-        if (typeof rv === "string" && rv.includes("<ref")) register(rv);
+        if (typeof rv === "string" && rv.includes("<ref")) register(rv, r);
       }
     }
   }
 }
 
-function buildRefTokenRegistry(
+export function resolveRefContent(
+  content: string,
+  config: TableConfig,
+  rowIdx: number,
+  displayRow: TableRow,
+  globalModifier: GlobalModifier = { entries: [] },
+): string {
+  const row: Record<string, string | number> = {};
+  for (const [k, v] of Object.entries(displayRow)) {
+    if (v !== undefined && v !== null) row[stripRefs(k)] = v;
+  }
+  const evalContext = applyGlobalModifierToRow(globalModifier, row);
+  const levelVal =
+    row.Level !== undefined
+      ? String(row.Level) + (config.branchSuffix || "")
+      : String(rowIdx) + (config.branchSuffix || "");
+
+  const resolved = resolveToken(
+    content,
+    levelVal,
+    evalContext,
+    formulaTokens(config),
+    config.skinData?.isPvp ?? config.isPvp ?? false,
+    0,
+    config.skinData?.tableCache ?? config.tableCache,
+    false,
+    false,
+    undefined,
+    undefined,
+    config.variantPrefix,
+  );
+
+  return resolved !== undefined ? String(resolved) : content;
+}
+
+type RefSource = {
+  src: string;
+  config: TableConfig;
+  rowIdx: number;
+  tokens: Record<string, string>;
+};
+
+function collectSkinRefSources(
   activeSkin: ActiveSkinTables,
   displayRowsCache: Map<string, TableRow[]>,
+): RefSource[] {
+  const sources: RefSource[] = [];
+  forEachSkinRefSource(activeSkin, displayRowsCache, (src, config, rowIdx, tokens) => {
+    sources.push({ src, config, rowIdx, tokens });
+  });
+  return sources;
+}
+
+function buildRefTokenRegistry(
+  activeSkin: ActiveSkinTables,
+  sources: RefSource[],
 ): RefTokenRegistry {
   const vars = formulaTokens(activeSkin.orderedTables[0]);
   const counts = new Map<string, number>();
 
-  forEachSkinRefSource(activeSkin, displayRowsCache, (src) => {
+  for (const { src } of sources) {
     TOK_RE.lastIndex = 0;
     let m: RegExpExecArray | null;
     while ((m = TOK_RE.exec(src)) !== null) {
@@ -560,7 +618,7 @@ function buildRefTokenRegistry(
         counts.set(tok, (counts.get(tok) ?? 0) + 1);
       }
     }
-  });
+  }
 
   const byToken = new Map<string, RefTokenMeta>();
   const byName = new Map<string, RefTokenMeta>();
@@ -591,26 +649,70 @@ export type SkinRefState = {
 export function buildSkinRefState(
   activeSkin: ActiveSkinTables | null,
   displayRowsCache: Map<string, TableRow[]>,
+  globalModifier: GlobalModifier = { entries: [] },
 ): SkinRefState {
   if (!activeSkin?.orderedTables.length) {
     return { registry: EMPTY_REF_REGISTRY, notes: [], refNumberMap: new Map() };
   }
 
-  const registry = buildRefTokenRegistry(activeSkin, displayRowsCache);
+  const sources = collectSkinRefSources(activeSkin, displayRowsCache);
+  const registry = buildRefTokenRegistry(activeSkin, sources);
   const notes: SkinNote[] = [];
   const refNumberMap = new Map<string, number>();
   let next = 1;
 
-  forEachSkinRefSource(activeSkin, displayRowsCache, (src, tokens) => {
-    for (const entry of extractRefEntries(src, "", tokens, registry)) {
-      const key = refEntryKey(entry);
+  for (const { src, config, rowIdx, tokens } of sources) {
+    const displayRows =
+      displayRowsCache.get(tableCacheKey(config.skinName, config.tableIdx)) ??
+      [];
+    const displayRow = displayRows[rowIdx] ?? displayRows[0] ?? {};
+
+    for (const entry of getRefsFromSources(
+      src,
+      "",
+      config,
+      rowIdx,
+      displayRow,
+      globalModifier,
+      tokens,
+      registry,
+    )) {
+      const key = refEntryKey(entry.content, entry.name);
       if (refNumberMap.has(key)) continue;
       refNumberMap.set(key, next);
       notes.push({ num: next++, entry });
     }
-  });
+  }
 
   return { registry, notes, refNumberMap };
+}
+
+export function getRefsFromSources(
+  s1: string,
+  s2: string,
+  config: TableConfig,
+  rowIdx: number,
+  displayRow: TableRow,
+  globalModifier: GlobalModifier,
+  tokens?: Record<string, string>,
+  refTokenRegistry?: RefTokenRegistry,
+): RefEntry[] {
+  const entries = extractRefEntries(
+    s1,
+    s2,
+    tokens ?? formulaTokens(config),
+    refTokenRegistry,
+  );
+  return entries.map((entry) => ({
+    ...entry,
+    content: resolveRefContent(
+      entry.content,
+      config,
+      rowIdx,
+      displayRow,
+      globalModifier,
+    ),
+  }));
 }
 
 export function getCellRefs(
@@ -618,6 +720,8 @@ export function getCellRefs(
   sourceVal: unknown,
   config: TableConfig,
   rowIdx: number,
+  displayRow: TableRow,
+  globalModifier: GlobalModifier,
   refTokenRegistry?: RefTokenRegistry,
 ): RefEntry[] {
   const tokens = cellFormulaTokens(config)?.[String(rowIdx)] ?? {};
@@ -630,16 +734,20 @@ export function getCellRefs(
       }
     }
   }
-  return extractRefEntries(
+  return getRefsFromSources(
     typeof sourceVal === "string" ? sourceVal : "",
     typeof cellTok === "string" ? cellTok : "",
+    config,
+    rowIdx,
+    displayRow,
+    globalModifier,
     formulaTokens(config),
     refTokenRegistry,
   );
 }
 
-function refEntryKey(entry: RefEntry): string {
-  return entry.name ? `n:${entry.name}` : `c:${entry.content}`;
+export function refEntryKey(content: string, name?: string | null): string {
+  return name ? `n:${name}` : `c:${content}`;
 }
 
 export function getCompareValueForKey(

@@ -23,6 +23,7 @@
     buildDisplayRowsCache,
     buildSkinRefState,
     getCompareValueForKey as getCompareValueFromCache,
+    refEntryKey,
     rebuildBaselineForSkin,
     tableCacheKey,
     type TableConfig,
@@ -74,13 +75,17 @@
 
   const skinRefs = $derived.by(() => {
     towerStore.refreshTrigger;
-    return buildSkinRefState(activeSkinData, displayRowsCache);
+    return buildSkinRefState(
+      activeSkinData,
+      displayRowsCache,
+      towerStore.globalModifier,
+    );
   });
 
   const getSkinRefNum = $derived.by(() => {
     const map = skinRefs.refNumberMap;
     return (content: string, name?: string | null) =>
-      map.get(name ? `n:${name}` : `c:${content}`) ?? 1;
+      map.get(refEntryKey(content, name)) ?? 1;
   });
 
   let showDiff = $state(settingsStore.seeValueDifference);
