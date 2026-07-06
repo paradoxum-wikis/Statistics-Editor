@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Tabs, Popover, Tooltip } from "bits-ui";
+  import { Tabs, Popover } from "bits-ui";
   import Separator from "./smol/Separator.svelte";
   import Btn from "./smol/Btn.svelte";
   import type Tower from "$lib/towerComponents/tower";
@@ -9,31 +9,23 @@
   import { noFetchTowers } from "$lib/services/fetchTowerWiki";
   import { createShare, sharePageUrl } from "$lib/services/shareTower";
   import { isCustomTower } from "$lib/towerComponents/customTowers";
-  import { fly } from "svelte/transition";
-  import { cubicOut } from "svelte/easing";
-  import { untrack } from "svelte";
-  import {
-    mkCellKey,
-    parseCellKey,
-    stripSeDiff,
-  } from "$lib/neowtext/directives";
-  import MoneyIcon from "$lib/assets/Income.png";
-  import { SvelteSet, SvelteMap } from "svelte/reactivity";
-  import type { Attachment } from "svelte/attachments";
+  import { mkCellKey, stripSeDiff } from "$lib/neowtext/directives";
   import {
     formatNumber,
-    formatValue,
-    applyRofBug,
+    getRofBugVer,
     stripRefs,
     toDisplayNumber,
-    getRofBugVer,
   } from "$lib/utils/format";
-  import { renderCellHtml } from "$lib/neowtext/render";
-  import { resolveToken } from "$lib/neowtext/functions";
+  import TowerDataTable from "./table/TowerDataTable.svelte";
   import {
-    applyGlobalModifierDisplay,
-    applyGlobalModifierToRow,
-  } from "$lib/utils/globalModifier";
+    buildActiveSkinTables,
+    buildCompareRowsCache,
+    buildDisplayRowsCache,
+    getCompareValueForKey as getCompareValueFromCache,
+    rebuildBaselineForSkin,
+    tableCacheKey,
+    type TableConfig,
+  } from "$lib/towerTable";
 
   let {
     tower = null,
@@ -46,382 +38,66 @@
   const availableSkins = $derived(tower?.skinNames ?? []);
   const selectedSkinName = $derived(towerStore.selectedSkinName);
 
-  const activeSkinData = $derived.by(() => {
-    towerStore.refreshTrigger;
-    if (!tower) return null;
-    const skin = tower.getSkin(towerStore.selectedSkinName);
-    if (!skin) return null;
-    const primaryIdx = Number.isFinite(skin.primaryTableIndex)
-      ? Math.max(0, skin.primaryTableIndex)
-      : 0;
-    const headers =
-      skin.headers.length > 0 ? skin.headers : skin.levels.attributes;
-    const rawHeaders =
-      skin.rawHeaders?.length === headers.length ? skin.rawHeaders : headers;
-    const orderedTables = [
-      {
-        name: skin.tableName,
-        headers,
-        rawHeaders,
-        rows: skin.levels.levels.slice(0, skin.rawRows.length),
-        moneyColumns: skin.moneyColumns,
-        readOnlyColumns: [] as string[],
-        skinData: skin,
-        cellFormulaTokens: undefined,
-        branchSuffix: undefined,
-        internalTableIdx: 0,
-        sourceExtraTableIndex: -1,
-        variantPrefix: skin.variantPrefix,
-      },
-      ...(skin.extraTables?.map((t, extraIdx) => ({
-        ...t,
-        rows: [...t.rows],
-        skinData: null,
-        internalTableIdx: extraIdx + 1,
-        sourceExtraTableIndex: extraIdx,
-        variantPrefix: skin.variantPrefix,
-      })) ?? []),
-    ];
-
-    if (primaryIdx > 0 && primaryIdx < orderedTables.length) {
-      const [primaryTable] = orderedTables.splice(0, 1);
-      orderedTables.splice(primaryIdx, 0, primaryTable);
-    }
-
-    return {
-      skin,
-      orderedTables,
-    };
-  });
-
-  let rofInfo = $derived.by(() => {
-    const tokens = tower?.getSkin(selectedSkinName)?.formulaTokens;
-    const info = getRofBugVer(tokens);
+  const rofInfo = $derived.by(() => {
+    settingsStore.rofBug;
+    const info = getRofBugVer(tower?.getSkin(selectedSkinName)?.formulaTokens);
     return {
       type: info.type,
-      cols: new SvelteSet(info.cols),
+      cols: new Set(info.cols),
+      enabled: settingsStore.rofBug,
     };
   });
 
-  interface TableConfig {
-    skinName: string;
-    tableIdx: number;
-    sourceExtraTableIndex?: number;
-    variantPrefix?: string;
-    tableName: string;
-    headers: string[];
-    rawHeaders?: string[];
-    rows: Record<string, string | number>[];
-    moneyColumns: string[];
-    readOnlyColumns: string[];
-    skinData: SkinData | null;
-    formulaTokens?: Record<string, string>;
-    cellFormulaTokens?: Record<string, Record<string, string>>;
-    isPvp?: boolean;
-    branchSuffix?: string;
-    tableCache?: unknown;
-  }
+  const activeSkinData = $derived.by(() => {
+    towerStore.refreshTrigger;
+    return buildActiveSkinTables(tower, selectedSkinName);
+  });
 
-  function tableCacheKey(skinName: string, tableIdx: number): string {
-    return `${skinName}:${tableIdx}`;
-  }
+  const compareRowsCache = $derived.by(() => {
+    towerStore.refreshTrigger;
+    return buildCompareRowsCache(tower, rofInfo, towerStore.globalModifier);
+  });
 
-  let focusedCell = $state<string | null>(null);
-  let showDiff = $state(settingsStore.seeValueDifference);
-
-  const focusOnMount: Attachment<HTMLElement> = (node) => {
-    node.focus();
-  };
-
-  const INVERSE_STATS = new SvelteSet([
-    "cooldown",
-    "firerate",
-    "cost",
-    "total price",
-    "cost efficiency",
-    "price",
-    "rev-up time",
-    "bomb cooldown",
-    "burn tick",
-    "knife cooldown",
-    "spawnrate",
-    "deadzone range",
-    "rocket firerate",
-    "reload time",
-    "spread",
-    "recoil",
-    "swingrate",
-    "parry cooldown",
-    "max cost efficiency",
-    "spin time",
-    "income per second",
-    "income efficiency",
-    "missile cooldown",
-    "shield recharge speed",
-    "tower selection cooldown",
-    "charge time",
-    "aim time",
-    "cannon firerate",
-    "build time",
-    "tick",
-    "base spread",
-    "throw cooldown",
-    "spool-up time",
-    "min cost efficiency",
-    "lowest firerate",
-    "highest firerate",
-    "aftershock delay",
-    "confusion cooldown",
-    "missle reload",
-    "charge-up",
-  ]);
-
-  function displayCellValue(header: string, value: unknown) {
+  const displayRowsCache = $derived.by(() => {
+    towerStore.refreshTrigger;
     towerStore.globalModifier;
-    const raw =
-      value === undefined || value === null
-        ? value
-        : typeof value === "string" || typeof value === "number"
-          ? value
-          : undefined;
-    return applyGlobalModifierDisplay(towerStore.globalModifier, header, raw);
-  }
-
-  function formatDelta(delta: number): string {
-    return `${delta > 0 ? "+" : ""}${formatNumber(delta)}`;
-  }
-
-  function getDeltaClasses(header: string, delta: number) {
-    if (delta === 0) return { text: "", cell: "" };
-
-    const inv = INVERSE_STATS.has(stripRefs(header).trim().toLowerCase());
-    const isGood = inv ? delta < 0 : delta > 0;
-
-    return {
-      text: isGood ? "text-green-500" : "text-red-500",
-      cell: isGood ? "diff-positive" : "diff-negative",
-    };
-  }
-
-  function getDeltaForCell(
-    currentValue: string | number | undefined,
-    skinName: string,
-    tableIdx: number,
-    levelIndex: number,
-    header: string,
-    cellReadOnly: boolean,
-  ): { delta: number | null; className: string; cellClass: string } {
-    const baseN = toDisplayNumber(
-      towerStore.baseline[mkCellKey(skinName, tableIdx, levelIndex, header)],
-      cellReadOnly,
+    settingsStore.rofBug;
+    return buildDisplayRowsCache(
+      activeSkinData,
+      selectedSkinName,
+      rofInfo,
+      towerStore.globalModifier,
     );
-    const currentN = toDisplayNumber(currentValue, cellReadOnly);
+  });
 
-    if (baseN == null || currentN == null)
-      return { delta: null, className: "", cellClass: "" };
+  let showDiff = $state(settingsStore.seeValueDifference);
+  let isFetching = $state(false);
+  let shareOpen = $state(false);
+  let isSharing = $state(false);
+  let shareLink = $state<string | null>(null);
+  let shareError = $state<string | null>(null);
 
-    const delta = currentN - baseN;
-    const classes = getDeltaClasses(header, delta);
-
-    return {
-      delta: Math.abs(delta) < 1e-9 ? 0 : delta,
-      className: classes.text,
-      cellClass: classes.cell,
-    };
-  }
-
-  function extractRefEntries(
-    s1: string,
-    s2: string,
-    formulaTokens: Record<string, string>,
-  ): Array<{ content: string; name: string | null }> {
-    const sources = [s1, s2].filter(Boolean) as string[];
-    const entries: Array<{ content: string; name: string | null }> = [];
-    const refRe = /<ref\b([^>]*)>([\s\S]*?)<\/ref>|<ref\b([^>]*)\/>/gi;
-    const tokRe = /\$[A-Z0-9_-]+\$/g;
-
-    const seen = new SvelteSet<string>();
-    const add = (content: string, name: string | null) => {
-      const t = content.trim();
-      if (!t) return;
-      const key = name ? `n:${name}` : `c:${t}`;
-      if (seen.has(key)) return;
-      seen.add(key);
-      entries.push({ content: t, name });
-    };
-
-    function handleSrc(src: string) {
-      let m: RegExpExecArray | null;
-      refRe.lastIndex = 0;
-      while ((m = refRe.exec(src)) !== null) {
-        const attrs = m[1] || m[3] || "";
-        const content = m[2];
-        let name: string | null = null;
-        const nm = attrs.match(/name\s*=\s*["']?([^"'\s>]+)/i);
-        if (nm) name = nm[1];
-        if (content !== undefined) add(content, name);
-        else if (name) {
-          for (const def of Object.values(formulaTokens)) {
-            if (typeof def !== "string") continue;
-            const defNameM = def.match(
-              /<ref\b[^>]*name\s*=\s*["']?([^"'\s>]+)/i,
-            );
-            if (defNameM && defNameM[1] === name) {
-              const cm = def.match(/<ref\b[^>]*>([\s\S]*?)<\/ref>/i);
-              if (cm) add(cm[1], name);
-              break;
-            }
-          }
-        }
-      }
-    }
-
-    for (const src of sources) {
-      handleSrc(src);
-      tokRe.lastIndex = 0;
-      let t: RegExpExecArray | null;
-      while ((t = tokRe.exec(src)) !== null) {
-        const def = formulaTokens[t[0]];
-        if (typeof def === "string" && /^<ref\b/i.test(def.trim()))
-          handleSrc(def);
-      }
-    }
-    return entries;
-  }
-
-  function getCellRefs(
-    header: string,
-    sourceVal: unknown,
-    config: TableConfig,
-    rowIdx: number,
-  ) {
-    const ct = config.cellFormulaTokens?.[String(rowIdx)] ?? {};
-    let cellTok = ct[header] ?? ct[stripRefs(header)];
-    if (!cellTok)
-      for (const [k, v] of Object.entries(ct))
-        if (stripRefs(k) === stripRefs(header)) {
-          cellTok = v;
-          break;
-        }
-    const fTokens = (config.skinData?.formulaTokens ??
-      config.formulaTokens ??
-      {}) as Record<string, string>;
-    const srcStr = typeof sourceVal === "string" ? sourceVal : "";
-    const tokStr = typeof cellTok === "string" ? cellTok : "";
-    return extractRefEntries(srcStr, tokStr, fTokens);
-  }
-
-  function rebuildBaselineForSkin(t: Tower, skinName: string) {
+  function setBaselineForSkin(t: Tower, skinName: string) {
     if (settingsStore.debugMode) {
       console.log(
         `[TowerEditor] Rebuilding baseline for ${t.name} (skin: ${skinName})`,
       );
     }
-    const skinData = t.getSkin(skinName);
-    if (!skinData) return;
-
-    const headers =
-      skinData.headers.length > 0
-        ? skinData.headers
-        : skinData.levels.attributes;
-    const next: Record<string, string | number | boolean> = {};
-    const { levels } = skinData.levels;
-
-    for (let i = 0; i < levels.length; i++) {
-      for (const header of headers) {
-        next[mkCellKey(skinName, 0, i, header)] =
-          header === "Level" ? i : skinData.levels.getCell(i, header);
-      }
-    }
-
-    if (skinData.extraTables) {
-      skinData.extraTables.forEach((extTable, idx) => {
-        const tableIdx = idx + 1;
-        const resolvedRows = buildDisplayRowsInner(
-          {
-            skinName,
-            tableIdx,
-            tableName: extTable.name,
-            headers: extTable.headers,
-            rows: extTable.rows,
-            moneyColumns: extTable.moneyColumns,
-            readOnlyColumns: extTable.readOnlyColumns,
-            skinData: null,
-            cellFormulaTokens: extTable.cellFormulaTokens,
-            formulaTokens: skinData.formulaTokens,
-            isPvp: skinData.isPvp,
-            branchSuffix: extTable.branchSuffix,
-            tableCache: skinData.tableCache,
-          } as any,
-          false,
-          false,
-        );
-
-        for (let i = 0; i < resolvedRows.length; i++) {
-          for (const header of extTable.headers) {
-            next[mkCellKey(skinName, tableIdx, i, header)] =
-              header === "Level" ? i : resolvedRows[i][header];
-          }
-        }
-      });
-    }
-
-    towerStore.baseline = next;
+    towerStore.baseline = rebuildBaselineForSkin(
+      t,
+      skinName,
+      rofInfo,
+      towerStore.globalModifier,
+    );
     towerStore.baselineTowerId = t.name;
     towerStore.baselineSkinName = skinName;
     towerStore.baselineLocked = false;
   }
 
-  function buildTableConfigForSkin(
-    t: Tower,
-    skinName: string,
-    tableIdx: number,
-    sourceExtraTableIndex: number,
-  ): TableConfig | null {
-    const skin = t.getSkin(skinName);
-    if (!skin) return null;
-
-    if (tableIdx === 0) {
-      const headers =
-        skin.headers.length > 0 ? skin.headers : skin.levels.attributes;
-      const rawHeaders =
-        skin.rawHeaders?.length === headers.length ? skin.rawHeaders : headers;
-      return {
-        skinName,
-        tableIdx: 0,
-        sourceExtraTableIndex: -1,
-        variantPrefix: skin.variantPrefix,
-        tableName: skin.tableName,
-        headers,
-        rawHeaders,
-        rows: skin.levels.levels.slice(0, skin.rawRows.length),
-        moneyColumns: skin.moneyColumns,
-        readOnlyColumns: [] as string[],
-        skinData: skin,
-        cellFormulaTokens: undefined,
-        branchSuffix: undefined,
-      };
-    }
-
-    const extra = skin.extraTables?.[sourceExtraTableIndex];
-    if (!extra) return null;
-    return {
-      skinName,
-      tableIdx,
-      sourceExtraTableIndex,
-      variantPrefix: skin.variantPrefix,
-      tableName: extra.name,
-      headers: extra.headers,
-      rawHeaders: extra.rawHeaders,
-      rows: [...extra.rows],
-      moneyColumns: extra.moneyColumns,
-      readOnlyColumns: extra.readOnlyColumns,
-      skinData: null,
-      cellFormulaTokens: extra.cellFormulaTokens,
-      formulaTokens: skin.formulaTokens,
-      isPvp: skin.isPvp,
-      branchSuffix: extra.branchSuffix,
-    };
+  function parseEditValue(value: string): string | number | boolean {
+    if (value === "true") return true;
+    if (value === "false") return false;
+    return value.trim() !== "" && !isNaN(Number(value)) ? Number(value) : value;
   }
 
   function updateStatForSkin(
@@ -430,13 +106,8 @@
     attribute: string,
     value: string,
   ) {
-    if (!skinData || disabled) return;
-    let parsedValue: string | number | boolean = value;
-    if (value === "true") parsedValue = true;
-    else if (value === "false") parsedValue = false;
-    else if (value.trim() !== "" && !isNaN(Number(value)))
-      parsedValue = Number(value);
-
+    if (disabled) return;
+    const parsedValue = parseEditValue(value);
     if (settingsStore.debugMode) {
       console.log(
         `[TowerEditor] updateStat: Level ${levelIndex}, ${attribute} = ${parsedValue}`,
@@ -458,12 +129,7 @@
     const row = extraTable?.rows?.[rowIdx];
     if (!row) return;
 
-    let parsedValue: string | number | boolean = value;
-    if (value === "true") parsedValue = true;
-    else if (value === "false") parsedValue = false;
-    else if (value.trim() !== "" && !isNaN(Number(value)))
-      parsedValue = Number(value);
-
+    const parsedValue = parseEditValue(value);
     const formulaToken =
       extraTable?.cellFormulaTokens?.[String(rowIdx)]?.[header];
     if (typeof formulaToken === "string" && typeof parsedValue !== "boolean") {
@@ -492,15 +158,49 @@
     );
     if (level != null) {
       const upgradeStats = skinData.data?.Upgrades?.[level - 1]?.Stats;
-      if (upgradeStats && typeof upgradeStats === "object") {
+      if (upgradeStats && typeof upgradeStats === "object")
         upgradeStats[header] = parsedValue;
-      }
       skinData.set(level, header, parsedValue);
     } else {
       skinData.refreshDerivedData();
     }
 
     towerStore.markDirty();
+  }
+
+  function captureBaselineIfMissing(
+    config: TableConfig,
+    rowIdx: number,
+    header: string,
+  ) {
+    const key = mkCellKey(config.skinName, config.tableIdx, rowIdx, header);
+    if (key in towerStore.baseline) return;
+    const row = compareRowsCache.get(
+      tableCacheKey(config.skinName, config.tableIdx),
+    )?.[rowIdx];
+    if (row)
+      towerStore.captureBaselineCell(
+        key,
+        header === "Level" ? rowIdx : row[header],
+      );
+  }
+
+  function commitEdit(
+    config: TableConfig,
+    rowIdx: number,
+    header: string,
+    value: string,
+  ) {
+    captureBaselineIfMissing(config, rowIdx, header);
+    if (config.skinData) {
+      updateStatForSkin(config.skinData, rowIdx, header, value);
+      return;
+    }
+
+    const skin = activeSkinData?.skin;
+    const extraTableIndex = config.sourceExtraTableIndex ?? -1;
+    if (skin && extraTableIndex >= 0)
+      updateRowStat(skin, extraTableIndex, rowIdx, header, value);
   }
 
   async function handleDiscard() {
@@ -510,11 +210,8 @@
       );
     }
     await towerStore.discardChanges();
-    if (settingsStore.debugMode) {
-      console.log(`[TowerEditor] Discard complete; rebuilding baseline...`);
-    }
     if (tower && selectedSkinName && !towerStore.baselineLocked)
-      rebuildBaselineForSkin(tower, selectedSkinName);
+      setBaselineForSkin(tower, selectedSkinName);
     towerStore.refresh();
   }
 
@@ -528,15 +225,26 @@
     towerStore.refresh();
   }
 
+  function getCompareValueForKey(key: string): string | number | undefined {
+    return getCompareValueFromCache(compareRowsCache, key);
+  }
+
+  function collectChangedBaseline(): Record<string, unknown> {
+    if (!tower) return {};
+    const out: Record<string, unknown> = {};
+    for (const [key, baseVal] of Object.entries(towerStore.baseline)) {
+      const current = getCompareValueForKey(key);
+      const baseN = toDisplayNumber(baseVal, false);
+      const currentN = toDisplayNumber(current, false);
+      if (baseN == null || currentN == null) continue;
+      if (Math.abs(currentN - baseN) >= 1e-9) out[key] = baseVal;
+    }
+    return out;
+  }
+
   function handleSave() {
     towerStore.save(collectChangedBaseline());
   }
-
-  let isFetching = $state(false);
-  let shareOpen = $state(false);
-  let isSharing = $state(false);
-  let shareLink = $state<string | null>(null);
-  let shareError = $state<string | null>(null);
 
   function resetShareState() {
     shareLink = null;
@@ -569,8 +277,7 @@
   }
 
   async function copyShareLink() {
-    if (!shareLink) return;
-    await navigator.clipboard.writeText(shareLink);
+    if (shareLink) await navigator.clipboard.writeText(shareLink);
   }
 
   async function handleFetchWiki() {
@@ -590,7 +297,7 @@
         const refreshed = towerStore.selectedData;
         const skin = towerStore.selectedSkinName;
         if (refreshed && skin && !towerStore.baselineLocked)
-          rebuildBaselineForSkin(refreshed, skin);
+          setBaselineForSkin(refreshed, skin);
       } else {
         alert("Failed to fetch wikitext from the Wiki.");
       }
@@ -600,221 +307,6 @@
     } finally {
       isFetching = false;
     }
-  }
-
-  function isCellEditable(config: TableConfig, header: string): boolean {
-    const clean = stripRefs(header);
-    return config.skinData
-      ? !config.skinData.readOnlyAttributes.includes(clean) &&
-          (clean !== "Cost" || config.skinData.locator.hasLocation(header))
-      : !config.readOnlyColumns.includes(clean);
-  }
-
-  function captureBaselineIfMissing(
-    config: TableConfig,
-    rowIdx: number,
-    header: string,
-  ): void {
-    const key = mkCellKey(config.skinName, config.tableIdx, rowIdx, header);
-    if (key in towerStore.baseline) return;
-    const compareRows =
-      compareRowsCache.get(tableCacheKey(config.skinName, config.tableIdx)) ??
-      [];
-    const row = compareRows[rowIdx];
-    if (!row) return;
-    const val = header === "Level" ? rowIdx : row[header];
-    towerStore.captureBaselineCell(key, val);
-  }
-
-  function commitEdit(
-    config: TableConfig,
-    rowIdx: number,
-    header: string,
-    value: string,
-  ) {
-    captureBaselineIfMissing(config, rowIdx, header);
-    if (config.skinData) {
-      updateStatForSkin(config.skinData, rowIdx, header, value);
-    } else {
-      const skin = activeSkinData?.skin;
-      if (!skin) return;
-      const extraTableIndex = config.sourceExtraTableIndex ?? -1;
-      if (extraTableIndex < 0) return;
-      updateRowStat(skin, extraTableIndex, rowIdx, header, value);
-    }
-  }
-
-  function buildDisplayRowsInner(
-    config: TableConfig,
-    applyDisplayRofBug: boolean = true,
-    applyGlobalModifier: boolean = true,
-  ): Record<string, string | number>[] {
-    if (config.rows.length === 0) return [];
-
-    if (applyGlobalModifier) towerStore.globalModifier;
-
-    const keyMap = new SvelteMap<string, string>();
-    for (const k of Object.keys(config.rows[0])) {
-      keyMap.set(k, stripRefs(k));
-    }
-
-    return config.rows.map((r, rowIdx) => {
-      const cleanRow: Record<string, string | number> = {};
-
-      for (const [k, v] of Object.entries(r)) {
-        const ck = keyMap.get(k)!;
-        if (
-          applyDisplayRofBug &&
-          settingsStore.rofBug &&
-          rofInfo.cols.has(ck)
-        ) {
-          const n = Number(v);
-          cleanRow[ck] =
-            !isNaN(n) && n !== 0
-              ? applyRofBug(n, rofInfo.type)
-              : (v as string | number);
-        } else {
-          cleanRow[ck] = v as string | number;
-        }
-      }
-
-      const cellTokens =
-        config.skinData?.cellFormulaTokens ?? config.cellFormulaTokens;
-      const fTokens =
-        config.skinData?.formulaTokens ?? config.formulaTokens ?? {};
-      const isPvp = config.skinData?.isPvp ?? config.isPvp ?? false;
-      const tCache = config.skinData?.tableCache ?? (config as any).tableCache;
-      const tokens = cellTokens?.[String(rowIdx)];
-      let evalContext = applyGlobalModifier
-        ? applyGlobalModifierToRow(towerStore.globalModifier, cleanRow)
-        : cleanRow;
-      if (tokens) {
-        for (let pass = 0; pass < 2; pass++) {
-          for (const [col, tok] of Object.entries(tokens)) {
-            const levelVal =
-              cleanRow["Level"] !== undefined
-                ? String(cleanRow["Level"]) + (config.branchSuffix || "")
-                : String(rowIdx) + (config.branchSuffix || "");
-            const res = resolveToken(
-              tok,
-              levelVal,
-              evalContext,
-              fTokens,
-              isPvp,
-              0,
-              tCache,
-              applyDisplayRofBug,
-              false,
-              undefined,
-              undefined,
-              config.variantPrefix,
-            );
-            if (res != null) {
-              const colKey = stripRefs(col);
-              cleanRow[colKey] = res;
-              evalContext[colKey] = res;
-            }
-          }
-        }
-      }
-
-      const outRow = { ...r };
-      for (const k of Object.keys(r))
-        outRow[k] = cleanRow[keyMap.get(k)!] ?? r[k];
-      return outRow;
-    });
-  }
-
-  const compareRowsCache = $derived.by(
-    (): SvelteMap<string, Record<string, string | number>[]> => {
-      towerStore.refreshTrigger;
-      const cache = new SvelteMap<string, Record<string, string | number>[]>();
-      const t = tower;
-      if (!t) return cache;
-      for (const skinName of t.skinNames) {
-        const skin = t.getSkin(skinName);
-        if (!skin) continue;
-        const extraCount = skin.extraTables?.length ?? 0;
-        for (let tableIdx = 0; tableIdx <= extraCount; tableIdx++) {
-          const config = buildTableConfigForSkin(
-            t,
-            skinName,
-            tableIdx,
-            tableIdx - 1,
-          );
-          if (!config || config.rows.length === 0) continue;
-          cache.set(
-            tableCacheKey(skinName, tableIdx),
-            buildDisplayRowsInner(config, false, false),
-          );
-        }
-      }
-      return cache;
-    },
-  );
-
-  const displayRowsCache = $derived.by(
-    (): SvelteMap<string, Record<string, string | number>[]> => {
-      towerStore.refreshTrigger;
-      settingsStore.rofBug;
-      towerStore.globalModifier;
-      const cache = new SvelteMap<string, Record<string, string | number>[]>();
-      const data = activeSkinData;
-      const skinName = towerStore.selectedSkinName;
-      if (!data) return cache;
-      for (const table of data.orderedTables) {
-        if (table.rows.length === 0) continue;
-        const config: TableConfig = {
-          skinName,
-          tableIdx: table.internalTableIdx,
-          sourceExtraTableIndex: table.sourceExtraTableIndex,
-          variantPrefix: table.variantPrefix,
-          tableName: table.name,
-          headers: table.headers,
-          rawHeaders: table.rawHeaders,
-          rows: table.rows,
-          moneyColumns: table.moneyColumns,
-          readOnlyColumns: table.readOnlyColumns,
-          skinData: table.skinData,
-          cellFormulaTokens: table.cellFormulaTokens,
-          formulaTokens: data.skin.formulaTokens,
-          isPvp: data.skin.isPvp,
-          branchSuffix: table.branchSuffix,
-          tableCache: data.skin.tableCache,
-        };
-        cache.set(
-          tableCacheKey(skinName, table.internalTableIdx),
-          buildDisplayRowsInner(config, true, true),
-        );
-      }
-      return cache;
-    },
-  );
-
-  function getCompareValueForKey(key: string): string | number | undefined {
-    const parsed = parseCellKey(key);
-    if (!parsed) return undefined;
-    const { skin, tableIdx, rowIdx, header } = parsed;
-    const compareRows = compareRowsCache.get(tableCacheKey(skin, tableIdx));
-    if (!compareRows) return undefined;
-    const row = compareRows[rowIdx];
-    if (!row) return undefined;
-    if (header === "Level") return rowIdx;
-    return row[header];
-  }
-
-  function collectChangedBaseline(): Record<string, unknown> {
-    if (!tower) return {};
-    const out: Record<string, unknown> = {};
-    for (const [key, baseVal] of Object.entries(towerStore.baseline)) {
-      const current = getCompareValueForKey(key);
-      const baseN = toDisplayNumber(baseVal, false);
-      const currentN = toDisplayNumber(current, false);
-      if (baseN == null || currentN == null) continue;
-      const delta = currentN - baseN;
-      if (Math.abs(delta) >= 1e-9) out[key] = baseVal;
-    }
-    return out;
   }
 
   const hasDiffData = $derived.by(() => {
@@ -836,260 +328,6 @@
     return stripSeDiff(text) !== text;
   });
 </script>
-
-{#snippet refIndicator(content: string, num: number)}
-  <Tooltip.Root>
-    <Tooltip.Trigger>
-      {#snippet child({ props })}
-        <sup class="ref-sup" {...props}>[{num}]</sup>
-      {/snippet}
-    </Tooltip.Trigger>
-    <Tooltip.Portal>
-      <Tooltip.Content
-        class="tooltip-content max-w-72! text-sm"
-        side="top"
-        sideOffset={4}
-      >
-        {@html renderCellHtml(content, true)}
-      </Tooltip.Content>
-    </Tooltip.Portal>
-  </Tooltip.Root>
-{/snippet}
-
-{#snippet dataTable(config: TableConfig, isFirst: boolean)}
-  {@const displayRows =
-    displayRowsCache.get(tableCacheKey(config.skinName, config.tableIdx)) ?? []}
-  {@const compareRows =
-    compareRowsCache.get(tableCacheKey(config.skinName, config.tableIdx)) ?? []}
-
-  {@const fTokens = (config.formulaTokens ?? {}) as Record<string, string>}
-  {@const cft = config.cellFormulaTokens ?? {}}
-  {@const refNumberMap = (() => {
-    const map = new SvelteMap<string, number>();
-    let next = 1;
-    const register = (src: unknown) => {
-      const s = typeof src === "string" ? src : "";
-      if (!s.includes("<ref") && !/\$[A-Z]/.test(s)) return;
-      for (const e of extractRefEntries(s, "", fTokens)) {
-        const key = e.name ? `n:${e.name}` : `c:${e.content}`;
-        if (!map.has(key)) map.set(key, next++);
-      }
-    };
-    for (let i = 0; i < config.headers.length; i++) {
-      register(config.rawHeaders?.[i] ?? config.headers[i]);
-    }
-    for (let r = 0; r < displayRows.length; r++) {
-      const row = displayRows[r];
-      for (const h of config.headers) {
-        register(cft[String(r)]?.[h] ?? cft[String(r)]?.[stripRefs(h)]);
-        const rv = row[h];
-        if (typeof rv === "string" && rv.includes("<ref")) register(rv);
-      }
-    }
-    return map;
-  })()}
-  {@const getRefNum = (content: string, name?: string | null) =>
-    refNumberMap.get(name ? `n:${name}` : `c:${content}`) ?? 1}
-
-  {#snippet cellRefs(val: any, readOnly: boolean, entries: any[])}
-    {@html renderCellHtml(
-      val,
-      readOnly,
-    )}{#each entries as entry (entry.name ? `n:${entry.name}` : `c:${entry.content}`)}{@const n =
-        getRefNum(entry.content, entry.name)}{@render refIndicator(
-        entry.content,
-        n,
-      )}{/each}
-  {/snippet}
-
-  <Tooltip.Provider delayDuration={150}>
-    <div
-      class="table-container {!isFirst
-        ? 'extra-table-container'
-        : ''} {settingsStore.minTableWidth ? 'min-content' : ''}"
-      in:fly={isFirst
-        ? { y: 8, duration: 160, easing: cubicOut }
-        : { duration: 0 }}
-    >
-      <table class="table {settingsStore.minTableWidth ? 'min-content' : ''}">
-        <thead class="table-head">
-          {#if config.tableName}
-            <tr>
-              <th colspan={config.headers.length} class="table-name-header">
-                {@html renderCellHtml(config.tableName, true)}
-              </th>
-            </tr>
-          {/if}
-          <tr>
-            {#each config.headers as header, hIdx (header)}
-              <th
-                scope="col"
-                class={header === "Level"
-                  ? "table-header-sticky px-2"
-                  : "table-header whitespace-nowrap"}
-                >{@render cellRefs(
-                  header,
-                  true,
-                  extractRefEntries(
-                    config.rawHeaders?.[hIdx] || header,
-                    "",
-                    fTokens,
-                  ),
-                )}</th
-              >
-            {/each}
-          </tr>
-        </thead>
-        <tbody class="table-body">
-          {#each displayRows as row, rowIdx (rowIdx)}
-            <tr class="table-row">
-              {#each config.headers as header (header)}
-                {#if header === "Level"}
-                  <td class="table-cell-sticky">
-                    {row[header] ?? rowIdx}
-                  </td>
-                {:else}
-                  {@const editable = isCellEditable(config, header)}
-                  {@const deltaInfo = showDiff
-                    ? getDeltaForCell(
-                        compareRows[rowIdx]?.[header],
-                        config.skinName,
-                        config.tableIdx,
-                        rowIdx,
-                        header,
-                        !editable,
-                      )
-                    : { delta: null, className: "", cellClass: "" }}
-                  {@const isMoney = config.moneyColumns.includes(header)}
-                  {@const ck = mkCellKey(
-                    config.skinName,
-                    config.tableIdx,
-                    rowIdx,
-                    header,
-                  )}
-                  {@const isFocused = focusedCell === ck}
-                  {@const cellRefEntries = getCellRefs(
-                    header,
-                    row[header],
-                    config,
-                    rowIdx,
-                  )}
-                  <td class="table-data {deltaInfo.cellClass}">
-                    {#if editable}
-                      <div
-                        class="cell-wrapper {isMoney
-                          ? 'money-wrapper'
-                          : ''} {settingsStore.hideCellWrapper
-                          ? 'hide-wrapper'
-                          : ''} {deltaInfo.cellClass}"
-                      >
-                        {#if isMoney}
-                          <img
-                            src={MoneyIcon}
-                            alt=""
-                            class="money-icon money-icon-input"
-                          />
-                        {/if}
-                        {#if isFocused}
-                          <input
-                            {@attach focusOnMount}
-                            type="text"
-                            size="1"
-                            class="table-input"
-                            value={formatValue(config.rows[rowIdx]?.[header])}
-                            {disabled}
-                            onfocus={(e) => {
-                              e.currentTarget.dataset.original =
-                                e.currentTarget.value;
-                              if (settingsStore.clearOnEdit)
-                                e.currentTarget.value = "";
-                            }}
-                            onblur={(e) => {
-                              focusedCell = null;
-                              const next = e.currentTarget.value;
-                              const original =
-                                e.currentTarget.dataset.original ?? "";
-                              if (next === "") {
-                                e.currentTarget.value = original;
-                              } else if (next !== original) {
-                                commitEdit(config, rowIdx, header, next);
-                              }
-                            }}
-                            onkeydown={(e) => {
-                              if (e.key === "Enter") e.currentTarget.blur();
-                              if (e.key === "Escape") {
-                                e.currentTarget.value =
-                                  e.currentTarget.dataset.original ?? "";
-                                focusedCell = null;
-                              }
-                            }}
-                          />
-                        {:else}
-                          <button
-                            type="button"
-                            class="cell-display"
-                            {disabled}
-                            onclick={() => {
-                              focusedCell = ck;
-                            }}
-                            >{@render cellRefs(
-                              displayCellValue(header, row[header]),
-                              false,
-                              cellRefEntries,
-                            )}</button
-                          >
-                        {/if}
-                        {#if showDiff && deltaInfo.delta !== null && deltaInfo.delta !== 0}
-                          <span class="delta-text {deltaInfo.className}">
-                            ({formatDelta(deltaInfo.delta)})
-                          </span>
-                        {/if}
-                      </div>
-                    {:else}
-                      <div
-                        class="table-cell-readonly flex items-center justify-between gap-2 {settingsStore.hideCellWrapper
-                          ? 'hide-wrapper'
-                          : ''} {deltaInfo.cellClass}"
-                      >
-                        {#if isMoney}
-                          <span class="money-value">
-                            <img src={MoneyIcon} alt="" class="money-icon" />
-                            <span
-                              >{@render cellRefs(
-                                displayCellValue(header, row[header]),
-                                true,
-                                cellRefEntries,
-                              )}</span
-                            >
-                          </span>
-                        {:else}
-                          <span class="cell-multiline"
-                            >{@render cellRefs(
-                              displayCellValue(header, row[header]),
-                              true,
-                              cellRefEntries,
-                            )}</span
-                          >
-                        {/if}
-                        {#if showDiff && deltaInfo.delta !== null && deltaInfo.delta !== 0}
-                          <span
-                            class="delta-text text-xs {deltaInfo.className}"
-                          >
-                            ({formatDelta(deltaInfo.delta)})
-                          </span>
-                        {/if}
-                      </div>
-                    {/if}
-                  </td>
-                {/if}
-              {/each}
-            </tr>
-          {/each}
-        </tbody>
-      </table>
-    </div>
-  </Tooltip.Provider>
-{/snippet}
 
 <div class="space-y-4">
   {#if tower}
@@ -1128,27 +366,22 @@
 
       <Tabs.Content value={selectedSkinName}>
         {#if activeSkinData}
-          {#each activeSkinData.orderedTables as table, orderedIdx (orderedIdx)}
-            {@render dataTable(
-              {
-                skinName: selectedSkinName,
-                tableIdx: table.internalTableIdx,
-                sourceExtraTableIndex: table.sourceExtraTableIndex,
-                tableName: table.name,
-                headers: table.headers,
-                rawHeaders: table.rawHeaders,
-                rows: table.rows,
-                moneyColumns: table.moneyColumns,
-                readOnlyColumns: table.readOnlyColumns,
-                skinData: table.skinData,
-                cellFormulaTokens: table.cellFormulaTokens,
-                formulaTokens: activeSkinData.skin.formulaTokens,
-                isPvp: activeSkinData.skin.isPvp,
-                branchSuffix: table.branchSuffix,
-                tableCache: activeSkinData.skin.tableCache,
-              } as any,
-              orderedIdx === 0,
-            )}
+          {#each activeSkinData.orderedTables as table, orderedIdx (tableCacheKey(table.skinName, table.tableIdx))}
+            <TowerDataTable
+              config={table}
+              displayRows={displayRowsCache.get(
+                tableCacheKey(table.skinName, table.tableIdx),
+              ) ?? []}
+              compareRows={compareRowsCache.get(
+                tableCacheKey(table.skinName, table.tableIdx),
+              ) ?? []}
+              baseline={towerStore.baseline}
+              globalModifier={towerStore.globalModifier}
+              {showDiff}
+              {disabled}
+              isFirst={orderedIdx === 0}
+              commit={commitEdit}
+            />
           {/each}
         {:else}
           <div class="text-center py-4 text-muted-foreground">
@@ -1290,286 +523,3 @@
     </div>
   {/if}
 </div>
-
-<style>
-  @reference "../../routes/layout.css";
-
-  .table-container {
-    overflow-x: auto;
-    border: 1px solid var(--border);
-    background: var(--card);
-
-    &.min-content {
-      width: max-content;
-      max-width: 100%;
-    }
-  }
-
-  .extra-table-container {
-    margin-top: 0.75rem;
-  }
-
-  .table-name-header {
-    padding: 0.4rem 0.75rem;
-    text-align: center;
-    font-weight: 700;
-    font-size: 0.8rem;
-    color: var(--foreground);
-    border-bottom: 1px solid var(--border);
-    @apply bg-secondary/40;
-  }
-
-  .table {
-    min-width: 100%;
-    border-collapse: collapse;
-    font-size: 0.875rem;
-
-    &.min-content {
-      min-width: 0;
-      width: min-content;
-    }
-
-    thead,
-    tbody {
-      border-color: var(--border);
-
-      tr {
-        border-bottom: 1px solid var(--border);
-      }
-    }
-  }
-
-  .table-head {
-    background: var(--muted);
-  }
-
-  .table-body {
-    background: var(--card);
-
-    tr {
-      border-bottom: 1px solid var(--border);
-
-      &:nth-child(even) {
-        background: var(--secondary);
-
-        .table-cell-sticky {
-          background: var(--secondary);
-        }
-      }
-    }
-  }
-
-  tr.table-row:hover {
-    background: var(--accent);
-
-    .table-cell-sticky {
-      background: var(--accent);
-    }
-  }
-
-  .table-header {
-    padding: 0.5rem 0.75rem;
-    text-align: left;
-    font-weight: 600;
-    color: var(--foreground);
-  }
-
-  .table-header-sticky {
-    position: sticky;
-    left: 0;
-    background: var(--muted);
-    z-index: 7;
-    text-align: center;
-    font-weight: 600;
-    color: var(--foreground);
-  }
-
-  .table-cell-sticky {
-    position: sticky;
-    left: 0;
-    background: var(--card);
-    z-index: 7;
-    text-align: center;
-  }
-
-  .table-data {
-    padding: 0.25rem;
-    min-width: 100px;
-    vertical-align: top;
-  }
-
-  .cell-wrapper {
-    display: flex;
-    align-items: flex-start;
-    width: 100%;
-    border-radius: var(--radius) 0;
-    border: 1px solid var(--input);
-    background: transparent !important;
-    padding: 0.25rem 0.75rem;
-    transition: border-color 0.25s;
-
-    &:focus-within {
-      border-color: var(--ring);
-    }
-
-    &.hide-wrapper {
-      border-color: transparent;
-      padding: 0.1rem;
-
-      &:focus-within {
-        border-color: transparent;
-      }
-    }
-  }
-
-  .table-input {
-    display: block;
-    width: 100%;
-    border: none;
-    background: transparent;
-    padding: 0;
-    font-size: 0.875rem;
-    outline: none;
-    flex: 1;
-    min-width: 0;
-  }
-
-  .table-cell-readonly {
-    padding: 0.25rem 0.75rem;
-    color: var(--muted-foreground);
-    font-style: italic;
-    background: var(--muted);
-    border-radius: var(--radius) 0;
-    border: 1px solid var(--border);
-    cursor: not-allowed;
-
-    &.hide-wrapper {
-      background: transparent;
-      padding: 0.1rem;
-      border: 0;
-    }
-  }
-
-  .cell-multiline {
-    white-space: pre-line;
-  }
-
-  .cell-display {
-    display: block;
-    width: 100%;
-    padding: 0;
-    cursor: text;
-    line-height: 1.4;
-    white-space: normal;
-    background: none;
-    border: none;
-    text-align: left;
-    font: inherit;
-    color: inherit;
-
-    &:disabled {
-      cursor: default;
-    }
-  }
-
-  .delta-text {
-    font-size: 0.75rem;
-    line-height: 1rem;
-    white-space: nowrap;
-  }
-
-  .diff-positive {
-    .table-data&,
-    .cell-wrapper&,
-    .table-cell-readonly& {
-      background-color: color-mix(
-        in oklch,
-        transparent,
-        oklch(0.6 0.12 145 / 0.16)
-      ) !important;
-    }
-  }
-
-  .diff-negative {
-    .table-data&,
-    .cell-wrapper&,
-    .table-cell-readonly& {
-      background-color: color-mix(
-        in oklch,
-        transparent,
-        oklch(0.58 0.14 25 / 0.16)
-      ) !important;
-    }
-  }
-
-  tr.table-row:hover {
-    .diff-positive {
-      .cell-wrapper&,
-      .table-cell-readonly& {
-        background-color: color-mix(
-          in oklch,
-          transparent,
-          oklch(0.6 0.12 145 / 0.22)
-        ) !important;
-      }
-    }
-
-    .diff-negative {
-      .cell-wrapper&,
-      .table-cell-readonly& {
-        background-color: color-mix(
-          in oklch,
-          transparent,
-          oklch(0.58 0.14 25 / 0.22)
-        ) !important;
-      }
-    }
-  }
-
-  .money-icon {
-    width: 1.1em;
-    height: 1.1em;
-    object-fit: contain;
-    vertical-align: middle;
-    display: inline;
-    flex-shrink: 0;
-  }
-
-  .money-icon-input {
-    opacity: 0.75;
-  }
-
-  .money-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-  }
-
-  .money-value {
-    color: #44e500;
-    text-shadow:
-      0 0 0.09375em black,
-      0 0 0.09375em black,
-      0 0 0.09375em black,
-      0 0 0.09375em black,
-      0 0 0.09375em black;
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-  }
-
-  .ref-sup {
-    font-size: 0.6em;
-    line-height: 1;
-    vertical-align: super;
-    padding-inline: 0.08em;
-    color: var(--muted-foreground);
-    cursor: help;
-    user-select: none;
-    font-weight: 500;
-  }
-
-  .ref-sup:hover {
-    color: var(--foreground);
-  }
-</style>
