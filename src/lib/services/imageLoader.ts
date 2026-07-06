@@ -10,8 +10,7 @@ import { mwWikiFileUrl, mwSetBaseUrl } from "mediawiki-file-url";
 
 mwSetBaseUrl("https://static.wikia.nocookie.net/tower-defense-sim/images");
 
-type ImageCache = Map<string, { [key: number]: string }>;
-type LoadingState = Map<number, boolean>;
+type LoadingState = Map<string, boolean>;
 type FailedRequests = Set<string>;
 
 type CacheConfig = {
@@ -41,7 +40,7 @@ export interface ImageLoaderState {
  * Service for loading and caching tower upgrade images.
  */
 class ImageLoaderService {
-  private cache: ImageCache = new Map();
+  private cache: Map<string, string> = new Map();
   private loading: LoadingState = new Map();
   private failed: FailedRequests = new Set();
 
@@ -170,16 +169,32 @@ class ImageLoaderService {
     }
   }
 
-  getCachedImages(towerName: string): { [key: number]: string } | undefined {
-    return this.cache.get(towerName);
+  private requestKey(
+    towerName: string,
+    index: number,
+    imageId: string | number,
+  ): string {
+    return `${towerName}:${index}:${String(imageId)}`;
   }
 
-  isLoading(index: number): boolean {
-    return this.loading.get(index) ?? false;
+  getCachedUrl(
+    towerName: string,
+    index: number,
+    imageId: string | number,
+  ): string | undefined {
+    return this.cache.get(this.requestKey(towerName, index, imageId));
   }
 
-  hasFailed(towerName: string, index: number): boolean {
-    return this.failed.has(`${towerName}:${index}`);
+  isLoading(towerName: string, index: number, imageId: string | number): boolean {
+    return this.loading.get(this.requestKey(towerName, index, imageId)) ?? false;
+  }
+
+  hasFailed(
+    towerName: string,
+    index: number,
+    imageId: string | number,
+  ): boolean {
+    return this.failed.has(this.requestKey(towerName, index, imageId));
   }
 
   /**
@@ -195,11 +210,16 @@ class ImageLoaderService {
    * Use when an upgrade's image ID changes so the new image is refetched.
    */
   clearUpgradeImageCache(towerName: string, index: number): void {
-    const existing = this.cache.get(towerName);
-    if (existing?.[index] !== undefined) {
-      delete existing[index];
+    const prefix = `${towerName}:${index}:`;
+    for (const key of [...this.cache.keys()]) {
+      if (key.startsWith(prefix)) this.cache.delete(key);
     }
-    this.failed.delete(`${towerName}:${index}`);
+    for (const key of [...this.failed]) {
+      if (key.startsWith(prefix)) this.failed.delete(key);
+    }
+    for (const key of [...this.loading.keys()]) {
+      if (key.startsWith(prefix)) this.loading.delete(key);
+    }
   }
 
   /**
@@ -207,7 +227,16 @@ class ImageLoaderService {
    * Use when the tower is reloaded so stale images are refetched.
    */
   clearTowerImageCache(towerName: string): void {
-    this.cache.delete(towerName);
+    const prefix = `${towerName}:`;
+    for (const key of [...this.cache.keys()]) {
+      if (key.startsWith(prefix)) this.cache.delete(key);
+    }
+    for (const key of [...this.failed]) {
+      if (key.startsWith(prefix)) this.failed.delete(key);
+    }
+    for (const key of [...this.loading.keys()]) {
+      if (key.startsWith(prefix)) this.loading.delete(key);
+    }
   }
 
   /**
@@ -283,27 +312,25 @@ class ImageLoaderService {
     index: number,
     imageId: string | number,
   ): Promise<string | null> {
-    const requestKey = `${towerName}:${index}`;
+    const requestKey = this.requestKey(towerName, index, imageId);
 
-    const cached = this.cache.get(towerName);
-    if (cached?.[index]) {
-      return cached[index];
+    const cached = this.cache.get(requestKey);
+    if (cached) {
+      return cached;
     }
 
-    if (this.loading.get(index) || this.failed.has(requestKey)) {
+    if (this.loading.get(requestKey) || this.failed.has(requestKey)) {
       return null;
     }
 
-    this.loading.set(index, true);
+    this.loading.set(requestKey, true);
 
     try {
       const imageIdStr = String(imageId);
 
       // Direct URL
       if (typeof imageId === "string" && imageId.startsWith("http")) {
-        const existing = this.cache.get(towerName) || {};
-        existing[index] = imageId;
-        this.cache.set(towerName, existing);
+        this.cache.set(requestKey, imageId);
         return imageId;
       }
 
@@ -311,9 +338,7 @@ class ImageLoaderService {
       if (typeof imageId === "string") {
         const mwUrl = this.resolveWikiFileUrl(imageIdStr);
         if (mwUrl) {
-          const existing = this.cache.get(towerName) || {};
-          existing[index] = mwUrl;
-          this.cache.set(towerName, existing);
+          this.cache.set(requestKey, mwUrl);
           return mwUrl;
         }
       }
@@ -329,9 +354,7 @@ class ImageLoaderService {
 
       const cachedBlobUrl = await this.cacheGetFreshBlobUrl(imageIdStr);
       if (cachedBlobUrl) {
-        const existing = this.cache.get(towerName) || {};
-        existing[index] = cachedBlobUrl;
-        this.cache.set(towerName, existing);
+        this.cache.set(requestKey, cachedBlobUrl);
         return cachedBlobUrl;
       }
 
@@ -371,9 +394,7 @@ class ImageLoaderService {
       const objectUrl = URL.createObjectURL(blob);
       this.objectUrlsByKey.set(this.cacheKeyForAssetId(imageIdStr), objectUrl);
 
-      const existing = this.cache.get(towerName) || {};
-      existing[index] = objectUrl;
-      this.cache.set(towerName, existing);
+      this.cache.set(requestKey, objectUrl);
 
       return objectUrl;
     } catch (error) {
@@ -381,11 +402,11 @@ class ImageLoaderService {
       this.failed.add(requestKey);
       return null;
     } finally {
-      this.loading.set(index, false);
+      this.loading.delete(requestKey);
     }
   }
 
-  getLoadingState(): Map<number, boolean> {
+  getLoadingState(): Map<string, boolean> {
     return new Map(this.loading);
   }
 }

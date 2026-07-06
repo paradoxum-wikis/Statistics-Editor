@@ -8,8 +8,6 @@
   import { renderCellHtml } from "$lib/neowtext/render";
   import { towerStore } from "$lib/stores/tower.svelte";
   import { imageLoader } from "$lib/services/imageLoader";
-  import { untrack } from "svelte";
-  import { SvelteMap, SvelteSet } from "svelte/reactivity";
   import { settingsStore } from "$lib/stores/settings.svelte";
 
   type SummaryLine = {
@@ -41,59 +39,73 @@
     );
   }
 
-  let upgradeImages = new SvelteMap<number, string>();
-  let loadingImages = new SvelteMap<number, boolean>();
-  let failedImages = new SvelteSet<number>();
-
   let selectedUpgradeIndex = $derived.by(() => {
     const i = parseInt(selectedUpgrade);
     return Number.isNaN(i) ? -1 : i;
   });
+
+  let selectedImageContext = $derived.by(() => {
+    towerStore.refreshTrigger;
+    const tower = towerStore.selectedData;
+    const index = selectedUpgradeIndex;
+    if (!tower || index < 0) return null;
+
+    const skin = tower.getSkin(towerStore.selectedSkinName);
+    const imageId = skin?.upgrades?.[index]?.upgradeData?.Image;
+    if (!imageId) return null;
+
+    return { towerName: tower.name, index, imageId };
+  });
+
+  let selectedImageUrl = $state<string | null>(null);
+  let selectedImageLoading = $state(false);
+  let selectedImageFailed = $state(false);
 
   $effect(() => {
     imageLoader.setDebugMode(settingsStore.debugMode);
   });
 
   $effect(() => {
-    const tower = towerStore.selectedData;
-    const index = selectedUpgradeIndex;
-    towerStore.refreshTrigger;
+    const ctx = selectedImageContext;
+    if (!ctx) {
+      selectedImageUrl = null;
+      selectedImageLoading = false;
+      selectedImageFailed = false;
+      return;
+    }
 
-    if (!tower || index < 0) return;
+    const { towerName, index, imageId } = ctx;
+    const cached = imageLoader.getCachedUrl(towerName, index, imageId);
+    if (cached) {
+      selectedImageUrl = cached;
+      selectedImageLoading = false;
+      selectedImageFailed = false;
+      return;
+    }
 
-    const skin = tower.getSkin(towerStore.selectedSkinName);
-    if (!skin?.upgrades?.[index]) return;
+    if (imageLoader.hasFailed(towerName, index, imageId)) {
+      selectedImageUrl = null;
+      selectedImageLoading = false;
+      selectedImageFailed = true;
+      return;
+    }
 
-    const upgradeData = skin.upgrades[index];
-    const imageId = upgradeData.upgradeData.Image;
-    const towerName = tower.name;
+    selectedImageUrl = null;
+    selectedImageLoading = true;
+    selectedImageFailed = false;
 
-    const hasImage = untrack(() => upgradeImages.get(index));
-    const isCurrentlyLoading = imageLoader.isLoading(index);
-    const hasFailed = imageLoader.hasFailed(towerName, index);
-
-    if (!imageId || hasImage || isCurrentlyLoading || hasFailed) return;
-
-    // start loading
-    untrack(() => {
-      loadingImages.set(index, true);
-      failedImages.delete(index);
-    });
+    let cancelled = false;
 
     imageLoader.loadImage(towerName, index, imageId).then((url) => {
-      const currentTower = untrack(() => towerStore.selectedData);
-      if (currentTower?.name !== towerName) return;
-
-      untrack(() => {
-        if (url) {
-          upgradeImages.set(index, url);
-          failedImages.delete(index);
-        } else {
-          failedImages.add(index);
-        }
-        loadingImages.set(index, false);
-      });
+      if (cancelled || towerStore.selectedData?.name !== towerName) return;
+      selectedImageUrl = url;
+      selectedImageLoading = false;
+      selectedImageFailed = !url;
     });
+
+    return () => {
+      cancelled = true;
+    };
   });
 </script>
 
@@ -130,15 +142,15 @@
     <Tabs.Content value={index.toString()}>
       {#if selectedUpgrade === index.toString()}
         <div in:fade={{ duration: 250, easing: cubicOut }}>
-          {#if loadingImages.get(index)}
+          {#if selectedImageLoading}
             <div class="upgrade-image-container">Loading...</div>
-          {:else if upgradeImages.get(index)}
+          {:else if selectedImageUrl}
             <img
-              src={upgradeImages.get(index)}
+              src={selectedImageUrl}
               alt={`Upgrade ${index + 1}`}
               class="upgrade-bg"
             />
-          {:else if failedImages.has(index)}
+          {:else if selectedImageFailed}
             <div class="upgrade-image-container">Failed to load image</div>
           {:else}
             <div class="upgrade-image-container">No image available</div>
