@@ -501,19 +501,62 @@ export function buildRefNumberMap(
 ): Map<string, number> {
   const map = new Map<string, number>();
   let next = 1;
+
+  walkRefSources(config, displayRows, (entry) => {
+    const key = entry.name ? `n:${entry.name}` : `c:${entry.content}`;
+    if (!map.has(key)) map.set(key, next++);
+  });
+
+  return map;
+}
+
+export type SkinNote = { num: number; entry: RefEntry; tableName: string };
+
+export function buildSkinNotes(
+  activeSkin: ActiveSkinTables | null,
+  displayRowsCache: Map<string, TableRow[]>,
+): SkinNote[] {
+  if (!activeSkin) return [];
+
+  const notes: SkinNote[] = [];
+
+  for (const config of activeSkin.orderedTables) {
+    const displayRows =
+      displayRowsCache.get(tableCacheKey(config.skinName, config.tableIdx)) ??
+      [];
+    const refMap = buildRefNumberMap(config, displayRows);
+    const seen = new Set<string>();
+
+    walkRefSources(config, displayRows, (entry) => {
+      const key = entry.name ? `n:${entry.name}` : `c:${entry.content}`;
+      if (seen.has(key)) return;
+      seen.add(key);
+      const num = refMap.get(key);
+      if (num != null) {
+        notes.push({ num, entry, tableName: config.tableName });
+      }
+    });
+  }
+
+  return notes;
+}
+
+function walkRefSources(
+  config: TableConfig,
+  displayRows: TableRow[],
+  visitor: (entry: RefEntry) => void,
+): void {
   const tokens = formulaTokens(config);
   const cft = cellFormulaTokens(config) ?? {};
   const register = (src: unknown) => {
     const s = typeof src === "string" ? src : "";
     if (!s.includes("<ref") && !/\$[A-Z]/.test(s)) return;
-    for (const e of extractRefEntries(s, "", tokens)) {
-      const key = e.name ? `n:${e.name}` : `c:${e.content}`;
-      if (!map.has(key)) map.set(key, next++);
-    }
+    for (const entry of extractRefEntries(s, "", tokens)) visitor(entry);
   };
 
-  for (let i = 0; i < config.headers.length; i++)
+  for (let i = 0; i < config.headers.length; i++) {
     register(config.rawHeaders?.[i] ?? config.headers[i]);
+  }
 
   for (let r = 0; r < displayRows.length; r++) {
     const row = displayRows[r];
@@ -523,8 +566,6 @@ export function buildRefNumberMap(
       if (typeof rv === "string" && rv.includes("<ref")) register(rv);
     }
   }
-
-  return map;
 }
 
 export function getCompareValueForKey(

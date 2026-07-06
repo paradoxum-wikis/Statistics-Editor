@@ -21,11 +21,13 @@
     buildActiveSkinTables,
     buildCompareRowsCache,
     buildDisplayRowsCache,
+    buildSkinNotes,
     getCompareValueForKey as getCompareValueFromCache,
     rebuildBaselineForSkin,
     tableCacheKey,
     type TableConfig,
   } from "$lib/towerTable";
+  import NotesSection from "./NotesSection.svelte";
 
   let {
     tower = null,
@@ -68,6 +70,11 @@
       rofInfo,
       towerStore.globalModifier,
     );
+  });
+
+  const skinNotes = $derived.by(() => {
+    towerStore.refreshTrigger;
+    return buildSkinNotes(activeSkinData, displayRowsCache);
   });
 
   let showDiff = $state(settingsStore.seeValueDifference);
@@ -517,6 +524,8 @@
         </Btn>
       {/if}
     </div>
+
+    <NotesSection notes={skinNotes} />
   {:else}
     <div class="text-center py-8 text-body">
       Select a tower to edit its skins.
