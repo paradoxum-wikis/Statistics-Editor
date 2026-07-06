@@ -9,9 +9,7 @@
   let { notes }: { notes: SkinNote[] } = $props();
 
   function noteKey(note: SkinNote): string {
-    return note.entry.name
-      ? `n:${note.entry.name}`
-      : `c:${note.entry.content}`;
+    return note.entry.name ? `n:${note.entry.name}` : `c:${note.entry.content}`;
   }
 </script>
 
@@ -31,9 +29,12 @@
       <Accordion.Content forceMount>
         {#snippet child({ open })}
           {#if open}
-            <ol class="list-none py-3 pb-1" transition:slide={{ duration: 150 }}>
+            <ol
+              class="list-none py-3 pb-1"
+              transition:slide={{ duration: 150 }}
+            >
               {#each notes as note (noteKey(note))}
-                <li class="flex items-start gap-1.5 text-sm not-first:mt-2">
+                <li class="flex gap-1 text-sm not-first:mt-2">
                   <span class="text-[0.75em] text-muted-foreground">
                     [{note.num}]
                   </span>
