@@ -5,12 +5,12 @@
   import { renderCellHtml } from "$lib/neowtext/render";
   import type { GlobalModifier } from "$lib/utils/globalModifier";
   import {
-    buildRefNumberMap,
     displayCellValue,
     extractRefEntries,
     getCellRefs,
     getDeltaForCell,
     isCellEditable,
+    type RefTokenRegistry,
     type TableConfig,
     type TableRow,
   } from "$lib/towerTable";
@@ -28,6 +28,8 @@
     showDiff,
     disabled,
     isFirst,
+    refTokenRegistry,
+    getRefNum,
     commit,
   }: {
     config: TableConfig;
@@ -38,6 +40,8 @@
     showDiff: boolean;
     disabled: boolean;
     isFirst: boolean;
+    refTokenRegistry: RefTokenRegistry;
+    getRefNum: (content: string, name?: string | null) => number;
     commit: (
       config: TableConfig,
       rowIdx: number,
@@ -46,9 +50,6 @@
     ) => void;
   } = $props();
 
-  const refNumberMap = $derived(buildRefNumberMap(config, displayRows));
-  const getRefNum = (content: string, name?: string | null) =>
-    refNumberMap.get(name ? `n:${name}` : `c:${content}`) ?? 1;
   const fTokens = $derived(
     (config.skinData?.formulaTokens ?? config.formulaTokens ?? {}) as Record<
       string,
@@ -90,6 +91,7 @@
                   config.rawHeaders?.[hIdx] || header,
                   "",
                   fTokens,
+                  refTokenRegistry,
                 )}
                 {getRefNum}
               />
@@ -137,7 +139,13 @@
                     {disabled}
                     {isMoney}
                     readOnlyValue={!editable}
-                    refs={getCellRefs(header, row[header], config, rowIdx)}
+                    refs={getCellRefs(
+                      header,
+                      row[header],
+                      config,
+                      rowIdx,
+                      refTokenRegistry,
+                    )}
                     {deltaInfo}
                     {getRefNum}
                     commit={(value) => commit(config, rowIdx, header, value)}

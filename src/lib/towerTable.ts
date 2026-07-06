@@ -419,6 +419,7 @@ export function extractRefEntries(
   s1: string,
   s2: string,
   tokens: Record<string, string>,
+  refTokenRegistry?: RefTokenRegistry,
 ): RefEntry[] {
   const sources = [s1, s2].filter(Boolean) as string[];
   const entries: RefEntry[] = [];
@@ -428,7 +429,7 @@ export function extractRefEntries(
   const add = (content: string, name: string | null) => {
     const t = content.trim();
     if (!t) return;
-    const key = name ? `n:${name}` : `c:${t}`;
+    const key = refEntryKey({ content: t, name });
     if (!seen.has(key)) {
       seen.add(key);
       entries.push({ content: t, name });
@@ -444,15 +445,19 @@ export function extractRefEntries(
       const name = attrs.match(/name\s*=\s*["']?([^"'\s>]+)/i)?.[1] ?? null;
       if (content !== undefined) add(content, name);
       else if (name) {
-        for (const def of Object.values(tokens)) {
-          if (typeof def !== "string") continue;
-          if (
-            def.match(/<ref\b[^>]*name\s*=\s*["']?([^"'\s>]+)/i)?.[1] !== name
-          )
-            continue;
-          const cm = def.match(/<ref\b[^>]*>([\s\S]*?)<\/ref>/i);
-          if (cm) add(cm[1], name);
-          break;
+        const grouped = refTokenRegistry?.byName.get(name);
+        if (grouped) add(grouped.content, name);
+        else {
+          for (const def of Object.values(tokens)) {
+            if (typeof def !== "string") continue;
+            if (
+              def.match(/<ref\b[^>]*name\s*=\s*["']?([^"'\s>]+)/i)?.[1] !== name
+            )
+              continue;
+            const cm = def.match(/<ref\b[^>]*>([\s\S]*?)<\/ref>/i);
+            if (cm) add(cm[1], name);
+            break;
+          }
         }
       }
     }
@@ -463,13 +468,149 @@ export function extractRefEntries(
     tokRe.lastIndex = 0;
     let t: RegExpExecArray | null;
     while ((t = tokRe.exec(src)) !== null) {
-      const def = tokens[t[0]];
-      if (typeof def === "string" && /^<ref\b/i.test(def.trim()))
-        handleSrc(def);
+      const tok = t[0];
+      const def = tokens[tok];
+      if (typeof def !== "string" || !parseRefDef(def)) continue;
+      const grouped = refTokenRegistry?.byToken.get(tok);
+      if (grouped) add(grouped.content, grouped.name);
+      else handleSrc(def);
     }
   }
 
   return entries;
+}
+
+export type RefTokenMeta = { name: string; content: string };
+
+export type RefTokenRegistry = {
+  byToken: Map<string, RefTokenMeta>;
+  byName: Map<string, RefTokenMeta>;
+};
+
+const EMPTY_REF_REGISTRY: RefTokenRegistry = {
+  byToken: new Map(),
+  byName: new Map(),
+};
+
+const TOK_RE = /\$[A-Z0-9_-]+\$/g;
+
+function parseRefDef(val: string): { attrs: string; content: string } | null {
+  const m = val.trim().match(/^<ref\s*([^>]*)>([\s\S]*?)<\/ref>\s*$/i);
+  if (!m) return null;
+  return { attrs: m[1], content: m[2] };
+}
+
+function refNameFromToken(tok: string, attrs: string): string {
+  const existing = attrs.match(/name\s*=\s*["']?([^"'\s>]+)/i)?.[1];
+  if (existing) return existing;
+  return tok
+    .replace(/^\$|\$$/g, "")
+    .replace(/[^a-zA-Z0-9]/g, "")
+    .toLowerCase();
+}
+
+function forEachSkinRefSource(
+  activeSkin: ActiveSkinTables | null,
+  displayRowsCache: Map<string, TableRow[]>,
+  fn: (src: string, tokens: Record<string, string>) => void,
+): void {
+  if (!activeSkin) return;
+
+  for (const config of activeSkin.orderedTables) {
+    const tokens = formulaTokens(config);
+    const cft = cellFormulaTokens(config) ?? {};
+    const displayRows =
+      displayRowsCache.get(tableCacheKey(config.skinName, config.tableIdx)) ??
+      [];
+
+    const register = (src: unknown) => {
+      const s = typeof src === "string" ? src : "";
+      if (!s.includes("<ref") && !/\$[A-Z]/.test(s)) return;
+      fn(s, tokens);
+    };
+
+    for (let i = 0; i < config.headers.length; i++) {
+      register(config.rawHeaders?.[i] ?? config.headers[i]);
+    }
+
+    for (let r = 0; r < displayRows.length; r++) {
+      const row = displayRows[r];
+      for (const h of config.headers) {
+        register(cft[String(r)]?.[h] ?? cft[String(r)]?.[stripRefs(h)]);
+        const rv = row[h];
+        if (typeof rv === "string" && rv.includes("<ref")) register(rv);
+      }
+    }
+  }
+}
+
+function buildRefTokenRegistry(
+  activeSkin: ActiveSkinTables,
+  displayRowsCache: Map<string, TableRow[]>,
+): RefTokenRegistry {
+  const vars = formulaTokens(activeSkin.orderedTables[0]);
+  const counts = new Map<string, number>();
+
+  forEachSkinRefSource(activeSkin, displayRowsCache, (src) => {
+    TOK_RE.lastIndex = 0;
+    let m: RegExpExecArray | null;
+    while ((m = TOK_RE.exec(src)) !== null) {
+      const tok = m[0];
+      if (parseRefDef(vars[tok] ?? "")) {
+        counts.set(tok, (counts.get(tok) ?? 0) + 1);
+      }
+    }
+  });
+
+  const byToken = new Map<string, RefTokenMeta>();
+  const byName = new Map<string, RefTokenMeta>();
+
+  for (const [tok, count] of counts) {
+    if (count <= 1) continue;
+    const parsed = parseRefDef(vars[tok] ?? "");
+    if (!parsed) continue;
+    const meta = {
+      name: refNameFromToken(tok, parsed.attrs),
+      content: parsed.content.trim(),
+    };
+    byToken.set(tok, meta);
+    byName.set(meta.name, meta);
+  }
+
+  return { byToken, byName };
+}
+
+export type SkinNote = { num: number; entry: RefEntry };
+
+export type SkinRefState = {
+  registry: RefTokenRegistry;
+  notes: SkinNote[];
+  refNumberMap: Map<string, number>;
+};
+
+export function buildSkinRefState(
+  activeSkin: ActiveSkinTables | null,
+  displayRowsCache: Map<string, TableRow[]>,
+): SkinRefState {
+  if (!activeSkin?.orderedTables.length) {
+    return { registry: EMPTY_REF_REGISTRY, notes: [], refNumberMap: new Map() };
+  }
+
+  const registry = buildRefTokenRegistry(activeSkin, displayRowsCache);
+  const notes: SkinNote[] = [];
+  const refNumberMap = new Map<string, number>();
+  let next = 1;
+
+  forEachSkinRefSource(activeSkin, displayRowsCache, (src, tokens) => {
+    for (const entry of extractRefEntries(src, "", tokens, registry)) {
+      const key = refEntryKey(entry);
+      if (refNumberMap.has(key)) continue;
+      refNumberMap.set(key, next);
+      notes.push({ num: next++, entry });
+    }
+  });
+
+  return { registry, notes, refNumberMap };
 }
 
 export function getCellRefs(
@@ -477,6 +618,7 @@ export function getCellRefs(
   sourceVal: unknown,
   config: TableConfig,
   rowIdx: number,
+  refTokenRegistry?: RefTokenRegistry,
 ): RefEntry[] {
   const tokens = cellFormulaTokens(config)?.[String(rowIdx)] ?? {};
   let cellTok = tokens[header] ?? tokens[stripRefs(header)];
@@ -492,80 +634,12 @@ export function getCellRefs(
     typeof sourceVal === "string" ? sourceVal : "",
     typeof cellTok === "string" ? cellTok : "",
     formulaTokens(config),
+    refTokenRegistry,
   );
 }
 
-export function buildRefNumberMap(
-  config: TableConfig,
-  displayRows: TableRow[],
-): Map<string, number> {
-  const map = new Map<string, number>();
-  let next = 1;
-
-  walkRefSources(config, displayRows, (entry) => {
-    const key = entry.name ? `n:${entry.name}` : `c:${entry.content}`;
-    if (!map.has(key)) map.set(key, next++);
-  });
-
-  return map;
-}
-
-export type SkinNote = { num: number; entry: RefEntry; tableName: string };
-
-export function buildSkinNotes(
-  activeSkin: ActiveSkinTables | null,
-  displayRowsCache: Map<string, TableRow[]>,
-): SkinNote[] {
-  if (!activeSkin) return [];
-
-  const notes: SkinNote[] = [];
-
-  for (const config of activeSkin.orderedTables) {
-    const displayRows =
-      displayRowsCache.get(tableCacheKey(config.skinName, config.tableIdx)) ??
-      [];
-    const refMap = buildRefNumberMap(config, displayRows);
-    const seen = new Set<string>();
-
-    walkRefSources(config, displayRows, (entry) => {
-      const key = entry.name ? `n:${entry.name}` : `c:${entry.content}`;
-      if (seen.has(key)) return;
-      seen.add(key);
-      const num = refMap.get(key);
-      if (num != null) {
-        notes.push({ num, entry, tableName: config.tableName });
-      }
-    });
-  }
-
-  return notes;
-}
-
-function walkRefSources(
-  config: TableConfig,
-  displayRows: TableRow[],
-  visitor: (entry: RefEntry) => void,
-): void {
-  const tokens = formulaTokens(config);
-  const cft = cellFormulaTokens(config) ?? {};
-  const register = (src: unknown) => {
-    const s = typeof src === "string" ? src : "";
-    if (!s.includes("<ref") && !/\$[A-Z]/.test(s)) return;
-    for (const entry of extractRefEntries(s, "", tokens)) visitor(entry);
-  };
-
-  for (let i = 0; i < config.headers.length; i++) {
-    register(config.rawHeaders?.[i] ?? config.headers[i]);
-  }
-
-  for (let r = 0; r < displayRows.length; r++) {
-    const row = displayRows[r];
-    for (const h of config.headers) {
-      register(cft[String(r)]?.[h] ?? cft[String(r)]?.[stripRefs(h)]);
-      const rv = row[h];
-      if (typeof rv === "string" && rv.includes("<ref")) register(rv);
-    }
-  }
+function refEntryKey(entry: RefEntry): string {
+  return entry.name ? `n:${entry.name}` : `c:${entry.content}`;
 }
 
 export function getCompareValueForKey(

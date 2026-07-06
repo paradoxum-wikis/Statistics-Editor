@@ -21,7 +21,7 @@
     buildActiveSkinTables,
     buildCompareRowsCache,
     buildDisplayRowsCache,
-    buildSkinNotes,
+    buildSkinRefState,
     getCompareValueForKey as getCompareValueFromCache,
     rebuildBaselineForSkin,
     tableCacheKey,
@@ -72,9 +72,15 @@
     );
   });
 
-  const skinNotes = $derived.by(() => {
+  const skinRefs = $derived.by(() => {
     towerStore.refreshTrigger;
-    return buildSkinNotes(activeSkinData, displayRowsCache);
+    return buildSkinRefState(activeSkinData, displayRowsCache);
+  });
+
+  const getSkinRefNum = $derived.by(() => {
+    const map = skinRefs.refNumberMap;
+    return (content: string, name?: string | null) =>
+      map.get(name ? `n:${name}` : `c:${content}`) ?? 1;
   });
 
   let showDiff = $state(settingsStore.seeValueDifference);
@@ -387,6 +393,8 @@
               {showDiff}
               {disabled}
               isFirst={orderedIdx === 0}
+              refTokenRegistry={skinRefs.registry}
+              getRefNum={getSkinRefNum}
               commit={commitEdit}
             />
           {/each}
@@ -525,7 +533,7 @@
       {/if}
     </div>
 
-    <NotesSection notes={skinNotes} />
+    <NotesSection notes={skinRefs.notes} />
   {:else}
     <div class="text-center py-8 text-body">
       Select a tower to edit its skins.
