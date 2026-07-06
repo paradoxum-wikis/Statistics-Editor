@@ -17,10 +17,10 @@
   } = $props();
 </script>
 
-<RenderedHtml html={renderCellHtml(value, readOnly)} />
-{#each entries as entry (entry.name ? `n:${entry.name}` : `c:${entry.content}`)}
-  {@const n = getRefNum(entry.content, entry.name)}
-  <Tooltip.Root>
+<RenderedHtml
+  html={renderCellHtml(value, readOnly)}
+/>{#each entries as entry (entry.name ? `n:${entry.name}` : `c:${entry.content}`)}{@const n =
+    getRefNum(entry.content, entry.name)}<Tooltip.Root>
     <Tooltip.Trigger>
       {#snippet child({ props })}
         <sup class="ref-sup" {...props}>[{n}]</sup>
@@ -35,8 +35,7 @@
         <RenderedHtml html={renderCellHtml(entry.content, true)} />
       </Tooltip.Content>
     </Tooltip.Portal>
-  </Tooltip.Root>
-{/each}
+  </Tooltip.Root>{/each}
 
 <style>
   .ref-sup {
@@ -48,9 +47,9 @@
     cursor: help;
     user-select: none;
     font-weight: 500;
-  }
 
-  .ref-sup:hover {
-    color: var(--foreground);
+    &:hover {
+      color: var(--foreground);
+    }
   }
 </style>
