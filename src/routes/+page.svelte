@@ -40,6 +40,13 @@
   });
 </script>
 
+<svelte:window
+  onbeforeunload={(e) => {
+    if (!towerStore.isDirty) return;
+    e.preventDefault();
+  }}
+/>
+
 <div class="hidden md:flex h-screen flex-col">
   <DesktopLayout {isClient} />
 </div>
