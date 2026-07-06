@@ -12,7 +12,7 @@ import {
   isCustomTower,
 } from "$lib/towerComponents/customTowers";
 import { mergeBaselineOnTowerDiff } from "$lib/utils/towah";
-import { embedSeDiff } from "$lib/neowtext/directives";
+import { embedSeDiff, stripSeDiff } from "$lib/neowtext/directives";
 import { fetchShare, parseShareRef } from "$lib/services/shareTower";
 
 /**
@@ -459,6 +459,28 @@ class TowerStore {
     this.isDirty = false;
     this.#wikitextStale = false;
     return await this.forceReload();
+  }
+
+  clearDiff(): void {
+    let changed = false;
+
+    const eff = this.effectiveWikitext || "";
+    const cleanedEff = stripSeDiff(eff);
+    if (cleanedEff !== eff) {
+      this.effectiveWikitext = cleanedEff;
+      changed = true;
+    }
+
+    if (Object.keys(this.baseline).length > 0) {
+      this.baseline = {};
+      this.baselineLocked = false;
+      changed = true;
+    }
+
+    if (changed) {
+      this.isDirty = true;
+      this.#wikitextStale = false;
+    }
   }
 
   isCustomSelected(): boolean {

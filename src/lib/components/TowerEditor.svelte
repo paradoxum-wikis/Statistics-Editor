@@ -12,7 +12,11 @@
   import { fly } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
   import { untrack } from "svelte";
-  import { mkCellKey, parseCellKey } from "$lib/neowtext/directives";
+  import {
+    mkCellKey,
+    parseCellKey,
+    stripSeDiff,
+  } from "$lib/neowtext/directives";
   import MoneyIcon from "$lib/assets/Income.png";
   import { SvelteSet, SvelteMap } from "svelte/reactivity";
   import type { Attachment } from "svelte/attachments";
@@ -505,6 +509,16 @@
     towerStore.refresh();
   }
 
+  function handleClearDiff() {
+    if (settingsStore.debugMode) {
+      console.log(
+        `[TowerEditor] Clear diff requested (tower=${tower?.name ?? "null"}, skin=${selectedSkinName})`,
+      );
+    }
+    towerStore.clearDiff();
+    towerStore.refresh();
+  }
+
   function handleSave() {
     towerStore.save(collectChangedBaseline());
   }
@@ -805,6 +819,12 @@
       if (Math.abs(currentN - baseN) >= 1e-9) return true;
     }
     return false;
+  });
+
+  const hasSavedDiff = $derived.by(() => {
+    const text =
+      towerStore.originalWikitext || towerStore.effectiveWikitext || "";
+    return stripSeDiff(text) !== text;
   });
 </script>
 
@@ -1209,10 +1229,15 @@
       </Popover.Root>
       <Btn
         variant="secondary"
-        onclick={handleDiscard}
-        disabled={!towerStore.isDirty}
+        onclick={towerStore.isDirty
+          ? () => void handleDiscard()
+          : handleClearDiff}
+        disabled={!(towerStore.isDirty || hasSavedDiff)}
+        title={towerStore.isDirty
+          ? "Discard unsaved changes (revert to last loaded effective wiki)"
+          : "Clear the saved @se-diff baseline (removes the difference tracking comment without leaving an empty line)"}
       >
-        Clear Changes
+        {towerStore.isDirty ? "Clear Changes" : "Clear Difference"}
       </Btn>
       {#if towerStore.sharePreviewId}
         <Popover.Root>
