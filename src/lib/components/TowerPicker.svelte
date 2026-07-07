@@ -107,26 +107,24 @@
   </Combobox.Root>
 {:else}
   <div class={["home-picker flex min-h-0 flex-1 flex-col gap-3", className]}>
-    <div class="home-picker-search">
-      <TextInput
-        type="search"
-        placeholder="Enter a tower name!"
-        bind:value={query}
-        class="bg-card! border-border!"
-      />
-    </div>
+    <TextInput
+      type="search"
+      placeholder="Enter a tower name!"
+      bind:value={query}
+      class="bg-card! border-border! rounded-[var(--radius)_0_0]!"
+    />
 
     <div
-      class="home-picker-list min-h-0 max-h-[min(60vh,36rem)] flex-1 overflow-y-auto border border-border bg-card md:max-h-none"
+      class="rounded-[0_0_var(--radius)] min-h-0 max-h-[min(60vh,36rem)] flex-1 overflow-y-auto border border-border bg-card md:max-h-none"
     >
       {#if !query && recent.length > 0}
         <section class="p-2">
           <h3 class="picker-section-title">Recent</h3>
-          <ul>
+          <ul class="picker-grid">
             {#each recent as name (name)}
               <li
                 class="group relative min-w-0 rounded-[calc(var(--radius)-0.25rem)_0] hover:bg-accent hover:text-accent-foreground"
-                out:slide={{ duration: 150, easing: cubicOut }}
+                out:slide={{ duration: 177, easing: cubicOut, axis: "x" }}
               >
                 <button
                   type="button"
@@ -152,11 +150,11 @@
       {#each groups as group (group.label)}
         <section class="p-2">
           <h3 class="picker-section-title">{group.label}</h3>
-          <ul>
+          <ul class="picker-grid">
             {#each group.towers as name (name)}
-              <li>
+              <li class="min-w-0">
                 <button
-                  class="combobox-item hover:bg-accent hover:text-accent-foreground"
+                  class="combobox-item min-w-0 truncate hover:bg-accent hover:text-accent-foreground"
                   onclick={() => pick(name)}
                 >
                   {name}
@@ -175,14 +173,6 @@
 {/if}
 
 <style>
-  .home-picker-search :global(.input) {
-    border-radius: var(--radius) 0 0;
-  }
-
-  .home-picker-list {
-    border-radius: 0 0 var(--radius);
-  }
-
   .picker-section-title {
     padding: 0.25rem 0.5rem;
     font-size: 0.75rem;
@@ -190,5 +180,18 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: var(--muted-foreground);
+  }
+
+  .picker-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.125rem;
+    column-rule: 1px solid var(--border);
+  }
+
+  @media (min-width: 768px) {
+    .picker-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
   }
 </style>
