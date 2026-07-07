@@ -108,7 +108,7 @@
     <div class="home-picker-search">
       <TextInput
         type="search"
-        placeholder="Search towers..."
+        placeholder="Enter a tower name!"
         bind:value={query}
       />
     </div>
@@ -152,7 +152,7 @@
         </section>
       {:else}
         <p class="px-4 py-8 text-center text-sm text-muted-foreground">
-          No towers found
+          No such towers found..!
         </p>
       {/each}
     </div>

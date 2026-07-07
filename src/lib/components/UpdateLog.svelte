@@ -144,7 +144,7 @@
 
 {#if loading}
   <p class="animate-pulse text-center text-xs text-muted-foreground">
-    Loading updates...
+    Scout is on the lookout for updates...
   </p>
 {:else if failed}
   <p class="text-xs text-muted-foreground">
@@ -162,12 +162,16 @@
   <div class="min-w-0 space-y-4">
     {#each groups as group (group.label)}
       <section class="min-w-0 space-y-2">
-        <h4 class="text-[0.65rem] font-medium uppercase tracking-wide text-muted-foreground">
+        <h4
+          class="text-[0.65rem] font-medium uppercase tracking-wide text-muted-foreground"
+        >
           {group.label}
         </h4>
         <ul class="min-w-0 space-y-2">
           {#each group.entries as entry (entry.sha)}
-            <li class="min-w-0 rounded-[calc(var(--radius)-0.5rem)_0] border border-border/60 p-2">
+            <li
+              class="min-w-0 rounded-[calc(var(--radius)-0.5rem)_0] border border-border/60 p-2"
+            >
               <div class="mb-1 flex min-w-0 items-start justify-between gap-2">
                 {#if entry.badgeType}
                   <span
