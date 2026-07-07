@@ -3,9 +3,10 @@ $DPS$ = Damage / Firerate
 $CE$ = $TP$ / DPS
 $TP$ = $FNC-TOTALPRICE$
 $FNC-COST$ = 850; 350; 1500; 3800; 9500
-$FNC-DETECTION$ = 1; 0;
-$FNC-UPGRADE$ = Endurance; Piercing Cold; Subzero Hero; Hyper Icer Rifle
-$FNC-UPGRADEICON$ = 15686412605; 15686412501; 15686412400; 15686412306
+$FSE-DETECTION$ = 1; 0;
+$FSE-UPGRADE$ = Endurance; Piercing Cold; Subzero Hero; Hyper Icer Rifle
+$FSE-UPGRADEICON$ = 15686412605; 15686412501; 15686412400; 15686412306
+$FSE-CATEGORY$ = Exclusive
 $DREF$ = <ref>DPS assumes its projectile only hits one enemy.</ref>
 </var>
 <div class="overflow-box">

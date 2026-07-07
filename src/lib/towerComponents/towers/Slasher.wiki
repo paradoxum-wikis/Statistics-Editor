@@ -8,9 +8,10 @@ $TP$ = $FNC-TOTALPRICE$
 $CE$ = Total Price / DPS
 $CREF$ = <ref>Number listed is the required number of shots for it to deal a critical hit.</ref>
 $DREF$ = <ref>DPS is calculated as (Damage × 2 + Crit Damage) ÷ Crit Swing ÷ Swingrate. DPS does not include bleed damage.</ref>
-$FNC-UPGRADE$ = Sleight of Hands; Bloodlust; Psycho Knife; Ocean Of Blood
-$FNC-UPGRADEICON$ = 92740435796975; 93224058728799; 102669883500047; 102686099141752
-$FNC-DETECTION$ = 1; 2;
+$FSE-UPGRADE$ = Sleight of Hands; Bloodlust; Psycho Knife; Ocean Of Blood
+$FSE-UPGRADEICON$ = 92740435796975; 93224058728799; 102669883500047; 102686099141752
+$FSE-DETECTION$ = 1; 2;
+$FSE-CATEGORY$ = Exclusive
 </var>
 <div class="overflow-box">
 {| class="wikitable stats-table"

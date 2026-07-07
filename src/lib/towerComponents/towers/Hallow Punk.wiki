@@ -6,8 +6,9 @@ $TP$ = $FNC-TOTALPRICE$
 $TED$ = Burn Damage * (Burn Duration / Tick)
 $CE$ = Total Price / DPS
 $FNC-COST$ = 500; 300; 2700; 7270
-$FNC-UPGRADE$ = Bewitching Blaze; Vengeful Missiles; Queen of the Blood Ember
-$FNC-UPGRADEICON$ = 87280920444213; 103271630916907; 98952678277583
+$FSE-UPGRADE$ = Bewitching Blaze; Vengeful Missiles; Queen of the Blood Ember
+$FSE-UPGRADEICON$ = 87280920444213; 103271630916907; 98952678277583
+$FSE-CATEGORY$ = Exclusive
 $FREF$ = <ref>Firerate does not account for projectile travel time.</ref>
 $DREF$ = <ref>DPS assumes only one enemy is hit and receives full splash damage, and does not account for projectile travel time.<br/>With burn, Total DPS is calculated as Normal DPS + Burn DPS, with Burn DPS being calculated as Burn Damage ÷ Tick.</ref>
 </var>

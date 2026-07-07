@@ -3,10 +3,11 @@ $DPS$ = Damage / Firerate
 $CE$ = Total Price / DPS
 $TP$ = $FNC-TOTALPRICE$
 $FNC-COST$ = 300; 50; 320; 3000
-$FNC-DETECTION$ = ; 0; 3
-$FNC-UPGRADE$ = Snow Day; Frigid Temperatures; Snowball Cannon
-$FNC-UPGRADEICON$ = 15686418975; 15686418835; 15686418748
+$FSE-DETECTION$ = ; 0; 3
+$FSE-UPGRADE$ = Snow Day; Frigid Temperatures; Snowball Cannon
+$FSE-UPGRADEICON$ = 15686418975; 15686418835; 15686418748
 $FNC-ROFBUG$ = Firerate
+$FSE-CATEGORY$ = Exclusive
 </var>
 <div class="overflow-box">
 {| class="wikitable stats-table"

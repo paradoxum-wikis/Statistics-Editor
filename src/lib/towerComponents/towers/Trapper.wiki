@@ -11,10 +11,10 @@ $CE$ = Total Price / DPS
 $TP$ = $FNC-TOTALPRICE$
 $FNC-COST$ = 500; 500; 1500; 6000; 11500
 $FNC-PVP-COST$ = 500; 500; 1500; 5000; 13500
-$FNC-DETECTION$ = ; 0;
-$FNC-UPGRADE$ = Faster Throwing; Watch your step; Better Traps; Don't try this at home
-$FNC-UPGRADE$ = Sharper Spikes; Watch your step; Better Traps; Don't try this at home
-$FNC-UPGRADEICON$ = 16493201931; 16493202507; 16493202350; 16493202129
+$FSE-DETECTION$ = ; 0;
+$FSE-UPGRADE$ = Faster Throwing; Watch your step; Better Traps; Don't try this at home
+$FSE-UPGRADEICON$ = 16493201931; 16493202507; 16493202350; 16493202129
+$FSE-CATEGORY$ = Intermediate
 $BUREF$ = <ref name="MaxBuildUp">Max Build Up assumes only one enemy is hit and only walks the traps once. Max Build Up is calculated as Damage × Max Traps.</ref>
 $HBUREF$ = <ref name="MaxHealthBuildUp">Max Health Build Up but it uses the health statistic of the spike trap instead. Max Health Build Up is calculated as Health × Max Traps.</ref>
 $DREF$ = <ref name="DPS">DPS assumes only one enemy is hit by a single trap and receives full damage. For traps with health, uses health instead of damage.</ref>

@@ -11,9 +11,10 @@ $TED$ = Burn Damage * (Burn Time / Burn Tick)
 $CE$ = Total Price / DPS
 $TP$ = $FNC-TOTALPRICE$
 $FNC-COST$ = 650; 400; 670; 2750; 8500
-$FNC-DETECTION$ = 3; 0;
-$FNC-UPGRADE$ = Trained Juggling; Cold Humor; Potent Bombs; Harlequin of Doom
-$FNC-UPGRADEICON$ = 15332518871; 15332518503; 15332518237; 15332519184
+$FSE-DETECTION$ = 3; 0;
+$FSE-UPGRADE$ = Trained Juggling; Cold Humor; Potent Bombs; Harlequin of Doom
+$FSE-UPGRADEICON$ = 15332518871; 15332518503; 15332518237; 15332519184
+$FSE-CATEGORY$ = Exclusive
 $BREF$ = <ref>Burn damage is 30% of base damage.</ref>
 $DREF$ = <ref name="dps">DPS assumes only one enemy is hit and that only one type of bomb is used.</ref>
 $TREF$ = <ref>Total Elapsed Damage is calculated as Burn Damage × (Burn Time ÷ Burn Tick).</ref>

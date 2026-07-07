@@ -5,9 +5,9 @@ $CDPS$ = $DPS$ + $BDPS$
 $CE$ = Total Price / DPS
 $TP$ = $FNC-TOTALPRICE$
 $FNC-COST$ = 2000; 800; 2350; 5000; 8500; 22500
-$FNC-DETECTION$ = ; ;
-$FNC-UPGRADE$ = Better Production; Durable Minerals; High Radiation; Larger Isotopes; Nuclear Silo
-$FNC-UPGRADEICON$ = 0; 0; 0; 0; 0
+$FSE-DETECTION$ = ; ;
+$FSE-UPGRADE$ = Better Production; Durable Minerals; High Radiation; Larger Isotopes; Nuclear Silo
+$FSE-UPGRADEICON$ = 0; 0; 0; 0; 0
 $FNC-ROFBUG$ = Firerate
 </var>
 <div class="overflow-box">

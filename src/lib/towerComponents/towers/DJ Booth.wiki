@@ -1,9 +1,10 @@
 <var>
 $TP$ = $FNC-TOTALPRICE$
 $FNC-COST$ = 850; 300; 1250; 3000; 8000; 20000
-$FNC-DETECTION$ = ; 3;
-$FNC-UPGRADE$ = Laptop Studio; Party Mode; Thrifty Music; Audio Visualizer; Apocalypse Rave
-$FNC-UPGRADEICON$ = 95144637961093; 113548130163293; 101877307760287; 123117801948681; 113854542319656
+$FSE-DETECTION$ = ; 3;
+$FSE-UPGRADE$ = Laptop Studio; Party Mode; Thrifty Music; Audio Visualizer; Apocalypse Rave
+$FSE-UPGRADEICON$ = 95144637961093; 113548130163293; 101877307760287; 123117801948681; 113854542319656
+$FSE-CATEGORY$ = Advanced
 </var>
 <div class="overflow-box">
 {| class="wikitable stats-table"

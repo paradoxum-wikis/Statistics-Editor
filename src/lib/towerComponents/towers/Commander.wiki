@@ -6,9 +6,10 @@ $SDPS$ = ((Damage / Firerate) * 10) / 60
 $CE$ = Total Price / Call to Arms DPS
 $TP$ = $FNC-TOTALPRICE$
 $FNC-COST$ = 650; 400; 2450; 4500; 14000
-$FNC-DETECTION$ = 2; 2; 2
-$FNC-UPGRADE$ = Leadership; Call to Arms; Intense Training; Strength in Numbers
-$FNC-UPGRADEICON$ = 5525000768; 4594880289; 5525002879; 17512145719
+$FSE-DETECTION$ = 2; 2; 2
+$FSE-UPGRADE$ = Leadership; Call to Arms; Intense Training; Strength in Numbers
+$FSE-UPGRADEICON$ = 5525000768; 4594880289; 5525002879; 17512145719
+$FSE-CATEGORY$ = Advanced
 $DREF$ = <ref>DPS is calculated as ((Damage ÷ Firerate) × Attack Time) ÷ Ability Cooldown<br>'''Attack Time''' is the time in which the Commander can attack during its abilities while '''Ability Cooldown''' is the minimum time between ability activations.<br>DPS does not include any Firerate Buffs.</ref>
 $SREF$ = <ref>If both abilites are used, DPS is the same as Call to Arms DPS.</ref>
 </var>

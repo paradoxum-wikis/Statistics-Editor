@@ -5,9 +5,10 @@ $TP$ = $FNC-TOTALPRICE$
 $EXP$ = {{#expr:floor(50 * 1.09^(Level - 1))}}
 $FNC-COST$ = 125; 50; 375; 1350; 2200
 $FNC-PVP-COST$ = 300; 100; 650; 1800; 3250
-$FNC-DETECTION$ = 2; ;
-$FNC-UPGRADE$ = Faster Reloading; Precise Aiming; Stronger Equipment; Akimbo Handguns
-$FNC-UPGRADEICON$ = 3278746120; 3278749117; 3278741672; 3279537687
+$FSE-DETECTION$ = 2; ;
+$FSE-UPGRADE$ = Faster Reloading; Precise Aiming; Stronger Equipment; Akimbo Handguns
+$FSE-UPGRADEICON$ = 3278746120; 3278749117; 3278741672; 3279537687
+$FSE-CATEGORY$ = Starter
 </var>
 <div class="mobile-tabber"><tabber>
 |-|Regular =

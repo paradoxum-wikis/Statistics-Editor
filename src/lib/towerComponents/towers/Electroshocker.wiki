@@ -5,9 +5,10 @@ $CE$ = Total Price / DPS
 $MCE$ = Total Price / $MDPS$
 $TP$ = $FNC-TOTALPRICE$
 $FNC-COST$ = 650; 275; 950; 2400; 4000; 10000
-$FNC-DETECTION$ = 2; 0;
-$FNC-UPGRADE$ = Higher Voltage; Improved Handling; Faraday's Vest; Shock Force; Zeus Cannon
-$FNC-UPGRADEICON$ = 3280081327; 4675534331; 4675521746; 4675504505; 4675504640
+$FSE-DETECTION$ = 2; 0;
+$FSE-UPGRADE$ = Higher Voltage; Improved Handling; Faraday's Vest; Shock Force; Zeus Cannon
+$FSE-UPGRADEICON$ = 3280081327; 4675534331; 4675521746; 4675504505; 4675504640
+$FSE-CATEGORY$ = Intermediate
 $DREF$ = <ref>Assumes that only one enemy is hit per shock.</ref>
 $MREF$ = <ref>Calculated as DPS × Max Hits.</ref>
 </var>

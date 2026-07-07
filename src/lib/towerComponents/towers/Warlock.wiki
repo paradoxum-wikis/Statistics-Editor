@@ -2,9 +2,10 @@
 $TP$ = $FNC-TOTALPRICE$
 $FNC-COST$ = 4200; 2500; 6800; 12000; 20000; 30000
 $AOEDMG$ = Normal Damage
-$FNC-DETECTION$ = 2; 5;
-$FNC-UPGRADE$ = Alcoyte; Forbidden Arts; Pact of the Blade; Eldritch Knight; Abyss Walker
-$FNC-UPGRADEICON$ = 132600421163755; 92386627632419; 114159381171941; 135475007047111; 134932843522178
+$FSE-DETECTION$ = 2; 5;
+$FSE-UPGRADE$ = Alcoyte; Forbidden Arts; Pact of the Blade; Eldritch Knight; Abyss Walker
+$FSE-UPGRADEICON$ = 132600421163755; 92386627632419; 114159381171941; 135475007047111; 134932843522178
+$FSE-CATEGORY$ = Exclusive
 $RDPS$ = Damage / Firerate
 $MDPS$ = (Normal Damage + AOE Damage) / Swingrate
 $MaxDPS$ = (Normal Damage + (AOE Damage * Max Hits)) / Swingrate

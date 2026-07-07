@@ -4,12 +4,13 @@ $CE$ = Total Price / DPS
 $TP$ = $FNC-TOTALPRICE$
 $FNC-COST$ = 700; 250; 950; 2500; 6000
 $FNC-PVP-COST$ = 575; 150; 500; 1500; 6000
-$FNC-DETECTION$ = 2; 0;
-$FNC-PVP-DETECTION$ = ; 0;
-$FNC-UPGRADE$ = Faster Throwing; Ullapool Caber; Loch-n-Load; Expert's Ordnance
-$FNC-PVP-UPGRADE$ = Further Throwing; Steil Grenade; Chinalake; Collateral Damage
-$FNC-UPGRADEICON$ = 5523227714; 5523227714; 5523228733; 5523229364
-$FNC-PVP-UPGRADEICON$ = ; 5523227714; 5523228733; 5523229364
+$FSE-DETECTION$ = 2; 0;
+$FSE-PVP-DETECTION$ = ; 0;
+$FSE-UPGRADE$ = Faster Throwing; Ullapool Caber; Loch-n-Load; Expert's Ordnance
+$FSE-PVP-UPGRADE$ = Further Throwing; Steil Grenade; Chinalake; Collateral Damage
+$FSE-UPGRADEICON$ = 5523227714; 5523227714; 5523228733; 5523229364
+$FSE-PVP-UPGRADEICON$ = ; 5523227714; 5523228733; 5523229364
+$FSE-CATEGORY$ = Starter
 $SREF$ = <ref name=splash>Damage dealt in the inner explosion sphere. Splash damage is decreased linearly from the edge of the inner explosion sphere to the edge of the outer explosion sphere, if the enemy is in the outer explosion sphere.</ref>
 $AREF$ = <ref name=aim>Aim Time happens before the '''Demoman''' throws a grenade. This does not affect its firerate.</ref>
 $DREF$ = <ref name=dps>DPS does not consider projectile travel time.</ref>

@@ -6,10 +6,11 @@ $CE$ = Total Price / DPS
 $TP$ = $FNC-TOTALPRICE$
 $FNC-COST$ = 4500; 1500; 5500; 15750; 25000
 $FNC-PVP-COST$ = 2000; 650; 2400; 8500; 17000
-$FNC-DETECTION$ = ; 2; 0
-$FNC-PVP-DETECTION$ = ; 0; 0
-$FNC-UPGRADE$ = Faster Reloading; Intelligence Radio; Trained Outlaw; Experimental Weapon of Destruction
-$FNC-UPGRADEICON$ = 3280081327; 3381734408; 3381735232; 3381735846
+$FSE-DETECTION$ = ; 2; 0
+$FSE-PVP-DETECTION$ = ; 0; 0
+$FSE-UPGRADE$ = Faster Reloading; Intelligence Radio; Trained Outlaw; Experimental Weapon of Destruction
+$FSE-UPGRADEICON$ = 3280081327; 3381734408; 3381735232; 3381735846
+$FSE-CATEGORY$ = Advanced
 </var>
 <div class="mobile-tabber"><tabber>
 |-|Regular =

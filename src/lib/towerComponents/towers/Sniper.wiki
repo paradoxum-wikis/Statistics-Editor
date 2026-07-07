@@ -4,9 +4,10 @@ $CE$ = Total Price / DPS
 $TP$ = $FNC-TOTALPRICE$
 $FNC-COST$ = 450; 200; 750; 2000; 5000
 $FNC-PVP-COST$ = 500; 350; 800; 3250; 5000
-$FNC-UPGRADE$ = Faster Reloading; Geared Up; Frontlines Sniping; Spec Ops
-$FNC-UPGRADEICON$ = 3280081327; 3280367022; 3280367963; 3280368786
-$FNC-DETECTION$ = 2; 3; 0
+$FSE-UPGRADE$ = Faster Reloading; Geared Up; Frontlines Sniping; Spec Ops
+$FSE-UPGRADEICON$ = 3280081327; 3280367022; 3280367963; 3280368786
+$FSE-DETECTION$ = 2; 3; 0
+$FSE-CATEGORY$ = Starter
 </var>
 <div class="mobile-tabber"><tabber>
 |-|Regular =

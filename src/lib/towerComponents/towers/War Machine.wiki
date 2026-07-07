@@ -5,9 +5,10 @@ $TDPS$ = $DPS$ + $MDPS$
 $CE$ = Total Price / DPS
 $TP$ = $FNC-TOTALPRICE$
 $FNC-COST$ = 2000; 250; 650; 5000; 12500; 50000;
-$FNC-DETECTION$ = 2; 5; 5
-$FNC-UPGRADE$ = IMPROVED HANDLING; STARK MISSILE; EPIC ARMOR PLATING; ULTRA CHARGED BODY ARMOR; TO THE VOID AND BACK
-$FNC-UPGRADEICON$ = 4989372339; 4989372568; 3584258139; 4989373124; 4989373460
+$FSE-DETECTION$ = 2; 5; 5
+$FSE-UPGRADE$ = IMPROVED HANDLING; STARK MISSILE; EPIC ARMOR PLATING; ULTRA CHARGED BODY ARMOR; TO THE VOID AND BACK
+$FSE-UPGRADEICON$ = 4989372339; 4989372568; 3584258139; 4989373124; 4989373460
+$FSE-CATEGORY$ = Exclusive
 $SREF$ = <ref>Number is the damage dealt in the inner explosion sphere. Splash damage is decreased linearly from the edge of the inner explosion sphere to the edge of the outer explosion sphere, if the enemy is in the outer explosion sphere.</ref>
 $DREF$ = <ref>Total DPS is calculated as Normal DPS + Missile DPS.<br/>Missile DPS assumes only one enemy is hit with all missiles and it receives full splash damage.</ref>
 </var>

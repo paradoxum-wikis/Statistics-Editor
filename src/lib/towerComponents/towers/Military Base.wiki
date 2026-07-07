@@ -8,16 +8,17 @@ $CE$ = Total Price / Total DPS
 $TP$ = $FNC-TOTALPRICE$
 $FNC-COST$ = 400; 200; 400; 2000; 7500; 25000
 $FNC-PVP-COST$ = 400; 200; 400; 1750; 7500; 25000
-$FNC-DETECTION$ = 3; 0;
-$FNC-UPGRADE$ = Mechanics; Barbed Wire; Mounted Gunner; Tank; Railgun Tank
-$FNC-UPGRADEICON$ = 3877874591; 3877875003; 3877873543; 3444568329; 3444568580
+$FSE-DETECTION$ = 3; 0;
+$FSE-UPGRADE$ = Mechanics; Barbed Wire; Mounted Gunner; Tank; Railgun Tank
+$FSE-UPGRADEICON$ = 3877874591; 3877875003; 3877873543; 3444568329; 3444568580
+$FSE-CATEGORY$ = Intermediate
 $SREF$ = <ref name=splash>Damage dealt in the inner explosion sphere. Splash damage is decreased linearly if the enemy is in the outer explosion sphere.</ref>
 $RREF$ = <ref name=ram>DPS dealt with its collisions. It is calculated as Health ÷ Spawnrate.</ref>
 </var>
 <div class="mobile-tabber"><tabber>
 |-|Regular =
 <div class="overflow-box">
-{| class="wikitable stats-table" ! colspan="5"
+{| class="wikitable stats-table"
 ! Level !! Total Price !! Health !! Gunner Damage !! Cannon Splash Damage$SREF$ !! Cannon Firerate !! Airstrike Damage$SREF$ !! Spawnrate !! Firerate !! Range !! Ram DPS !! Gunner DPS !! Cannon DPS !! Total DPS !! Cost Efficiency
 |-
 | 0 || {{Money|$TP$}} || 60 || N/A || N/A || N/A || N/A || 45 || N/A || 5 || $RDPS$ || N/A || N/A || $RDPS$ || {{Money|$CE$}}
@@ -35,7 +36,7 @@ $RREF$ = <ref name=ram>DPS dealt with its collisions. It is calculated as Health
 </div>
 |-|PVP =
 <div class="overflow-box">
-{| class="wikitable stats-table" ! colspan="5"
+{| class="wikitable stats-table"
 ! Level !! Total Price !! Health !! Gunner Damage !! Cannon Splash Damage$SREF$ !! Cannon Firerate !! Airstrike Damage$SREF$ !! Spawnrate !! Firerate !! Range !! Ram DPS !! Gunner DPS !! Cannon DPS !! Total DPS !! Cost Efficiency
 |-
 | 0 || {{Money|$TP$}} || 60 || N/A || N/A || N/A || N/A || 40 || N/A || 5 || $RDPS$ || N/A || N/A || $RDPS$ || {{Money|$CE$}}

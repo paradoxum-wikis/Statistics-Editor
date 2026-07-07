@@ -8,12 +8,13 @@ $CE$ = Total Price / Combined DPS
 $TP$ = $FNC-TOTALPRICE$
 $FNC-COST$ = 600; 325; 900; 2077; 6250; 12500; 32500
 $FNC-PVP-COST$ = 700; 250; 400; 1800; 2600; 12500; 32500
-$FNC-DETECTION$ = 2; 0; 0
-$FNC-PVP-DETECTION$ = 2; 0; 2
-$FNC-UPGRADE$ = Precise Calculations; Makeshift Radar; Auto Converter; Heavy Construction; Improved Blueprints; Illegal Gun Parts
-$FNC-PVP-UPGRADE$ = Precise Calculations; Makeshift Radar; Auto Converter; Improved Blueprints; Heavy Construction; Illegal Gun Parts
-$FNC-UPGRADEICON$ = 4517035597; 149177741; 8998290803; 155526941; 31857714; 7852911857
-$FNC-PVP-UPGRADEICON$ = 4517035597; 149177741; 8998290803; 31857714; 155526941; 7852911857
+$FSE-DETECTION$ = 2; 0; 0
+$FSE-PVP-DETECTION$ = 2; 0; 2
+$FSE-UPGRADE$ = Precise Calculations; Makeshift Radar; Auto Converter; Heavy Construction; Improved Blueprints; Illegal Gun Parts
+$FSE-PVP-UPGRADE$ = Precise Calculations; Makeshift Radar; Auto Converter; Improved Blueprints; Heavy Construction; Illegal Gun Parts
+$FSE-UPGRADEICON$ = 4517035597; 149177741; 8998290803; 155526941; 31857714; 7852911857
+$FSE-PVP-UPGRADEICON$ = 4517035597; 149177741; 8998290803; 31857714; 155526941; 7852911857
+$FSE-CATEGORY$ = Hardcore
 $DREF$ = <ref name="dps">Does not account for time taken to build Sentries.</ref>
 $CDREF$ = <ref name="cdps">Combined DPS is the total DPS of the tower itself and the max number of units at that Level.</ref>
 $CEREF$ = <ref name="ce">Uses combined DPS in the calculation.</ref>

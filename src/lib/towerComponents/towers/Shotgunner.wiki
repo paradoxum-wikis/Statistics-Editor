@@ -4,11 +4,12 @@ $CE$ = Total Price / DPS
 $TP$ = $FNC-TOTALPRICE$
 $FNC-COST$ = 1225; 640; 1550; 6000; 18500
 $FNC-PVP-COST$ = 400; 150; 1050; 3000; 8500
-$FNC-DETECTION$ = 1; ; 2
-$FNC-PVP-DETECTION$ = 2; 2;
-$FNC-UPGRADE$ = Shotgun Knowledge; Clay Pigeon Training; Heavier Shells; Tactical Blowback
-$FNC-PVP-UPGRADE$ = Faster Reloading; Shotgun Knowledge; Slug Madness; Tactical Blowback
-$FNC-UPGRADEICON$ = 5587697635; 5587697884; 5587698104; 5587698246
+$FSE-DETECTION$ = 1; ; 2
+$FSE-PVP-DETECTION$ = 2; 2;
+$FSE-UPGRADE$ = Shotgun Knowledge; Clay Pigeon Training; Heavier Shells; Tactical Blowback
+$FSE-PVP-UPGRADE$ = Faster Reloading; Shotgun Knowledge; Slug Madness; Tactical Blowback
+$FSE-UPGRADEICON$ = 5587697635; 5587697884; 5587698104; 5587698246
+$FSE-CATEGORY$ = Intermediate
 $DREF$ = <ref name=damage>The first two enemies damaged by the same bullet are dealt full damage, while the third enemy is dealt half of the damage.</ref>
 $DPREF$ = <ref name=dps>DPS assumes all bullets hit only one enemy.</ref>
 </var>

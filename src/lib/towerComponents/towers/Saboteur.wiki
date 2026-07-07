@@ -9,10 +9,11 @@ $CE$ = Total Price / DPS
 $TP$ = $FNC-TOTALPRICE$
 $FNC-COST$ = 575; 500; 1475; 4850; 15115
 $FNC-PVP-COST$ = 575; 450; 1475; 5150; 15115
-$FNC-DETECTION$ = 1; 0;
-$FNC-PVP-DETECTION$ = 1; 2;
-$FNC-UPGRADE$ = Scam Artist; Brand New Rig; Black Market Tech; Neural-Runner
-$FNC-UPGRADEICON$ = 138135211876727; 75068776606540; 121470510950529; 111948304760969
+$FSE-DETECTION$ = 1; 0;
+$FSE-PVP-DETECTION$ = 1; 2;
+$FSE-UPGRADE$ = Scam Artist; Brand New Rig; Black Market Tech; Neural-Runner
+$FSE-UPGRADEICON$ = 138135211876727; 75068776606540; 121470510950529; 111948304760969
+$FSE-CATEGORY$ = Advanced
 $DPREF$ = <ref name=dps>DPS assumes all bullets hit only one enemy.</ref>
 </var>
 <div class="mobile-tabber"><tabber>

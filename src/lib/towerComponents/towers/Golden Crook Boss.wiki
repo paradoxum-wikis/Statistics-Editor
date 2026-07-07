@@ -5,9 +5,10 @@ $TDPS$ = Gun DPS + Ram DPS
 $CE$ = Total Price / DPS
 $TP$ = $FNC-TOTALPRICE$
 $FNC-COST$ = 2000; 1250; 3400; 16500; 50000
-$FNC-DETECTION$ = 2; ; 0
-$FNC-UPGRADE$ = Lvl 1. Broke; Lvl. 2 Normie; Lvl 3. Gamer; Lvl. 4 GOD
-$FNC-UPGRADEICON$ = 3032133716; 3444643559; 3838914605; 3444644903
+$FSE-DETECTION$ = 2; ; 0
+$FSE-UPGRADE$ = Lvl 1. Broke; Lvl. 2 Normie; Lvl 3. Gamer; Lvl. 4 GOD
+$FSE-UPGRADEICON$ = 3032133716; 3444643559; 3838914605; 3444644903
+$FSE-CATEGORY$ = Golden Perks
 $CREF$ = <ref>Does not account for unit DPS.</ref>
 $GREF$ = <ref>Goons are not affected by any buffs or debuffs.</ref>
 </var>

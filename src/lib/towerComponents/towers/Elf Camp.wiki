@@ -7,9 +7,10 @@ $BRDPS$ = (Health + [[Splash Damage]]) / Spawnrate
 $CE$ = Total Price / Combined DPS
 $TP$ = $FNC-TOTALPRICE$
 $FNC-COST$ = 300; 350; 1800; 4500; 10750
-$FNC-DETECTION$ = 0; 0; 4
-$FNC-UPGRADE$ = Sno'ball Training; Unpaid Labor; Cookie Cutting; A Violent Night
-$FNC-UPGRADEICON$ = 125956529169231; 75868965324711; 120660526589244; 70951173324126
+$FSE-DETECTION$ = 0; 0; 4
+$FSE-UPGRADE$ = Sno'ball Training; Unpaid Labor; Cookie Cutting; A Violent Night
+$FSE-UPGRADEICON$ = 125956529169231; 75868965324711; 120660526589244; 70951173324126
+$FSE-CATEGORY$ = Exclusive
 $UREF$ = <ref name="Unit">Elves are not affected by any buffs or debuffs.</ref>
 $BREF$ = <ref>For the [[Gunner Elf]], DPS is calculated as (Damage × Burst Count) ÷ (Cooldown + (Firerate × Burst Count)).</ref>
 $GREF$ = <ref>Two [[Gunner Elf|Gunner Elves]] spawn at once.</ref>

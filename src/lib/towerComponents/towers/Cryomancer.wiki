@@ -6,9 +6,10 @@ $CE$ = Total Price / DPS
 $TP$ = $FNC-TOTALPRICE$
 $TED$ = Chill Damage * (Slowdown Time / Tick)
 $FNC-COST$ = 250; 200; 935; 2750; 6250
-$FNC-DETECTION$ = ; 0;
-$FNC-UPGRADE$ = Frosty Gear; Freezing Tanks; Ice Commando; Winter's Fury
-$FNC-UPGRADEICON$ = 15686403377; 15686403176; 15686403037; 15686402849
+$FSE-DETECTION$ = ; 0;
+$FSE-UPGRADE$ = Frosty Gear; Freezing Tanks; Ice Commando; Winter's Fury
+$FSE-UPGRADEICON$ = 15686403377; 15686403176; 15686403037; 15686402849
+$FSE-CATEGORY$ = Exclusive
 $TREF$ = <ref>At Level 2+ Total Elapsed Damage is calculated as Chill Damage × (Slowdown Time ÷ Tick).</ref>
 $DREF$ = <ref>DPS assumes the ice flames only hit one enemy.<br>At Level 2+, Ice DPS is calculated as Chill Damage ÷ Tick.<br>At Level 3+ DPS is calculated as (Damage × Ammo) ÷ (Reload Time + (Firerate × Ammo)) + Ice DPS.</ref>
 </var>

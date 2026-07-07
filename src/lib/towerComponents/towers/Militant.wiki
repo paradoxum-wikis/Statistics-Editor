@@ -4,11 +4,12 @@ $CE$ = Total Price / DPS
 $TP$ = $FNC-TOTALPRICE$
 $FNC-COST$ = 600; 300; 850; 2750; 8000
 $FNC-PVP-COST$ = 1400; 600; 2600; 5000; 10000
-$FNC-DETECTION$ = 1; ; 1
-$FNC-UPGRADE$ = Radio Comms; Field Ops; Guerrilla Tactics; Stealth Mercenary
-$FNC-PVP-UPGRADE$ = Radio Comms; Bigger Rifle; Upskill; Stealth Mercenary
-$FNC-UPGRADEICON$ = 5523212631; 5523215135; 5523216332; 5523217773
+$FSE-DETECTION$ = 1; ; 1
+$FSE-UPGRADE$ = Radio Comms; Field Ops; Guerrilla Tactics; Stealth Mercenary
+$FSE-PVP-UPGRADE$ = Radio Comms; Bigger Rifle; Upskill; Stealth Mercenary
+$FSE-UPGRADEICON$ = 5523212631; 5523215135; 5523216332; 5523217773
 $FNC-ROFBUG$ = Firerate
+$FSE-CATEGORY$ = Intermediate
 </var>
 <div class="mobile-tabber"><tabber>
 |-|Regular =

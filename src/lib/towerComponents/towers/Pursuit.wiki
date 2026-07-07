@@ -9,11 +9,12 @@ $FNC-SCHEMA$ = N; N; N; N; A; A; B; B;
 $FNC-BRANCH$ = Top Path Stats; Bottom Path Stats
 $FNC-COST$ = 5000; 1750; 3000; 4750; 15000; 47500; 9500; 13500;
 $FNC-PVP-COST$ = 2500; 750; 1500; 3500; 12500; 30000; 7500; 22500;
-$FNC-DETECTION$ = ; 3; ; ; 3; ; 4; 3;
-$FNC-PVP-DETECTION$ = ; 1; ; ; 1; ; 4; 1;
-$FNC-UPGRADE$ = AP Rounds; Enhanced Radar; Air to Ground Missiles; Sky Shredder; Leviathan; Modified Payload; Demolition Gunship
-$FNC-PVP-UPGRADE$ = .50 Caliber; Enhanced Radar; Air to Ground Missiles; Sky Shredder; Leviathan; Modified Payload; Demolition Gunship
-$FNC-UPGRADEICON$ = 117186100008439; 117186100008439; 98101516586169; File:PursuitLevelT4.png; File:PursuitLevelT4.png; File:PursuitLevelB4.png; File:PursuitLevelB4.png
+$FSE-DETECTION$ = ; 3; ; ; 3; ; 4; 3;
+$FSE-PVP-DETECTION$ = ; 1; ; ; 1; ; 4; 1;
+$FSE-UPGRADE$ = AP Rounds; Enhanced Radar; Air to Ground Missiles; Sky Shredder; Leviathan; Modified Payload; Demolition Gunship
+$FSE-PVP-UPGRADE$ = .50 Caliber; Enhanced Radar; Air to Ground Missiles; Sky Shredder; Leviathan; Modified Payload; Demolition Gunship
+$FSE-UPGRADEICON$ = 117186100008439; 117186100008439; 98101516586169; File:PursuitLevelT4.png; File:PursuitLevelT4.png; File:PursuitLevelB4.png; File:PursuitLevelB4.png
+$FSE-CATEGORY$ = Advanced
 $DREF$ = <ref name=dps>Calculated as:<br><math>\frac{\left(\text{Damage}\ \times\ Ammo\right)}{\left(\text{Reload Time}+\left(Firerate\times Ammo\right)\right)}</math></ref>
 $DREF2$ = <ref name=dps2>Calculated as:<br><math>\frac{\left(\text{Damage}\ \times\ Ammo\right)}{\left(\text{Reload Time}+\text{Rev Time}+\left(Firerate\times Ammo\right)\right)}</math></ref>
 $MREF$ = <ref name=missile>Calculated as:<br><math>\frac{\left(\text{Splash Damage} \times\ \text{Missile Count}\right)}{\left(\text{Missile Cooldown}+\left(\text{Burst Time}\times \text{Missile Count}\right)\right)}</math><br>Assumes missiles only hit one enemy.</ref>

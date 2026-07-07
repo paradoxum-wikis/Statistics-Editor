@@ -1,8 +1,9 @@
 <var>
 $TP$ = $FNC-TOTALPRICE$
 $FNC-COST$ = 400; 425; 650; 2950; 6000; 14000
-$FNC-UPGRADE$ = Medical Precautions; Prescribed Vitamins; BIG BRAIN; Medical Pack; MD-PhD
-$FNC-UPGRADEICON$ = 117008581932706; 71546954858462; 130592941614779; 112504548905627; 112504548905627
+$FSE-UPGRADE$ = Medical Precautions; Prescribed Vitamins; BIG BRAIN; Medical Pack; MD-PhD
+$FSE-UPGRADEICON$ = 117008581932706; 71546954858462; 130592941614779; 112504548905627; 112504548905627
+$FSE-CATEGORY$ = Intermediate
 </var>
 <div class="overflow-box">
 {| class="wikitable stats-table"

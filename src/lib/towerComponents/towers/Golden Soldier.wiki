@@ -4,9 +4,10 @@ $DPS2$ = Damage / Firerate
 $CE$ = Total Price / DPS
 $TP$ = $FNC-TOTALPRICE$
 $FNC-COST$ = 450; 150; 800; 3750; 12000
-$FNC-DETECTION$ = 2; ; 0
-$FNC-UPGRADE$ = Trigger Finger; Field Training; Gilded Gear; Maximum Potential
-$FNC-UPGRADEICON$ = 5523192002; 5523193619; 5523195646; 5523196519
+$FSE-DETECTION$ = 2; ; 0
+$FSE-UPGRADE$ = Trigger Finger; Field Training; Gilded Gear; Maximum Potential
+$FSE-UPGRADEICON$ = 5523192002; 5523193619; 5523195646; 5523196519
+$FSE-CATEGORY$ = Golden Perks
 $FREF$ = <ref name=firerate>Firerate only applies to the burst and is not the time between bursts.</ref>
 $DREF$ = <ref name=dps>Calculated as (Damage × Burst Count) ÷ (Cooldown + (Firerate × Burst Count)).</ref>
 </var>

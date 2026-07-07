@@ -8,10 +8,11 @@ $CE4$ = Total Price / $DPS4$
 $TP$ = $FNC-TOTALPRICE$
 $FNC-COST$ = 300; 450; 750; 2400; 6350
 $FNC-PVP-COST$ = 300; 150; 600; 1700; 4750
-$FNC-DETECTION$ = 2; ;
-$FNC-UPGRADE$ = CQC Training; Umbral Tempest; Ascended Shadows; Death Arms Ninja
-$FNC-PVP-UPGRADE$ = CQC Training; Advanced Hand to Hand Training; Upgraded Blades; Black Ops
-$FNC-UPGRADEICON$ = 111493227843909; 92894447316956; 71356771597575; 88526006090438
+$FSE-DETECTION$ = 2; ;
+$FSE-UPGRADE$ = CQC Training; Umbral Tempest; Ascended Shadows; Death Arms Ninja
+$FSE-PVP-UPGRADE$ = CQC Training; Advanced Hand to Hand Training; Upgraded Blades; Black Ops
+$FSE-UPGRADEICON$ = 111493227843909; 92894447316956; 71356771597575; 88526006090438
+$FSE-CATEGORY$ = Intermediate
 $DREF$ = <ref name=dps>Calculated as (Damage × (Whirlwind Hit - 1) + Whirlwind Damage) ÷ (Swingrate × Whirlwind Hit) from Level 2+.<br>For Level 4, DPS is calculated as (Threshold + Knife Damage × Knife Count) ÷ (Threshold ÷ ((Damage × (Whirlwind Hit - 1) + Whirlwind Damage) ÷ Whirlwind Hit) × Swingrate + Knife Cooldown) assuming all knives hit one enemy.</ref>
 </var>
 <div class="mobile-tabber"><tabber>

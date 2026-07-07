@@ -9,9 +9,10 @@ $TED$ = Burn Damage * (Burn Time / Burn Tick)
 $CE$ = $TP$ / DPS
 $TP$ = $FNC-TOTALPRICE$
 $FNC-COST$ = 2000; 1500; 4000; 8000; 15000
-$FNC-DETECTION$ = 2; 0;
-$FNC-UPGRADE$ = Elemental Armory; Experimental Tech; Improved Exhaust Systems; Frost Fire Specialist
-$FNC-UPGRADEICON$ = 136223791844063; 124219033045691; 77890912829468; 90889171304008
+$FSE-DETECTION$ = 2; 0;
+$FSE-UPGRADE$ = Elemental Armory; Experimental Tech; Improved Exhaust Systems; Frost Fire Specialist
+$FSE-UPGRADEICON$ = 136223791844063; 124219033045691; 77890912829468; 90889171304008
+$FSE-CATEGORY$ = Exclusive
 $TREF$ = <ref name="TED">Total Elapsed Damage is calculated as Burn Damage × (Burn Time ÷ Tick).</ref>
 $DREF$ = <ref>Normal DPS assumes the flames only hit one enemy.</ref>
 </var>

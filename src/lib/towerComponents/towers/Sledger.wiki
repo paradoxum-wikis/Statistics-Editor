@@ -13,9 +13,10 @@ $CE$ = Total Price / DPS
 $FREF$ = <ref>Frozen damage is dealt when hitting enemies that are already frozen or chilled. Frozen damage is double the regular damage.</ref>
 $DREF$ = <ref>DPS assumes only one enemy is hit and is not frozen.</ref>
 $FDREF$ = <ref>Once ''Ice Breaker'' is unlocked, DPS assumes that the enemy is frozen at all times.</ref>
-$FNC-UPGRADE$ = Heavier Swings; Better Sledge; Freezing Point; Ice Breaker; Arctic Aftershocks
-$FNC-UPGRADEICON$ = File:SledgerLevel1.png; File:SledgerLevel2.png; File:SledgerLevel3.png; File:SledgerLevel4.png; File:SledgerLevel5.png
-$FNC-DETECTION$ = ; 0;
+$FSE-UPGRADE$ = Heavier Swings; Better Sledge; Freezing Point; Ice Breaker; Arctic Aftershocks
+$FSE-UPGRADEICON$ = File:SledgerLevel1.png; File:SledgerLevel2.png; File:SledgerLevel3.png; File:SledgerLevel4.png; File:SledgerLevel5.png
+$FSE-DETECTION$ = ; 0;
+$FSE-CATEGORY$ = Exclusive
 </var>
 <div class="overflow-box">
 {| class="wikitable stats-table"

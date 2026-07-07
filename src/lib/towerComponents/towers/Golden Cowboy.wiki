@@ -5,9 +5,10 @@ $IPS$ = Income / (Spin Time + (Firerate * (Cash Shot--)))
 $IE$ = (Income + Cash Shot * Damage) / (Cash Shot * Damage)
 $TP$ = $FNC-TOTALPRICE$
 $FNC-COST$ = 600; 200; 650; 2400; 4250; 9750
-$FNC-DETECTION$ = 3; ;
-$FNC-UPGRADE$ = Headshot Practice; Gold Shot; Deadly Precision; Double Tap II; Wildest Of The West
-$FNC-UPGRADEICON$ = 5523231844; 4999425200; 5523233366; 5523234030; 5523234990
+$FSE-DETECTION$ = 3; ;
+$FSE-UPGRADE$ = Headshot Practice; Gold Shot; Deadly Precision; Double Tap II; Wildest Of The West
+$FSE-UPGRADEICON$ = 5523231844; 4999425200; 5523233366; 5523234030; 5523234990
+$FSE-CATEGORY$ = Golden Perks
 $DREF$ = <ref name=dps>DPS is calculated as (Damage × Cash Shot) ÷ (Spin Time + (Firerate × (Cash Shot - 1))).</ref>
 $IREF$ = <ref name=ips>This is calculated as Income ÷ (Spin Time + (Firerate × (Cash Shot - 1))).</ref>
 $IEREF$ = <ref name=ie>Money generated per 1 damage is calculated as (Income + Cash Shot × Damage) ÷ (Cash Shot × Damage).</ref>

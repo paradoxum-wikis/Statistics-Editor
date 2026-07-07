@@ -6,10 +6,11 @@ $IE$ = (Income + Cash Shot * Damage) / (Cash Shot * Damage)
 $TP$ = $FNC-TOTALPRICE$
 $FNC-COST$ = 550; 200; 600; 2000; 3000; 7777
 $FNC-PVP-COST$ = 550; 200; 500; 2000; 3500; 7000
-$FNC-DETECTION$ = 3; ;
-$FNC-UPGRADE$ = Steady Hand; Lucky Shot; Deadly Precision; Double Tap; Outlawed
-$FNC-PVP-UPGRADE$ = Steady Hand; Lucky Shot; Faster Instincts; Double Tap; Outlawed
-$FNC-UPGRADEICON$ = 4999425200; 5523233366; 5523231844; 5523234030; 5523234990
+$FSE-DETECTION$ = 3; ;
+$FSE-UPGRADE$ = Steady Hand; Lucky Shot; Deadly Precision; Double Tap; Outlawed
+$FSE-PVP-UPGRADE$ = Steady Hand; Lucky Shot; Faster Instincts; Double Tap; Outlawed
+$FSE-UPGRADEICON$ = 4999425200; 5523233366; 5523231844; 5523234030; 5523234990
+$FSE-CATEGORY$ = Advanced
 $DREF$ = <ref name=dps>DPS is calculated as (Damage × Cash Shot) ÷ (Spin Time + (Firerate × (Cash Shot - 1))).</ref>
 $IREF$ = <ref name=ips>This is calculated as Income ÷ (Spin Time + (Firerate × (Cash Shot - 1))).</ref>
 $IEREF$ = <ref name=ie>Money generated per 1 damage is calculated as (Income + Cash Shot × Damage) ÷ (Cash Shot × Damage).</ref>

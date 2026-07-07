@@ -7,9 +7,10 @@ $CE$ = $TP$ / DPS
 $TP$ = $FNC-TOTALPRICE$
 $FNC-COST$ = 1850; 975; 1987; 5750; 16500
 $FNC-PVP-COST$ = 1000; 350; 1250; 4500; 17500
-$FNC-DETECTION$ = 1; 3;
-$FNC-UPGRADE$ = Night Shift; Heavier Stick; Stunning Blows; Class Foxtrot Defense Level
-$FNC-UPGRADEICON$ = 11415010529; 11415012702; 11415014676; 11415015418
+$FSE-DETECTION$ = 1; 3;
+$FSE-UPGRADE$ = Night Shift; Heavier Stick; Stunning Blows; Class Foxtrot Defense Level
+$FSE-UPGRADEICON$ = 11415010529; 11415012702; 11415014676; 11415015418
+$FSE-CATEGORY$ = Advanced
 $CREF$ = <ref name=crit>Every third hit is a critical hit. Critical hits increase damage by 50%. If the damage is a decimal, the damage is rounded up.</ref>
 $DREF$ = <ref name=dps>Calculated as ((Damage × 2) + Critical Damage) ÷ 3 ÷ Swingrate.</ref>
 $TREF$ = <ref name=thirdhit>Only happens every third hit.</ref>

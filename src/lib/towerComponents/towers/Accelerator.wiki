@@ -4,9 +4,10 @@ $CE$ = Total Price / DPS
 $TP$ = $FNC-TOTALPRICE$
 $FNC-COST$ = 7500; 2000; 6000; 9999; 27500; 50000
 $FNC-PVP-COST$ = 4250; 750; 2000; 4500; 12000; 28500
-$FNC-DETECTION$ = 1; 0; 
-$FNC-UPGRADE$ = Extra Juice; Second Energy Canister; Powerhouse Armor; Supercharger; Vessel Of Infinite Destruction
-$FNC-UPGRADEICON$ = 11821094308; 11821094198; 11821093989; 11821093828; 11821093672
+$FSE-DETECTION$ = 1; 0; ;
+$FSE-UPGRADE$ = Extra Juice; Second Energy Canister; Powerhouse Armor; Supercharger; Vessel Of Infinite Destruction
+$FSE-UPGRADEICON$ = 11821094308; 11821094198; 11821093989; 11821093828; 11821093672
+$FSE-CATEGORY$ = Hardcore
 $CUREF$ = <ref name="charge">The Charge-Up happens when the '''Accelerator''' first starts attacking or its cooldown ends. This is indicated by an animation where the '''Accelerator''' charges up its plasma gun.</ref>
 $CREF$ = <ref name="cooldown">The Cooldown happens when the Overcharge occurs. This is indicated by an animation where the '''Accelerator''' waves its hand.</ref>
 $DREF$ = <ref name="dps">DPS is calculated as Overcharge ÷ (Charge-Up + Cooldown + [Overcharge ÷ Damage x Tick]).</ref>

@@ -7,11 +7,12 @@ $CE$ = Total Price / DPS
 $TP$ = $FNC-TOTALPRICE$
 $FNC-COST$ = 450; 300; 450; 1700; 4500
 $FNC-PVP-COST$ = 425; 225; 650; 2000; 4500
-$FNC-DETECTION$ = 2; 0;
-$FNC-PVP-DETECTION$ = 2; ;
-$FNC-UPGRADE$ = Expedition Gear; Bundled Up!; Arctic Soldier; Ull's Arrow
-$FNC-PVP-UPGRADE$ = Expedition Gear; Bundled Up!; Arctic Soldier; Frost Bite!
-$FNC-UPGRADEICON$ = 15686418975; 15686418835; 15686418748; 15686418571
+$FSE-DETECTION$ = 2; 0;
+$FSE-PVP-DETECTION$ = 2; ;
+$FSE-UPGRADE$ = Expedition Gear; Bundled Up!; Arctic Soldier; Ull's Arrow
+$FSE-PVP-UPGRADE$ = Expedition Gear; Bundled Up!; Arctic Soldier; Frost Bite!
+$FSE-UPGRADEICON$ = 15686418975; 15686418835; 15686418748; 15686418571
+$FSE-CATEGORY$ = Intermediate
 $DREF$ = <ref name=dps>Calculated as (Damage × Burst Count) ÷ (Cooldown + (Firerate × Burst Count)) at Level 3+.</ref>
 </var>
 <div class="mobile-tabber"><tabber>
@@ -28,7 +29,7 @@ $DREF$ = <ref name=dps>Calculated as (Damage × Burst Count) ÷ (Cooldown + (Fir
 |-
 | 3 || {{Money|$TP$}} || 4 || 3 || 0.15 || 1 || 25% || 12.5% || 3 || 10% || 6 || 0.6 || 14 || 0.5 || $TED$ || $TDPS$<ref>$DPS$ Normal DPS + $CDPS$ Chill DPS</ref> || {{Money|$CE$}}
 |-
-| 4 || {{Money|$TP$}} || 8 || 5 || 0.15 || 1 || 25% || 12.5% || 3 || 10% || 8 || 0.6 || 16 || 0.75 || $TED$ || $TDPS$<ref>$DPS$ Normal DPS + $CDPS$ Chill DPS</ref> || {{Money|$CE$}}
+| 4 || {{Money|$TP$}} || 9 || 5 || 0.15 || 1 || 25% || 12.5% || 3 || 10% || 8 || 0.6 || 16 || 0.75 || $TED$ || $TDPS$<ref>$DPS$ Normal DPS + $CDPS$ Chill DPS</ref> || {{Money|$CE$}}
 |}
 </div>
 |-|PVP =

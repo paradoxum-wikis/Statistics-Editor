@@ -5,9 +5,10 @@ $TDPS$ = $GDPS$ + $BDPS$
 $CE$ = Total Price / DPS
 $TP$ = $FNC-TOTALPRICE$
 $FNC-COST$ = 500; 225; 625; 1500; 3000; 7000
-$FNC-DETECTION$ = 4; 2; 0
-$FNC-UPGRADE$ = Greased Guns; Bombs away!; Aerial Ace; Spy Plane; The Surging Sky
-$FNC-UPGRADEICON$ = 17847640091; 17847639896; 17847640366; 17847640366; 17847640211
+$FSE-DETECTION$ = 4; 2; 0
+$FSE-UPGRADE$ = Greased Guns; Bombs away!; Aerial Ace; Spy Plane; The Surging Sky
+$FSE-UPGRADEICON$ = 17847640091; 17847639896; 17847640366; 17847640366; 17847640211
+$FSE-CATEGORY$ = Intermediate
 $TREF$ = <ref>Calculated as Gun DPS + Bomb DPS.</ref>
 </var>
 <div class="overflow-box">

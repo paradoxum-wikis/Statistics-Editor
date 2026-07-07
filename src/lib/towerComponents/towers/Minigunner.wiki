@@ -5,10 +5,11 @@ $TP$ = $FNC-TOTALPRICE$
 $EXP$ = {{#expr:floor(50 * 1.09^(Level - 1))}}
 $FNC-COST$ = 1850; 350; 1500; 6500; 21500
 $FNC-PVP-COST$ = 2550; 850; 1550; 8500; 18750
-$FNC-DETECTION$ = 1; ;
-$FNC-PVP-DETECTION$ = 2; ;
-$FNC-UPGRADE$ = Improved Handling; Specialized Tech; Geared Up; Futuristic Armory
-$FNC-UPGRADEICON$ = 15184753790; 15184753514; 15184753289; 15184752970
+$FSE-DETECTION$ = 1; ;
+$FSE-PVP-DETECTION$ = 2; ;
+$FSE-UPGRADE$ = Improved Handling; Specialized Tech; Geared Up; Futuristic Armory
+$FSE-UPGRADEICON$ = 15184753790; 15184753514; 15184753289; 15184752970
+$FSE-CATEGORY$ = Advanced
 $DREF$ = <ref name=dps>DPS does not consider rev-up time.</ref>
 </var>
 <div class="mobile-tabber"><tabber>

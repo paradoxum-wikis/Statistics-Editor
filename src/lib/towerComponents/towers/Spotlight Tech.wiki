@@ -6,9 +6,10 @@ $TED$ = Burn Damage * (Burn Time / Tick)
 $CE$ = Total Price / DPS
 $TP$ = $FNC-TOTALPRICE$
 $FNC-COST$ = 3225; 1865; 4820; 12560; 19320
-$FNC-DETECTION$ = 2; 1; 0
-$FNC-UPGRADE$ = Backstage Crew; Non OSHA Compliant; Backstage Crew; Certified Spotlight Operator
-$FNC-UPGRADEICON$ = 131910648185483; 83428900433369; 120016900424836; 120615607474754
+$FSE-DETECTION$ = 2; 1; 0
+$FSE-UPGRADE$ = Backstage Crew; Non OSHA Compliant; Backstage Crew; Certified Spotlight Operator
+$FSE-UPGRADEICON$ = 131910648185483; 83428900433369; 120016900424836; 120615607474754
+$FSE-CATEGORY$ = Exclusive
 $TREF$ = <ref>Total Elapsed Damage is calculated as Burn Damage × (Burn Time ÷ Tick).</ref>
 $DREF$ = <ref>DPS assumes the flames only hit one enemy.<br/>Total DPS is calculated as Normal DPS + Burn DPS.<br/>Burn DPS is calculated as Burn Damage ÷ Tick.</ref>
 </var>

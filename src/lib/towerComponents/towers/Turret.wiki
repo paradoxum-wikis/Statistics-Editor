@@ -4,11 +4,12 @@ $CE$ = Total Price / DPS
 $TP$ = $FNC-TOTALPRICE$
 $FNC-COST$ = 7750; 3750; 7500; 20000; 35000; 65000
 $FNC-PVP-COST$ = 4000; 1000; 2750; 9000; 20000; 42500
-$FNC-DETECTION$ = 0; 1;
-$FNC-PVP-DETECTION$ = 1; 2;
-$FNC-UPGRADE$ = Stronger Ammunition; Radar; Dual Turret; Even Heavier Ammo; XR-200 Turret
-$FNC-PVP-UPGRADE$ = Radar; Stronger Ammunition; Dual Turret; Even Heavier Ammo; XR-200 Turret
-$FNC-UPGRADEICON$ = 149177741; 149177741; 3584258139; 3584280869; 3584258608
+$FSE-DETECTION$ = 0; 1;
+$FSE-PVP-DETECTION$ = 1; 2;
+$FSE-UPGRADE$ = Stronger Ammunition; Radar; Dual Turret; Even Heavier Ammo; XR-200 Turret
+$FSE-PVP-UPGRADE$ = Radar; Stronger Ammunition; Dual Turret; Even Heavier Ammo; XR-200 Turret
+$FSE-UPGRADEICON$ = 149177741; 149177741; 3584258139; 3584280869; 3584258608
+$FSE-CATEGORY$ = Advanced
 </var>
 <div class="mobile-tabber"><tabber>
 |-|Regular =

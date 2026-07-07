@@ -8,9 +8,10 @@ $CE$ = Total Price / DPS
 $TP$ = $FNC-TOTALPRICE$
 $FNC-COST$ = 900; 325; 1000; 2000; 3750; 7500
 $FNC-PVP-COST$ = 850; 350; 950; 1500; 3800; 9000
-$FNC-DETECTION$ = 2; 0;
-$FNC-UPGRADE$ = Improved Handling; Fire Fighting; Fire Hazard; Napalm Thrower; Pyromaniac
-$FNC-UPGRADEICON$ = 3280081327; 3304823121; 3304823988; 3304824958; 3304825822
+$FSE-DETECTION$ = 2; 0;
+$FSE-UPGRADE$ = Improved Handling; Fire Fighting; Fire Hazard; Napalm Thrower; Pyromaniac
+$FSE-UPGRADEICON$ = 3280081327; 3304823121; 3304823988; 3304824958; 3304825822
+$FSE-CATEGORY$ = Intermediate
 $TREF$ = <ref>Total Elapsed Damage is calculated as Burn Damage × (Burn Time ÷ Tick).</ref>
 $DREF$ = <ref>DPS assumes the flames only hit one enemy.<br/>Total DPS is calculated as Normal DPS + Burn DPS.<br/>Burn DPS is calculated as Burn Damage ÷ Tick.</ref>
 </var>

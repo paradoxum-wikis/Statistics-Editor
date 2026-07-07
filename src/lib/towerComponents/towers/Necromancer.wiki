@@ -2,10 +2,11 @@
 $TP$ = $FNC-TOTALPRICE$
 $FNC-COST$ = 4200; 3950; 11320; 26650; 65000
 $FNC-PVP-COST$ = 1500; 1000; 3500; 10000; 40000
-$FNC-DETECTION$ = 2; 4; 0
-$FNC-PVP-DETECTION$ = 2; 0; 0
-$FNC-UPGRADE$ = Soul Forge; Skull Centrifuge; Graveward; Apostle Of Hades
-$FNC-UPGRADEICON$ = 15332519996; 15332520691; 15332520335; 15332519505
+$FSE-DETECTION$ = 2; 4; 0
+$FSE-PVP-DETECTION$ = 2; 0; 0
+$FSE-UPGRADE$ = Soul Forge; Skull Centrifuge; Graveward; Apostle Of Hades
+$FSE-UPGRADEICON$ = 15332519996; 15332520691; 15332520335; 15332519505
+$FSE-CATEGORY$ = Hardcore
 $DPS$ = Damage / Firerate
 $Nec4DPS$ = (Damage * Max Hits) / Firerate
 $ExecDPS$ = (Damage / Tick) / Firerate

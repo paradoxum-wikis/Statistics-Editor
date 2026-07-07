@@ -4,10 +4,11 @@ $CE$ = Total Price / DPS
 $TP$ = $FNC-TOTALPRICE$
 $FNC-COST$ = 1625; 725; 2850; 9400; 20000
 $FNC-PVP-COST$ = 1600; 750; 1800; 6250; 12000
-$FNC-DETECTION$ = 3; ; 0
-$FNC-UPGRADE$ = Quickscope; Survivalist's Kit; Sharp Shooter; Hunter In The Night
-$FNC-PVP-UPGRADE$ = Faster Hands; Experienced; Better Gear; Deadliest Hunter
-$FNC-UPGRADEICON$ = 3839040358; 3839041547; 3839042767; 3839043838
+$FSE-DETECTION$ = 3; ; 0
+$FSE-UPGRADE$ = Quickscope; Survivalist's Kit; Sharp Shooter; Hunter In The Night
+$FSE-PVP-UPGRADE$ = Faster Hands; Experienced; Better Gear; Deadliest Hunter
+$FSE-UPGRADEICON$ = 3839040358; 3839041547; 3839042767; 3839043838
+$FSE-CATEGORY$ = Intermediate
 </var>
 <div class="mobile-tabber"><tabber>
 |-|Regular =

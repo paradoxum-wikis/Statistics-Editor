@@ -3,9 +3,10 @@ $DPS$ = Damage / Firerate
 $CE$ = Total Price / DPS
 $TP$ = $FNC-TOTALPRICE$
 $FNC-COST$ = 67; 320; 2222; 1000000
-$FNC-DETECTION$ = 0; 0; 0
-$FNC-UPGRADE$ = Lord Exo Slayer; QA Leaker; Spectin destroyer
-$FNC-UPGRADEICON$ = 139027030887404; 136854065383009; 16911190427
+$FSE-DETECTION$ = 0; 0; 0
+$FSE-UPGRADE$ = Lord Exo Slayer; QA Leaker; Spectin destroyer
+$FSE-UPGRADEICON$ = 139027030887404; 136854065383009; 16911190427
+$FSE-CATEGORY$ = Golden Perks
 </var>
 <div class="overflow-box">
 {| class="wikitable stats-table"

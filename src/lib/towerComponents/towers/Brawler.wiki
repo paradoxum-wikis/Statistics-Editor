@@ -5,12 +5,13 @@ $CE$ = $TP$ / DPS
 $TP$ = $FNC-TOTALPRICE$
 $FNC-COST$ = 300; 200; 1200; 2500; 3500; 7777;
 $FNC-PVP-COST$ = 600; 300; 950; 2250; 5200; 12000;
-$FNC-DETECTION$ = 4; 0; ;
-$FNC-PVP-DETECTION$ = 3; 0; ;
-$FNC-UPGRADE$ = Hand to Hand Training; Enhanced Gauntlets; Pack a Punch; GALVAKNUCKLES; Boreas' Fury
-$FNC-PVP-UPGRADE$ = Hand to Hand Training; Enhanced Gauntlets; Pack a Punch; Prototype Frame; Faster Hydraulics
-$FNC-UPGRADEICON$ = 17522564142; 17522564142; 17522564023; 17522564307; 17522563932
-$FNC-PVP-UPGRADEICON$ = 0; 17522564142; 17522564023; 17522564307; 17522563932
+$FSE-DETECTION$ = 4; 0; ;
+$FSE-PVP-DETECTION$ = 3; 0; ;
+$FSE-UPGRADE$ = Hand to Hand Training; Enhanced Gauntlets; Pack a Punch; GALVAKNUCKLES; Boreas' Fury
+$FSE-PVP-UPGRADE$ = Hand to Hand Training; Enhanced Gauntlets; Pack a Punch; Prototype Frame; Faster Hydraulics
+$FSE-UPGRADEICON$ = 17522564142; 17522564142; 17522564023; 17522564307; 17522563932
+$FSE-PVP-UPGRADEICON$ = 0; 17522564142; 17522564023; 17522564307; 17522563932
+$FSE-CATEGORY$ = Hardcore
 $SREF$ = <ref name="swingrate">Swingrate only applies to the first two hits in each burst and is not the time between bursts from level 2+.</ref>
 $DREF$ = <ref name="dps">DPS is calculated as [(Damage × 2) + Final Hit Damage] ÷ [Cooldown + (Swingrate × (Hit Count - 1))] from Level 2+.</ref>
 </var>

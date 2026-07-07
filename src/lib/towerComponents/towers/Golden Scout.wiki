@@ -3,9 +3,10 @@ $DPS$ = Damage / Firerate
 $CE$ = Total Price / DPS
 $TP$ = $FNC-TOTALPRICE$
 $FNC-COST$ = 250; 150; 600; 2400; 3600
-$FNC-UPGRADE$ = Higher Caliber; Precise Aiming; Golden Deagle; Twin Sovereigns
-$FNC-UPGRADEICON$ = 3032133716; 115730014; 3278741672; 3279537687
-$FNC-DETECTION$ = 2; 3;
+$FSE-UPGRADE$ = Higher Caliber; Precise Aiming; Golden Deagle; Twin Sovereigns
+$FSE-UPGRADEICON$ = 3032133716; 115730014; 3278741672; 3279537687
+$FSE-DETECTION$ = 2; 3;
+$FSE-CATEGORY$ = Golden Perks
 </var>
 <div class="overflow-box">
 {| class="wikitable stats-table"

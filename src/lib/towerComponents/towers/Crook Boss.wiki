@@ -6,10 +6,11 @@ $CE$ = Total Price / DPS
 $TP$ = $FNC-TOTALPRICE$
 $FNC-COST$ = 1600; 1150; 3400; 13500; 47500
 $FNC-PVP-COST$ = 800; 525; 1000; 5000; 16000
-$FNC-DETECTION$ = 2; ;0
-$FNC-PVP-DETECTION$ = 2; ;2
-$FNC-UPGRADE$ = Quick Getaway; Double Trouble; Tommy Goons; The Godfather
-$FNC-UPGRADEICON$ = 3032133716; 3444643559; 3838914605; 3444644903
+$FSE-DETECTION$ = 2; ;0
+$FSE-PVP-DETECTION$ = 2; ;2
+$FSE-UPGRADE$ = Quick Getaway; Double Trouble; Tommy Goons; The Godfather
+$FSE-UPGRADEICON$ = 3032133716; 3444643559; 3838914605; 3444644903
+$FSE-CATEGORY$ = Intermediate
 $CREF$ = <ref name=ce>Does not account for unit DPS.</ref>
 $GREF$ = <ref name=goon>Goons are not affected by any buffs or debuffs.</ref>
 </var>
