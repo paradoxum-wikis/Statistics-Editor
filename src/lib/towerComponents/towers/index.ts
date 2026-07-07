@@ -1,6 +1,9 @@
+import { categoryEntries } from "virtual:categories";
+
 const wikiModules = import.meta.glob("./*.wiki", {
   eager: true,
   query: "?raw",
+  import: "default",
 }) as Record<string, string>;
 
 export const towerNames: string[] = Object.keys(wikiModules)
@@ -21,21 +24,16 @@ export const towerCategoryOrder = [
 
 export type TowerCategory = (typeof towerCategoryOrder)[number];
 
-const isDebug =
-  typeof localStorage !== "undefined" &&
-  localStorage.getItem("tdse_debug") === "true";
-
-const categoryByTower = new Map<string, TowerCategory>();
-for (const [path, content] of Object.entries(wikiModules)) {
-  const name = path.slice(2, -5);
-  const cat =
-    content.match(/\$FSE-CATEGORY\$\s*=\s*["']?([^"'\s;]+)["']?/i)?.[1] ?? null;
-  if (cat && (towerCategoryOrder as readonly string[]).includes(cat)) {
-    categoryByTower.set(name, cat as TowerCategory);
-  } else if (isDebug) {
-    console.debug(`[towers] FSE-CATEGORY for ${name}: ${cat ?? "none"}`);
-  }
+function isTowerCategory(value: string): value is TowerCategory {
+  return (towerCategoryOrder as readonly string[]).includes(value);
 }
+
+const categoryByTower = new Map<string, TowerCategory>(
+  categoryEntries.map(([tower, category]): [string, TowerCategory] => [
+    tower,
+    isTowerCategory(category) ? category : "Custom",
+  ]),
+);
 
 export function groupedTowerNames(
   names: readonly string[],
