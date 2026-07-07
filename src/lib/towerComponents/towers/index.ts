@@ -21,103 +21,21 @@ export const towerCategoryOrder = [
 
 export type TowerCategory = (typeof towerCategoryOrder)[number];
 
-const towersByCategory: Record<
-  Exclude<TowerCategory, "Custom">,
-  readonly string[]
-> = {
-  Starter: [
-    "Scout",
-    "Sniper",
-    "Paintballer",
-    "Demoman",
-    "Slime Trooper",
-    "Soldier",
-  ],
-  Intermediate: [
-    "Freezer",
-    "Assassin",
-    "Militant",
-    "Shotgunner",
-    "Hunter",
-    "Pyromancer",
-    "Ace Pilot",
-    "Medic",
-    "Farm",
-    "Electroshocker",
-    "Rocketeer",
-    "Trapper",
-    "Military Base",
-    "Crook Boss",
-  ],
-  Advanced: [
-    "Commander",
-    "Warden",
-    "Cowboy",
-    "DJ Booth",
-    "Saboteur",
-    "Minigunner",
-    "Ranger",
-    "Pursuit",
-    "Gatling Gun",
-    "Turret",
-    "Mortar",
-    "Mercenary Base",
-  ],
-  Hardcore: [
-    "Brawler",
-    "Necromancer",
-    "Accelerator",
-    "Engineer",
-    "Hacker",
-  ],
-  Evolved: ["Operator", "Juggernaut"],
-  "Golden Perks": [
-    "Golden Minigunner",
-    "Golden Pyromancer",
-    "Golden Crook Boss",
-    "Golden Scout",
-    "Golden Cowboy",
-    "Golden Soldier",
-    "Golden Snowballer",
-  ],
-  Exclusive: [
-    "Gladiator",
-    "Commando",
-    "Slasher",
-    "Frost Blaster",
-    "Archer",
-    "Swarmer",
-    "Toxic Gunner",
-    "Sledger",
-    "Executioner",
-    "Elf Camp",
-    "Jester",
-    "Cryomancer",
-    "Hallow Punk",
-    "Harvester",
-    "Snowballer",
-    "Elementalist",
-    "Firework Technician",
-    "Biologist",
-    "Warlock",
-    "Spotlight Tech",
-    "War Machine",
-    "Mecha Base",
-  ],
-  Unavailable: [
-    "Void Miner",
-    "Combatant",
-    "Crystallizer",
-    "Sentry",
-    "Twitgunner",
-  ],
-};
+const isDebug =
+  typeof localStorage !== "undefined" &&
+  localStorage.getItem("tdse_debug") === "true";
 
-const categoryByTower = new Map<string, TowerCategory>(
-  Object.entries(towersByCategory).flatMap(([category, towers]) =>
-    towers.map((tower) => [tower, category as TowerCategory]),
-  ),
-);
+const categoryByTower = new Map<string, TowerCategory>();
+for (const [path, content] of Object.entries(wikiModules)) {
+  const name = path.slice(2, -5);
+  const cat =
+    content.match(/\$FSE-CATEGORY\$\s*=\s*["']?([^"'\s;]+)["']?/i)?.[1] ?? null;
+  if (cat && (towerCategoryOrder as readonly string[]).includes(cat)) {
+    categoryByTower.set(name, cat as TowerCategory);
+  } else if (isDebug) {
+    console.debug(`[towers] FSE-CATEGORY for ${name}: ${cat ?? "none"}`);
+  }
+}
 
 export function groupedTowerNames(
   names: readonly string[],
