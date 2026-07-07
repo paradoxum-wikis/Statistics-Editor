@@ -2,7 +2,7 @@
   import { towerStore } from "$lib/stores/tower.svelte";
   import { imageLoader } from "$lib/services/imageLoader";
   import { getTargetSkins } from "$lib/utils/towah";
-  import CollapsibleSection from "./smol/CollapsibleSection.svelte";
+  import CollapsibleSide from "./smol/CollapsibleSide.svelte";
   import { Layers } from "@lucide/svelte";
 
   type UpgradeRow = { index: number; title: string; image: string };
@@ -50,7 +50,7 @@
   }
 </script>
 
-<CollapsibleSection
+<CollapsibleSide
   title="Upgrades"
   icon={Layers}
   bind:open
@@ -103,4 +103,4 @@
       Select a tower to edit upgrades.
     </p>
   {/if}
-</CollapsibleSection>
+</CollapsibleSide>

@@ -6,7 +6,7 @@
   import FlyingIcon from "$lib/assets/FlyingDetection.png";
   import { Select } from "bits-ui";
   import { Check, ChevronDown, ScanEye } from "@lucide/svelte";
-  import CollapsibleSection from "./smol/CollapsibleSection.svelte";
+  import CollapsibleSide from "./smol/CollapsibleSide.svelte";
   import SubtleRow from "./smol/SubtleRow.svelte";
 
   let open = $state(true);
@@ -80,7 +80,7 @@
   }
 </script>
 
-<CollapsibleSection
+<CollapsibleSide
   title="Detections"
   icon={ScanEye}
   bind:open
@@ -153,4 +153,4 @@
       Select a tower to edit detections.
     </p>
   {/if}
-</CollapsibleSection>
+</CollapsibleSide>

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { towerStore } from "$lib/stores/tower.svelte";
   import { getTargetSkins } from "$lib/utils/towah";
-  import CollapsibleSection from "./smol/CollapsibleSection.svelte";
+  import CollapsibleSide from "./smol/CollapsibleSide.svelte";
   import SubtleRow from "./smol/SubtleRow.svelte";
   import { CircleDollarSign } from "@lucide/svelte";
   import { parseNumeric } from "$lib/utils/format";
@@ -65,7 +65,7 @@
   }
 </script>
 
-<CollapsibleSection
+<CollapsibleSide
   title="Costs"
   icon={CircleDollarSign}
   bind:open
@@ -102,4 +102,4 @@
       Select a tower to edit costs.
     </p>
   {/if}
-</CollapsibleSection>
+</CollapsibleSide>
