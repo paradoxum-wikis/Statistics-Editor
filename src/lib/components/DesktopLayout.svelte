@@ -14,12 +14,7 @@
   import StatusBar from "./StatusBar.svelte";
   import SettingsModal from "./SettingsModal.svelte";
 
-  import {
-    DropdownMenu,
-    Popover,
-    AlertDialog,
-    Dialog,
-  } from "bits-ui";
+  import { DropdownMenu, Popover, AlertDialog, Dialog } from "bits-ui";
   import ModeToggle from "./smol/ModeToggle.svelte";
   import Card from "./smol/Card.svelte";
   import Btn from "./smol/Btn.svelte";
@@ -222,7 +217,7 @@
                   <DropdownMenu.GroupHeading
                     class="px-2 py-1.5 text-sm font-semibold"
                   >
-                    Profiles
+                    <h4 class="text-sm font-medium">Profiles</h4>
                   </DropdownMenu.GroupHeading>
                   {#each profileStore.list as profile (profile)}
                     <DropdownMenu.Item
@@ -367,7 +362,10 @@
         class:overflow-x-auto={!!towerStore.selectedData}
       >
         {#key mainKey}
-          <div class="h-full" in:fly={{ y: 8, duration: 160, easing: cubicOut }}>
+          <div
+            class="h-full"
+            in:fly={{ y: 8, duration: 160, easing: cubicOut }}
+          >
             {#if !isClient}
               <Card class="p-8 text-center">
                 <p class="animate-pulse text-body">

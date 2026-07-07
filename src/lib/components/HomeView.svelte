@@ -36,7 +36,7 @@
     <div class="grid grid-cols-2 gap-2 lg:grid-cols-4">
       {#each steps as step, i (step.title)}
         <SubtleRow class="p-2.5">
-          <p class="text-sm font-medium">
+          <p class="text-sm font-semibold unisans">
             <span class="text-muted-foreground">{i + 1}.</span>
             {step.title}
           </p>

@@ -45,7 +45,7 @@
         <Dialog.Title
           class="text-lg font-semibold leading-none tracking-tight text-foreground"
         >
-          Settings
+          <h2>Settings</h2>
         </Dialog.Title>
         <Dialog.Description class="text-sm text-muted-foreground">
           Please change them to your heart's content.

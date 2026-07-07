@@ -17,12 +17,7 @@
   import GlobalModifierModal from "./tool/GlobalModifierModal.svelte";
   import CreateTower from "./tool/CreateTower.svelte";
 
-  import {
-    DropdownMenu,
-    Popover,
-    AlertDialog,
-    Dialog,
-  } from "bits-ui";
+  import { DropdownMenu, Popover, AlertDialog, Dialog } from "bits-ui";
   import ModeToggle from "./smol/ModeToggle.svelte";
   import Card from "./smol/Card.svelte";
   import Btn from "./smol/Btn.svelte";
@@ -222,7 +217,7 @@
 
   <!-- Header -->
   <header
-    class="sticky top-0 z-10 flex flex-col items-center gap-2 border-b bg-card px-4 py-1"
+    class="sticky top-0 z-10 flex flex-col items-center gap-2 border-b bg-card/20 px-4 py-1"
   >
     <h1 class="text-sm font-bold text-foreground tracking-wide">
       {towerStore.selectedName || "TDS Statistics Editor"}
@@ -307,7 +302,7 @@
       <DropdownMenu.Content align="center" side="top" class="dropdown-content">
         <DropdownMenu.Group>
           <DropdownMenu.GroupHeading class="px-2 py-1.5 text-sm font-semibold">
-            Profiles
+            <h4 class="text-sm font-medium">Profiles</h4>
           </DropdownMenu.GroupHeading>
           {#each profileStore.list as profile (profile)}
             <DropdownMenu.Item

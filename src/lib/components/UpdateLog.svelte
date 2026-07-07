@@ -170,7 +170,7 @@
         <ul class="min-w-0 space-y-2">
           {#each group.entries as entry (entry.sha)}
             <li
-              class="min-w-0 rounded-[calc(var(--radius)-0.5rem)_0] border border-border/60 p-2"
+              class="min-w-0 rounded-[calc(var(--radius)-0.5rem)_0] border border-border/60 p-2 bg-muted"
             >
               <div class="mb-1 flex min-w-0 items-start justify-between gap-2">
                 {#if entry.badgeType}

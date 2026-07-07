@@ -13,7 +13,7 @@
 </script>
 
 <div
-  class="rounded-[calc(var(--radius)-0.25rem)_0] border border-border bg-secondary/10 {className}"
+  class="rounded-[calc(var(--radius)-0.25rem)_0] border border-border bg-card {className}"
   {...restProps}
 >
   {@render children()}

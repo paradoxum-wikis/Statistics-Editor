@@ -659,6 +659,15 @@ class TowerStore {
     this.recentNames = next;
     localStorage.setItem(RECENT_KEY, JSON.stringify(next));
   }
+
+  removeRecent(name: string): void {
+    const next = this.recentNames.filter((n) => n !== name);
+    if (next.length === this.recentNames.length) return;
+    this.recentNames = next;
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem(RECENT_KEY, JSON.stringify(next));
+    }
+  }
 }
 
 export const towerStore = new TowerStore();

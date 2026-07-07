@@ -110,6 +110,7 @@
         type="search"
         placeholder="Enter a tower name!"
         bind:value={query}
+        class="bg-card! border-border!"
       />
     </div>
 
