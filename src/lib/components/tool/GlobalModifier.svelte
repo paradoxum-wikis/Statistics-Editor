@@ -3,7 +3,7 @@
   import { Zap } from "@lucide/svelte";
   import IconBtn from "../smol/IconBtn.svelte";
   import GlobalModifierPanel from "./GlobalModifierPanel.svelte";
-  import { towerStore } from "$lib/stores/tower.svelte";
+  import { modifierStore } from "$lib/stores/modifier.svelte";
   import { isGlobalModifierActive } from "$lib/utils/globalModifier";
 
   let {
@@ -16,7 +16,9 @@
     onOpen?: () => void;
   } = $props();
 
-  const active = $derived(isGlobalModifierActive(towerStore.globalModifier));
+  const active = $derived(
+    isGlobalModifierActive({ entries: modifierStore.entries }),
+  );
 </script>
 
 {#if variant === "menu"}

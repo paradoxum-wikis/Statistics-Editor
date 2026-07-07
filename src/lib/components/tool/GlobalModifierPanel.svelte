@@ -2,7 +2,7 @@
   import { Switch, Label } from "bits-ui";
   import Btn from "../smol/Btn.svelte";
   import TextInput from "../smol/TextInput.svelte";
-  import { towerStore } from "$lib/stores/tower.svelte";
+  import { modifierStore } from "$lib/stores/modifier.svelte";
   import { X } from "@lucide/svelte";
 
   let modifierColumn = $state("");
@@ -26,7 +26,7 @@
   }
 
   function addModifierColumn() {
-    towerStore.addGlobalModifierColumn(modifierColumn);
+    modifierStore.addColumn(modifierColumn);
     modifierColumn = "";
   }
 
@@ -66,11 +66,11 @@
     </div>
   </div>
 
-  {#if towerStore.globalModifier.entries.length > 0}
+  {#if modifierStore.entries.length > 0}
     <div
       class="grid max-h-60 grid-cols-1 gap-1.5 overflow-y-auto min-[24rem]:grid-cols-2"
     >
-      {#each towerStore.globalModifier.entries as entry, index (entry.column)}
+      {#each modifierStore.entries as entry, index (entry.column)}
         <div
           class="rounded-[calc(var(--radius)-0.625rem)_0] border border-border bg-secondary/40 p-1.5"
         >
@@ -82,7 +82,7 @@
               <Switch.Root
                 checked={entry.enabled}
                 onCheckedChange={(enabled) =>
-                  towerStore.setGlobalModifierEnabled(index, enabled)}
+                  modifierStore.setEnabled(index, enabled)}
                 class={switchRootClass}
                 aria-label="Enable {entry.column} modifier"
               >
@@ -92,7 +92,7 @@
                 type="button"
                 class="inline-flex items-center justify-center rounded-[calc(var(--radius)-0.875rem)_0] p-0.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                 title="Remove"
-                onclick={() => towerStore.removeGlobalModifierEntry(index)}
+                onclick={() => modifierStore.removeEntry(index)}
               >
                 <X size={12} />
               </button>
@@ -106,7 +106,7 @@
                 class={modifierInputClass}
                 value={entryNumericValue(entry.delta)}
                 oninput={(e: Event) =>
-                  towerStore.setGlobalModifierDelta(
+                  modifierStore.setDelta(
                     index,
                     (e.currentTarget as HTMLInputElement).value,
                   )}
@@ -120,7 +120,7 @@
                 class={modifierInputClass}
                 value={entryNumericValue(entry.percent)}
                 oninput={(e: Event) =>
-                  towerStore.setGlobalModifierPercent(
+                  modifierStore.setPercent(
                     index,
                     (e.currentTarget as HTMLInputElement).value,
                   )}

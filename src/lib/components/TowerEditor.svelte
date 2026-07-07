@@ -6,6 +6,7 @@
   import type SkinData from "$lib/towerComponents/skinData";
   import { settingsStore } from "$lib/stores/settings.svelte";
   import { towerStore } from "$lib/stores/tower.svelte";
+  import { modifierStore } from "$lib/stores/modifier.svelte";
   import { noFetchTowers } from "$lib/services/fetchTowerWiki";
   import { createShare, sharePageUrl } from "$lib/services/shareTower";
   import { isCustomTower } from "$lib/towerComponents/customTowers";
@@ -56,30 +57,30 @@
     return buildActiveSkinTables(tower, selectedSkinName);
   });
 
+  const modifier = $derived({ entries: modifierStore.entries });
+
   const compareRowsCache = $derived.by(() => {
     towerStore.refreshTrigger;
-    return buildCompareRowsCache(tower, rofInfo, towerStore.globalModifier);
+    modifierStore.entries;
+    return buildCompareRowsCache(tower, rofInfo, modifier);
   });
 
   const displayRowsCache = $derived.by(() => {
     towerStore.refreshTrigger;
-    towerStore.globalModifier;
+    modifierStore.entries;
     settingsStore.rofBug;
     return buildDisplayRowsCache(
       activeSkinData,
       selectedSkinName,
       rofInfo,
-      towerStore.globalModifier,
+      modifier,
     );
   });
 
   const skinRefs = $derived.by(() => {
     towerStore.refreshTrigger;
-    return buildSkinRefState(
-      activeSkinData,
-      displayRowsCache,
-      towerStore.globalModifier,
-    );
+    modifierStore.entries;
+    return buildSkinRefState(activeSkinData, displayRowsCache, modifier);
   });
 
   const getSkinRefNum = $derived.by(() => {
@@ -105,7 +106,7 @@
       t,
       skinName,
       rofInfo,
-      towerStore.globalModifier,
+      modifier,
     );
     towerStore.baselineTowerId = t.name;
     towerStore.baselineSkinName = skinName;
@@ -394,7 +395,7 @@
                 tableCacheKey(table.skinName, table.tableIdx),
               ) ?? []}
               baseline={towerStore.baseline}
-              globalModifier={towerStore.globalModifier}
+              globalModifier={modifier}
               {showDiff}
               {disabled}
               isFirst={orderedIdx === 0}

@@ -3,9 +3,6 @@ import { page } from "$app/state";
 import TowerManager from "$lib/towerComponents/towerManager";
 import type Tower from "$lib/towerComponents/tower";
 import { settingsStore } from "$lib/stores/settings.svelte";
-import type { GlobalModifier } from "$lib/utils/globalModifier";
-import { columnKeysEqual } from "$lib/utils/format";
-import { parseNumeric } from "$lib/utils/format";
 import {
   addCustomTower,
   guaraCustomTower,
@@ -75,10 +72,6 @@ class TowerStore {
    * Original wikitext before any unsaved changes.
    */
   originalWikitext = $state<string>("");
-
-  globalModifier = $state<GlobalModifier>({
-    entries: [],
-  });
 
   /**
    * Sets up the tower manager with a profile and loads tower names.
@@ -597,57 +590,6 @@ class TowerStore {
     this.baseline = {};
     this.baselineTowerId = null;
     this.baselineSkinName = null;
-  }
-
-  addGlobalModifierColumn(column: string): boolean {
-    const trimmed = column.trim();
-    if (!trimmed) return false;
-
-    if (
-      this.globalModifier.entries.some((entry) =>
-        columnKeysEqual(entry.column, trimmed),
-      )
-    ) {
-      return false;
-    }
-
-    this.globalModifier.entries = [
-      ...this.globalModifier.entries,
-      { column: trimmed, delta: 0, percent: 0, enabled: true },
-    ];
-    return true;
-  }
-
-  removeGlobalModifierEntry(index: number): void {
-    this.globalModifier.entries = this.globalModifier.entries.filter(
-      (_, i) => i !== index,
-    );
-  }
-
-  setGlobalModifierEnabled(index: number, enabled: boolean): void {
-    const entries = [...this.globalModifier.entries];
-    entries[index] = { ...entries[index], enabled };
-    this.globalModifier.entries = entries;
-  }
-
-  setGlobalModifierDelta(index: number, raw: string): void {
-    const delta = parseNumeric(raw);
-    const entries = [...this.globalModifier.entries];
-    entries[index] = {
-      ...entries[index],
-      delta: Number.isFinite(delta) ? delta : 0,
-    };
-    this.globalModifier.entries = entries;
-  }
-
-  setGlobalModifierPercent(index: number, raw: string): void {
-    const percent = parseNumeric(raw);
-    const entries = [...this.globalModifier.entries];
-    entries[index] = {
-      ...entries[index],
-      percent: Number.isFinite(percent) ? percent : 0,
-    };
-    this.globalModifier.entries = entries;
   }
 
   #touchRecent(name: string): void {
