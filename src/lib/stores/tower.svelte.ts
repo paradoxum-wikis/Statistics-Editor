@@ -9,7 +9,11 @@ import {
   isCustomTower,
 } from "$lib/towerComponents/customTowers";
 import { mergeBaselineOnTowerDiff } from "$lib/utils/towah";
-import { embedSeDirectives, extractSeMemo, stripSeDiff } from "$lib/neowtext/directives";
+import {
+  embedSeDirectives,
+  extractSeMemo,
+  stripSeDiff,
+} from "$lib/neowtext/directives";
 import { fetchShare, parseShareRef } from "$lib/services/shareTower";
 
 const RECENT_KEY = "tdse_recent_towers";
@@ -96,9 +100,6 @@ class TowerStore {
     this.effectiveWikitextSource = "";
     this.originalWikitext = "";
     this.isDirty = false;
-    this.baseline = {};
-    this.baselineTowerId = null;
-    this.baselineSkinName = null;
     this.#wikitextStale = false;
     this.baseline = {};
     this.baselineTowerId = null;
@@ -434,8 +435,7 @@ class TowerStore {
       editorMemo?: string;
     };
     const loadedMemo =
-      anyTower.editorMemo ??
-      extractSeMemo(this.#shareSnapshotWikitext).memo;
+      anyTower.editorMemo ?? extractSeMemo(this.#shareSnapshotWikitext).memo;
     this.editorMemo = loadedMemo;
     this.#originalEditorMemo = loadedMemo;
 
@@ -642,10 +642,10 @@ class TowerStore {
 
   #touchRecent(name: string): void {
     if (!name.trim() || typeof localStorage === "undefined") return;
-    const next = [
-      name,
-      ...this.recentNames.filter((n) => n !== name),
-    ].slice(0, RECENT_MAX);
+    const next = [name, ...this.recentNames.filter((n) => n !== name)].slice(
+      0,
+      RECENT_MAX,
+    );
     this.recentNames = next;
     localStorage.setItem(RECENT_KEY, JSON.stringify(next));
   }

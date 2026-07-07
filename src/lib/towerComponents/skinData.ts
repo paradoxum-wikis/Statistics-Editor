@@ -214,7 +214,6 @@ class SkinData {
 
     this.rebuildTableCache();
     this.recomputeCalculatedColumns();
-    this.rebuildTableCache();
     this.createData();
 
     if (settingsStore.debugMode) {
@@ -467,9 +466,6 @@ class SkinData {
     if (this.rawRows?.[level] && typeof this.rawRows[level] === "object") {
       this.rawRows[level][attribute] = newValue;
     }
-    const onlyPrimaryLevel =
-      level > 0 && level < this.rawRows.length ? level : undefined;
-    this.recomputeCalculatedColumns(onlyPrimaryLevel);
     this.refreshDerivedData();
   }
 

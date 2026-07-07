@@ -10,14 +10,6 @@
   import { imageLoader } from "$lib/services/imageLoader";
   import { settingsStore } from "$lib/stores/settings.svelte";
 
-  type SummaryLine = {
-    kind: "change" | "grant";
-    stat: string;
-    from?: string | number | null;
-    to?: string | number | null;
-    icon?: string;
-  };
-
   let {
     upgradeNames = {},
     upgradeSummaries = {},
@@ -26,7 +18,15 @@
     numUpgrades,
   }: {
     upgradeNames?: { [key: number]: string };
-    upgradeSummaries?: { [key: number]: SummaryLine[] };
+    upgradeSummaries?: {
+      [key: number]: Array<{
+        kind: "change" | "grant";
+        stat: string;
+        from?: string | number | null;
+        to?: string | number | null;
+        icon?: string;
+      }>;
+    };
     upgradeLevels?: string[];
     selectedUpgrade: string;
     numUpgrades: number;

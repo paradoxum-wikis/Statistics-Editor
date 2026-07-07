@@ -38,6 +38,7 @@
   let numUpgrades = $derived(currentSkin?.upgrades?.length ?? 0);
 
   let upgradeNames = $derived.by(() => {
+    towerStore.refreshTrigger;
     if (!currentSkin?.upgrades) return {};
     const names: { [key: number]: string } = {};
     currentSkin.upgrades.forEach((upgrade: any, index: number) => {
@@ -49,6 +50,7 @@
   });
 
   let upgradeLevels = $derived.by(() => {
+    towerStore.refreshTrigger;
     if (!currentSkin?.upgrades) return [];
     return currentSkin.upgrades.map((upgrade: any, index: number) =>
       upgrade.upgradeData?.Level != null

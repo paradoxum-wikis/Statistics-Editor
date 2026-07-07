@@ -104,8 +104,8 @@
   {/if}
 {/snippet}
 
-{#if settingsStore.hideCellWrapper}
-  <div class="cell-body {editable || isMoney ? 'cell-flex' : ''}">
+{#if editable || isMoney}
+  <div class="cell-flex">
     {@render body()}
   </div>
 {:else}
