@@ -100,7 +100,6 @@
 
 <script lang="ts">
   import { onMount } from "svelte";
-  import Separator from "./smol/Separator.svelte";
 
   type DayGroup = { label: string; entries: Entry[] };
 
@@ -128,6 +127,13 @@
     })) satisfies DayGroup[];
   });
 
+  function entryTime(date: string) {
+    return new Date(date).toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+    });
+  }
+
   onMount(async () => {
     const result = await loadUpdateLog();
     entries = result.entries;
@@ -137,11 +143,11 @@
 </script>
 
 {#if loading}
-  <p class="text-sm text-muted-foreground text-center animate-pulse">
+  <p class="animate-pulse text-center text-xs text-muted-foreground">
     Loading updates...
   </p>
 {:else if failed}
-  <p class="text-sm text-muted-foreground">
+  <p class="text-xs text-muted-foreground">
     Couldn't load updates.
     <a
       href="https://github.com/paradoxum-wikis/Statistics-Editor/commits/main/"
@@ -153,38 +159,46 @@
     </a>
   </p>
 {:else}
-  <div class="space-y-5 overflow-y-auto pr-1">
-    {#each groups as group, i (group.label)}
-      <section class="space-y-2">
-        <h4
-          class="text-xs font-medium uppercase tracking-wide text-muted-foreground"
-        >
+  <div class="min-w-0 space-y-4">
+    {#each groups as group (group.label)}
+      <section class="min-w-0 space-y-2">
+        <h4 class="text-[0.65rem] font-medium uppercase tracking-wide text-muted-foreground">
           {group.label}
         </h4>
-        <ul class="space-y-1.5">
+        <ul class="min-w-0 space-y-2">
           {#each group.entries as entry (entry.sha)}
-            <li class="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-sm">
-              {#if entry.badgeType}
-                <span
-                  class="rounded px-1.5 py-0.5 text-xs font-medium {entry.color}"
+            <li class="min-w-0 rounded-[calc(var(--radius)-0.5rem)_0] border border-border/60 p-2">
+              <div class="mb-1 flex min-w-0 items-start justify-between gap-2">
+                {#if entry.badgeType}
+                  <span
+                    class="min-w-0 truncate rounded px-1.5 py-0.5 text-[0.65rem] font-medium leading-tight {entry.color}"
+                    title={entry.badgeScope
+                      ? `${entry.badgeType} (${entry.badgeScope})`
+                      : entry.badgeType}
+                  >
+                    {entry.badgeType}{#if entry.badgeScope}
+                      <span class="font-normal opacity-75">
+                        ({entry.badgeScope})
+                      </span>
+                    {/if}
+                  </span>
+                {/if}
+                <time
+                  datetime={entry.date}
+                  class="shrink-0 text-[0.65rem] tabular-nums text-muted-foreground"
                 >
-                  {entry.badgeType}{#if entry.badgeScope}
-                    <span class="text-[0.65rem] font-normal opacity-75">
-                      &MediumSpace;({entry.badgeScope})
-                    </span>
-                  {/if}
-                </span>
-              {/if}
+                  {entryTime(entry.date)}
+                </time>
+              </div>
               <a
                 href={entry.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="min-w-0 text-foreground hover:text-link hover:underline"
+                class="block text-sm leading-snug text-foreground hover:text-link hover:underline"
               >
                 {entry.message}
               </a>
-              <span class="text-xs text-muted-foreground">
-                by
+              <p class="mt-1 truncate text-[0.65rem] text-muted-foreground">
                 <a
                   href={entry.authorUrl}
                   target="_blank"
@@ -193,14 +207,12 @@
                 >
                   {entry.author}
                 </a>
-              </span>
+                <span class="text-muted-foreground/70"> · {entry.sha}</span>
+              </p>
             </li>
           {/each}
         </ul>
       </section>
-      {#if i < groups.length - 1}
-        <Separator />
-      {/if}
     {/each}
   </div>
 {/if}
