@@ -13,8 +13,6 @@
 
   type UpdateLogCache = { entries: Entry[]; failed: boolean };
 
-  const REPO =
-    "https://api.github.com/repos/paradoxum-wikis/Statistics-Editor/commits";
   const CONVENTIONAL = /^(\w+)(?:\(([^)]+)\))?!?:\s*(.+)$/;
 
   const TYPE_LABELS: Record<string, string> = {
@@ -55,7 +53,9 @@
 
     loadPromise = (async () => {
       try {
-        const res = await fetch(REPO);
+        const res = await fetch(
+          "https://api.github.com/repos/paradoxum-wikis/Statistics-Editor/commits",
+        );
         if (!res.ok) throw new Error();
 
         const data = (await res.json()) as {
@@ -100,7 +100,6 @@
 
 <script lang="ts">
   import { onMount } from "svelte";
-  import Card from "./smol/Card.svelte";
   import Separator from "./smol/Separator.svelte";
 
   type DayGroup = { label: string; entries: Entry[] };
@@ -137,87 +136,71 @@
   });
 </script>
 
-<Card class="max-w-3xl mx-auto mt-6 p-8">
-  <div class="mb-4 flex items-baseline justify-between gap-4">
-    <h3 class="unisans text-xl font-bold text-foreground">Recent Updates</h3>
+{#if loading}
+  <p class="text-sm text-muted-foreground text-center animate-pulse">
+    Loading updates...
+  </p>
+{:else if failed}
+  <p class="text-sm text-muted-foreground">
+    Couldn't load updates.
     <a
       href="https://github.com/paradoxum-wikis/Statistics-Editor/commits/main/"
       target="_blank"
       rel="noopener noreferrer"
-      class="text-sm text-link hover:underline"
+      class="text-link hover:underline"
     >
-      View all
+      View on GitHub
     </a>
-  </div>
-
-  {#if loading}
-    <p class="text-sm text-muted-foreground text-center animate-pulse">
-      Loading updates...
-    </p>
-  {:else if failed}
-    <p class="text-sm text-muted-foreground">
-      Couldn't load updates.
-      <a
-        href="https://github.com/paradoxum-wikis/Statistics-Editor/commits/main/"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="text-link hover:underline"
-      >
-        View on GitHub
-      </a>
-    </p>
-  {:else}
-    <div class="max-h-80 space-y-5 overflow-y-auto pr-1">
-      {#each groups as group, i (group.label)}
-        <section class="space-y-2">
-          <h4
-            class="text-xs font-medium uppercase tracking-wide text-muted-foreground"
-          >
-            {group.label}
-          </h4>
-          <ul class="space-y-1.5">
-            {#each group.entries as entry (entry.sha)}
-              <li
-                class="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-sm"
+  </p>
+{:else}
+  <div class="space-y-5 overflow-y-auto pr-1">
+    {#each groups as group, i (group.label)}
+      <section class="space-y-2">
+        <h4
+          class="text-xs font-medium uppercase tracking-wide text-muted-foreground"
+        >
+          {group.label}
+        </h4>
+        <ul class="space-y-1.5">
+          {#each group.entries as entry (entry.sha)}
+            <li class="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-sm">
+              {#if entry.badgeType}
+                <span
+                  class="rounded px-1.5 py-0.5 text-xs font-medium {entry.color}"
+                >
+                  {entry.badgeType}{#if entry.badgeScope}
+                    <span class="text-[0.65rem] font-normal opacity-75">
+                      &MediumSpace;({entry.badgeScope})
+                    </span>
+                  {/if}
+                </span>
+              {/if}
+              <a
+                href={entry.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="min-w-0 text-foreground hover:text-link hover:underline"
               >
-                {#if entry.badgeType}
-                  <span
-                    class="rounded px-1.5 py-0.5 text-xs font-medium {entry.color}"
-                  >
-                    {entry.badgeType}{#if entry.badgeScope}
-                      <span class="text-[0.65rem] font-normal opacity-75">
-                        &MediumSpace;({entry.badgeScope})
-                      </span>
-                    {/if}
-                  </span>
-                {/if}
+                {entry.message}
+              </a>
+              <span class="text-xs text-muted-foreground">
+                by
                 <a
-                  href={entry.url}
+                  href={entry.authorUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="min-w-0 text-foreground hover:text-link hover:underline"
+                  class="text-link hover:underline"
                 >
-                  {entry.message}
+                  {entry.author}
                 </a>
-                <span class="text-xs text-muted-foreground">
-                  by
-                  <a
-                    href={entry.authorUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="text-link hover:underline"
-                  >
-                    {entry.author}
-                  </a>
-                </span>
-              </li>
-            {/each}
-          </ul>
-        </section>
-        {#if i < groups.length - 1}
-          <Separator />
-        {/if}
-      {/each}
-    </div>
-  {/if}
-</Card>
+              </span>
+            </li>
+          {/each}
+        </ul>
+      </section>
+      {#if i < groups.length - 1}
+        <Separator />
+      {/if}
+    {/each}
+  </div>
+{/if}

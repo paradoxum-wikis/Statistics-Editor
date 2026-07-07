@@ -3,6 +3,9 @@
   import UpgradeEditor from "./UpgradeEditor.svelte";
   import DetectionEditor from "./DetectionEditor.svelte";
   import CostEditor from "./CostEditor.svelte";
+  import UpdateLog from "./UpdateLog.svelte";
+  import WikiBanner from "./smol/WikiBanner.svelte";
+  import Separator from "./smol/Separator.svelte";
   import { towerStore } from "$lib/stores/tower.svelte";
   import { settingsStore } from "$lib/stores/settings.svelte";
   import { applyRofBug, toNumericValue, getRofBugVer } from "$lib/utils/format";
@@ -23,7 +26,7 @@
     icon?: string;
   };
 
-  let { class: className = "" }: { class?: string } = $props();
+  let { class: className }: { class?: string } = $props();
 
   let selectedUpgrade = $state("0");
 
@@ -232,20 +235,40 @@
   }
 </script>
 
-<aside class="flex h-full flex-col border-r border-border bg-card {className}">
+<aside
+  class={["flex h-full flex-col border-r border-border bg-card", className]}
+>
   <div class="flex flex-1 flex-col overflow-y-auto p-3.5">
-    {#key towerKey}
-      <UpgradeViewer
-        {upgradeNames}
-        {upgradeSummaries}
-        {upgradeLevels}
-        bind:selectedUpgrade
-        {numUpgrades}
-      />
-    {/key}
+    {#if towerStore.selectedData}
+      {#key towerKey}
+        <UpgradeViewer
+          {upgradeNames}
+          {upgradeSummaries}
+          {upgradeLevels}
+          bind:selectedUpgrade
+          {numUpgrades}
+        />
+      {/key}
 
-    <UpgradeEditor />
-    <DetectionEditor />
-    <CostEditor />
+      <UpgradeEditor />
+      <DetectionEditor />
+      <CostEditor />
+    {:else}
+      <WikiBanner />
+      <Separator class="mb-4" />
+
+      <div class="mb-3 flex items-baseline justify-between gap-2">
+        <h3 class="text-sm font-semibold">Recent Updates</h3>
+        <a
+          href="https://github.com/paradoxum-wikis/Statistics-Editor/commits/main/"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-xs text-link hover:underline"
+        >
+          View all
+        </a>
+      </div>
+      <UpdateLog />
+    {/if}
   </div>
 </aside>

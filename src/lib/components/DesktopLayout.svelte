@@ -9,12 +9,12 @@
 
   import Sidebar from "./Sidebar.svelte";
   import TowerEditor from "./TowerEditor.svelte";
-  import Introduction from "./Introduction.svelte";
+  import HomeView from "./HomeView.svelte";
+  import TowerPicker from "./TowerPicker.svelte";
   import StatusBar from "./StatusBar.svelte";
   import SettingsModal from "./SettingsModal.svelte";
 
   import {
-    Combobox,
     DropdownMenu,
     Popover,
     AlertDialog,
@@ -28,7 +28,7 @@
   import DiscardMessage, {
     type PendingDiscardAction,
   } from "./smol/DiscardMessage.svelte";
-  import { Trash2, Check, ChevronsUpDown, X } from "@lucide/svelte";
+  import { Trash2, Check, X } from "@lucide/svelte";
 
   let { isClient }: { isClient: boolean } = $props();
 
@@ -36,24 +36,6 @@
 
   let settingsOpen = $state(false);
   let editorMode = $state<EditorMode>("cells");
-
-  let searchValue = $state("");
-  let comboboxOpen = $state(false);
-
-  let items = $derived(
-    towerStore.names.map((name) => ({
-      value: name,
-      label: name,
-    })),
-  );
-
-  let filteredTowers = $derived(
-    searchValue === ""
-      ? items
-      : items.filter((item) =>
-          item.label.toLowerCase().includes(searchValue.toLowerCase()),
-        ),
-  );
 
   const mainKey = $derived(
     !isClient
@@ -78,11 +60,9 @@
   async function performTowerSelect(tower: string) {
     const success = await towerStore.load(tower);
     if (success) {
-      searchValue = "";
       const url = new URL(page.url);
       url.searchParams.set("tower", tower);
       await goto(url, { keepFocus: true, noScroll: true });
-      comboboxOpen = false;
     }
   }
 
@@ -107,7 +87,6 @@
   async function performProfileSwitch(profile: string) {
     if (profileStore.switch(profile)) {
       await towerStore.switchProfile(profile);
-      searchValue = "";
     }
   }
 
@@ -374,71 +353,21 @@
           {/if}
 
           {#if isClient}
-            <div class="flex items-center space-x-2">
-              <Combobox.Root
-                type="single"
-                {items}
-                value={towerStore.selectedName}
-                bind:open={comboboxOpen}
-                onValueChange={(v) => handleSelect(v)}
-                onOpenChange={(open) => {
-                  if (!open) searchValue = "";
-                }}
-              >
-                <div class="relative">
-                  <Combobox.Input
-                    placeholder="Select a tower..."
-                    class="combobox-input"
-                    oninput={(e) => {
-                      searchValue = e.currentTarget.value;
-                      comboboxOpen = true;
-                    }}
-                    onclick={() => (comboboxOpen = true)}
-                  />
-                  <Combobox.Trigger class="absolute right-3 top-3">
-                    <ChevronsUpDown class="h-4 w-4 opacity-50" />
-                  </Combobox.Trigger>
-                </div>
-
-                <Combobox.Portal>
-                  <Combobox.Content class="combobox-content">
-                    <Combobox.Viewport class="p-2 max-h-75 overflow-y-auto">
-                      {#each filteredTowers as item (item.value)}
-                        <Combobox.Item
-                          class="combobox-item"
-                          value={item.value}
-                          label={item.label}
-                        >
-                          {#snippet children({ selected })}
-                            {item.label}
-                            {#if selected}
-                              <span
-                                class="absolute right-2 flex h-3.5 w-3.5 items-center justify-center"
-                              >
-                                <Check class="h-4 w-4" />
-                              </span>
-                            {/if}
-                          {/snippet}
-                        </Combobox.Item>
-                      {:else}
-                        <span
-                          class="block px-4 py-2 text-sm text-muted-foreground"
-                        >
-                          No results found
-                        </span>
-                      {/each}
-                    </Combobox.Viewport>
-                  </Combobox.Content>
-                </Combobox.Portal>
-              </Combobox.Root>
-            </div>
+            <TowerPicker
+              variant="compact"
+              selected={towerStore.selectedName}
+              onSelect={handleSelect}
+            />
           {/if}
         </div>
       </header>
 
-      <main class="flex-1 p-5 overflow-x-auto">
+      <main
+        class="flex-1 overflow-hidden p-5"
+        class:overflow-x-auto={!!towerStore.selectedData}
+      >
         {#key mainKey}
-          <div in:fly={{ y: 8, duration: 160, easing: cubicOut }}>
+          <div class="h-full" in:fly={{ y: 8, duration: 160, easing: cubicOut }}>
             {#if !isClient}
               <Card class="p-8 text-center">
                 <p class="animate-pulse text-body">
@@ -473,7 +402,7 @@
                 </p>
               </Card>
             {:else}
-              <Introduction />
+              <HomeView onSelect={handleSelect} />
             {/if}
           </div>
         {/key}

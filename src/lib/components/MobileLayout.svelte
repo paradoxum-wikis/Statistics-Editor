@@ -10,14 +10,14 @@
 
   import Sidebar from "./Sidebar.svelte";
   import TowerEditor from "./TowerEditor.svelte";
-  import Introduction from "./Introduction.svelte";
+  import HomeView from "./HomeView.svelte";
+  import TowerPicker from "./TowerPicker.svelte";
   import SettingsModal from "./SettingsModal.svelte";
   import GlobalModifier from "./tool/GlobalModifier.svelte";
   import GlobalModifierModal from "./tool/GlobalModifierModal.svelte";
   import CreateTower from "./tool/CreateTower.svelte";
 
   import {
-    Combobox,
     DropdownMenu,
     Popover,
     AlertDialog,
@@ -34,7 +34,6 @@
     type PendingDiscardAction,
   } from "./smol/DiscardMessage.svelte";
   import {
-    ChevronsUpDown,
     Check,
     Trash2,
     X,
@@ -59,21 +58,6 @@
   let toolsOpen = $state(false);
   let modifierOpen = $state(false);
 
-  let searchValue = $state("");
-  let comboboxOpen = $state(false);
-
-  let items = $derived(
-    towerStore.names.map((name) => ({ value: name, label: name })),
-  );
-
-  let filteredTowers = $derived(
-    searchValue === ""
-      ? items
-      : items.filter((item) =>
-          item.label.toLowerCase().includes(searchValue.toLowerCase()),
-        ),
-  );
-
   async function performGoHome() {
     sidebarOpen = false;
     const url = new URL(page.url);
@@ -88,11 +72,9 @@
   async function performTowerSelect(tower: string) {
     const success = await towerStore.load(tower);
     if (success) {
-      searchValue = "";
       const url = new URL(page.url);
       url.searchParams.set("tower", tower);
       await goto(url, { keepFocus: true, noScroll: true });
-      comboboxOpen = false;
     }
   }
 
@@ -115,7 +97,6 @@
   async function performProfileSwitch(profile: string) {
     if (profileStore.switch(profile)) {
       await towerStore.switchProfile(profile);
-      searchValue = "";
     }
   }
 
@@ -231,7 +212,6 @@
     ></div>
   {/if}
 
-  <!-- Sidebar Overlay -->
   <div
     class="fixed inset-y-0 left-0 z-51 w-72 transition-transform duration-200 {sidebarOpen
       ? 'translate-x-0'
@@ -249,60 +229,11 @@
     </h1>
 
     {#if isClient}
-      <Combobox.Root
-        type="single"
-        {items}
-        value={towerStore.selectedName}
-        bind:open={comboboxOpen}
-        onValueChange={(v) => handleSelect(v)}
-        onOpenChange={(open) => {
-          if (!open) searchValue = "";
-        }}
-      >
-        <div class="relative">
-          <Combobox.Input
-            placeholder="Select a tower..."
-            class="combobox-input w-[90dvw]!"
-            oninput={(e) => {
-              searchValue = e.currentTarget.value;
-              comboboxOpen = true;
-            }}
-            onclick={() => (comboboxOpen = true)}
-          />
-          <Combobox.Trigger class="absolute right-3 top-3">
-            <ChevronsUpDown class="h-4 w-4 opacity-50" />
-          </Combobox.Trigger>
-        </div>
-
-        <Combobox.Portal>
-          <Combobox.Content class="combobox-content">
-            <Combobox.Viewport class="p-2 max-h-75 overflow-y-auto">
-              {#each filteredTowers as item (item.value)}
-                <Combobox.Item
-                  class="combobox-item"
-                  value={item.value}
-                  label={item.label}
-                >
-                  {#snippet children({ selected })}
-                    {item.label}
-                    {#if selected}
-                      <span
-                        class="absolute right-2 flex h-3.5 w-3.5 items-center justify-center"
-                      >
-                        <Check class="h-4 w-4" />
-                      </span>
-                    {/if}
-                  {/snippet}
-                </Combobox.Item>
-              {:else}
-                <span class="block px-4 py-2 text-sm text-muted-foreground">
-                  No results found
-                </span>
-              {/each}
-            </Combobox.Viewport>
-          </Combobox.Content>
-        </Combobox.Portal>
-      </Combobox.Root>
+      <TowerPicker
+        variant="compact"
+        selected={towerStore.selectedName}
+        onSelect={handleSelect}
+      />
 
       <ModeToggle
         bind:mode={editorMode}
@@ -346,7 +277,7 @@
             </p>
           </Card>
         {:else}
-          <Introduction />
+          <HomeView onSelect={handleSelect} />
         {/if}
       </div>
     {/key}
@@ -356,11 +287,10 @@
   <div
     class="fixed inset-x-0 bottom-0 z-30 flex h-14 items-center justify-around border-t border-border bg-card px-6"
   >
-    <!-- Sidebar Toggle -->
     <IconBtn
       onclick={() => (sidebarOpen = !sidebarOpen)}
-      title="Toggle Sidebar"
-      aria-label="Toggle sidebar"
+      title={towerStore.selectedData ? "Toggle Sidebar" : "Recent Updates"}
+      aria-label={towerStore.selectedData ? "Toggle sidebar" : "Recent updates"}
     >
       <PanelLeft size={20} />
     </IconBtn>

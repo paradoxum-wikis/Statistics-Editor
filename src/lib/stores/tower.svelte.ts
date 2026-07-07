@@ -15,6 +15,22 @@ import { mergeBaselineOnTowerDiff } from "$lib/utils/towah";
 import { embedSeDiff, stripSeDiff } from "$lib/neowtext/directives";
 import { fetchShare, parseShareRef } from "$lib/services/shareTower";
 
+const RECENT_KEY = "tdse_recent_towers";
+const RECENT_MAX = 8;
+
+function readRecentTowers(): string[] {
+  if (typeof localStorage === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(RECENT_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed)
+      ? parsed.filter((n): n is string => typeof n === "string" && !!n.trim())
+      : [];
+  } catch {
+    return [];
+  }
+}
+
 /**
  * Manages tower selection and data reactively.
  */
@@ -25,6 +41,7 @@ class TowerStore {
   selectedData = $state<Tower | null>(null);
   isLoading = $state(false);
   isDirty = $state(false);
+  recentNames = $state<string[]>(readRecentTowers());
   #lastLoadedName = $state<string | null>(null);
 
   selectedSkinName = $state<string>("Regular");
@@ -183,6 +200,7 @@ class TowerStore {
 
         if (settingsStore.debugMode)
           console.log(`Loaded tower data for ${name}`);
+        this.#touchRecent(name);
         return true;
       } else {
         console.error(`Failed to load tower: ${name}`);
@@ -630,6 +648,16 @@ class TowerStore {
       percent: Number.isFinite(percent) ? percent : 0,
     };
     this.globalModifier.entries = entries;
+  }
+
+  #touchRecent(name: string): void {
+    if (!name.trim() || typeof localStorage === "undefined") return;
+    const next = [
+      name,
+      ...this.recentNames.filter((n) => n !== name),
+    ].slice(0, RECENT_MAX);
+    this.recentNames = next;
+    localStorage.setItem(RECENT_KEY, JSON.stringify(next));
   }
 }
 

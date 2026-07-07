@@ -1,9 +1,9 @@
 <script lang="ts">
   import { Tabs } from "bits-ui";
   import { fade } from "svelte/transition";
-  import Separator from "./smol/Separator.svelte";
   import { cubicOut } from "svelte/easing";
-  import TDSWLogo from "$lib/assets/tdswbanner.png";
+  import WikiBanner from "./smol/WikiBanner.svelte";
+  import Separator from "./smol/Separator.svelte";
   import { stripRefs } from "$lib/utils/format";
   import { renderCellHtml } from "$lib/neowtext/render";
   import { towerStore } from "$lib/stores/tower.svelte";
@@ -109,21 +109,7 @@
   });
 </script>
 
-<div class="mb-3 px-2">
-  <a
-    href="https://tds.fandom.com/wiki/"
-    target="_blank"
-    rel="noopener"
-    class="animate-in fade-in"
-  >
-    <img
-      src={TDSWLogo}
-      alt="TDS Wiki Logo"
-      class="w-full max-h-14 object-contain drop-shadow-sm transition-transform duration-150 ease-out hover:scale-115"
-    />
-  </a>
-</div>
-
+<WikiBanner />
 <Separator class="mb-4" />
 
 <Tabs.Root bind:value={selectedUpgrade}>

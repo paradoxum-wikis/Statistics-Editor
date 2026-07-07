@@ -27,7 +27,9 @@
         if (ok) url.searchParams.set("tower", towerStore.selectedName);
         else alert("Failed to import shared tower.");
       } catch (e) {
-        alert(e instanceof Error ? e.message : "Failed to import shared tower.");
+        alert(
+          e instanceof Error ? e.message : "Failed to import shared tower.",
+        );
       }
       await goto(url, { replaceState: true, keepFocus: true, noScroll: true });
       return;
