@@ -93,7 +93,7 @@ export function parseWikitext(content: string): ParsedWikitext {
     }
   }
 
-  // $FNC-* and Table.Col refs are left for per row resolution
+  // $FNC-* / $FSE-* and Table.Col refs are left for per row resolution
   const keys = Object.keys(variables);
   if (keys.length > 0) {
     const replacer = createVariableReplacer(variables);

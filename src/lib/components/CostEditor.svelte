@@ -5,6 +5,7 @@
   import SubtleRow from "./smol/SubtleRow.svelte";
   import { CircleDollarSign } from "@lucide/svelte";
   import { parseNumeric } from "$lib/utils/format";
+  import { getEffectiveFncKey, getFncValue } from "$lib/neowtext/functions";
 
   type CostRow = {
     level: number;
@@ -26,9 +27,10 @@
     const rows: CostRow[] = [];
 
     const costKey =
-      skinData.isPvp && skinData.formulaTokens["$FNC-PVP-COST$"] !== undefined
-        ? "$FNC-PVP-COST$"
-        : "$FNC-COST$";
+      skinData.isPvp &&
+      getFncValue(skinData.formulaTokens, "PVP-COST") !== undefined
+        ? getEffectiveFncKey(skinData.formulaTokens, "PVP-COST")
+        : getEffectiveFncKey(skinData.formulaTokens, "COST");
 
     const costArr = (skinData.formulaTokens[costKey] || "")
       .split(";")

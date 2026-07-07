@@ -1,6 +1,7 @@
 import type Tower from "$lib/towerComponents/tower";
 import type { TableData } from "./parser";
 import { serializeTable, serializeVariables } from "./serializer";
+import { getDefaultFncKey } from "./functions";
 
 /**
  * Updates the given source wikitext with data from the Tower instance.
@@ -67,10 +68,9 @@ export function patchWikitext(sourceWikitext: string, tower: Tower): string {
  * - Existing formula tokens (preserved from original parse)
  * - Funcs (Cost, Detection, Upgrades, Icons)
  *
- * Automatically diffs PVP against Regular and writes $FNC-PVP-* arrays
+ * Automatically diffs PVP against Regular and writes $FNC-PVP-* / $FSE-PVP-* arrays
  * if the PVP skin deviates from the base tower.
  */
-
 function buildVariablesMap(tower: Tower): Record<string, string> {
   const variables: Record<string, string> = {};
 
@@ -83,7 +83,7 @@ function buildVariablesMap(tower: Tower): Record<string, string> {
     if (!skin?.formulaTokens) return;
     for (const [key, val] of Object.entries(skin.formulaTokens)) {
       if (
-        /^\$FNC-(?:[A-Z0-9]+-)?(?:COST|DETECTION|UPGRADE|UPGRADEICON)(?:-[A-Z])?\$$/.test(
+        /^\$(?:FNC|FSE)-(?:[A-Z0-9]+-)?(?:COST|DETECTION|UPGRADE|UPGRADEICON)(?:-[A-Z])?\$$/.test(
           key,
         )
       )
@@ -149,11 +149,13 @@ function buildVariablesMap(tower: Tower): Record<string, string> {
 
   const baseFnc = baseSkinJson ? extractFncArrays(baseSkinJson) : null;
   if (baseFnc) {
-    if (baseFnc.costStr) variables["$FNC-COST$"] = baseFnc.costStr;
+    if (baseFnc.costStr) variables[getDefaultFncKey("COST")] = baseFnc.costStr;
     if (baseFnc.detStr && baseFnc.detStr !== "; ; ")
-      variables["$FNC-DETECTION$"] = baseFnc.detStr;
-    if (baseFnc.upgradeStr) variables["$FNC-UPGRADE$"] = baseFnc.upgradeStr;
-    if (baseFnc.iconStr) variables["$FNC-UPGRADEICON$"] = baseFnc.iconStr;
+      variables[getDefaultFncKey("DETECTION")] = baseFnc.detStr;
+    if (baseFnc.upgradeStr)
+      variables[getDefaultFncKey("UPGRADE")] = baseFnc.upgradeStr;
+    if (baseFnc.iconStr)
+      variables[getDefaultFncKey("UPGRADEICON")] = baseFnc.iconStr;
   }
 
   for (const skinName of tower.skinNames) {
@@ -173,16 +175,16 @@ function buildVariablesMap(tower: Tower): Record<string, string> {
     if (!prefix || !baseFnc) continue;
 
     if (variant.costStr !== baseFnc.costStr)
-      variables[`$FNC-${prefix}-COST$`] = variant.costStr;
+      variables[getDefaultFncKey("COST", prefix)] = variant.costStr;
 
     if (variant.detStr !== baseFnc.detStr && variant.detStr !== "; ; ")
-      variables[`$FNC-${prefix}-DETECTION$`] = variant.detStr;
+      variables[getDefaultFncKey("DETECTION", prefix)] = variant.detStr;
 
     if (variant.upgradeStr !== baseFnc.upgradeStr)
-      variables[`$FNC-${prefix}-UPGRADE$`] = variant.upgradeStr;
+      variables[getDefaultFncKey("UPGRADE", prefix)] = variant.upgradeStr;
 
     if (variant.iconStr !== baseFnc.iconStr)
-      variables[`$FNC-${prefix}-UPGRADEICON$`] = variant.iconStr;
+      variables[getDefaultFncKey("UPGRADEICON", prefix)] = variant.iconStr;
   }
 
   return variables;
@@ -207,6 +209,9 @@ function patchVariableBlock(
   for (const [, key] of oldBlock.matchAll(/^\s*([^=\s]+)\s*=/gm)) {
     if (key in variables) {
       orderedVars[key] = variables[key];
+    } else if (key.startsWith("$FNC-")) {
+      const fse = "$FSE-" + key.slice(5);
+      if (fse in variables) orderedVars[fse] = variables[fse];
     }
   }
 

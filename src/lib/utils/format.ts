@@ -84,7 +84,7 @@ export const ROF_KEYS = [
 export function getRofBugVer(
   tokens: Record<string, string> | undefined | null,
 ) {
-  let type = "$FNC-ROFBUG2022$";
+  let type = "$FNC-ROFBUG2022";
   let colsStr = "";
 
   if (tokens) {
@@ -112,15 +112,16 @@ export function getRofBugVer(
  */
 export function applyRofBug(
   seconds: number,
-  type: string = "FNC-ROFBUG2022",
+  type: string = "$FNC-ROFBUG2022",
 ): number {
   if (isNaN(seconds) || seconds <= 0) return seconds;
 
-  if (type === "$FNC-ROFBUG2019$" || type === "FNC-ROFBUG2019") {
+  const norm = type.replace(/^\$?FNC-?/, "").replace(/\$$/, "");
+  if (norm === "ROFBUG2019") {
     return Math.round((seconds + 0.05) * 1000) / 1000;
   }
 
-  if (type === "$FNC-ROFBUG2020$" || type === "FNC-ROFBUG2020") {
+  if (norm === "ROFBUG2020") {
     return Math.round((seconds + 0.03) * 1000) / 1000;
   }
 

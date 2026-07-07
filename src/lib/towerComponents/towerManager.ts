@@ -1,7 +1,12 @@
 import Tower from "./tower";
 import { towerNames } from "./towers";
 import { fetchTowerWiki } from "$lib/services/fetchTowerWiki";
-import { resolveToken, type TableCache } from "$lib/neowtext/functions";
+import {
+  getDefaultFncKey,
+  getFncValue,
+  resolveToken,
+  type TableCache,
+} from "$lib/neowtext/functions";
 import { parseWikitext, type TableData } from "$lib/neowtext/parser";
 import { patchWikitext } from "$lib/neowtext/patcher";
 import {
@@ -17,7 +22,11 @@ import {
   removeCustomTower,
 } from "./customTowers";
 import { stripRefs } from "$lib/utils/format";
-import { embedSeDirectives, extractDirectives, stripSeMeta } from "$lib/neowtext/directives";
+import {
+  embedSeDirectives,
+  extractDirectives,
+  stripSeMeta,
+} from "$lib/neowtext/directives";
 
 const wikitextFiles = import.meta.glob("./towers/*.wiki", {
   query: "?raw",
@@ -216,8 +225,11 @@ export default class TowerManager {
         currentSource = source;
         currentText = text;
       }
-      const { text: parseText, baseline: diffBaseline, memo } =
-        extractDirectives(currentText);
+      const {
+        text: parseText,
+        baseline: diffBaseline,
+        memo,
+      } = extractDirectives(currentText);
       if (this.debug())
         console.log(
           `[TowerManager] Loaded effective wikitext from ${currentSource}, length: ${currentText.length}, se-diff cells: ${Object.keys(diffBaseline).length}, se-memo chars: ${memo.length}`,
@@ -327,7 +339,7 @@ export default class TowerManager {
           val ? val.split(";").map((s) => s.trim()) : [];
         const v = parsed.variables;
         const indexOverrides: Record<string, string> = {};
-        const indexVal = v["$FNC-INDEX$"];
+        const indexVal = getFncValue(v, "INDEX");
         if (indexVal) {
           for (const entry of indexVal.split(";")) {
             const m = entry.trim().match(/^(.+)\.([^.]+)$/);
@@ -340,12 +352,12 @@ export default class TowerManager {
         );
         const branchMapping: Record<string, string> = {};
         const branchNames = (
-          isPvp && v["$FNC-PVP-BRANCH$"]
-            ? getArr(v["$FNC-PVP-BRANCH$"])
-            : getArr(v["$FNC-BRANCH$"])
+          isPvp && getFncValue(v, "PVP-BRANCH")
+            ? getArr(getFncValue(v, "PVP-BRANCH"))
+            : getArr(getFncValue(v, "BRANCH"))
         ).filter(Boolean);
 
-        const schemaStr = v["$FNC-SCHEMA$"];
+        const schemaStr = getFncValue(v, "SCHEMA");
         const schema = schemaStr ? getArr(schemaStr).filter(Boolean) : null;
 
         if (schema && schema.length > 0) {
@@ -359,12 +371,10 @@ export default class TowerManager {
           });
         }
 
-        const baseCosts = getArr(v["$FNC-COST$"]);
-        const baseDetects = getArr(v["$FNC-DETECTION$"]);
-        const baseUpgs = getArr(v["$FNC-UPGRADE$"]);
-        const baseIcons = getArr(v["$FNC-UPGRADEICON$"]);
-        const variantFnc = (suffix: string) =>
-          variantPrefix ? `$FNC-${variantPrefix}-${suffix}$` : "";
+        const baseCosts = getArr(getFncValue(v, "COST"));
+        const baseDetects = getArr(getFncValue(v, "DETECTION"));
+        const baseUpgs = getArr(getFncValue(v, "UPGRADE"));
+        const baseIcons = getArr(getFncValue(v, "UPGRADEICON"));
 
         const mergeArrays = (base: string[], pvp?: string[]) => {
           if (!pvp || pvp.length === 0) return base;
@@ -375,24 +385,30 @@ export default class TowerManager {
           });
         };
 
-        const costs = mergeArrays(baseCosts, getArr(v[variantFnc("COST")]));
+        const costs = mergeArrays(
+          baseCosts,
+          getArr(getFncValue(v, "COST", variantPrefix)),
+        );
         const detects = mergeArrays(
           baseDetects,
-          getArr(v[variantFnc("DETECTION")]),
+          getArr(getFncValue(v, "DETECTION", variantPrefix)),
         );
-        const upgs = mergeArrays(baseUpgs, getArr(v[variantFnc("UPGRADE")]));
+        const upgs = mergeArrays(
+          baseUpgs,
+          getArr(getFncValue(v, "UPGRADE", variantPrefix)),
+        );
         const icons = mergeArrays(
           baseIcons,
-          getArr(v[variantFnc("UPGRADEICON")]),
+          getArr(getFncValue(v, "UPGRADEICON", variantPrefix)),
         );
 
-        formulaTokens["$FNC-COST$"] = costs.join("; ");
-        formulaTokens["$FNC-DETECTION$"] = detects.join("; ");
-        formulaTokens["$FNC-UPGRADE$"] = upgs.join("; ");
-        formulaTokens["$FNC-UPGRADEICON$"] = icons.join("; ");
-        const variantBranch = v[variantFnc("BRANCH")];
+        formulaTokens[getDefaultFncKey("COST")] = costs.join("; ");
+        formulaTokens[getDefaultFncKey("DETECTION")] = detects.join("; ");
+        formulaTokens[getDefaultFncKey("UPGRADE")] = upgs.join("; ");
+        formulaTokens[getDefaultFncKey("UPGRADEICON")] = icons.join("; ");
+        const variantBranch = getFncValue(v, "BRANCH", variantPrefix);
         if (variantBranch !== undefined) {
-          formulaTokens["$FNC-BRANCH$"] = variantBranch;
+          formulaTokens[getDefaultFncKey("BRANCH")] = variantBranch;
         }
 
         const getIndex = (lvl: number, branch: string) => {

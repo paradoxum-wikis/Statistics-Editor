@@ -3,7 +3,12 @@ import Defaults from "./defaults";
 import Upgrade from "./upgrade";
 import Levels from "./levels";
 import Locator from "./locator";
-import { resolveToken, type TableCache } from "$lib/neowtext/functions";
+import {
+  getEffectiveFncKey,
+  getFncValue,
+  resolveToken,
+  type TableCache,
+} from "$lib/neowtext/functions";
 import type { TableData } from "$lib/neowtext/parser";
 import { settingsStore } from "$lib/stores/settings.svelte";
 import { formatNumber, stripRefs } from "$lib/utils/format";
@@ -158,7 +163,7 @@ class SkinData {
 
   private rebuildTableCache(): void {
     const indexOverrides: Record<string, string> = {};
-    const indexVal = this.formulaTokens["$FNC-INDEX$"];
+    const indexVal = getFncValue(this.formulaTokens, "INDEX");
     if (indexVal) {
       for (const entry of indexVal.split(";")) {
         const m = entry.trim().match(/^(.+)\.([^.]+)$/);
@@ -392,13 +397,11 @@ class SkinData {
   }
 
   setCost(level: number, value: number): void {
-    const variantCostKey = this.variantPrefix
-      ? `$FNC-${this.variantPrefix}-COST$`
-      : "";
-    const costKey =
-      variantCostKey && this.formulaTokens[variantCostKey] !== undefined
-        ? variantCostKey
-        : "$FNC-COST$";
+    const costKey = getEffectiveFncKey(
+      this.formulaTokens,
+      "COST",
+      this.variantPrefix,
+    );
     const costs = (this.formulaTokens[costKey] || "")
       .split(";")
       .map((s) => s.trim());

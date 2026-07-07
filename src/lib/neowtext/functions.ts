@@ -15,6 +15,79 @@ function parseLevelNumber(level: number | string): number {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
+/**
+ * FNC- : **f**u**nc**tions that are understood both by the wiki and this editor.
+ * FSE- : **f**unctions that are exclusive to this editor, the **S**tatistics **E**ditor.
+ *
+ * Exceptions are DETECTION/UPGRADE/UPGRADEICON for compatibility reasons,
+ * FNC- versions are accepted on read but migrated to FSE- on save.
+ */
+const FSE_BASES = ["DETECTION", "UPGRADE", "UPGRADEICON", "CATEGORY"];
+const COMPATIBILITY_FSE = ["DETECTION", "UPGRADE", "UPGRADEICON"];
+
+function isFseSuffix(suffix: string): boolean {
+  const clean = suffix.replace(/^PVP-/, "").toUpperCase();
+  return FSE_BASES.includes(clean);
+}
+
+function getDefaultPrefix(suffix: string): "FNC" | "FSE" {
+  return isFseSuffix(suffix) ? "FSE" : "FNC";
+}
+
+export function getFncKeys(suffix: string, variantPrefix?: string): string[] {
+  const keys: string[] = [];
+  const bases = variantPrefix
+    ? [`${variantPrefix}-${suffix}`, suffix]
+    : [suffix];
+  const defaultPre = getDefaultPrefix(suffix);
+  for (const base of bases) {
+    keys.push(`$${defaultPre}-${base}$`);
+  }
+  const clean = suffix.replace(/^PVP-/, "").toUpperCase();
+  if (COMPATIBILITY_FSE.includes(clean)) {
+    const otherPre = defaultPre === "FSE" ? "FNC" : "FSE";
+    for (const base of bases) {
+      keys.push(`$${otherPre}-${base}$`);
+    }
+  }
+  return keys;
+}
+
+export function getFncValue(
+  tokens: Record<string, string>,
+  suffix: string,
+  variantPrefix?: string,
+): string | undefined {
+  for (const key of getFncKeys(suffix, variantPrefix)) {
+    if (tokens[key] !== undefined) return tokens[key];
+  }
+  return undefined;
+}
+
+export function getEffectiveFncKey(
+  tokens: Record<string, string>,
+  suffix: string,
+  variantPrefix?: string,
+): string {
+  for (const key of getFncKeys(suffix, variantPrefix)) {
+    if (tokens[key] !== undefined) return key;
+  }
+  const pre = getDefaultPrefix(suffix);
+  return variantPrefix
+    ? `$${pre}-${variantPrefix}-${suffix}$`
+    : `$${pre}-${suffix}$`;
+}
+
+export function getDefaultFncKey(
+  suffix: string,
+  variantPrefix?: string,
+): string {
+  const pre = getDefaultPrefix(suffix);
+  return variantPrefix
+    ? `$${pre}-${variantPrefix}-${suffix}$`
+    : `$${pre}-${suffix}$`;
+}
+
 function parseLevelBranch(level: number | string): string {
   if (typeof level !== "string") return "";
   return level.match(/[A-Za-z]+$/)?.[0] ?? "";
@@ -25,16 +98,17 @@ function getVariantFncKey(
   variantPrefix: string | undefined,
   suffix: string,
 ): string {
-  const keyed = variantPrefix ? `$FNC-${variantPrefix}-${suffix}$` : "";
-  if (keyed && tokens[keyed] !== undefined) return keyed;
-  return `$FNC-${suffix}$`;
+  for (const key of getFncKeys(suffix, variantPrefix)) {
+    if (tokens[key] !== undefined) return key;
+  }
+  return getDefaultFncKey(suffix, variantPrefix);
 }
 
 function buildBranchMap(
   tokens: Record<string, string>,
   variantPrefix?: string,
 ): Record<string, string> {
-  const schemaStr = tokens["$FNC-SCHEMA$"];
+  const schemaStr = getFncValue(tokens, "SCHEMA");
   if (!schemaStr) return {};
 
   const schema = schemaStr
@@ -226,7 +300,7 @@ function formatNumberLike(input: string, useGrouping: boolean): string {
 }
 
 /**
- * Resolves a $FNC-NAME$ function for the given row level.
+ * Resolves a $FNC-NAME$ / $FSE-NAME$ function for the given row level.
  * Returns the computed numeric value, or undefined if the function is unknown.
  */
 export function resolveFNC(
@@ -250,7 +324,7 @@ export function resolveFNC(
 
   let total = 0;
 
-  const schemaStr = tokens["$FNC-SCHEMA$"];
+  const schemaStr = getFncValue(tokens, "SCHEMA");
   if (schemaStr) {
     const schema = schemaStr
       .split(";")
@@ -306,7 +380,7 @@ export type TableCache = Record<
 >;
 
 /**
- * Resolves a token ($FNC-NAME$, $nVar$, or $Var$) to a value,
+ * Resolves a token ($FNC-NAME$ / $FSE-NAME$, $nVar$, or $Var$) to a value,
  * recursing through token aliases when a $Var$ points to another token.
  */
 export function resolveToken(
@@ -402,8 +476,8 @@ export function resolveToken(
     });
   }
 
-  // $FNC-NAME$
-  const fncMatch = token.match(/^\$FNC-([A-Z]+)\$$/);
+  // $FNC-NAME$ or $FSE-NAME$ (FSE = editor-only functions)
+  const fncMatch = token.match(/^\$(?:FNC|FSE)-([A-Z0-9]+)\$$/i);
   if (fncMatch) {
     return resolveFNC(
       fncMatch[1],
