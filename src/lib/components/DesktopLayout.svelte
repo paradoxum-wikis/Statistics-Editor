@@ -358,12 +358,14 @@
       </header>
 
       <main
-        class="flex-1 overflow-hidden p-5"
+        class="min-h-0 flex-1 overflow-y-auto p-5"
         class:overflow-x-auto={!!towerStore.selectedData}
       >
         {#key mainKey}
           <div
-            class="h-full"
+            class:h-full={isClient &&
+              !towerStore.selectedData &&
+              !towerStore.isLoading}
             in:fly={{ y: 8, duration: 160, easing: cubicOut }}
           >
             {#if !isClient}

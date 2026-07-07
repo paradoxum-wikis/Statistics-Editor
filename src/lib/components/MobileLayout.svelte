@@ -238,7 +238,7 @@
   </header>
 
   <!-- Main Content -->
-  <main class="flex-1 overflow-x-auto p-4 pb-16">
+  <main class="min-h-0 flex-1 overflow-x-auto overflow-y-auto p-4 pb-16">
     {#key `${isClient}-${towerStore.isLoading}-${towerStore.selectedName ?? ""}-${editorMode}`}
       <div in:fly={{ y: 8, duration: 160, easing: cubicOut }}>
         {#if !isClient}
