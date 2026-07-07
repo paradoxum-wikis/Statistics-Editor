@@ -323,7 +323,7 @@ h4,
 
 .combobox-item {
   border-radius: calc(var(--radius) - 0.25rem) 0;
-  @apply relative flex w-full cursor-default select-none items-center py-1.5 ps-4 pe-8 text-sm outline-none;
+  @apply relative flex w-full cursor-pointer select-none items-center py-1.5 ps-4 pe-8 text-sm outline-none;
 
   &[data-disabled] {
     @apply pointer-events-none opacity-50;
