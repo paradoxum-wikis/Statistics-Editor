@@ -1,6 +1,8 @@
 <script lang="ts">
   import { Combobox } from "bits-ui";
-  import { Check, ChevronsUpDown } from "@lucide/svelte";
+  import { Check, ChevronsUpDown, X } from "@lucide/svelte";
+  import { slide } from "svelte/transition";
+  import { cubicOut } from "svelte/easing";
   import { groupedTowerNames } from "$lib/towerComponents/towers";
   import { towerStore } from "$lib/stores/tower.svelte";
   import TextInput from "./smol/TextInput.svelte";
@@ -122,12 +124,24 @@
           <h3 class="picker-section-title">Recent</h3>
           <ul>
             {#each recent as name (name)}
-              <li>
+              <li
+                class="group relative min-w-0 rounded-[calc(var(--radius)-0.25rem)_0] hover:bg-accent hover:text-accent-foreground"
+                out:slide={{ duration: 150, easing: cubicOut }}
+              >
                 <button
-                  class="combobox-item hover:bg-accent hover:text-accent-foreground"
+                  type="button"
+                  class="block w-full cursor-pointer truncate py-1.5 ps-4 pe-9 text-left text-sm outline-none"
                   onclick={() => pick(name)}
                 >
                   {name}
+                </button>
+                <button
+                  type="button"
+                  class="absolute top-1/2 right-2 -translate-y-1/2 cursor-pointer p-0.5 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:text-destructive"
+                  aria-label="Remove {name} from recents"
+                  onclick={() => towerStore.removeRecent(name)}
+                >
+                  <X class="h-3.5 w-3.5" />
                 </button>
               </li>
             {/each}
