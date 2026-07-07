@@ -23,11 +23,19 @@
       text: "Export the stats you've edited and contribute them to the TDS Wiki to help keep it updated!",
     },
   ] as const;
+
+  const greeting = $derived.by(() => {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) return "Good morning, editor!";
+    if (hour >= 12 && hour < 17) return "Good afternoon, editor!";
+    if (hour >= 17 && hour < 22) return "Good evening, editor!";
+    return "Up late, editor? Welcome!";
+  });
 </script>
 
 <div class="flex h-full min-h-0 flex-col gap-3 overflow-hidden">
   <div class="shrink-0 space-y-2">
-    <h2 class="unisans text-xl font-bold md:text-2xl">Welcome, strategist!</h2>
+    <h2 class="unisans text-xl font-bold md:text-2xl">{greeting}</h2>
     <p class="text-xs text-muted-foreground md:text-sm">
       The Statistics Editor is a community made tool for creating and editing
       Tower Defense Simulator tower stats, duh.
