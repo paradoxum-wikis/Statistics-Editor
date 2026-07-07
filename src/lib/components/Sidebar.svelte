@@ -30,9 +30,11 @@
 
   let selectedUpgrade = $state("0");
 
-  let currentSkin = $derived(
-    towerStore.selectedData?.getSkin(towerStore.selectedSkinName),
-  );
+  let currentSkin = $derived.by(() => {
+    towerStore.refreshTrigger;
+    return towerStore.selectedData?.getSkin(towerStore.selectedSkinName);
+  });
+
   let numUpgrades = $derived(currentSkin?.upgrades?.length ?? 0);
 
   let upgradeNames = $derived.by(() => {
@@ -56,6 +58,7 @@
   });
 
   let upgradeSummaries = $derived.by(() => {
+    towerStore.refreshTrigger;
     if (!currentSkin) return {};
     return buildUpgradeSummariesForeskin(currentSkin);
   });
