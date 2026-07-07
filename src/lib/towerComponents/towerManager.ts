@@ -17,7 +17,7 @@ import {
   removeCustomTower,
 } from "./customTowers";
 import { stripRefs } from "$lib/utils/format";
-import { embedSeDiff, extractDirectives, stripSeDiff } from "$lib/neowtext/directives";
+import { embedSeDirectives, extractDirectives, stripSeMeta } from "$lib/neowtext/directives";
 
 const wikitextFiles = import.meta.glob("./towers/*.wiki", {
   query: "?raw",
@@ -69,7 +69,7 @@ export default class TowerManager {
     const src = (tower as any).sourceWikitext;
     if (!src) return null;
     try {
-      return patchWikitext(stripSeDiff(src), tower);
+      return patchWikitext(stripSeMeta(src), tower);
     } catch (err) {
       console.error(
         `[TowerManager] Failed to generate wikitext for ${tower.name}:`,
@@ -82,6 +82,7 @@ export default class TowerManager {
   saveTower(
     tower: Tower,
     diffBaseline: Record<string, unknown> = {},
+    memo = "",
   ): string | null {
     if (this.debug())
       console.log(`[TowerManager] saveTower called for ${tower.name}`);
@@ -90,21 +91,25 @@ export default class TowerManager {
     const src = (tower as { sourceWikitext?: string }).sourceWikitext;
     if (!src) return null;
 
-    const patched = patchWikitext(stripSeDiff(src), tower);
+    const patched = patchWikitext(stripSeMeta(src), tower);
     if (!patched) return null;
 
-    const withDiff = embedSeDiff(patched, diffBaseline);
+    const withDirectives = embedSeDirectives(patched, {
+      memo,
+      baseline: diffBaseline,
+    });
     if (this.debug())
       console.log(
-        `[TowerManager] Patched wikitext length: ${withDiff.length}`,
+        `[TowerManager] Patched wikitext length: ${withDirectives.length}`,
       );
-    setWikiOverride(this.dataKey ?? "Default", tower.name, withDiff);
+    setWikiOverride(this.dataKey ?? "Default", tower.name, withDirectives);
     Object.assign(tower, {
-      sourceWikitext: withDiff,
+      sourceWikitext: withDirectives,
       wikitextSource: "override",
       diffBaseline,
+      editorMemo: memo,
     });
-    return withDiff;
+    return withDirectives;
   }
 
   clearCache(name: string): void {
@@ -211,10 +216,11 @@ export default class TowerManager {
         currentSource = source;
         currentText = text;
       }
-      const { text: parseText, baseline: diffBaseline } = extractDirectives(currentText);
+      const { text: parseText, baseline: diffBaseline, memo } =
+        extractDirectives(currentText);
       if (this.debug())
         console.log(
-          `[TowerManager] Loaded effective wikitext from ${currentSource}, length: ${currentText.length}, se-diff cells: ${Object.keys(diffBaseline).length}`,
+          `[TowerManager] Loaded effective wikitext from ${currentSource}, length: ${currentText.length}, se-diff cells: ${Object.keys(diffBaseline).length}, se-memo chars: ${memo.length}`,
         );
 
       const parsed = parseWikitext(parseText);
@@ -789,6 +795,7 @@ export default class TowerManager {
         sourceWikitext: currentText,
         wikitextSource: currentSource,
         diffBaseline,
+        editorMemo: memo,
       });
 
       if (ephemeral) return towerData;
@@ -796,11 +803,12 @@ export default class TowerManager {
     } catch (err) {
       console.error("Failed to load wikitext for", name, ":", err);
       const towerData = new Tower(name, {});
-      const { baseline: diffBaseline } = extractDirectives(currentText);
+      const { baseline: diffBaseline, memo } = extractDirectives(currentText);
       Object.assign(towerData, {
         sourceWikitext: currentText,
         wikitextSource: currentSource,
         diffBaseline,
+        editorMemo: memo,
       });
       if (ephemeral) return towerData;
       return (this.towers[name] = towerData);

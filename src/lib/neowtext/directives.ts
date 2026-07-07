@@ -15,8 +15,12 @@ export function stripSeIgnore(text: string): string {
     .join("\n");
 }
 
-// @se-diff
 const SE_DIFF_INLINE_RE = /<!--\s*@se-diff:(.*?)\s*-->/gis;
+const SE_MEMO_INLINE_RE = /<!--\s*@se-memo:(.*?)\s*-->/gis;
+/**
+ * The maximum JSON payload per comment before splitting into adjacent `@se-memo` blocks.
+ */
+const MEMO_JSON_CHUNK = 8000;
 
 export function mkCellKey(
   skin: string,
@@ -59,6 +63,18 @@ function parseSeDiffPayload(raw: string): Record<string, unknown> {
   return {};
 }
 
+function parseSeMemoPayload(raw: string): string {
+  try {
+    const parsed: unknown = JSON.parse(raw.trim());
+    if (typeof parsed === "string") return parsed;
+  } catch {
+    if (settingsStore.debugMode) {
+      console.log(`[parseSeMemoPayload] Invalid payload: ${raw}`);
+    }
+  }
+  return "";
+}
+
 export function extractSeDiff(text: string): {
   text: string;
   baseline: Record<string, unknown>;
@@ -75,29 +91,75 @@ export function stripSeDiff(text: string): string {
   return extractSeDiff(text).text;
 }
 
-export function embedSeDiff(
+export function extractSeMemo(text: string): {
+  text: string;
+  memo: string;
+} {
+  const parts: string[] = [];
+  const stripped = text.replace(SE_MEMO_INLINE_RE, (_, payload: string) => {
+    parts.push(parseSeMemoPayload(payload));
+    return "";
+  });
+  return { text: stripped.trimEnd(), memo: parts.join("") };
+}
+
+export function stripSeMemo(text: string): string {
+  return extractSeMemo(text).text;
+}
+
+/** Strip `@se-memo` and `@se-diff` (not `@se-ignore`). */
+export function stripSeMeta(text: string): string {
+  return stripSeMemo(stripSeDiff(text));
+}
+
+function memoComments(memo: string): string {
+  const comment = (slice: string) =>
+    `<!-- @se-memo:${JSON.stringify(slice)} -->`;
+  const json = JSON.stringify(memo);
+  if (json.length <= MEMO_JSON_CHUNK) return comment(memo);
+
+  const comments: string[] = [];
+  for (let i = 0; i < memo.length; ) {
+    let end = Math.min(memo.length, i + 2000);
+    let slice = memo.slice(i, end);
+    while (JSON.stringify(slice).length > MEMO_JSON_CHUNK && slice.length > 1) {
+      slice = memo.slice(i, --end);
+    }
+    comments.push(comment(slice));
+    i += slice.length;
+  }
+  return comments.join("");
+}
+
+export function embedSeDirectives(
   text: string,
-  baseline: Record<string, unknown>,
+  opts: { memo?: string; baseline?: Record<string, unknown> } = {},
 ): string {
-  const stripped = stripSeDiff(text).trimEnd();
-  if (Object.keys(baseline).length === 0) return stripped;
-  return `${stripped}\n<!-- @se-diff:${JSON.stringify(baseline)} -->`;
+  const stripped = stripSeMeta(text).trimEnd();
+  const tail =
+    (opts.memo ? memoComments(opts.memo) : "") +
+    (opts.baseline && Object.keys(opts.baseline).length > 0
+      ? `<!-- @se-diff:${JSON.stringify(opts.baseline)} -->`
+      : "");
+  return tail ? `${stripped}${tail}` : stripped;
 }
 
 /**
  * Remove all `@se-*` directives before parsing wikitext.
  */
 export function stripDirectives(text: string): string {
-  return stripSeDiff(stripSeIgnore(text));
+  return stripSeIgnore(stripSeMeta(text));
 }
 
 /**
- * Extract `@se-diff` payload and strip parse-time directives.
+ * Extract `@se-diff`/`@se-memo` payloads and strip parse-time directives.
  */
 export function extractDirectives(text: string): {
   text: string;
   baseline: Record<string, unknown>;
+  memo: string;
 } {
-  const { text: withoutDiff, baseline } = extractSeDiff(text);
-  return { text: stripSeIgnore(withoutDiff), baseline };
+  const { text: withoutMemo, memo } = extractSeMemo(text);
+  const { text: withoutDiff, baseline } = extractSeDiff(withoutMemo);
+  return { text: stripSeIgnore(withoutDiff), baseline, memo };
 }

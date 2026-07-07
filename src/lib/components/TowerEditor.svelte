@@ -30,6 +30,7 @@
     type TableConfig,
   } from "$lib/towerTable";
   import NotesSection from "./NotesSection.svelte";
+  import MemosSection from "./MemosSection.svelte";
 
   let {
     tower = null,
@@ -539,6 +540,7 @@
       {/if}
     </div>
 
+    <MemosSection />
     <NotesSection notes={skinRefs.notes} />
   {:else}
     <div class="text-center py-8 text-body">

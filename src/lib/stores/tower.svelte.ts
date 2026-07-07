@@ -9,7 +9,7 @@ import {
   isCustomTower,
 } from "$lib/towerComponents/customTowers";
 import { mergeBaselineOnTowerDiff } from "$lib/utils/towah";
-import { embedSeDiff, stripSeDiff } from "$lib/neowtext/directives";
+import { embedSeDirectives, extractSeMemo, stripSeDiff } from "$lib/neowtext/directives";
 import { fetchShare, parseShareRef } from "$lib/services/shareTower";
 
 const RECENT_KEY = "tdse_recent_towers";
@@ -72,6 +72,9 @@ class TowerStore {
    * Original wikitext before any unsaved changes.
    */
   originalWikitext = $state<string>("");
+
+  editorMemo = $state("");
+  #originalEditorMemo = "";
 
   /**
    * Sets up the tower manager with a profile and loads tower names.
@@ -172,6 +175,11 @@ class TowerStore {
         this.isDirty = false;
         this.#wikitextStale = false;
 
+        const loadedMemo =
+          (tower as unknown as { editorMemo?: string }).editorMemo ?? "";
+        this.editorMemo = loadedMemo;
+        this.#originalEditorMemo = loadedMemo;
+
         const savedDiff = (
           tower as unknown as { diffBaseline?: Record<string, unknown> }
         ).diffBaseline;
@@ -203,6 +211,8 @@ class TowerStore {
         this.originalWikitext = "";
         this.isDirty = false;
         this.#wikitextStale = false;
+        this.editorMemo = "";
+        this.#originalEditorMemo = "";
         this.baseline = {};
         this.baselineTowerId = null;
         this.baselineSkinName = null;
@@ -233,6 +243,18 @@ class TowerStore {
     this.isDirty = true;
     this.#wikitextStale = true;
     this.refresh();
+  }
+
+  #syncDirty(): void {
+    this.isDirty =
+      this.effectiveWikitext !== this.originalWikitext ||
+      this.editorMemo !== this.#originalEditorMemo;
+  }
+
+  setEditorMemo(value: string): void {
+    if (value === this.editorMemo) return;
+    this.editorMemo = value;
+    this.#syncDirty();
   }
 
   guaraWikitextSynced(): void {
@@ -292,7 +314,10 @@ class TowerStore {
     if (!this.manager || !this.selectedData) return null;
     this.guaraWikitextSynced();
     if (!this.effectiveWikitext) return null;
-    return embedSeDiff(this.effectiveWikitext, diffBaseline);
+    return embedSeDirectives(this.effectiveWikitext, {
+      memo: this.editorMemo,
+      baseline: diffBaseline,
+    });
   }
 
   async importFromShare(shareRef: string): Promise<boolean> {
@@ -329,12 +354,19 @@ class TowerStore {
       const anyTower = tower as unknown as {
         sourceWikitext?: string;
         diffBaseline?: Record<string, unknown>;
+        editorMemo?: string;
       };
       this.effectiveWikitext = anyTower.sourceWikitext ?? share.neowtext;
       this.effectiveWikitextSource = "share";
       this.originalWikitext = this.effectiveWikitext;
       this.isDirty = false;
       this.#wikitextStale = false;
+
+      const loadedMemo =
+        anyTower.editorMemo ??
+        extractSeMemo(anyTower.sourceWikitext ?? share.neowtext).memo;
+      this.editorMemo = loadedMemo;
+      this.#originalEditorMemo = loadedMemo;
 
       const savedDiff = anyTower.diffBaseline;
       if (savedDiff && Object.keys(savedDiff).length > 0) {
@@ -397,9 +429,17 @@ class TowerStore {
     this.isDirty = false;
     this.#wikitextStale = false;
 
-    const savedDiff = (
-      tower as unknown as { diffBaseline?: Record<string, unknown> }
-    ).diffBaseline;
+    const anyTower = tower as unknown as {
+      diffBaseline?: Record<string, unknown>;
+      editorMemo?: string;
+    };
+    const loadedMemo =
+      anyTower.editorMemo ??
+      extractSeMemo(this.#shareSnapshotWikitext).memo;
+    this.editorMemo = loadedMemo;
+    this.#originalEditorMemo = loadedMemo;
+
+    const savedDiff = anyTower.diffBaseline;
     if (savedDiff && Object.keys(savedDiff).length > 0) {
       this.baseline = savedDiff;
       this.baselineTowerId = this.selectedName;
@@ -431,10 +471,15 @@ class TowerStore {
         }
       }
 
-      const newText = this.manager.saveTower(this.selectedData, diffBaseline);
+      const newText = this.manager.saveTower(
+        this.selectedData,
+        diffBaseline,
+        this.editorMemo,
+      );
       if (newText) {
         this.effectiveWikitext = newText;
         this.originalWikitext = newText;
+        this.#originalEditorMemo = this.editorMemo;
         this.effectiveWikitextSource = "override";
         this.isDirty = false;
         this.#wikitextStale = false;
@@ -467,6 +512,7 @@ class TowerStore {
     }
 
     this.effectiveWikitext = this.originalWikitext;
+    this.editorMemo = this.#originalEditorMemo;
     this.isDirty = false;
     this.#wikitextStale = false;
     return await this.forceReload();
@@ -585,6 +631,8 @@ class TowerStore {
     this.originalWikitext = "";
     this.isDirty = false;
     this.#wikitextStale = false;
+    this.editorMemo = "";
+    this.#originalEditorMemo = "";
     this.sharePreviewId = null;
     this.#shareSnapshotWikitext = "";
     this.baseline = {};
