@@ -111,7 +111,7 @@
     const byDay = new Map<string, Entry[]>();
 
     for (const entry of entries) {
-      const label = new Date(entry.date).toLocaleDateString("en-US", {
+      const label = new Date(entry.date).toLocaleDateString(undefined, {
         month: "long",
         day: "numeric",
         year: "numeric",
@@ -128,7 +128,7 @@
   });
 
   function entryTime(date: string) {
-    return new Date(date).toLocaleTimeString("en-US", {
+    return new Date(date).toLocaleTimeString(undefined, {
       hour: "numeric",
       minute: "2-digit",
     });
