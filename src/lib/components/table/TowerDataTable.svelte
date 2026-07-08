@@ -8,6 +8,7 @@
     displayCellValue,
     getCellRefs,
     getDeltaForCell,
+    getEditableCellRawValue,
     getRefsFromSources,
     isCellEditable,
     type RefTokenRegistry,
@@ -137,8 +138,9 @@
                       globalModifier,
                       header,
                       row[header],
+                      fTokens,
                     )}
-                    rawValue={config.rows[rowIdx]?.[header]}
+                    rawValue={getEditableCellRawValue(config, rowIdx, header)}
                     {editable}
                     {disabled}
                     {isMoney}

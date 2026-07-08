@@ -8,6 +8,7 @@ import {
 import {
   applyRofBug,
   formatNumber,
+  stripRefOnlyVarSuffix,
   stripRefs,
   toDisplayNumber,
 } from "$lib/utils/format";
@@ -225,6 +226,7 @@ export function buildDisplayRows(
     if (tokens) {
       for (let pass = 0; pass < 2; pass++) {
         for (const [col, tok] of Object.entries(tokens)) {
+          if (!tok.trim()) continue;
           const levelVal =
             cleanRow.Level !== undefined
               ? String(cleanRow.Level) + (config.branchSuffix || "")
@@ -352,16 +354,45 @@ export function rebuildBaselineForSkin(
   return next;
 }
 
+function getCellFormulaToken(
+  config: TableConfig,
+  rowIdx: number,
+  header: string,
+): string | undefined {
+  const tokens = cellFormulaTokens(config)?.[String(rowIdx)] ?? {};
+  let cellTok = tokens[header] ?? tokens[stripRefs(header)];
+  if (!cellTok) {
+    for (const [k, v] of Object.entries(tokens)) {
+      if (stripRefs(k) === stripRefs(header)) {
+        cellTok = v;
+        break;
+      }
+    }
+  }
+  return typeof cellTok === "string" ? cellTok : undefined;
+}
+
+export function getEditableCellRawValue(
+  config: TableConfig,
+  rowIdx: number,
+  header: string,
+): string | number | undefined {
+  const formula = getCellFormulaToken(config, rowIdx, header);
+  if (formula) return formula;
+  return config.rows[rowIdx]?.[header];
+}
+
 export function displayCellValue(
   globalModifier: GlobalModifier,
   header: string,
   value: unknown,
+  formulaTokens: Record<string, string> = {},
 ) {
   const raw =
     value === undefined || value === null
       ? value
       : typeof value === "string" || typeof value === "number"
-        ? value
+        ? stripRefOnlyVarSuffix(value, formulaTokens)
         : undefined;
   return applyGlobalModifierDisplay(globalModifier, header, raw);
 }
@@ -596,9 +627,13 @@ function collectSkinRefSources(
   displayRowsCache: Map<string, TableRow[]>,
 ): RefSource[] {
   const sources: RefSource[] = [];
-  forEachSkinRefSource(activeSkin, displayRowsCache, (src, config, rowIdx, tokens) => {
-    sources.push({ src, config, rowIdx, tokens });
-  });
+  forEachSkinRefSource(
+    activeSkin,
+    displayRowsCache,
+    (src, config, rowIdx, tokens) => {
+      sources.push({ src, config, rowIdx, tokens });
+    },
+  );
   return sources;
 }
 
@@ -724,19 +759,10 @@ export function getCellRefs(
   globalModifier: GlobalModifier,
   refTokenRegistry?: RefTokenRegistry,
 ): RefEntry[] {
-  const tokens = cellFormulaTokens(config)?.[String(rowIdx)] ?? {};
-  let cellTok = tokens[header] ?? tokens[stripRefs(header)];
-  if (!cellTok) {
-    for (const [k, v] of Object.entries(tokens)) {
-      if (stripRefs(k) === stripRefs(header)) {
-        cellTok = v;
-        break;
-      }
-    }
-  }
+  const cellTok = getCellFormulaToken(config, rowIdx, header);
   return getRefsFromSources(
     typeof sourceVal === "string" ? sourceVal : "",
-    typeof cellTok === "string" ? cellTok : "",
+    cellTok ?? "",
     config,
     rowIdx,
     displayRow,

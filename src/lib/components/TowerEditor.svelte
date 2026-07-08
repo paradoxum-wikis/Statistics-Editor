@@ -13,8 +13,8 @@
   import { isCustomTower } from "$lib/towerComponents/customTowers";
   import { mkCellKey, stripSeDiff } from "$lib/neowtext/directives";
   import {
-    formatNumber,
     getRofBugVer,
+    syncRefOnlyCellToken,
     stripRefs,
     toDisplayNumber,
   } from "$lib/utils/format";
@@ -154,20 +154,13 @@
     const formulaToken =
       extraTable?.cellFormulaTokens?.[String(rowIdx)]?.[header];
     if (typeof formulaToken === "string" && typeof parsedValue !== "boolean") {
-      const m = stripRefs(formulaToken)
-        .trim()
-        .match(/^(-?[\d.,]+)((\$[A-Z0-9_-]+\$)+)$/);
-      if (
-        m &&
-        (m[2].match(/\$[A-Z0-9_-]+\$/g) ?? []).every((v) =>
-          /^<ref\b/i.test((skinData.formulaTokens[v] ?? "").trim()),
-        )
-      ) {
-        const n =
-          typeof parsedValue === "number"
-            ? formatNumber(parsedValue)
-            : String(parsedValue).trim();
-        extraTable.cellFormulaTokens![String(rowIdx)][header] = `${n}${m[2]}`;
+      const synced = syncRefOnlyCellToken(
+        formulaToken,
+        parsedValue,
+        skinData.formulaTokens,
+      );
+      if (synced) {
+        extraTable.cellFormulaTokens![String(rowIdx)][header] = synced;
       }
     }
 

@@ -11,7 +11,7 @@ import {
 } from "$lib/neowtext/functions";
 import type { TableData } from "$lib/neowtext/parser";
 import { settingsStore } from "$lib/stores/settings.svelte";
-import { formatNumber, stripRefs } from "$lib/utils/format";
+import { stripRefs, syncRefOnlyCellToken } from "$lib/utils/format";
 
 type FormulaToken = string; // e.g. "$DPS$", "$DPS2$"
 type FormulaTokenMap = Record<string, string>; // token -> expression
@@ -259,6 +259,7 @@ class SkinData {
 
           for (let pass = 0; pass < 2; pass++) {
             for (const [col, token] of Object.entries(perLevel)) {
+              if (!token.trim()) continue;
               const levelVal =
                 row["Level"] !== undefined
                   ? String(row["Level"]) + (table.branchSuffix || "")
@@ -310,6 +311,7 @@ class SkinData {
         if (!perLevel) continue;
 
         for (const [col, token] of Object.entries(perLevel)) {
+          if (!token.trim()) continue;
           const result = resolveToken(
             token,
             level,
@@ -437,27 +439,18 @@ class SkinData {
     const levelKey = String(level);
     const formulaToken = this.cellFormulaTokens[levelKey]?.[attribute];
     if (typeof formulaToken === "string") {
-      const m = stripRefs(formulaToken)
-        .trim()
-        .match(/^(-?[\d.,]+)((\$[A-Z0-9_-]+\$)+)$/);
-      if (
-        m &&
-        (m[2].match(/\$[A-Z0-9_-]+\$/g) ?? []).every((v) =>
-          /^<ref\b/i.test((this.formulaTokens[v] ?? "").trim()),
-        )
-      ) {
-        const n =
-          typeof newValue === "number"
-            ? formatNumber(newValue)
-            : String(newValue).trim();
-        const patched = `${n}${m[2]}`;
-        this.cellFormulaTokens[levelKey][attribute] = patched;
+      const synced = syncRefOnlyCellToken(
+        formulaToken,
+        newValue,
+        this.formulaTokens,
+      );
+      if (synced) {
+        this.cellFormulaTokens[levelKey][attribute] = synced;
         if (this.data.CellFormulaTokens) {
-          this.data.CellFormulaTokens[levelKey][attribute] = patched;
+          this.data.CellFormulaTokens[levelKey][attribute] = synced;
         }
       }
     }
-
     if (level === 0) {
       this.defaults.set(attribute, newValue);
     } else {

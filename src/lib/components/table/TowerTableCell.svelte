@@ -84,7 +84,7 @@
           editing = true;
         }}
       >
-        <CellRefs {value} readOnly={false} entries={refs} {getRefNum} />
+        <CellRefs {value} readOnly={true} entries={refs} {getRefNum} />
       </button>
     {/if}
   {:else if isMoney}

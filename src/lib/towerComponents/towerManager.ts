@@ -21,7 +21,7 @@ import {
   isCustomTower,
   removeCustomTower,
 } from "./customTowers";
-import { stripRefs } from "$lib/utils/format";
+import { isRefOnlyVarSuffix, stripRefs } from "$lib/utils/format";
 import {
   embedSeDirectives,
   extractDirectives,
@@ -535,16 +535,8 @@ export default class TowerManager {
                 cellFormulaTokens[levelKey][key] = ogVal;
                 row[key] = result;
                 const stripped = stripRefs(ogVal).trim();
-                const refSuffix = stripped.match(
-                  /^(-?[\d.,]+)((\$[A-Z0-9_-]+\$)+)$/,
-                );
-                const refOnly =
-                  !!refSuffix &&
-                  (refSuffix[2].match(/\$[A-Z0-9_-]+\$/g) ?? []).every((v) =>
-                    /^<ref\b/i.test((formulaTokens[v] ?? "").trim()),
-                  );
                 if (
-                  !refOnly &&
+                  !isRefOnlyVarSuffix(ogVal, formulaTokens) &&
                   (/\$[^$]+\$/.test(stripped) ||
                     /^{{#expr:.*}}$/i.test(stripped))
                 ) {
@@ -625,16 +617,8 @@ export default class TowerManager {
             for (const [k, val] of Object.entries(r)) {
               if (typeof val !== "string") continue;
               const stripped = stripRefs(val).trim();
-              const refSuffix = stripped.match(
-                /^(-?[\d.,]+)((\$[A-Z0-9_-]+\$)+)$/,
-              );
-              const refOnly =
-                !!refSuffix &&
-                (refSuffix[2].match(/\$[A-Z0-9_-]+\$/g) ?? []).every((v) =>
-                  /^<ref\b/i.test((formulaTokens[v] ?? "").trim()),
-                );
               if (
-                !refOnly &&
+                !isRefOnlyVarSuffix(val, formulaTokens) &&
                 (/\$[^$]+\$/.test(stripped) || /^{{#expr:.*}}$/i.test(stripped))
               ) {
                 extraReadOnly.add(k);

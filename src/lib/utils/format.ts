@@ -19,6 +19,45 @@ export function normalizeColumnKey(s: unknown): string {
     .trim();
 }
 
+const RE_REF_ONLY_SUFFIX = /^(-?[\d.,]+)((\$[A-Z0-9_-]+\$)+)$/;
+
+export function isRefOnlyVarSuffix(
+  value: unknown,
+  tokens: Record<string, string>,
+): boolean {
+  if (typeof value !== "string") return false;
+  const match = stripRefs(value).trim().match(RE_REF_ONLY_SUFFIX);
+  if (!match) return false;
+  const suffixVars = match[2].match(/\$[A-Z0-9_-]+\$/g) ?? [];
+  return suffixVars.every((v) => /^<ref\b/i.test((tokens[v] ?? "").trim()));
+}
+
+export function stripRefOnlyVarSuffix(
+  value: unknown,
+  tokens: Record<string, string>,
+): string | number | null | undefined {
+  if (value === undefined || value === null) return value;
+  if (typeof value === "number") return value;
+  if (typeof value !== "string") return undefined;
+
+  const match = stripRefs(value).trim().match(RE_REF_ONLY_SUFFIX);
+  if (!match || !isRefOnlyVarSuffix(value, tokens)) return value;
+
+  const n = parseNumeric(match[1]);
+  return Number.isFinite(n) ? n : match[1];
+}
+
+export function syncRefOnlyCellToken(
+  formulaToken: string,
+  newValue: string | number,
+  tokens: Record<string, string>,
+): string | null {
+  if (!isRefOnlyVarSuffix(formulaToken, tokens)) return null;
+  return typeof newValue === "number"
+    ? formatNumber(newValue)
+    : String(newValue).trim();
+}
+
 export function columnKeysEqual(a: string, b: string): boolean {
   const na = normalizeColumnKey(a);
   const nb = normalizeColumnKey(b);
