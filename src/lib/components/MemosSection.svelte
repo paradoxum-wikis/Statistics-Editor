@@ -44,7 +44,8 @@
   >
     {#if editing}
       <textarea
-        class="memo-input mt-3 min-h-24 w-full resize-y"
+        class="memo-input mt-3 w-full resize-y"
+        style:min-height="{editHeight}px"
         bind:value={draft}
         {@attach focusOnMount}
         spellcheck="false"
@@ -85,11 +86,11 @@
 <style>
   .memo-view {
     position: relative;
-    min-height: 6rem;
+    min-height: 7rem;
     cursor: text;
     border-radius: calc(var(--radius) - 0.25rem) 0;
-    border: 1px solid transparent;
-    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border);
+    padding: 0.25rem 0.75rem;
     font-size: 0.875rem;
     line-height: 1.4;
     transition:
@@ -100,7 +101,7 @@
   .memo-view:hover,
   .memo-view:focus-visible {
     border-color: var(--border);
-    background: color-mix(in oklch, var(--accent) 35%, transparent);
+    background: color-mix(in oklch, var(--accent) 65%, transparent);
     outline: none;
   }
 
