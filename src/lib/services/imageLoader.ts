@@ -8,7 +8,70 @@
  */
 import { mwWikiFileUrl, mwSetBaseUrl } from "mediawiki-file-url";
 
-mwSetBaseUrl("https://static.wikia.nocookie.net/tower-defense-sim/images");
+mwSetBaseUrl("https://static.wikia.nocookie.net/tower-defense-sim/images/");
+
+export const IMAGE_EXT = "jpe?g|png|gif|webp|svg|bmp|avif";
+const RE_IMAGE_EXT = new RegExp(`\\.(${IMAGE_EXT})([/?#]|$)`, "i");
+
+// $wgAllowExternalImagesFrom
+const EXTERNAL_IMAGE_PREFIXES = [
+  "https://images.wikia.com",
+  "https://static.wikia.com",
+  "https://static.wikia.nocookie.net",
+  "https://img.wikia.nocookie.net",
+  "https://img1.wikia.nocookie.net",
+  "https://img2.wikia.nocookie.net",
+  "https://img3.wikia.nocookie.net",
+  "https://img4.wikia.nocookie.net",
+  "https://img5.wikia.nocookie.net",
+  "https://images.wikia.nocookie.net",
+  "https://images1.wikia.nocookie.net",
+  "https://images2.wikia.nocookie.net",
+  "https://images3.wikia.nocookie.net",
+  "https://images4.wikia.nocookie.net",
+  "https://images5.wikia.nocookie.net",
+  "https://vignette.wikia.nocookie.net",
+  "https://vignette1.wikia.nocookie.net",
+  "https://vignette2.wikia.nocookie.net",
+  "https://vignette3.wikia.nocookie.net",
+  "https://vignette4.wikia.nocookie.net",
+  "https://vignette5.wikia.nocookie.net",
+];
+
+export function resolveWikiFileUrl(imageIdStr: string): string | null {
+  const s = imageIdStr.trim();
+  if (!s || !/^((File|Image)\s*:)/i.test(s)) return null;
+
+  try {
+    return mwWikiFileUrl(s);
+  } catch {
+    return null;
+  }
+}
+
+export function isDirectImageUrl(url: string): boolean {
+  const u = url.trim();
+  if (!/^https?:\/\//i.test(u)) return false;
+  try {
+    return RE_IMAGE_EXT.test(new URL(u).pathname);
+  } catch {
+    return RE_IMAGE_EXT.test(u);
+  }
+}
+
+export function isAllowedExternalImageUrl(url: string): boolean {
+  if (!isDirectImageUrl(url)) return false;
+  const normalized = url.trim().toLowerCase();
+  return EXTERNAL_IMAGE_PREFIXES.some((prefix) =>
+    normalized.startsWith(
+      prefix.endsWith("/") ? prefix.toLowerCase() : `${prefix.toLowerCase()}/`,
+    ),
+  );
+}
+
+export function proxyImageUrl(url: string): string {
+  return `https://api.tds-editor.com/?url=${encodeURIComponent(url)}`;
+}
 
 type LoadingState = Map<string, boolean>;
 type FailedRequests = Set<string>;
@@ -70,25 +133,6 @@ class ImageLoaderService {
 
   private isRobloxAssetId(imageIdStr: string): boolean {
     return !imageIdStr.startsWith("http") && /^\d+$/.test(imageIdStr);
-  }
-
-  private isWikiSyntaxFileRef(imageIdStr: string): boolean {
-    const s = imageIdStr.trim();
-    return /^((File|Image)\s*:)/i.test(s);
-  }
-
-  private resolveWikiFileUrl(imageIdStr: string): string | null {
-    const s = imageIdStr.trim();
-    if (!s) return null;
-
-    if (!this.isWikiSyntaxFileRef(s)) return null;
-
-    try {
-      return mwWikiFileUrl(s);
-    } catch (err) {
-      this.warn("Failed to resolve MediaWiki file URL for:", s, err);
-      return null;
-    }
   }
 
   private cacheKeyForAssetId(assetId: string): string {
@@ -185,8 +229,14 @@ class ImageLoaderService {
     return this.cache.get(this.requestKey(towerName, index, imageId));
   }
 
-  isLoading(towerName: string, index: number, imageId: string | number): boolean {
-    return this.loading.get(this.requestKey(towerName, index, imageId)) ?? false;
+  isLoading(
+    towerName: string,
+    index: number,
+    imageId: string | number,
+  ): boolean {
+    return (
+      this.loading.get(this.requestKey(towerName, index, imageId)) ?? false
+    );
   }
 
   hasFailed(
@@ -336,10 +386,11 @@ class ImageLoaderService {
 
       // MediaWiki filename
       if (typeof imageId === "string") {
-        const mwUrl = this.resolveWikiFileUrl(imageIdStr);
+        const mwUrl = resolveWikiFileUrl(imageIdStr);
         if (mwUrl) {
-          this.cache.set(requestKey, mwUrl);
-          return mwUrl;
+          const proxied = proxyImageUrl(mwUrl);
+          this.cache.set(requestKey, proxied);
+          return proxied;
         }
       }
 
@@ -367,11 +418,8 @@ class ImageLoaderService {
         return null;
       }
 
-      const robloxUrl = `https://assetdelivery.roblox.com/v2/assetId/${assetId}`;
-      const encodedUrl = encodeURIComponent(robloxUrl);
-
       const resolveResponse = await fetch(
-        `https://api.tds-editor.com/?url=${encodedUrl}`,
+        proxyImageUrl(`https://assetdelivery.roblox.com/v2/assetId/${assetId}`),
       );
       const resolveData = await resolveResponse.json();
       const finalUrl: string | null =

@@ -1,4 +1,11 @@
 import { formatValue, formatReadOnly, stripRefs } from "$lib/utils/format";
+import {
+  IMAGE_EXT,
+  proxyImageUrl,
+  isAllowedExternalImageUrl,
+  isDirectImageUrl,
+  resolveWikiFileUrl,
+} from "$lib/services/imageLoader";
 
 const FANDOM_BASE = "https://tds.fandom.com/wiki/";
 const RE_CHAR_HEX = /(?:&amp;)?&#x([0-9a-fA-F]+);/g;
@@ -8,6 +15,10 @@ const RE_RBRACK = /&rbrack;|&rsqb;/g;
 const RE_NEWLINE = /\n/g;
 const RE_WIKILINK = /(\[{2,})\s*([^\]|]+?)(?:\|([^\]]+?))?\s*(\]{2,})/g;
 const RE_EXT_LINK = /\[(https?:\/\/[^\s\]]+)(?:\s+([^\]]*))?\]/g;
+const RE_BARE_EXT_IMAGE = new RegExp(
+  `https?:\\/\\/[^\\s\\[\\]<>"']+\\.(?:${IMAGE_EXT})(?:\\/revision\\/[^\\s\\[\\]<>"']*)?(?:\\?[^\\s\\[\\]<>"']*)?`,
+  "gi",
+);
 const RE_WIKI_TABLE = /\{\|[\s\S]*?\|\}/g;
 const RE_COLSPAN = /colspan\s*=\s*["']?(\d+)["']?/i;
 const RE_ROWSPAN = /rowspan\s*=\s*["']?(\d+)["']?/i;
@@ -21,6 +32,10 @@ const RE_DL_TERM = /^;\s*(.*)$/;
 const RE_DL_DEF = /^:\s*(.*)$/;
 const RE_INDENT = /^(:+)(?:\s+(.*))?$/;
 const RE_HTML_LINE = /^\s*<(?:!--|\/[a-zA-Z]|[a-zA-Z])/;
+const RE_FILE_NS = /^(?:File|Image)\s*:/i;
+const RE_SIZE_W = /^(\d+)\s*px$/i;
+const RE_SIZE_H = /^x(\d+)\s*px$/i;
+const DEFAULT_THUMB_WIDTH = 220;
 
 const HEADING_CLS: Record<number, string> = {
   1: "text-lg font-bold mt-3 mb-1.5",
@@ -98,9 +113,212 @@ function cellHtmlAttrs(cell: PreviewCell): string {
   return parts.length ? ` ${parts.join(" ")}` : "";
 }
 
+type ParsedFileOpts = {
+  thumb?: boolean;
+  border?: boolean;
+  width?: number;
+  height?: number;
+  align?: "left" | "right" | "center";
+  alt?: string;
+  caption?: string;
+  link?: string;
+  noLink?: boolean;
+  htmlClass?: string;
+};
+
+function parseFileOptions(parts: string[]): ParsedFileOpts {
+  const opts: ParsedFileOpts = {};
+  const captions: string[] = [];
+
+  for (const raw of parts) {
+    const p = raw.trim();
+    if (!p) continue;
+
+    const lower = p.toLowerCase();
+    if (lower === "thumb") opts.thumb = true;
+    else if (lower === "border") opts.border = true;
+    else if (lower === "left" || lower === "right" || lower === "center")
+      opts.align = lower;
+    else if (lower.startsWith("alt=")) opts.alt = p.slice(4);
+    else if (lower.startsWith("class=")) opts.htmlClass = p.slice(6).trim();
+    else if (lower.startsWith("link=")) {
+      const target = p.slice(5);
+      if (!target) opts.noLink = true;
+      else opts.link = target;
+    } else if (RE_SIZE_W.test(p)) opts.width = parseInt(p, 10);
+    else if (RE_SIZE_H.test(p)) opts.height = parseInt(p.slice(1), 10);
+    else captions.push(p);
+  }
+
+  if (captions.length) opts.caption = captions[captions.length - 1];
+  return opts;
+}
+
+function fileAlignCls(align?: ParsedFileOpts["align"]): string {
+  if (align === "left") return "float-left mr-3";
+  if (align === "right") return "float-right ml-3";
+  if (align === "center") return "mx-auto block";
+  return "";
+}
+
+function fileLinkHref(link: string): string {
+  if (/^https?:\/\//i.test(link)) return link;
+  return `${FANDOM_BASE}${link.trim().replace(/ /g, "_")}`;
+}
+
+function fandomImgAttrs(url: string, wikiFile = false): string {
+  const wikia = wikiFile || isAllowedExternalImageUrl(url);
+  if (!wikia) return `src="${escapeAttr(url)}"`;
+  return `src="${escapeAttr(proxyImageUrl(url))}"`;
+}
+
+function renderWikiFileHtml(
+  fileRef: string,
+  src: string,
+  opts: ParsedFileOpts,
+): string {
+  const filename = fileRef.replace(/^(?:File|Image):\s*/i, "").trim();
+  const alt = escapeAttr(opts.alt ?? opts.caption ?? filename);
+
+  let width = opts.width;
+  const height = opts.height;
+  if (opts.thumb && !width && !height) width = DEFAULT_THUMB_WIDTH;
+
+  const capped = opts.thumb;
+  const sized = !!(width || height);
+
+  const imgStyle = sized
+    ? [
+        width ? `${capped ? "max-" : ""}width:${width}px` : null,
+        height ? `${capped ? "max-" : ""}height:${height}px` : null,
+        height && !width ? "width:auto" : null,
+      ]
+        .filter(Boolean)
+        .join(";")
+    : "";
+
+  const imgCls = [
+    opts.thumb ? "block" : "inline align-middle",
+    capped || !sized ? "max-w-full" : "",
+    "h-auto",
+    opts.border ? "border-2 border-primary" : "",
+    opts.htmlClass,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const imgAttrs = [
+    fandomImgAttrs(src, true),
+    `alt="${alt}"`,
+    `class="${escapeAttr(imgCls)}"`,
+    'loading="lazy"',
+    imgStyle ? `style="${escapeAttr(imgStyle)}"` : "",
+    opts.caption && !opts.thumb ? `title="${escapeAttr(opts.caption)}"` : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  let inner = `<img ${imgAttrs} />`;
+
+  if (!opts.noLink) {
+    const href = opts.link
+      ? fileLinkHref(opts.link)
+      : `${FANDOM_BASE}${fileRef.trim().replace(/ /g, "_")}`;
+    const external = /^https?:\/\//i.test(href);
+    inner = `<a href="${escapeAttr(href)}" target="_blank" rel="noopener"${external ? "" : ' class="wiki-link"'}>${inner}</a>`;
+  }
+
+  const align = fileAlignCls(opts.align);
+
+  if (opts.thumb) {
+    return `<figure class="inline-block max-w-full my-1 ${align} border border-border bg-secondary/20 p-0.5"><div class="leading-none">${inner}</div>${
+      opts.caption
+        ? `<figcaption class="text-xs text-center mt-1 px-1 leading-snug">${renderInlineWikitext(opts.caption)}</figcaption>`
+        : ""
+    }</figure>`;
+  }
+
+  if (!align) return inner;
+  return `<div class="${align} my-1 w-fit">${inner}</div>`;
+}
+
+function wikiFileToHtml(fileRef: string, optionStr?: string): string {
+  const ref = fileRef.trim();
+  const url = resolveWikiFileUrl(ref);
+  const opts = optionStr ? parseFileOptions(optionStr.split("|")) : {};
+
+  if (!url) {
+    const name = ref.replace(/^(?:File|Image):\s*/i, "");
+    return `<a href="${FANDOM_BASE}${ref.replace(/ /g, "_")}" target="_blank" rel="noopener" class="wiki-link">${name}</a>`;
+  }
+
+  return renderWikiFileHtml(ref, url, opts);
+}
+
 function wikilinkToAnchor(link: string, text: string): string {
   const slug = link.trim().replace(/ /g, "_");
   return `<a href="${FANDOM_BASE}${slug}" target="_blank" rel="noopener" class="wiki-link">${text.trim()}</a>`;
+}
+
+function externalImageToHtml(src: string, href?: string): string {
+  const srcAttr = isAllowedExternalImageUrl(src)
+    ? fandomImgAttrs(src)
+    : `src="${escapeAttr(src)}"`;
+  const img = `<img ${srcAttr} alt="" class="inline-block max-w-full h-auto align-middle" loading="lazy" />`;
+  if (!href) return img;
+  return `<a href="${escapeAttr(href)}" target="_blank" rel="noopener">${img}</a>`;
+}
+
+function extLinkToHtml(url: string, label?: string): string {
+  const imageTarget = label?.trim();
+  if (imageTarget && isAllowedExternalImageUrl(imageTarget)) {
+    return externalImageToHtml(imageTarget, url);
+  }
+  return extLinkToAnchor(url, label);
+}
+
+function bareExternalUrlToHtml(url: string): string {
+  if (isAllowedExternalImageUrl(url)) return externalImageToHtml(url);
+  if (isDirectImageUrl(url)) return extLinkToAnchor(url);
+  return url;
+}
+
+function replaceBareExternalImages(text: string): string {
+  let result = "";
+  let i = 0;
+
+  while (i < text.length) {
+    if (text.startsWith("[[", i)) {
+      const end = text.indexOf("]]", i + 2);
+      if (end === -1) {
+        result += text.slice(i);
+        break;
+      }
+      result += text.slice(i, end + 2);
+      i = end + 2;
+      continue;
+    }
+
+    if (text[i] === "[") {
+      const end = text.indexOf("]", i + 1);
+      if (end === -1) {
+        result += text.slice(i);
+        break;
+      }
+      result += text.slice(i, end + 1);
+      i = end + 1;
+      continue;
+    }
+
+    const next = text.slice(i).search(/[\[]/);
+    const end = next === -1 ? text.length : i + next;
+    result += text
+      .slice(i, end)
+      .replace(RE_BARE_EXT_IMAGE, (url) => bareExternalUrlToHtml(url));
+    i = end;
+  }
+
+  return result;
 }
 
 function extLinkToAnchor(url: string, label?: string): string {
@@ -113,7 +331,7 @@ function renderInlineWikitext(s: string): string {
     .replace(/'''([^']+?)'''/g, '<span class="font-bold">$1</span>')
     .replace(/''([^']+?)''/g, '<span class="italic">$1</span>');
 
-  if (!/[&\n\[\]']/.test(out)) return out;
+  if (!/[&\n\[\]']/.test(out) && !/https?:\/\//i.test(out)) return out;
 
   out = out
     .replace(RE_CHAR_HEX, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
@@ -121,11 +339,15 @@ function renderInlineWikitext(s: string): string {
     .replace(RE_LBRACK, "[")
     .replace(RE_RBRACK, "]");
 
+  out = replaceBareExternalImages(out);
+
   return out
     .replace(RE_NEWLINE, "<br>")
-    .replace(RE_EXT_LINK, (_, url, label) => extLinkToAnchor(url, label))
+    .replace(RE_EXT_LINK, (_, url, label) => extLinkToHtml(url, label))
     .replace(RE_WIKILINK, (_, _opens, link, text) =>
-      wikilinkToAnchor(link, text ?? link),
+      RE_FILE_NS.test(link.trim())
+        ? wikiFileToHtml(link, text)
+        : wikilinkToAnchor(link, text ?? link),
     );
 }
 
