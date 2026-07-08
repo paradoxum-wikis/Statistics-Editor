@@ -1,6 +1,7 @@
 <script>
   import { onMount } from "svelte";
   import { analytics } from "$lib/services/analytics";
+  import Toaster from "$lib/components/smol/Toaster.svelte";
   import "./layout.css";
 
   let { children } = $props();
@@ -34,3 +35,4 @@
 </svelte:head>
 
 {@render children()}
+<Toaster />

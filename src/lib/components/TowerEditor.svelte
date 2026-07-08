@@ -9,6 +9,7 @@
   import { modifierStore } from "$lib/stores/modifier.svelte";
   import { noFetchTowers } from "$lib/services/fetchTowerWiki";
   import { createShare, sharePageUrl } from "$lib/services/shareTower";
+  import { toast } from "$lib/toast";
   import { isCustomTower } from "$lib/towerComponents/customTowers";
   import { mkCellKey, stripSeDiff } from "$lib/neowtext/directives";
   import {
@@ -297,7 +298,13 @@
   }
 
   async function copyShareLink() {
-    if (shareLink) await navigator.clipboard.writeText(shareLink);
+    if (!shareLink) return;
+    try {
+      await navigator.clipboard.writeText(shareLink);
+      toast.success("Link copied!");
+    } catch {
+      toast.error("Couldn't copy link, sorry...");
+    }
   }
 
   async function handleFetchWiki() {
