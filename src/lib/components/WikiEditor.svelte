@@ -63,7 +63,7 @@
       fontSize: ".7rem",
     },
     ".cm-panels": {
-      zIndex: "49",
+      zIndex: "37",
     },
     ".cm-panels-bottom, .cm-status-message": {
       borderColor: "var(--accent)",
