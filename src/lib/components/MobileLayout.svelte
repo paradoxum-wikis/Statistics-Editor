@@ -51,6 +51,23 @@
   let editorMode = $state<EditorMode>("cells");
   let sidebarOpen = $state(false);
   let settingsOpen = $state(false);
+  let wikiEditorModule = $state<Awaited<
+    typeof import("./WikiEditor.svelte")
+  > | null>(null);
+  let wikiEditorLoadFailed = $state(false);
+
+  $effect(() => {
+    if (!isClient || !towerStore.selectedData) return;
+    wikiEditorLoadFailed = false;
+    void import("./WikiEditor.svelte")
+      .then((mod) => {
+        wikiEditorModule = mod;
+      })
+      .catch(() => {
+        wikiEditorLoadFailed = true;
+      });
+  });
+
   let toolsOpen = $state(false);
   let modifierOpen = $state(false);
 
@@ -249,20 +266,19 @@
             <div in:fly={{ y: 8, duration: 160, easing: cubicOut }}>
               {#if editorMode === "cells" && !towerStore.selectedData.isMalformed}
                 <TowerEditor tower={towerStore.selectedData} />
+              {:else if wikiEditorModule}
+                {@const WikiEditor = wikiEditorModule.default}
+                <WikiEditor towerName={towerStore.selectedName} open={true} />
+              {:else if wikiEditorLoadFailed}
+                <Card class="p-8 text-center">
+                  <p class="text-body text-red-600">
+                    Failed to load the source editor.
+                  </p>
+                </Card>
               {:else}
-                {#await import("./WikiEditor.svelte")}
-                  <LoadingCard
-                    message="Brawler is unpacking the source editor..."
-                  />
-                {:then { default: WikiEditor }}
-                  <WikiEditor towerName={towerStore.selectedName} open={true} />
-                {:catch}
-                  <Card class="p-8 text-center">
-                    <p class="text-body text-red-600">
-                      Failed to load the source editor.
-                    </p>
-                  </Card>
-                {/await}
+                <LoadingCard
+                  message="Brawler is unpacking the source editor..."
+                />
               {/if}
             </div>
           {/key}
