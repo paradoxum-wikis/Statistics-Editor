@@ -16,11 +16,14 @@
     node.setSelectionRange(node.value.length, node.value.length);
   };
 
+  let editHeight = $state<number | null>(null);
   function enterEdit(e: MouseEvent | KeyboardEvent) {
     if (editing) return;
     if (e instanceof MouseEvent && (e.target as HTMLElement).closest("a")) {
       return;
     }
+    editHeight = (e.currentTarget as HTMLElement).getBoundingClientRect()
+      .height;
     draft = towerStore.editorMemo;
     editing = true;
   }
