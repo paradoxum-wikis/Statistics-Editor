@@ -2,14 +2,14 @@
   import type { Attachment } from "svelte/attachments";
   import CollaspibleMain from "./smol/CollaspibleMain.svelte";
   import RenderedHtml from "./table/RenderedHtml.svelte";
-  import { renderCellHtml } from "$lib/neowtext/render";
+  import { renderWikitextHtml } from "$lib/neowtext/render";
   import { towerStore } from "$lib/stores/tower.svelte";
 
   let sectionValue = $state("editor-memos");
   let editing = $state(false);
   let draft = $state("");
 
-  const rendered = $derived(renderCellHtml(towerStore.editorMemo, true));
+  const rendered = $derived(renderWikitextHtml(towerStore.editorMemo));
 
   const focusOnMount: Attachment<HTMLTextAreaElement> = (node) => {
     node.focus();
@@ -69,7 +69,7 @@
         }}
       >
         {#if towerStore.editorMemo.trim()}
-          <RenderedHtml html={rendered} />
+          <RenderedHtml html={rendered} block />
         {:else}
           <p class="text-sm text-muted-foreground">
             Have further comments about this tower that you'd like to make
