@@ -1,15 +1,10 @@
-import { categoryEntries } from "virtual:categories";
+import { listWikiOverrides } from "$lib/neowtext/wikiSource";
+import { parseTowerCategory } from "$lib/plugins/towers/parse";
+import { categoryEntries, towerNames } from "virtual:towers";
 
-const wikiModules = import.meta.glob("./*.wiki", {
-  eager: true,
-  query: "?raw",
-  import: "default",
-}) as Record<string, string>;
+export { towerNames };
 
-export const towerNames: string[] = Object.keys(wikiModules)
-  .map((path) => path.slice(2, -5))
-  .sort();
-
+// $FSE-CATEGORY$
 export const towerCategoryOrder = [
   "Starter",
   "Intermediate",
@@ -19,32 +14,42 @@ export const towerCategoryOrder = [
   "Golden Perks",
   "Exclusive",
   "Unavailable",
-  "Custom",
 ] as const;
 
-export type TowerCategory = (typeof towerCategoryOrder)[number];
+const baseCategoryMap = new Map<string, string>(categoryEntries);
 
-function isTowerCategory(value: string): value is TowerCategory {
-  return (towerCategoryOrder as readonly string[]).includes(value);
+function categoryFromWikitext(wikitext: string): string {
+  return parseTowerCategory(wikitext) ?? "Custom";
 }
 
-const categoryByTower = new Map<string, TowerCategory>(
-  categoryEntries.map(([tower, category]): [string, TowerCategory] => [
-    tower,
-    isTowerCategory(category) ? category : "Custom",
-  ]),
-);
+export function buildCategoryMap(
+  profileName: string,
+  live?: { towerName: string; wikitext: string },
+): Map<string, string> {
+  const map = new Map(baseCategoryMap);
+
+  for (const [tower, wikitext] of listWikiOverrides(profileName)) {
+    map.set(tower, categoryFromWikitext(wikitext));
+  }
+
+  if (live?.towerName && live.wikitext.trim()) {
+    map.set(live.towerName, categoryFromWikitext(live.wikitext));
+  }
+
+  return map;
+}
 
 export function groupedTowerNames(
   names: readonly string[],
   query: string,
-): { label: TowerCategory; towers: string[] }[] {
+  categoryByTower: ReadonlyMap<string, string>,
+): { label: string; towers: string[] }[] {
   const q = query.trim().toLowerCase();
   const filtered = q
     ? names.filter((name) => name.toLowerCase().includes(q))
     : names;
 
-  const buckets = new Map<TowerCategory, string[]>();
+  const buckets = new Map<string, string[]>();
   for (const name of filtered) {
     const label = categoryByTower.get(name) ?? "Custom";
     const bucket = buckets.get(label) ?? [];
@@ -52,10 +57,20 @@ export function groupedTowerNames(
     buckets.set(label, bucket);
   }
 
-  return towerCategoryOrder.flatMap((label) => {
-    const towers = buckets.get(label);
-    if (!towers?.length) return [];
+  const known = new Set<string>(towerCategoryOrder);
+  const dynamicLabels = [...buckets.keys()]
+    .filter((label) => !known.has(label) && label !== "Custom")
+    .sort((a, b) => a.localeCompare(b));
+
+  const orderedLabels = [
+    ...towerCategoryOrder.filter((label) => buckets.has(label)),
+    ...dynamicLabels,
+    ...(buckets.has("Custom") ? ["Custom"] : []),
+  ];
+
+  return orderedLabels.map((label) => {
+    const towers = buckets.get(label)!;
     towers.sort((a, b) => a.localeCompare(b));
-    return [{ label, towers }];
+    return { label, towers };
   });
 }

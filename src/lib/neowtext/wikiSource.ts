@@ -26,6 +26,24 @@ export function getWikiOverride(
   return value && value.trim() ? value : null;
 }
 
+export function listWikiOverrides(
+  profileName: string,
+): ReadonlyMap<string, string> {
+  const overrides = new Map<string, string>();
+  if (!canUseLocalStorage()) return overrides;
+
+  const prefix = `${WIKI_OVERRIDE_PREFIX}${profileName}::`;
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (!key?.startsWith(prefix)) continue;
+    const towerName = key.slice(prefix.length);
+    const value = localStorage.getItem(key);
+    if (value?.trim()) overrides.set(towerName, value);
+  }
+
+  return overrides;
+}
+
 export function setWikiOverride(
   profileName: string,
   towerName: string,

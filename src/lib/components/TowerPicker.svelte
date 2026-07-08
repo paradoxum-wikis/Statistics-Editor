@@ -3,8 +3,9 @@
   import { Check, ChevronsUpDown, X } from "@lucide/svelte";
   import { slide } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
-  import { groupedTowerNames } from "$lib/towerComponents/towers";
+  import { buildCategoryMap, groupedTowerNames } from "$lib/towerComponents/towers";
   import { towerStore } from "$lib/stores/tower.svelte";
+  import { profileStore } from "$lib/stores/profile.svelte";
   import TextInput from "./smol/TextInput.svelte";
 
   let {
@@ -34,7 +35,15 @@
         ),
   );
 
-  const groups = $derived(groupedTowerNames(towerStore.names, query));
+  const categoryMap = $derived.by(() => {
+    void towerStore.refreshTrigger;
+    return buildCategoryMap(profileStore.current, {
+      towerName: towerStore.selectedName,
+      wikitext: towerStore.effectiveWikitext,
+    });
+  });
+
+  const groups = $derived(groupedTowerNames(towerStore.names, query, categoryMap));
 
   const recent = $derived(
     towerStore.recentNames.filter((name) => towerStore.names.includes(name)),
