@@ -208,7 +208,7 @@
   {/if}
 
   <div
-    class="fixed inset-y-0 left-0 z-51 w-72 transition-transform duration-200 {sidebarOpen
+    class="fixed inset-y-0 left-0 z-57 w-72 transition-transform duration-200 {sidebarOpen
       ? 'translate-x-0'
       : '-translate-x-full'}"
   >
@@ -217,7 +217,7 @@
 
   <!-- Header -->
   <header
-    class="sticky top-0 z-10 flex flex-col items-center gap-2 border-b bg-card/20 px-4 py-1"
+    class="sticky top-0 z-17 flex flex-col items-center gap-2 border-b bg-card/20 px-4 py-1"
   >
     <h1 class="text-sm font-bold text-foreground tracking-wide">
       {towerStore.selectedName || "TDS Statistics Editor"}
@@ -280,7 +280,7 @@
 
   <!-- Bottom Bar -->
   <div
-    class="fixed inset-x-0 bottom-0 z-30 flex h-14 items-center justify-around border-t border-border bg-card px-6"
+    class="fixed inset-x-0 bottom-0 z-37 flex h-14 items-center justify-around border-t border-border bg-card px-6"
   >
     <IconBtn
       onclick={() => (sidebarOpen = !sidebarOpen)}

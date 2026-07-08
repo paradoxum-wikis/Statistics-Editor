@@ -193,7 +193,7 @@
 
     <div class="flex min-w-0 flex-1 flex-col">
       <header
-        class="sticky top-0 z-10 flex items-center justify-between border-b bg-card p-2 px-3"
+        class="sticky top-0 z-7 flex items-center justify-between border-b bg-card p-2 px-3"
       >
         <h1 class="unisans text-3xl font-black text-foreground">
           {towerStore.selectedName || "TDS Statistics Editor"}

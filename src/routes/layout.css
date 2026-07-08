@@ -285,13 +285,13 @@ h4,
 
 .tooltip-content {
   border-radius: calc(var(--radius) - 0.25rem) 0;
-  @apply z-50 max-w-56 border bg-popover px-2.5 py-1.5 text-popover-foreground shadow-md;
+  @apply z-47 max-w-56 border bg-popover px-2.5 py-1.5 text-popover-foreground shadow-md;
   @apply data-[state=delayed-open]:animate-in data-[state=delayed-open]:fade-in-0 data-[state=delayed-open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=top]:slide-in-from-bottom-2;
 }
 
 .dropdown-content {
   border-radius: var(--radius) 0;
-  @apply z-50 min-w-45 border bg-popover p-2 text-popover-foreground shadow-md;
+  @apply z-47 min-w-45 border bg-popover p-2 text-popover-foreground shadow-md;
   @apply data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2;
 }
 
@@ -306,7 +306,7 @@ h4,
 
 .popover-content {
   border-radius: var(--radius) 0;
-  @apply w-80 z-50 border bg-popover p-4 text-popover-foreground shadow-md;
+  @apply w-80 z-47 border bg-popover p-4 text-popover-foreground shadow-md;
   @apply data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2;
 }
 
@@ -317,7 +317,7 @@ h4,
 
 .combobox-content {
   border-radius: var(--radius) 0;
-  @apply z-50 min-w-62.5 overflow-hidden border bg-popover text-popover-foreground shadow-md;
+  @apply z-47 min-w-62.5 overflow-hidden border bg-popover text-popover-foreground shadow-md;
   @apply data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2;
 }
 
@@ -335,13 +335,13 @@ h4,
 }
 
 .settings-overlay {
-  @apply fixed inset-0 z-50 bg-black/50 backdrop-blur-sm;
+  @apply fixed inset-0 z-47 bg-black/50 backdrop-blur-sm;
   @apply data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0;
 }
 
 .settings-content {
   border-radius: var(--radius) 0;
-  @apply fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border border-border bg-background p-6 shadow-lg duration-200;
+  @apply fixed left-[50%] top-[50%] z-47 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border border-border bg-background p-6 shadow-lg duration-200;
   @apply data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95;
 }
 
