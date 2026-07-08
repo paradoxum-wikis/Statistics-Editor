@@ -21,21 +21,6 @@
   import { isCustomTower } from "$lib/towerComponents/customTowers";
 
   const syncFromStoreAnnotation = Annotation.define<boolean>();
-
-  let {
-    towerName,
-    open = false,
-  }: {
-    towerName: string;
-    open?: boolean;
-  } = $props();
-
-  let saving = $state(false);
-  let errorMessage = $state<string | null>(null);
-  let editorContainer = $state<HTMLElement>();
-  let editorView: EditorView | undefined;
-  let editorReady = $state(false);
-
   const editorTheme = EditorView.theme({
     "&": {
       fontSize: ".75rem",
@@ -92,7 +77,37 @@
     "&.cm-focused .cm-selectionBackground, .cm-selectionBackground": {
       backgroundColor: "color-mix(in oklch, var(--primary) 25%, transparent)",
     },
+    ".cm-tooltip": {
+      border: "1px solid var(--border)",
+      backgroundColor: "var(--popover)",
+      color: "var(--popover-foreground)",
+    },
+    ".cm-tooltip-section:not(:first-child)": {
+      borderTop: "1px solid var(--border)",
+    },
+    ".cm-tooltip-autocomplete ul li[aria-selected]": {
+      backgroundColor: "var(--accent)",
+      color: "var(--accent-foreground)",
+    },
+    ".cm-diagnosticAction": {
+      backgroundColor: "var(--secondary)",
+      color: "var(--secondary-foreground)",
+    },
   });
+
+  let {
+    towerName,
+    open = false,
+  }: {
+    towerName: string;
+    open?: boolean;
+  } = $props();
+
+  let saving = $state(false);
+  let errorMessage = $state<string | null>(null);
+  let editorContainer = $state<HTMLElement>();
+  let editorView: EditorView | undefined;
+  let editorReady = $state(false);
 
   function syncToStore(doc: string) {
     const dirty = doc !== towerStore.originalWikitext;
