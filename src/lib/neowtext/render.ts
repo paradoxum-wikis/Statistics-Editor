@@ -27,10 +27,10 @@ const RE_QUOTED_STYLE = /style\s*=\s*(["'])([\s\S]*?)\1/i;
 const RE_TH_PARTS = /!!|\|\|/;
 const RE_HEADING = /^(=+)([^=].*?)\1\s*$/;
 const RE_HR = /^-{4,}\s*$/;
-const RE_LIST_ITEM = /^([*#]+)\s+(.*)$/;
+const RE_LIST_ITEM = /^([*#]+)\s*(.*)$/;
 const RE_DL_TERM = /^;\s*(.*)$/;
 const RE_DL_DEF = /^:\s*(.*)$/;
-const RE_INDENT = /^(:+)(?:\s+(.*))?$/;
+const RE_INDENT = /^(:+)\s*(.*)$/;
 const RE_HTML_LINE = /^\s*<(?:!--|\/[a-zA-Z]|[a-zA-Z])/;
 const RE_FILE_NS = /^(?:File|Image)\s*:/i;
 const RE_SIZE_W = /^(\d+)\s*px$/i;
@@ -513,6 +513,7 @@ function renderBlockWikitext(text: string): string {
       continue;
     }
 
+    const paraStart = i;
     const para: string[] = [];
     while (i < lines.length) {
       const cur = lines[i];
@@ -532,6 +533,8 @@ function renderBlockWikitext(text: string): string {
     }
     if (para.some((s) => s.length)) {
       out.push(`<p class="my-1">${renderInlineWikitext(para.join("\n"))}</p>`);
+    } else if (i === paraStart) {
+      i++; // avoid hang if a block-starter line was not consumed
     }
   }
 
