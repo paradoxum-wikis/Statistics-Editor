@@ -3,7 +3,10 @@
   import { Check, ChevronsUpDown, X } from "@lucide/svelte";
   import { slide } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
-  import { buildCategoryMap, groupedTowerNames } from "$lib/towerComponents/towers";
+  import {
+    buildCategoryMap,
+    groupedTowerNames,
+  } from "$lib/towerComponents/towers";
   import { towerStore } from "$lib/stores/tower.svelte";
   import { profileStore } from "$lib/stores/profile.svelte";
   import TextInput from "./smol/TextInput.svelte";
@@ -43,7 +46,9 @@
     });
   });
 
-  const groups = $derived(groupedTowerNames(towerStore.names, query, categoryMap));
+  const groups = $derived(
+    groupedTowerNames(towerStore.names, query, categoryMap),
+  );
 
   const recent = $derived(
     towerStore.recentNames.filter((name) => towerStore.names.includes(name)),
@@ -144,11 +149,11 @@
                 </button>
                 <button
                   type="button"
-                  class="absolute top-1/2 right-2 -translate-y-1/2 cursor-pointer p-0.5 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:text-destructive"
+                  class="absolute top-1/2 right-2 -translate-y-1/2 cursor-pointer p-0.5 pe-2 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:text-destructive"
                   aria-label="Remove {name} from recents"
                   onclick={() => towerStore.removeRecent(name)}
                 >
-                  <X class="h-3.5 w-3.5" />
+                  <X class="size-3.5" />
                 </button>
               </li>
             {/each}
