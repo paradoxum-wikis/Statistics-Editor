@@ -17,6 +17,7 @@
   import { DropdownMenu, Popover, AlertDialog, Dialog } from "bits-ui";
   import ModeToggle from "./smol/ModeToggle.svelte";
   import Card from "./smol/Card.svelte";
+  import LoadingCard from "./smol/LoadingCard.svelte";
   import Btn from "./smol/Btn.svelte";
   import TextInput from "./smol/TextInput.svelte";
   import Alert from "./smol/Alert.svelte";
@@ -369,18 +370,20 @@
             in:fly={{ y: 8, duration: 160, easing: cubicOut }}
           >
             {#if !isClient}
-              <Card class="p-8 text-center">
-                <p class="animate-pulse text-body">
-                  Engineer is setting up the editor for you...
-                </p>
-              </Card>
+              <LoadingCard
+                message="Engineer is setting up the editor for you..."
+              />
             {:else if towerStore.selectedData}
               {#key editorMode}
                 <div in:fly={{ y: 8, duration: 160, easing: cubicOut }}>
                   {#if editorMode === "cells" && !towerStore.selectedData.isMalformed}
                     <TowerEditor tower={towerStore.selectedData} />
                   {:else}
-                    {#await import("./WikiEditor.svelte") then { default: WikiEditor }}
+                    {#await import("./WikiEditor.svelte")}
+                      <LoadingCard
+                        message="Brawler is unpacking the source editor..."
+                      />
+                    {:then { default: WikiEditor }}
                       <WikiEditor
                         towerName={towerStore.selectedName}
                         open={true}
@@ -396,11 +399,9 @@
                 </div>
               {/key}
             {:else if towerStore.isLoading}
-              <Card class="p-8 text-center">
-                <p class="animate-pulse text-body">
-                  Commander is getting this tower's files ready...
-                </p>
-              </Card>
+              <LoadingCard
+                message="Commander is getting this tower's files ready..."
+              />
             {:else}
               <HomeView onSelect={handleSelect} />
             {/if}
