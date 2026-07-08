@@ -27,10 +27,7 @@ const RE_QUOTED_STYLE = /style\s*=\s*(["'])([\s\S]*?)\1/i;
 const RE_TH_PARTS = /!!|\|\|/;
 const RE_HEADING = /^(=+)([^=].*?)\1\s*$/;
 const RE_HR = /^-{4,}\s*$/;
-const RE_LIST_ITEM = /^([*#]+)\s*(.*)$/;
-const RE_DL_TERM = /^;\s*(.*)$/;
-const RE_DL_DEF = /^:\s*(.*)$/;
-const RE_INDENT = /^(:+)\s*(.*)$/;
+const RE_LIST_LINE = /^([*#;:]+)\s*(.*)$/;
 const RE_HTML_LINE = /^\s*<(?:!--|\/[a-zA-Z]|[a-zA-Z])/;
 const RE_FILE_NS = /^(?:File|Image)\s*:/i;
 const RE_SIZE_W = /^(\d+)\s*px$/i;
@@ -47,7 +44,31 @@ const HEADING_CLS: Record<number, string> = {
 };
 const UL_CLS = "list-disc pl-5 my-1";
 const OL_CLS = "list-decimal pl-5 my-1";
-const INDENT_CLS = ["", "pl-4", "pl-8", "pl-12", "pl-16"];
+const DL_CLS = "my-1";
+const LIST_OPEN: Record<string, string> = {
+  "*": `<ul class="${UL_CLS}">`,
+  "#": `<ol class="${OL_CLS}">`,
+  ";": `<dl class="${DL_CLS}">`,
+  ":": `<dl class="${DL_CLS}">`,
+};
+const LIST_CLOSE: Record<string, string> = {
+  "*": "</ul>",
+  "#": "</ol>",
+  ";": "</dl>",
+  ":": "</dl>",
+};
+const ITEM_OPEN: Record<string, string> = {
+  "*": '<li class="my-0.5">',
+  "#": '<li class="my-0.5">',
+  ";": '<dt class="font-medium">',
+  ":": '<dd class="pl-4 mb-1">',
+};
+const ITEM_CLOSE: Record<string, string> = {
+  "*": "</li>",
+  "#": "</li>",
+  ";": "</dt>",
+  ":": "</dd>",
+};
 
 type PreviewCell = {
   tag: "th" | "td";
@@ -367,9 +388,8 @@ function isBlockStarter(line: string): boolean {
   if (c === "<") return RE_HTML_LINE.test(line);
   if (c === "=") return RE_HEADING.test(t);
   if (c === "-") return RE_HR.test(t);
-  if (c === "*" || c === "#") return RE_LIST_ITEM.test(line);
-  if (c === ";") return true;
-  if (c === ":") return true;
+  if (c === "*" || c === "#" || c === ";" || c === ":")
+    return RE_LIST_LINE.test(line);
   return false;
 }
 
@@ -378,86 +398,76 @@ function renderHeading({ level, content }: { level: number; content: string }) {
   return `<h${level} class="${cls}">${renderInlineWikitext(content)}</h${level}>`;
 }
 
+// ; and : both open a <dl>, so they match for nesting purposes
+function sameListKind(a: string, b: string): boolean {
+  if (a === b) return true;
+  return (a === ";" || a === ":") && (b === ";" || b === ":");
+}
+
 function renderListBlock(
   lines: string[],
   start: number,
   out: string[],
 ): number {
-  const stack: ("ul" | "ol")[] = [];
+  const stack: string[] = [];
   let i = start;
 
   const closeTo = (depth: number) => {
-    while (stack.length > depth) out.push(`</${stack.pop()!}>`);
-  };
-
-  const openAt = (depth: number, kind: "ul" | "ol") => {
-    closeTo(depth);
-    while (stack.length < depth) {
-      stack.push(kind);
-      out.push(`<${kind} class="${kind === "ul" ? UL_CLS : OL_CLS}">`);
-    }
-    if (stack.length === depth && stack[depth - 1] !== kind) {
-      out.push(`</${stack.pop()!}>`);
-      stack.push(kind);
-      out.push(`<${kind} class="${kind === "ul" ? UL_CLS : OL_CLS}">`);
+    while (stack.length > depth) {
+      const c = stack.pop()!;
+      out.push(ITEM_CLOSE[c], LIST_CLOSE[c]);
     }
   };
 
   while (i < lines.length) {
-    const m = lines[i].match(RE_LIST_ITEM);
+    const m = lines[i].match(RE_LIST_LINE);
     if (!m) break;
-    const depth = m[1].length;
-    const kind = m[1][0] === "*" ? "ul" : "ol";
-    openAt(depth, kind);
-    out.push(`<li class="my-0.5">${renderInlineWikitext(m[2])}</li>`);
+
+    const prefix = m[1];
+    const text = m[2];
+
+    let common = 0;
+    const n = Math.min(stack.length, prefix.length);
+    while (common < n && sameListKind(stack[common], prefix[common])) common++;
+
+    closeTo(common);
+
+    if (common === prefix.length && common > 0) {
+      const prev = stack[common - 1];
+      const c = prefix[common - 1];
+      out.push(ITEM_CLOSE[prev], ITEM_OPEN[c]);
+      stack[common - 1] = c;
+    } else {
+      if (common > 0 && stack[common - 1] !== prefix[common - 1]) {
+        out.push(ITEM_CLOSE[stack[common - 1]], ITEM_OPEN[prefix[common - 1]]);
+        stack[common - 1] = prefix[common - 1];
+      }
+      for (let d = common; d < prefix.length; d++) {
+        const c = prefix[d];
+        stack.push(c);
+        out.push(LIST_OPEN[c], ITEM_OPEN[c]);
+      }
+    }
+
+    // ;term: def → <dt> + <dd> on one line
+    if (prefix.endsWith(";")) {
+      const split = text.match(/^([^:]*?)\s*:\s*(.*)$/s);
+      if (split?.[1].trim()) {
+        out.push(renderInlineWikitext(split[1].trim()));
+        out.push(ITEM_CLOSE[";"]);
+        stack[stack.length - 1] = ":";
+        out.push(ITEM_OPEN[":"]);
+        if (split[2].trim()) out.push(renderInlineWikitext(split[2].trim()));
+        i++;
+        continue;
+      }
+    }
+
+    out.push(renderInlineWikitext(text));
     i++;
   }
 
   closeTo(0);
-  return i;
-}
-
-function renderDefListBlock(
-  lines: string[],
-  start: number,
-  out: string[],
-): number {
-  let i = start;
-  if (!RE_DL_TERM.test(lines[i])) return start;
-
-  out.push('<dl class="my-1">');
-  while (i < lines.length) {
-    const term = lines[i].match(RE_DL_TERM);
-    if (term) {
-      let text = term[1];
-      const split = text.match(/^([^:]*?)\s*:\s*(.*)$/s);
-      if (split?.[1].trim()) {
-        out.push(
-          `<dt class="font-medium">${renderInlineWikitext(split[1].trim())}</dt>`,
-        );
-        if (split[2].trim()) {
-          out.push(
-            `<dd class="pl-4 mb-1">${renderInlineWikitext(split[2].trim())}</dd>`,
-          );
-        }
-      } else {
-        out.push(
-          `<dt class="font-medium">${renderInlineWikitext(text.trim())}</dt>`,
-        );
-      }
-      i++;
-      continue;
-    }
-
-    const def = lines[i].match(RE_DL_DEF);
-    if (def) {
-      out.push(`<dd class="pl-4 mb-1">${renderInlineWikitext(def[1])}</dd>`);
-      i++;
-      continue;
-    }
-    break;
-  }
-  out.push("</dl>");
   return i;
 }
 
@@ -493,23 +503,8 @@ function renderBlockWikitext(text: string): string {
       continue;
     }
 
-    if (RE_LIST_ITEM.test(line)) {
+    if (RE_LIST_LINE.test(line)) {
       i = renderListBlock(lines, i, out);
-      continue;
-    }
-
-    if (RE_DL_TERM.test(line)) {
-      i = renderDefListBlock(lines, i, out);
-      continue;
-    }
-
-    const indent = line.match(RE_INDENT);
-    if (indent) {
-      const depth = Math.min(indent[1].length, INDENT_CLS.length - 1);
-      out.push(
-        `<div class="${INDENT_CLS[depth]} my-0.5">${renderInlineWikitext(indent[2] ?? "")}</div>`,
-      );
-      i++;
       continue;
     }
 
