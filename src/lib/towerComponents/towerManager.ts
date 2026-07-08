@@ -21,7 +21,7 @@ import {
   isCustomTower,
   removeCustomTower,
 } from "./customTowers";
-import { isRefOnlyVarSuffix, stripRefs } from "$lib/utils/format";
+import { isEditableRefSuffixCell, stripRefs } from "$lib/utils/format";
 import {
   embedSeDirectives,
   extractDirectives,
@@ -508,7 +508,8 @@ export default class TowerManager {
               const stripped = stripRefs(v).trim();
               if (
                 !/\$[^$]+\$/.test(stripped) &&
-                !/^{{#expr:.*}}$/i.test(stripped)
+                !/^{{#expr:.*}}$/i.test(stripped) &&
+                !isEditableRefSuffixCell(v, formulaTokens)
               )
                 return null;
               return [k, stripped, v];
@@ -536,7 +537,7 @@ export default class TowerManager {
                 row[key] = result;
                 const stripped = stripRefs(ogVal).trim();
                 if (
-                  !isRefOnlyVarSuffix(ogVal, formulaTokens) &&
+                  !isEditableRefSuffixCell(ogVal, formulaTokens) &&
                   (/\$[^$]+\$/.test(stripped) ||
                     /^{{#expr:.*}}$/i.test(stripped))
                 ) {
@@ -618,7 +619,7 @@ export default class TowerManager {
               if (typeof val !== "string") continue;
               const stripped = stripRefs(val).trim();
               if (
-                !isRefOnlyVarSuffix(val, formulaTokens) &&
+                !isEditableRefSuffixCell(val, formulaTokens) &&
                 (/\$[^$]+\$/.test(stripped) || /^{{#expr:.*}}$/i.test(stripped))
               ) {
                 extraReadOnly.add(k);
@@ -656,7 +657,8 @@ export default class TowerManager {
                   const stripped = stripRefs(v).trim();
                   if (
                     !/\$[^$]+\$/.test(stripped) &&
-                    !/^{{#expr:.*}}$/i.test(stripped)
+                    !/^{{#expr:.*}}$/i.test(stripped) &&
+                    !isEditableRefSuffixCell(v, formulaTokens)
                   )
                     return null;
                   return [k, stripped, v];

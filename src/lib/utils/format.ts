@@ -19,17 +19,35 @@ export function normalizeColumnKey(s: unknown): string {
     .trim();
 }
 
-const RE_REF_ONLY_SUFFIX = /^(-?[\d.,]+)((\$[A-Z0-9_-]+\$)+)$/;
+const RE_EDITABLE_REF_PREFIX = /^(-?[\d.,]+)([\s\S]+)$/;
 
-export function isRefOnlyVarSuffix(
+function parseEditableRefSuffix(
+  value: string,
+  tokens: Record<string, string>,
+): { numeric: string; suffix: string } | null {
+  const match = value.trim().match(RE_EDITABLE_REF_PREFIX);
+  if (!match) return null;
+
+  const suffix = match[2];
+  if (/<ref\b/i.test(suffix)) return { numeric: match[1], suffix };
+
+  const suffixVars = suffix.match(/\$[A-Z0-9_-]+\$/g) ?? [];
+  if (
+    suffixVars.length > 0 &&
+    suffixVars.every((v) => /^<ref\b/i.test((tokens[v] ?? "").trim()))
+  ) {
+    return { numeric: match[1], suffix };
+  }
+
+  return null;
+}
+
+export function isEditableRefSuffixCell(
   value: unknown,
   tokens: Record<string, string>,
 ): boolean {
   if (typeof value !== "string") return false;
-  const match = stripRefs(value).trim().match(RE_REF_ONLY_SUFFIX);
-  if (!match) return false;
-  const suffixVars = match[2].match(/\$[A-Z0-9_-]+\$/g) ?? [];
-  return suffixVars.every((v) => /^<ref\b/i.test((tokens[v] ?? "").trim()));
+  return parseEditableRefSuffix(value, tokens) !== null;
 }
 
 export function stripRefOnlyVarSuffix(
@@ -40,22 +58,26 @@ export function stripRefOnlyVarSuffix(
   if (typeof value === "number") return value;
   if (typeof value !== "string") return undefined;
 
-  const match = stripRefs(value).trim().match(RE_REF_ONLY_SUFFIX);
-  if (!match || !isRefOnlyVarSuffix(value, tokens)) return value;
+  const parsed = parseEditableRefSuffix(value, tokens);
+  if (!parsed) return value;
 
-  const n = parseNumeric(match[1]);
-  return Number.isFinite(n) ? n : match[1];
+  const n = parseNumeric(parsed.numeric);
+  return Number.isFinite(n) ? n : parsed.numeric;
 }
 
 export function syncRefOnlyCellToken(
   formulaToken: string,
   newValue: string | number,
   tokens: Record<string, string>,
+  appendRef: boolean,
 ): string | null {
-  if (!isRefOnlyVarSuffix(formulaToken, tokens)) return null;
-  return typeof newValue === "number"
-    ? formatNumber(newValue)
-    : String(newValue).trim();
+  const parsed = parseEditableRefSuffix(formulaToken, tokens);
+  if (!parsed) return null;
+  const n =
+    typeof newValue === "number"
+      ? formatNumber(newValue)
+      : String(newValue).trim();
+  return appendRef ? `${n}${parsed.suffix}` : n;
 }
 
 export function columnKeysEqual(a: string, b: string): boolean {

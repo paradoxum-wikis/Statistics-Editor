@@ -158,6 +158,7 @@
         formulaToken,
         parsedValue,
         skinData.formulaTokens,
+        settingsStore.restoreRefOnClearEdit,
       );
       if (synced) {
         extraTable.cellFormulaTokens![String(rowIdx)][header] = synced;

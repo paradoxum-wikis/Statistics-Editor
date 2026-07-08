@@ -9,10 +9,6 @@
 
   const canAddColumn = $derived(modifierColumn.trim().length > 0);
 
-  const switchRootClass =
-    "inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-gray-200";
-  const switchThumbClass =
-    "pointer-events-none block h-4 w-4 rounded-full bg-white shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-4 data-[state=unchecked]:translate-x-0";
   const modifierFieldClass = "flex min-w-0 flex-1 items-center gap-0.5";
   const modifierSuffixClass =
     "w-3 shrink-0 text-center text-[0.6875rem] text-muted-foreground";
@@ -83,10 +79,12 @@
                 checked={entry.enabled}
                 onCheckedChange={(enabled) =>
                   modifierStore.setEnabled(index, enabled)}
-                class={switchRootClass}
+                class="inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-gray-200"
                 aria-label="Enable {entry.column} modifier"
               >
-                <Switch.Thumb class={switchThumbClass} />
+                <Switch.Thumb
+                  class="pointer-events-none block h-4 w-4 rounded-full bg-white shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-4 data-[state=unchecked]:translate-x-0"
+                />
               </Switch.Root>
               <button
                 type="button"

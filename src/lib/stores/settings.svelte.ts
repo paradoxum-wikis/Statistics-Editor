@@ -6,6 +6,7 @@ import {
   Scaling,
   Skull,
   SquareDashedBottom,
+  Superscript,
 } from "@lucide/svelte";
 
 export type SettingTab = "editor" | "appearance" | "advanced";
@@ -18,6 +19,7 @@ type BooleanSettingDef = {
   icon: Component;
   label: string;
   description: string;
+  dependsOn?: string;
 };
 
 const SETTING_DEFS = {
@@ -30,6 +32,17 @@ const SETTING_DEFS = {
     label: "Clear Cell on Edit",
     description:
       "Clears the input box when you click on a cell instead of keeping whatever was already there.",
+  },
+  restoreRefOnClearEdit: {
+    storageKey: "tdse_coe_ref",
+    default: false,
+    id: "restore-ref-on-clear-edit",
+    tab: "editor",
+    icon: Superscript,
+    label: "Restore Reference Suffixes",
+    description:
+      "Re-appends cell references automatically when you save a cleared cell.",
+    dependsOn: "clearOnEdit",
   },
   rofBug: {
     storageKey: "tdse_rof_bug",
@@ -80,15 +93,24 @@ const SETTING_DEFS = {
 } as const satisfies Record<string, BooleanSettingDef>;
 
 export type BooleanSettingKey = keyof typeof SETTING_DEFS;
-
 export type BooleanSetting = BooleanSettingDef & { key: BooleanSettingKey };
 
 export const BOOLEAN_SETTINGS: BooleanSetting[] = (
   Object.entries(SETTING_DEFS) as [BooleanSettingKey, BooleanSettingDef][]
 ).map(([key, def]) => ({ key, ...def }));
 
-export function settingsForTab(tab: SettingTab): BooleanSetting[] {
-  return BOOLEAN_SETTINGS.filter((setting) => setting.tab === tab);
+export type SettingGroup = {
+  parent: BooleanSetting;
+  children: BooleanSetting[];
+};
+
+export function settingGroupsForTab(tab: SettingTab): SettingGroup[] {
+  const tabSettings = BOOLEAN_SETTINGS.filter((setting) => setting.tab === tab);
+  const parents = tabSettings.filter((setting) => !setting.dependsOn);
+  return parents.map((parent) => ({
+    parent,
+    children: tabSettings.filter((setting) => setting.dependsOn === parent.key),
+  }));
 }
 
 type SettingString<T extends string> = {
@@ -134,6 +156,9 @@ class SettingsStore {
   hideCellWrapper = $state<boolean>(SETTING_DEFS.hideCellWrapper.default);
   minTableWidth = $state<boolean>(SETTING_DEFS.minTableWidth.default);
   clearOnEdit = $state<boolean>(SETTING_DEFS.clearOnEdit.default);
+  restoreRefOnClearEdit = $state<boolean>(
+    SETTING_DEFS.restoreRefOnClearEdit.default,
+  );
   rofBug = $state<boolean>(SETTING_DEFS.rofBug.default);
   theme = $state(THEME_SETTING.default);
 
@@ -141,6 +166,9 @@ class SettingsStore {
     switch (key) {
       case "clearOnEdit":
         this.clearOnEdit = value;
+        break;
+      case "restoreRefOnClearEdit":
+        this.restoreRefOnClearEdit = value;
         break;
       case "rofBug":
         this.rofBug = value;
@@ -185,6 +213,8 @@ class SettingsStore {
     switch (key) {
       case "clearOnEdit":
         return this.clearOnEdit;
+      case "restoreRefOnClearEdit":
+        return this.restoreRefOnClearEdit;
       case "rofBug":
         return this.rofBug;
       case "seeValueDifference":
@@ -202,6 +232,10 @@ class SettingsStore {
     this.assignBoolean(key, value);
     const def = SETTING_DEFS[key];
     writeBoolean(def.storageKey, value);
+    if (key === "clearOnEdit" && !value) {
+      this.assignBoolean("restoreRefOnClearEdit", false);
+      writeBoolean(SETTING_DEFS.restoreRefOnClearEdit.storageKey, false);
+    }
   }
 
   setTheme(value: "light" | "dark" | "system") {

@@ -443,6 +443,7 @@ class SkinData {
         formulaToken,
         newValue,
         this.formulaTokens,
+        settingsStore.restoreRefOnClearEdit,
       );
       if (synced) {
         this.cellFormulaTokens[levelKey][attribute] = synced;
