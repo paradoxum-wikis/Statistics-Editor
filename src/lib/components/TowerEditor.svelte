@@ -414,13 +414,14 @@
     </Tabs.Root>
 
     <Separator class="mt-4" />
-    <div class="flex justify-end gap-2">
+    <div class="tower-editor-actions flex justify-end gap-2">
       <Popover.Root bind:open={shareOpen} onOpenChange={onShareOpenChange}>
         <Popover.Trigger
           class="btn btn-secondary"
           title="Create a short link to share this tower's stats"
         >
-          Share URL
+          <span class="max-md:hidden">Share URL</span>
+          <span class="hidden max-md:inline">Share</span>
         </Popover.Trigger>
         <Popover.Content class="popover-content w-80">
           <div class="space-y-3">
@@ -457,7 +458,12 @@
       {#if tower && !noFetchTowers.has(tower.name) && !isCustomTower(tower.name)}
         <Popover.Root>
           <Popover.Trigger class="btn btn-secondary" disabled={isFetching}>
-            {isFetching ? "Fetching..." : "Fetch Latest Data"}
+            {#if isFetching}
+              Fetching…
+            {:else}
+              <span class="max-md:hidden">Fetch Latest Data</span>
+              <span class="hidden max-md:inline">Fetch Latest</span>
+            {/if}
           </Popover.Trigger>
           <Popover.Content class="popover-content">
             <div class="space-y-2">
@@ -488,7 +494,12 @@
           : "No differences to display"}
       >
         <span class="inline-flex items-center gap-1.5">
-          {showDiff ? "Hide Difference" : "View Difference"}
+          <span class="max-md:hidden"
+            >{showDiff ? "Hide Difference" : "View Difference"}</span
+          >
+          <span class="hidden max-md:inline"
+            >{showDiff ? "Hide Diff" : "View Diff"}</span
+          >
         </span>
       </Btn>
       <Btn
@@ -501,16 +512,23 @@
           ? "Discard unsaved changes (revert to last loaded effective wiki)"
           : "Clear the saved @se-diff baseline (removes the difference tracking comment without leaving an empty line)"}
       >
-        {towerStore.isDirty ? "Clear Changes" : "Clear Difference"}
+        {#if towerStore.isDirty}
+          <span class="max-md:hidden">Clear Changes</span>
+          <span class="hidden max-md:inline">Clear</span>
+        {:else}
+          <span class="max-md:hidden">Clear Difference</span>
+          <span class="hidden max-md:inline">Clear</span>
+        {/if}
       </Btn>
       {#if towerStore.sharePreviewId}
         <Popover.Root>
           <Popover.Trigger
-            class="btn btn-primary"
+            class="btn btn-primary tower-editor-actions-primary"
             disabled={!towerStore.isDirty}
             title="Write these stats to your current profile"
           >
-            Apply to Profile
+            <span class="max-md:hidden">Apply to Profile</span>
+            <span class="hidden max-md:inline">Apply</span>
           </Popover.Trigger>
           <Popover.Content class="popover-content">
             <div class="space-y-2">
@@ -532,10 +550,12 @@
       {:else}
         <Btn
           variant="primary"
+          class="tower-editor-actions-primary"
           onclick={handleSave}
           disabled={!towerStore.isDirty}
         >
-          Save Changes
+          <span class="max-md:hidden">Save Changes</span>
+          <span class="hidden max-md:inline">Save</span>
         </Btn>
       {/if}
     </div>
