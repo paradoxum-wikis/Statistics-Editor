@@ -2,9 +2,8 @@ import { listWikiOverrides } from "$lib/neowtext/wikiSource";
 import { parseTowerCategory } from "$lib/plugins/towers/parse";
 import { categoryEntries, towerNames } from "virtual:towers";
 
-export { towerNames };
-
 // $FSE-CATEGORY$
+export { towerNames };
 export const towerCategoryOrder = [
   "Starter",
   "Intermediate",
