@@ -268,12 +268,12 @@
                   </Dialog.Trigger>
 
                   <Dialog.Portal>
-                    <Dialog.Overlay class="settings-overlay" />
-                    <Dialog.Content class="settings-content">
-                      <Dialog.Title class="settings-title">
+                    <Dialog.Overlay class="dialog-overlay" />
+                    <Dialog.Content class="dialog-content">
+                      <Dialog.Title class="dialog-title">
                         Create Profile
                       </Dialog.Title>
-                      <Dialog.Description class="settings-description">
+                      <Dialog.Description class="dialog-description">
                         Enter a name for the new profile.
                       </Dialog.Description>
 
@@ -402,7 +402,7 @@
                     />
                   {:else if wikiEditorLoadFailed}
                     <Card class="p-8 text-center">
-                      <p class="text-body text-red-600">
+                      <p class="text-muted-foreground text-red-600">
                         Failed to load the source editor.
                       </p>
                     </Card>
@@ -457,8 +457,8 @@
 
 <AlertDialog.Root bind:open={deleteProfileOpen}>
   <AlertDialog.Portal>
-    <AlertDialog.Overlay class="settings-overlay" />
-    <AlertDialog.Content class="settings-content">
+    <AlertDialog.Overlay class="dialog-overlay" />
+    <AlertDialog.Content class="dialog-content">
       <div class="flex flex-col space-y-2 text-center sm:text-start">
         <AlertDialog.Title class="text-lg font-semibold">
           Are you absolutely sure?

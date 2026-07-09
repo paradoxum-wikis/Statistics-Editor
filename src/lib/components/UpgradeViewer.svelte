@@ -189,8 +189,6 @@
 </Tabs.Root>
 
 <style>
-  @reference "../../routes/layout.css";
-
   .upgrade-summary-box {
     margin-top: 0.75rem;
     border: 1px solid var(--border);
@@ -242,19 +240,31 @@
   }
 
   .upgrade-image-container {
-    @apply w-full aspect-square bg-muted rounded flex items-center justify-center text-muted-foreground;
+    width: 100%;
+    aspect-ratio: 1;
+    background: var(--muted);
+    border-radius: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted-foreground);
   }
 
   .upgrade-name {
-    @apply mt-2 text-center text-sm font-medium;
+    margin-top: 0.5rem;
+    text-align: center;
+    font-size: 0.875rem;
+    font-weight: 500;
   }
 
   .upgrade-bg {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: contain;
     background-image: repeating-conic-gradient(
       var(--upgrade-bg-1) 0 25%,
       var(--upgrade-bg-2) 0 50%
     );
     background-size: 1.9em 1.9em;
-    @apply w-full aspect-square object-contain;
   }
 </style>

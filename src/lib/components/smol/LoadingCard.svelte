@@ -11,5 +11,5 @@
 </script>
 
 <Card class="p-8 text-center {className}">
-  <p class="animate-pulse text-body">{message}</p>
+  <p class="animate-pulse text-muted-foreground">{message}</p>
 </Card>

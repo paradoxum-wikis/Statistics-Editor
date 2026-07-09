@@ -53,3 +53,38 @@
     </div>
   </button>
 </div>
+
+<style>
+  .mode-toggle-group {
+    display: flex;
+    border-radius: var(--radius) 0;
+    background: var(--muted);
+    padding: 0.25rem;
+    border: 1px solid var(--border);
+    margin-inline-end: 0.5rem;
+  }
+
+  .mode-toggle-btn {
+    border-radius: calc(var(--radius) - 0.25rem) 0;
+
+    div {
+      padding: 0.25rem 1rem;
+      font-size: 0.875rem;
+      transition: color 0.15s;
+    }
+
+    &.active {
+      background: var(--background);
+      color: var(--foreground);
+      box-shadow: 0 1px 2px oklch(0 0 0 / 0.05);
+    }
+
+    &.inactive {
+      color: var(--muted-foreground);
+
+      &:hover {
+        color: var(--foreground);
+      }
+    }
+  }
+</style>

@@ -8,9 +8,9 @@
 
 <Dialog.Root bind:open>
   <Dialog.Portal>
-    <Dialog.Overlay class="settings-overlay"></Dialog.Overlay>
+    <Dialog.Overlay class="dialog-overlay"></Dialog.Overlay>
     <Dialog.Content
-      class="settings-content sm:max-w-2xl max-h-[85dvh] overflow-y-auto"
+      class="dialog-content sm:max-w-2xl max-h-[85dvh] overflow-y-auto"
     >
       <GlobalModifierPanel />
 

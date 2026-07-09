@@ -109,9 +109,7 @@
                 val === "none" ? null : parseInt(val),
               )}
           >
-            <Select.Trigger
-              class="inline-flex h-7 w-22.5 items-center justify-between rounded-[var(--radius)_0] border border-input bg-background px-4 text-sm transition-colors duration-250 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 data-placeholder:text-muted-foreground"
-            >
+            <Select.Trigger class="select-trigger w-22.5">
               <span class="truncate">
                 {levelOptions.find(
                   (o) => o.value === selectedDetectionStart[detection.type],
@@ -121,13 +119,13 @@
             </Select.Trigger>
             <Select.Portal>
               <Select.Content
-                class="z-17 min-w-27 max-h-55 overflow-hidden rounded-[var(--radius)_0] border border-border bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
+                class="select-content min-w-27 max-h-55"
                 sideOffset={5}
               >
                 <Select.Viewport class="p-1">
                   {#each levelOptions as option (option.value)}
                     <Select.Item
-                      class="relative flex w-full select-none items-center rounded-[calc(var(--radius)-0.25rem)_0] p-1 px-3 my-1 text-sm outline-none data-disabled:pointer-events-none data-disabled:opacity-50 data-highlighted:bg-accent data-highlighted:text-accent-foreground"
+                      class="select-item"
                       value={option.value}
                       label={option.label}
                     >
@@ -154,3 +152,71 @@
     </p>
   {/if}
 </CollapsibleSide>
+
+<style>
+  :global(.select-trigger) {
+    display: inline-flex;
+    height: 1.75rem;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: var(--radius) 0;
+    border: 1px solid var(--input);
+    background: var(--background);
+    padding: 0 1rem;
+    font-size: 0.875rem;
+    transition:
+      color 0.25s,
+      background-color 0.25s,
+      border-color 0.25s;
+    outline: none;
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
+    &[data-placeholder] {
+      color: var(--muted-foreground);
+    }
+  }
+
+  :global(.select-content) {
+    z-index: 17;
+    overflow: hidden;
+    border-radius: var(--radius) 0;
+    border: 1px solid var(--border);
+    background: var(--popover);
+    color: var(--popover-foreground);
+
+    &[data-state="open"] {
+      animation: overlay-in 150ms ease;
+    }
+
+    &[data-state="closed"] {
+      animation: overlay-out 100ms ease;
+    }
+  }
+
+  :global(.select-item) {
+    position: relative;
+    display: flex;
+    width: 100%;
+    user-select: none;
+    align-items: center;
+    border-radius: calc(var(--radius) - 0.25rem) 0;
+    padding: 0.25rem 0.75rem;
+    margin-block: 0.25rem;
+    font-size: 0.875rem;
+    outline: none;
+
+    &[data-disabled] {
+      pointer-events: none;
+      opacity: 0.5;
+    }
+
+    &[data-highlighted] {
+      background: var(--accent);
+      color: var(--accent-foreground);
+    }
+  }
+</style>

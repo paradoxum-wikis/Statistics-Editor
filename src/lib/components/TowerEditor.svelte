@@ -564,8 +564,29 @@
     <MemosSection />
     <NotesSection notes={skinRefs.notes} />
   {:else}
-    <div class="text-center py-8 text-body">
+    <div class="text-center py-8 text-muted-foreground">
       Select a tower to edit its skins.
     </div>
   {/if}
 </div>
+
+<style>
+  .tower-editor-actions {
+    @media (width < 48rem) {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.375rem;
+
+      :global(.btn) {
+        width: 100%;
+        height: 2rem;
+        padding: 0 1rem;
+        font-size: 0.75rem;
+      }
+
+      :global(.tower-editor-actions-primary) {
+        grid-column: 1 / -1;
+      }
+    }
+  }
+</style>

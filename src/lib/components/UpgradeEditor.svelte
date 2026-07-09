@@ -74,7 +74,7 @@
               </span>
               <input
                 type="text"
-                class="flex-1 text-[0.7rem] bg-background border border-input rounded-[calc(var(--radius)-0.5rem)_0] px-1.5 py-0.5 text-foreground outline-none min-w-0 placeholder:text-muted-foreground/40"
+                class="input input-compact placeholder:text-muted-foreground/40"
                 placeholder="-"
                 value={row.title}
                 onchange={(e) => updateTitle(row.index, e.currentTarget.value)}
@@ -86,7 +86,7 @@
               </span>
               <input
                 type="text"
-                class="flex-1 text-[0.7rem] bg-background border border-input rounded-[calc(var(--radius)-0.5rem)_0] px-1.5 py-0.5 text-foreground outline-none min-w-0 placeholder:text-muted-foreground/40"
+                class="input input-compact placeholder:text-muted-foreground/40"
                 placeholder="-"
                 value={row.image}
                 onchange={(e) => updateImage(row.index, e.currentTarget.value)}

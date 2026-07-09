@@ -169,8 +169,6 @@
 </Tooltip.Provider>
 
 <style>
-  @reference "../../../routes/layout.css";
-
   .table-container {
     overflow-x: auto;
     border: 1px solid var(--border);
@@ -193,7 +191,7 @@
     font-size: 0.8rem;
     color: var(--foreground);
     border-bottom: 1px solid var(--border);
-    @apply bg-secondary/40;
+    background: color-mix(in oklch, var(--secondary) 40%, transparent);
   }
 
   .table {

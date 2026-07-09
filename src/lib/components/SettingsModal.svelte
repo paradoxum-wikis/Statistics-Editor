@@ -1,7 +1,8 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { Dialog, Switch, Tabs } from "bits-ui";
+  import { Dialog, Tabs } from "bits-ui";
   import { ChartLine } from "@lucide/svelte";
+  import Switch from "$lib/components/smol/Switch.svelte";
   import {
     settingsStore,
     settingGroupsForTab,
@@ -62,29 +63,24 @@
         </p>
       </div>
     </div>
-    <Switch.Root
+    <Switch
       id={setting.id}
       checked={settingsStore.getBoolean(setting.key)}
       disabled={child && parentActive === false}
-      onCheckedChange={(v) => settingsStore.setBoolean(setting.key, v)}
-      class="inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-gray-200"
-    >
-      <Switch.Thumb
-        class="pointer-events-none block h-5 w-5 rounded-full bg-white shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0"
-      ></Switch.Thumb>
-    </Switch.Root>
+      onCheckedChange={(v: boolean) => settingsStore.setBoolean(setting.key, v)}
+    />
   </div>
 {/snippet}
 
 <Dialog.Root bind:open>
   <Dialog.Portal>
-    <Dialog.Overlay class="settings-overlay"></Dialog.Overlay>
-    <Dialog.Content class="settings-content sm:max-w-2xl">
+    <Dialog.Overlay class="dialog-overlay"></Dialog.Overlay>
+    <Dialog.Content class="dialog-content sm:max-w-2xl">
       <div class="flex flex-col space-y-1.5 text-center sm:text-start">
-        <Dialog.Title class="settings-title">
+        <Dialog.Title class="dialog-title">
           <h2>Settings</h2>
         </Dialog.Title>
-        <Dialog.Description class="settings-description">
+        <Dialog.Description class="dialog-description">
           Please change them to your heart's content.
         </Dialog.Description>
       </div>
@@ -153,16 +149,11 @@
                       </p>
                     </div>
                   </div>
-                  <Switch.Root
+                  <Switch
                     id="analytics-toggle"
-                    checked={analyticsEnabled}
-                    onCheckedChange={(v) => analytics.setConsent(v)}
-                    class="inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-gray-200"
-                  >
-                    <Switch.Thumb
-                      class="pointer-events-none block h-5 w-5 rounded-full bg-white shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0"
-                    ></Switch.Thumb>
-                  </Switch.Root>
+                    bind:checked={analyticsEnabled}
+                    onCheckedChange={(v: boolean) => analytics.setConsent(v)}
+                  />
                 </div>
               {/if}
             </div>
