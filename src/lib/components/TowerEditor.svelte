@@ -441,7 +441,7 @@
               </div>
             {:else if shareLink}
               <input
-                class="input input-sm w-full font-mono text-xs"
+                class="input input-short w-full font-mono text-xs"
                 readonly
                 value={shareLink}
                 onclick={(e) => (e.currentTarget as HTMLInputElement).select()}

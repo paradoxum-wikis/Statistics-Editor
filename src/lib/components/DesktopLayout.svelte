@@ -402,7 +402,7 @@
                     />
                   {:else if wikiEditorLoadFailed}
                     <Card class="p-8 text-center">
-                      <p class="text-muted-foreground text-red-600">
+                      <p class="text-red-600">
                         Failed to load the source editor.
                       </p>
                     </Card>

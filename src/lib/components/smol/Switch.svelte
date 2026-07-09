@@ -77,10 +77,6 @@
     transform: translateX(1.25rem);
   }
 
-  :global(.switch[data-state="unchecked"] .switch-thumb) {
-    transform: translateX(0);
-  }
-
   :global(.switch-sm .switch-thumb) {
     height: 1rem;
     width: 1rem;

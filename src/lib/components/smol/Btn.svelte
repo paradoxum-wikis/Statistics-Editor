@@ -5,7 +5,6 @@
     | "primary"
     | "secondary"
     | "outline"
-    | "ghost"
     | "destructive"
     | "destructive-fill";
 
@@ -29,7 +28,6 @@
     primary: "btn-primary",
     secondary: "btn-secondary",
     outline: "btn-outline",
-    ghost: "btn-ghost",
     destructive: "btn-destructive",
     "destructive-fill": "btn-destructive-fill",
   };
