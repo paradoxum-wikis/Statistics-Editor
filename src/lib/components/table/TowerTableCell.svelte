@@ -2,7 +2,7 @@
   import type { Attachment } from "svelte/attachments";
   import MoneyIcon from "$lib/assets/Income.png";
   import { settingsStore } from "$lib/stores/settings.svelte";
-  import { formatValue } from "$lib/utils/format";
+  import { formatNumber } from "$lib/utils/format";
   import { formatDelta, type DeltaInfo, type RefEntry } from "$lib/towerTable";
   import CellRefs from "./CellRefs.svelte";
 
@@ -32,6 +32,14 @@
 
   let editing = $state(false);
 
+  const editText = $derived(
+    rawValue === undefined || rawValue === null
+      ? ""
+      : typeof rawValue === "number"
+        ? formatNumber(rawValue)
+        : String(rawValue),
+  );
+
   const focusOnMount: Attachment<HTMLElement> = (node) => node.focus();
 </script>
 
@@ -51,7 +59,7 @@
         type="text"
         size="1"
         class="table-input"
-        value={formatValue(rawValue)}
+        value={editText}
         {disabled}
         onfocus={(e) => {
           e.currentTarget.dataset.original = e.currentTarget.value;

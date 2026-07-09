@@ -35,7 +35,7 @@ const SETTING_DEFS = {
   },
   restoreRefOnClearEdit: {
     storageKey: "tdse_coe_ref",
-    default: false,
+    default: true,
     id: "restore-ref-on-clear-edit",
     tab: "editor",
     icon: Superscript,

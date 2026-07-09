@@ -536,6 +536,8 @@ export function resolveToken(
 
   if (isExpr || isVar || isFormatNum) {
     let val = isVar ? tokens[token] : token;
+    if (isVar && /<ref\b/i.test(val) && !stripRefs(val).trim()) return val;
+
     let hadFormatnum = false;
 
     const resolveSingleFormatnum = (call: string): string | null => {

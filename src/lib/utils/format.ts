@@ -73,10 +73,16 @@ export function syncRefOnlyCellToken(
 ): string | null {
   const parsed = parseEditableRefSuffix(formulaToken, tokens);
   if (!parsed) return null;
-  const n =
-    typeof newValue === "number"
-      ? formatNumber(newValue)
-      : String(newValue).trim();
+
+  let n: string;
+  if (typeof newValue === "number") {
+    n = formatNumber(newValue);
+  } else {
+    const s = String(newValue).trim();
+    const fromInput = parseEditableRefSuffix(s, tokens);
+    n = fromInput ? fromInput.numeric : (s.match(/^-?[\d.,]+/)?.[0] ?? s);
+  }
+
   return appendRef ? `${n}${parsed.suffix}` : n;
 }
 

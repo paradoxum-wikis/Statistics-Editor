@@ -543,6 +543,8 @@ export default class TowerManager {
                 ) {
                   readOnly.add(key);
                 }
+              } else if (isEditableRefSuffixCell(ogVal, formulaTokens)) {
+                cellFormulaTokens[levelKey][key] = ogVal;
               }
             }
           }
@@ -684,6 +686,8 @@ export default class TowerManager {
                   if (result !== undefined) {
                     cellFormulaTokens[levelKey][key] = ogVal;
                     resRow[key] = result;
+                  } else if (isEditableRefSuffixCell(ogVal, formulaTokens)) {
+                    cellFormulaTokens[levelKey][key] = ogVal;
                   }
                 }
               }

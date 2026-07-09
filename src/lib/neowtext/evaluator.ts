@@ -46,9 +46,14 @@ export function evaluateFormula(
 
   // for example "Cost Efficiency" = "Cost_Efficiency"
   const numericContextAliased: Record<string, number> = {};
+  const allKeys = new Set<string>();
 
   for (const [key, value] of Object.entries(row)) {
     const cleanKey = normalizeColumnKey(key);
+    if (!cleanKey) continue;
+    allKeys.add(cleanKey);
+    if (/\s/.test(cleanKey)) allKeys.add(cleanKey.replace(/\s+/g, "_"));
+
     let n = toNumericValue(value);
     if (n === null) {
       const s = stripRefs(value).trim();
@@ -61,8 +66,7 @@ export function evaluateFormula(
     }
   }
 
-  const keys = Object.keys(numericContextAliased);
-  let expression = getReplacer(keys)(formula, numericContextAliased);
+  let expression = getReplacer([...allKeys])(formula, numericContextAliased);
 
   expression = expression
     .replace(/\+\+\s*([a-zA-Z0-9_.\-$]+)/g, "(1 + $1)") // prefix ++
@@ -71,6 +75,7 @@ export function evaluateFormula(
     .replace(/([a-zA-Z0-9_.\-$]+)\s*--/g, "($1 - 1)"); // postfix --
 
   try {
+    if (!expression.trim()) return NaN;
     expression = transpileExpr(expression);
 
     if (!ARITHMETIC_ALLOWED.test(expression)) {
