@@ -34,7 +34,7 @@
     "vite-plugin-lucide-preprocess": "^1.5.0"
   },
   "dependencies": {
-    "@bhsd/codemirror-wikitext": "^0.9.0",
+    "@bhsd/codemirror-wikitext": "^0.10.0",
     "@lucide/svelte": "^1.8.0",
     "codemirror": "^6.0.2",
     "mediawiki-expr": "^0.0.2",
