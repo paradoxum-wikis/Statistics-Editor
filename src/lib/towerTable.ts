@@ -382,18 +382,61 @@ export function getEditableCellRawValue(
   return config.rows[rowIdx]?.[header];
 }
 
+export function cellDisplaySource(
+  value: unknown,
+  formula: string | number | undefined,
+  tokens: Record<string, string>,
+): string | number | null | undefined {
+  if (value === undefined || value === null) return value;
+  if (typeof value === "string" && /<ref\b|\$[A-Z0-9_-]+\$/i.test(value))
+    return value;
+
+  if (typeof formula === "string" && /<ref\b|\$[A-Z0-9_-]+\$/i.test(formula)) {
+    const n =
+      typeof value === "number"
+        ? formatNumber(value)
+        : typeof value === "string" && /^-?[\d.,]+$/.test(value.trim())
+          ? value.trim()
+          : null;
+    if (n != null) {
+      if (/^-?[\d.,]+/.test(formula)) return formula.replace(/^-?[\d.,]+/, n);
+      let out = "";
+      let used = false;
+      for (const tok of formula.match(/\$[A-Z0-9_-]+\$/gi) ?? []) {
+        const def = tokens[tok];
+        const isRef =
+          typeof def === "string" &&
+          /<ref\b/i.test(def) &&
+          !stripRefs(def).trim();
+        if (isRef) out += tok;
+        else if (!used) {
+          out += n;
+          used = true;
+        }
+      }
+      if (out) return out;
+    }
+    return formula;
+  }
+
+  return value as string | number;
+}
+
 export function displayCellValue(
   globalModifier: GlobalModifier,
   header: string,
   value: unknown,
   formulaTokens: Record<string, string> = {},
 ) {
+  if (value === undefined || value === null) return value;
+  // so that footnote doesn't snap to end
+  if (typeof value === "string" && /<ref\b|\$[A-Z0-9_-]+\$/i.test(value)) {
+    return value;
+  }
   const raw =
-    value === undefined || value === null
-      ? value
-      : typeof value === "string" || typeof value === "number"
-        ? stripRefOnlyVarSuffix(value, formulaTokens)
-        : undefined;
+    typeof value === "string" || typeof value === "number"
+      ? stripRefOnlyVarSuffix(value, formulaTokens)
+      : undefined;
   return applyGlobalModifierDisplay(globalModifier, header, raw);
 }
 

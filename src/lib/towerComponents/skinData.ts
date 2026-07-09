@@ -439,11 +439,13 @@ class SkinData {
     const levelKey = String(level);
     const formulaToken = this.cellFormulaTokens[levelKey]?.[attribute];
     if (typeof formulaToken === "string") {
+      const appendRef =
+        !settingsStore.clearOnEdit || settingsStore.restoreRefOnClearEdit;
       const synced = syncRefOnlyCellToken(
         formulaToken,
         newValue,
         this.formulaTokens,
-        settingsStore.restoreRefOnClearEdit,
+        appendRef,
       );
       if (synced) {
         this.cellFormulaTokens[levelKey][attribute] = synced;

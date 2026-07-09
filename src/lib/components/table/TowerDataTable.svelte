@@ -5,11 +5,10 @@
   import { renderCellHtml } from "$lib/neowtext/render";
   import type { GlobalModifier } from "$lib/utils/globalModifier";
   import {
+    cellDisplaySource,
     displayCellValue,
-    getCellRefs,
     getDeltaForCell,
     getEditableCellRawValue,
-    getRefsFromSources,
     isCellEditable,
     type RefTokenRegistry,
     type TableConfig,
@@ -86,18 +85,9 @@
                 : "table-header whitespace-nowrap"}
             >
               <CellRefs
-                value={header}
+                value={config.rawHeaders?.[hIdx] || header}
                 readOnly={true}
-                entries={getRefsFromSources(
-                  config.rawHeaders?.[hIdx] || header,
-                  "",
-                  config,
-                  0,
-                  displayRows[0] ?? {},
-                  globalModifier,
-                  fTokens,
-                  refTokenRegistry,
-                )}
+                tokens={fTokens}
                 {getRefNum}
               />
             </th>
@@ -115,6 +105,11 @@
               {:else}
                 {@const editable = isCellEditable(config, header)}
                 {@const isMoney = config.moneyColumns.includes(header)}
+                {@const rawValue = getEditableCellRawValue(
+                  config,
+                  rowIdx,
+                  header,
+                )}
                 {@const deltaInfo = showDiff
                   ? getDeltaForCell(
                       baseline,
@@ -137,23 +132,15 @@
                     value={displayCellValue(
                       globalModifier,
                       header,
-                      row[header],
+                      cellDisplaySource(row[header], rawValue, fTokens),
                       fTokens,
                     )}
-                    rawValue={getEditableCellRawValue(config, rowIdx, header)}
+                    {rawValue}
                     {editable}
                     {disabled}
                     {isMoney}
                     readOnlyValue={!editable}
-                    refs={getCellRefs(
-                      header,
-                      row[header],
-                      config,
-                      rowIdx,
-                      displayRows[rowIdx],
-                      globalModifier,
-                      refTokenRegistry,
-                    )}
+                    tokens={fTokens}
                     {deltaInfo}
                     {getRefNum}
                     commit={(value) => commit(config, rowIdx, header, value)}

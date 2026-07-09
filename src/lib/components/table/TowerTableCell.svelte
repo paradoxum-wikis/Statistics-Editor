@@ -3,7 +3,7 @@
   import MoneyIcon from "$lib/assets/Income.png";
   import { settingsStore } from "$lib/stores/settings.svelte";
   import { formatNumber } from "$lib/utils/format";
-  import { formatDelta, type DeltaInfo, type RefEntry } from "$lib/towerTable";
+  import { formatDelta, type DeltaInfo } from "$lib/towerTable";
   import CellRefs from "./CellRefs.svelte";
 
   let {
@@ -13,7 +13,7 @@
     disabled,
     isMoney,
     readOnlyValue,
-    refs,
+    tokens = {},
     deltaInfo,
     getRefNum,
     commit,
@@ -24,7 +24,7 @@
     disabled: boolean;
     isMoney: boolean;
     readOnlyValue: boolean;
-    refs: RefEntry[];
+    tokens?: Record<string, string>;
     deltaInfo: DeltaInfo;
     getRefNum: (content: string, name?: string | null) => number;
     commit: (value: string) => void;
@@ -92,16 +92,16 @@
           editing = true;
         }}
       >
-        <CellRefs {value} readOnly={true} entries={refs} {getRefNum} />
+        <CellRefs {value} readOnly={true} {tokens} {getRefNum} />
       </button>
     {/if}
   {:else if isMoney}
     <span class="money-value">
-      <CellRefs {value} readOnly={readOnlyValue} entries={refs} {getRefNum} />
+      <CellRefs {value} readOnly={readOnlyValue} {tokens} {getRefNum} />
     </span>
   {:else}
     <span class="cell-multiline">
-      <CellRefs {value} readOnly={readOnlyValue} entries={refs} {getRefNum} />
+      <CellRefs {value} readOnly={readOnlyValue} {tokens} {getRefNum} />
     </span>
   {/if}
 

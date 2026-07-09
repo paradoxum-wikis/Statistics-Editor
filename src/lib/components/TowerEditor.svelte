@@ -154,11 +154,13 @@
     const formulaToken =
       extraTable?.cellFormulaTokens?.[String(rowIdx)]?.[header];
     if (typeof formulaToken === "string" && typeof parsedValue !== "boolean") {
+      const appendRef =
+        !settingsStore.clearOnEdit || settingsStore.restoreRefOnClearEdit;
       const synced = syncRefOnlyCellToken(
         formulaToken,
         parsedValue,
         skinData.formulaTokens,
-        settingsStore.restoreRefOnClearEdit,
+        appendRef,
       );
       if (synced) {
         extraTable.cellFormulaTokens![String(rowIdx)][header] = synced;

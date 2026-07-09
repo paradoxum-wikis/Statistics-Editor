@@ -19,27 +19,31 @@ export function normalizeColumnKey(s: unknown): string {
     .trim();
 }
 
-const RE_EDITABLE_REF_PREFIX = /^(-?[\d.,]+)([\s\S]+)$/;
+/**
+ * True if `rest` starts with <ref>...</ref> or a ref-only $VAR$.
+ */
+function startsWithRef(rest: string, tokens: Record<string, string>): boolean {
+  if (/^<ref\b/i.test(rest)) return true;
+  const tok = rest.match(/^\$[A-Z0-9_-]+\$/i)?.[0];
+  if (!tok) return false;
+  const def = (tokens[tok] ?? "").trim();
+  return /<ref\b/i.test(def) && !stripRefs(def).trim();
+}
 
+/**
+ * leading number + everything from the first ref onward (ref + any tail).
+ */
 function parseEditableRefSuffix(
   value: string,
   tokens: Record<string, string>,
-): { numeric: string; suffix: string } | null {
-  const match = value.trim().match(RE_EDITABLE_REF_PREFIX);
-  if (!match) return null;
-
-  const suffix = match[2];
-  if (/<ref\b/i.test(suffix)) return { numeric: match[1], suffix };
-
-  const suffixVars = suffix.match(/\$[A-Z0-9_-]+\$/g) ?? [];
-  if (
-    suffixVars.length > 0 &&
-    suffixVars.every((v) => /^<ref\b/i.test((tokens[v] ?? "").trim()))
-  ) {
-    return { numeric: match[1], suffix };
-  }
-
-  return null;
+): { numeric: string; rest: string } | null {
+  const s = value.trim();
+  const numMatch = s.match(/^(-?[\d.,]+)/);
+  if (!numMatch) return null;
+  const numeric = numMatch[1];
+  const rest = s.slice(numeric.length);
+  if (!rest || !startsWithRef(rest, tokens)) return null;
+  return { numeric, rest };
 }
 
 export function isEditableRefSuffixCell(
@@ -61,8 +65,16 @@ export function stripRefOnlyVarSuffix(
   const parsed = parseEditableRefSuffix(value, tokens);
   if (!parsed) return value;
 
+  // see CellRefs handling mid-string refs
+  let after = parsed.rest;
+  after = after.replace(/^(?:<ref\b[^>]*>[\s\S]*?<\/ref>|<ref\b[^>]*\/>)/i, "");
+  after = after.replace(/^\$[A-Z0-9_-]+\$/i, (tok) =>
+    startsWithRef(tok, tokens) ? "" : tok,
+  );
+
   const n = parseNumeric(parsed.numeric);
-  return Number.isFinite(n) ? n : parsed.numeric;
+  const head = Number.isFinite(n) ? n : parsed.numeric;
+  return after ? `${head}${after}` : head;
 }
 
 export function syncRefOnlyCellToken(
@@ -74,16 +86,21 @@ export function syncRefOnlyCellToken(
   const parsed = parseEditableRefSuffix(formulaToken, tokens);
   if (!parsed) return null;
 
-  let n: string;
   if (typeof newValue === "number") {
-    n = formatNumber(newValue);
-  } else {
-    const s = String(newValue).trim();
-    const fromInput = parseEditableRefSuffix(s, tokens);
-    n = fromInput ? fromInput.numeric : (s.match(/^-?[\d.,]+/)?.[0] ?? s);
+    const n = formatNumber(newValue);
+    return appendRef ? `${n}${parsed.rest}` : n;
   }
 
-  return appendRef ? `${n}${parsed.suffix}` : n;
+  const s = String(newValue).trim();
+  const fromInput = parseEditableRefSuffix(s, tokens);
+  if (fromInput) return `${fromInput.numeric}${fromInput.rest}`;
+
+  if (/^-?[\d.,]+$/.test(s)) {
+    return appendRef ? `${s}${parsed.rest}` : s;
+  }
+
+  const n = s.match(/^-?[\d.,]+/)?.[0] ?? s;
+  return appendRef ? `${n}${parsed.rest}` : n;
 }
 
 export function columnKeysEqual(a: string, b: string): boolean {
