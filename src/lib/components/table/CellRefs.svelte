@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { Tooltip } from "bits-ui";
   import { renderCellHtml } from "$lib/neowtext/render";
   import { stripRefs } from "$lib/utils/format";
+  import Tip from "../smol/Tip.svelte";
   import RenderedHtml from "./RenderedHtml.svelte";
 
   type Part =
@@ -81,21 +81,14 @@
     {/if}
   {:else}
     {@const n = getRefNum(part.content, part.name)}
-    <Tooltip.Root>
-      <Tooltip.Trigger>
-        {#snippet child({ props })}
-          <sup class="ref-sup" {...props}>[{n}]</sup>
-        {/snippet}
-      </Tooltip.Trigger><!--this removes space after ref--><Tooltip.Portal>
-        <Tooltip.Content
-          class="tooltip-content max-w-72! text-sm"
-          side="top"
-          sideOffset={4}
-        >
-          <RenderedHtml html={renderCellHtml(part.content, true)} />
-        </Tooltip.Content>
-      </Tooltip.Portal>
-    </Tooltip.Root>
+    <Tip class="max-w-72!" sideOffset={4}>
+      {#snippet content()}
+        <RenderedHtml html={renderCellHtml(part.content, true)} />
+      {/snippet}
+      {#snippet children({ props })}
+        <sup class="ref-sup" {...props}>[{n}]</sup>
+      {/snippet}
+    </Tip>
   {/if}
 {/each}
 

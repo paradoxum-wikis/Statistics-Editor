@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { Tooltip, Popover } from "bits-ui";
+  import { Popover } from "bits-ui";
   import IconBtn from "./smol/IconBtn.svelte";
+  import Tip from "./smol/Tip.svelte";
   import Veperator from "./smol/Veperator.svelte";
   import GlobalModifier from "./tool/GlobalModifier.svelte";
   import CreateTower from "./tool/CreateTower.svelte";
@@ -118,27 +119,19 @@
     {#if activeSettings.length > 0}
       <div class="flex items-center gap-1">
         {#each activeSettings as setting (setting.key)}
-          <Tooltip.Root>
-            <Tooltip.Trigger>
-              {#snippet child({ props })}
-                <IconBtn {...props} class="status-bar-indicator">
-                  <setting.icon size={14} />
-                </IconBtn>
-              {/snippet}
-            </Tooltip.Trigger>
-            <Tooltip.Portal>
-              <Tooltip.Content
-                class="tooltip-content"
-                side="top"
-                sideOffset={6}
-              >
-                <p class="text-sm font-medium">{setting.label}</p>
-                <p class="text-xs text-muted-foreground">
-                  {setting.description}
-                </p>
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          </Tooltip.Root>
+          <Tip>
+            {#snippet content()}
+              <p class="text-sm font-medium">{setting.label}</p>
+              <p class="text-xs text-muted-foreground">
+                {setting.description}
+              </p>
+            {/snippet}
+            {#snippet children({ props })}
+              <IconBtn {...props} class="status-bar-indicator">
+                <setting.icon size={14} />
+              </IconBtn>
+            {/snippet}
+          </Tip>
         {/each}
       </div>
     {/if}
