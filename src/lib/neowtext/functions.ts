@@ -299,24 +299,13 @@ function formatNumberLike(input: string, useGrouping: boolean): string {
   });
 }
 
-/**
- * Resolves a $FNC-NAME$ / $FSE-NAME$ function for the given row level.
- * Returns the computed numeric value, or undefined if the function is unknown.
- */
-export function resolveFNC(
-  name: string,
+function sumSeriesThroughLevel(
+  series: string[],
   level: number | string,
   tokens: Record<string, string>,
-  isPvp: boolean,
   branchOverride?: string,
   branchMap?: Record<string, string>,
-  variantPrefix?: string,
-): number | undefined {
-  if (name !== "TOTALPRICE") return undefined;
-
-  const baseKey = getVariantFncKey(tokens, variantPrefix, "COST");
-  const baseCosts = tokens[baseKey]?.split(";") || [];
-
+): number {
   const numericLevel = parseLevelNumber(level);
   const branch = branchOverride || parseLevelBranch(level);
   const resolvedBranch =
@@ -336,17 +325,17 @@ export function resolveFNC(
     let trunkLevel = 0;
     const branchLevels: Record<string, number> = {};
 
-    for (let i = 0; i < baseCosts.length; i++) {
+    for (let i = 0; i < series.length; i++) {
       const letter = schema[i] || trunkLetter;
 
       if (letter === trunkLetter) {
         if (targetBranch === trunkLetter) {
           if (trunkLevel <= numericLevel) {
-            const num = parseNumeric(baseCosts[i]);
+            const num = parseNumeric(series[i]);
             total += isNaN(num) ? 0 : num;
           }
         } else {
-          const num = parseNumeric(baseCosts[i]);
+          const num = parseNumeric(series[i]);
           total += isNaN(num) ? 0 : num;
         }
         trunkLevel++;
@@ -357,7 +346,7 @@ export function resolveFNC(
 
         if (targetBranch === letter) {
           if (branchLevels[letter] <= numericLevel) {
-            const num = parseNumeric(baseCosts[i]);
+            const num = parseNumeric(series[i]);
             total += isNaN(num) ? 0 : num;
           }
         }
@@ -365,13 +354,54 @@ export function resolveFNC(
       }
     }
   } else {
-    for (let i = 0; i <= numericLevel && i < baseCosts.length; i++) {
-      const num = parseNumeric(baseCosts[i]);
+    for (let i = 0; i <= numericLevel && i < series.length; i++) {
+      const num = parseNumeric(series[i]);
       total += isNaN(num) ? 0 : num;
     }
   }
 
   return total;
+}
+
+/**
+ * $FNC-TOTALPRICE$ links with $FNC-COST$.
+ * $FNC-TOTAL-X$ links with any array $VAR$ / $PVP-VAR$.
+ */
+export function resolveFNC(
+  name: string,
+  level: number | string,
+  tokens: Record<string, string>,
+  _isPvp: boolean,
+  branchOverride?: string,
+  branchMap?: Record<string, string>,
+  variantPrefix?: string,
+): number | undefined {
+  const upper = name.toUpperCase();
+
+  let seriesKey: string;
+  if (upper === "TOTALPRICE") {
+    seriesKey = getVariantFncKey(tokens, variantPrefix, "COST");
+  } else {
+    const m = upper.match(/^TOTAL-(.+)$/);
+    if (!m?.[1]) return undefined;
+    const plain = `$${m[1]}$`;
+    if (variantPrefix) {
+      const variantKey = `$${variantPrefix}-${m[1]}$`;
+      seriesKey = tokens[variantKey] !== undefined ? variantKey : plain;
+    } else {
+      seriesKey = plain;
+    }
+  }
+
+  const series = (tokens[seriesKey] ?? "").split(";");
+
+  return sumSeriesThroughLevel(
+    series,
+    level,
+    tokens,
+    branchOverride,
+    branchMap,
+  );
 }
 
 export type TableCache = Record<
@@ -476,11 +506,12 @@ export function resolveToken(
     });
   }
 
-  // $FNC-NAME$ or $FSE-NAME$ (FSE = editor-only functions)
-  const fncMatch = token.match(/^\$(?:FNC|FSE)-([A-Z0-9]+)\$$/i);
-  if (fncMatch) {
+  const totalMatch = token.match(
+    /^\$FNC-(TOTALPRICE|TOTAL-[A-Z0-9]+(?:-[A-Z0-9]+)*)\$$/i,
+  );
+  if (totalMatch) {
     return resolveFNC(
-      fncMatch[1],
+      totalMatch[1],
       level,
       tokens,
       isPvp,
