@@ -379,48 +379,45 @@
         class:overflow-x-auto={!!towerStore.selectedData}
       >
         {#key mainKey}
-          <div
-            class:h-full={isClient &&
-              !towerStore.selectedData &&
-              !towerStore.isLoading}
-            in:fly={{ y: 8, duration: 160, easing: cubicOut }}
-          >
-            {#if !isClient}
-              <LoadingCard
-                message="Engineer is setting up the editor for you..."
-              />
-            {:else if towerStore.selectedData}
-              {#key editorMode}
-                <div in:fly={{ y: 8, duration: 160, easing: cubicOut }}>
-                  {#if editorMode === "cells" && !towerStore.selectedData.isMalformed}
-                    <TowerEditor tower={towerStore.selectedData} />
-                  {:else if wikiEditorModule}
-                    {@const WikiEditor = wikiEditorModule.default}
-                    <WikiEditor
-                      towerName={towerStore.selectedName}
-                      open={true}
-                    />
-                  {:else if wikiEditorLoadFailed}
-                    <Card class="p-8 text-center">
-                      <p class="text-red-600">
-                        Failed to load the source editor.
-                      </p>
-                    </Card>
-                  {:else}
-                    <LoadingCard
-                      message="Brawler is unpacking the source editor..."
-                    />
-                  {/if}
-                </div>
-              {/key}
-            {:else if towerStore.isLoading}
-              <LoadingCard
-                message="Commander is getting this tower's files ready..."
-              />
-            {:else}
-              <HomeView onSelect={handleSelect} />
-            {/if}
-          </div>
+          {#if isClient && !towerStore.selectedData && !towerStore.isLoading}
+            <HomeView onSelect={handleSelect} />
+          {:else}
+            <div in:fly={{ y: 8, duration: 160, easing: cubicOut }}>
+              {#if !isClient}
+                <LoadingCard
+                  message="Engineer is setting up the editor for you..."
+                />
+              {:else if towerStore.selectedData}
+                {#key editorMode}
+                  <div in:fly={{ y: 8, duration: 160, easing: cubicOut }}>
+                    {#if editorMode === "cells" && !towerStore.selectedData.isMalformed}
+                      <TowerEditor tower={towerStore.selectedData} />
+                    {:else if wikiEditorModule}
+                      {@const WikiEditor = wikiEditorModule.default}
+                      <WikiEditor
+                        towerName={towerStore.selectedName}
+                        open={true}
+                      />
+                    {:else if wikiEditorLoadFailed}
+                      <Card class="p-8 text-center">
+                        <p class="text-red-600">
+                          Failed to load the source editor.
+                        </p>
+                      </Card>
+                    {:else}
+                      <LoadingCard
+                        message="Brawler is unpacking the source editor..."
+                      />
+                    {/if}
+                  </div>
+                {/key}
+              {:else}
+                <LoadingCard
+                  message="Commander is getting this tower's files ready..."
+                />
+              {/if}
+            </div>
+          {/if}
         {/key}
       </main>
     </div>

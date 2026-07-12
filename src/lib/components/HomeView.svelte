@@ -2,6 +2,9 @@
   import TowerPicker from "./TowerPicker.svelte";
   import Supporters from "./smol/Supporters.svelte";
   import SubtleRow from "./smol/SubtleRow.svelte";
+  import ghLogo from "$lib/assets/GitHub.svg?raw";
+  import aewLogo from "$lib/assets/AEW.svg?raw";
+  import tdswLogo from "$lib/assets/TDSW.svg?raw";
 
   let { onSelect }: { onSelect: (name: string) => void } = $props();
 
@@ -24,6 +27,27 @@
     },
   ] as const;
 
+  const footerLinks = [
+    {
+      href: "https://github.com/paradoxum-wikis",
+      label: "GitHub",
+      icon: ghLogo,
+      accent: "oklch(0.578 0.0292 35.72)",
+    },
+    {
+      href: "https://alter-ego.fandom.com",
+      label: "ALTER EGO Wiki",
+      icon: aewLogo,
+      accent: "oklch(0.5915 0.2276 27.11)",
+    },
+    {
+      href: "https://tds.fandom.com",
+      label: "Tower Defense Simulator Wiki",
+      icon: tdswLogo,
+      accent: "var(--link)",
+    },
+  ] as const;
+
   const greeting = $derived.by(() => {
     const hour = new Date().getHours();
     if (hour >= 5 && hour < 12) return "Good morning, editor!";
@@ -33,7 +57,9 @@
   });
 </script>
 
-<div class="flex h-full min-h-0 flex-col gap-3 overflow-hidden">
+<div
+  class="flex min-h-full flex-col gap-3 lg:h-full lg:min-h-0 lg:overflow-hidden"
+>
   <div class="shrink-0 space-y-2">
     <h2 class="unisans text-xl font-bold md:text-2xl">{greeting}</h2>
     <p class="text-xs text-muted-foreground md:text-sm">
@@ -56,8 +82,47 @@
     </div>
   </div>
 
-  <div class="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden lg:flex-row">
-    <TowerPicker variant="home" class="min-h-0 min-w-0 flex-1" {onSelect} />
-    <Supporters class="h-full min-h-0 self-stretch" />
+  <div
+    class="flex min-h-0 flex-col gap-3 lg:flex-1 lg:flex-row lg:overflow-hidden"
+  >
+    <TowerPicker
+      variant="home"
+      class="min-h-0 min-w-0 lg:h-full lg:flex-1"
+      {onSelect}
+    />
+    <Supporters class="min-h-0 max-lg:min-h-72 lg:h-full" />
   </div>
 </div>
+
+<footer
+  class="mt-8 border-t border-border pt-5 text-center text-sm text-muted-foreground"
+>
+  <p>
+    The TDS Statistics Editor is maintained by Paradoxum Wikis. It is not
+    affiliated with Paradoxum Games and is an independent community project.
+  </p>
+
+  <ul
+    class="mt-3 flex list-none flex-wrap items-center justify-center gap-x-4 gap-y-2 p-0"
+  >
+    {#each footerLinks as link (link.href)}
+      <li>
+        <a
+          class="inline-flex items-center gap-1.5 font-medium text-(--footer-accent) transition-colors hover:text-[color-mix(in_oklch,var(--footer-accent),black_27%)] hover:underline hover:underline-offset-2"
+          href={link.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          style:--footer-accent={link.accent}
+        >
+          <span
+            class="size-4.5 shrink-0 [&>svg]:block [&>svg]:size-full"
+            aria-hidden="true"
+          >
+            {@html link.icon}
+          </span>
+          {link.label}
+        </a>
+      </li>
+    {/each}
+  </ul>
+</footer>

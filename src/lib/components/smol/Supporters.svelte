@@ -18,7 +18,9 @@
   }
 </script>
 
-<div class={["flex h-full min-h-0 flex-col gap-2 lg:w-72 xl:w-80", className]}>
+<div
+  class={["flex min-h-0 flex-col gap-2 lg:h-full lg:w-72 xl:w-80", className]}
+>
   {#if data?.profile}
     <div
       class="shrink-0 rounded-[calc(var(--radius)-0.25rem)_0] border border-border bg-card p-2.5 text-center"
