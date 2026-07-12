@@ -2,10 +2,17 @@
   import { onMount } from "svelte";
   import { Tooltip } from "bits-ui";
   import { analytics } from "$lib/services/analytics";
+  import { towerStore } from "$lib/stores/tower.svelte";
   import Toaster from "$lib/components/smol/Toaster.svelte";
   import "./layout.css";
 
   let { children } = $props();
+
+  const pageTitle = $derived(
+    towerStore.selectedName
+      ? `${towerStore.selectedName} | TDS Statistics Editor`
+      : "TDS Statistics Editor",
+  );
 
   onMount(() => {
     analytics.init();
@@ -13,7 +20,7 @@
 </script>
 
 <svelte:head>
-  <title>[TEST] TDS Statistics Editor</title>
+  <title>{pageTitle}</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="icon" href="/favicon.ico" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
