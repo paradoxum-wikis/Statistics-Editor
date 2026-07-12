@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
+  import { mergeProps } from "bits-ui";
   import Tip from "./Tip.svelte";
 
   let {
@@ -25,8 +26,7 @@
       <button
         class="icon-btn {className}"
         aria-label={label}
-        {...restProps}
-        {...props}
+        {...mergeProps(props, restProps)}
       >
         {@render icon()}
       </button>

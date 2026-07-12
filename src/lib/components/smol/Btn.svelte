@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
+  import { mergeProps } from "bits-ui";
   import Tip from "./Tip.svelte";
 
   type BtnVariant =
@@ -39,9 +40,17 @@
 {#if title}
   <Tip content={title}>
     {#snippet children({ props })}
-      <button class={btnClass} {...restProps} {...props}>
-        {@render label()}
-      </button>
+      {#if restProps.disabled}
+        <span class="inline-flex" {...props}>
+          <button class={btnClass} {...restProps}>
+            {@render label()}
+          </button>
+        </span>
+      {:else}
+        <button class={btnClass} {...mergeProps(props, restProps)}>
+          {@render label()}
+        </button>
+      {/if}
     {/snippet}
   </Tip>
 {:else}
