@@ -462,14 +462,22 @@
       </Popover.Root>
       {#if tower && !noFetchTowers.has(tower.name) && !isCustomTower(tower.name)}
         <Popover.Root>
-          <Popover.Trigger class="btn btn-secondary" disabled={isFetching}>
-            {#if isFetching}
-              Fetching…
-            {:else}
-              <span class="max-md:hidden">Fetch Latest Data</span>
-              <span class="hidden max-md:inline">Fetch Latest</span>
-            {/if}
-          </Popover.Trigger>
+          <Tip content="Fetch latest Neowtext from the TDS Wiki">
+            {#snippet children({ props })}
+              <Popover.Trigger
+                class="btn btn-secondary"
+                disabled={isFetching}
+                {...props}
+              >
+                {#if isFetching}
+                  Fetching…
+                {:else}
+                  <span class="max-md:hidden">Fetch Latest Data</span>
+                  <span class="hidden max-md:inline">Fetch Latest</span>
+                {/if}
+              </Popover.Trigger>
+            {/snippet}
+          </Tip>
           <Popover.Content class="popover-content">
             <div class="space-y-2">
               <h4 class="font-medium leading-none">Confirm Fetch</h4>
@@ -496,7 +504,7 @@
           ? showDiff
             ? "Hide value differences"
             : "Show value differences"
-          : "No differences to display"}
+          : "No differences"}
       >
         <span class="inline-flex items-center gap-1.5">
           <span class="max-md:hidden"
@@ -514,8 +522,8 @@
           : handleClearDiff}
         disabled={!(towerStore.isDirty || hasSavedDiff)}
         title={towerStore.isDirty
-          ? "Discard unsaved changes (revert to last loaded effective wiki)"
-          : "Clear the saved @se-diff baseline (removes the difference tracking comment without leaving an empty line)"}
+          ? "Discard unsaved changes"
+          : "Clear saved difference (@se-diff)"}
       >
         {#if towerStore.isDirty}
           <span class="max-md:hidden">Clear Changes</span>
@@ -562,6 +570,7 @@
           class="tower-editor-actions-primary"
           onclick={handleSave}
           disabled={!towerStore.isDirty}
+          title={towerStore.isDirty ? "Save to profile" : "No unsaved changes"}
         >
           <span class="max-md:hidden">Save Changes</span>
           <span class="hidden max-md:inline">Save</span>

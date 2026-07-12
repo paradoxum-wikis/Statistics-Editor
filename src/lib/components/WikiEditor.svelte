@@ -259,7 +259,7 @@
   <div class="flex justify-end gap-2 mb-4">
     {#if !noFetchTowers.has(towerName) && !isCustomTower(towerName)}
       <Popover.Root>
-        <Tip content="Fetch latest wikitext from the Wiki">
+        <Tip content="Fetch latest Neowtext from the TDS Wiki">
           {#snippet children({ props })}
             <Popover.Trigger
               class="btn btn-secondary btn-sm"
@@ -294,7 +294,7 @@
       size="sm"
       onclick={() => void discardChanges()}
       disabled={!towerStore.isDirty || saving}
-      title="Discard unsaved changes (revert to last loaded effective wiki)"
+      title="Discard unsaved changes"
     >
       Discard
     </Btn>
@@ -303,7 +303,7 @@
       <Tip
         content={towerStore.sharePreviewId
           ? "Exit share preview or apply from the visual editor first"
-          : "Save source as profile-specific override"}
+          : "Save as profile override"}
       >
         {#snippet children({ props })}
           <Popover.Trigger
