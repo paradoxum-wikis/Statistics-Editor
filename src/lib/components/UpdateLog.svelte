@@ -100,6 +100,7 @@
 
 <script lang="ts">
   import { onMount } from "svelte";
+  import Tip from "./smol/Tip.svelte";
 
   type DayGroup = { label: string; entries: Entry[] };
 
@@ -174,18 +175,24 @@
             >
               <div class="mb-1 flex min-w-0 items-start justify-between gap-2">
                 {#if entry.badgeType}
-                  <span
-                    class="min-w-0 truncate rounded px-1.5 py-0.5 text-[0.65rem] font-medium leading-tight {entry.color}"
-                    title={entry.badgeScope
+                  <Tip
+                    content={entry.badgeScope
                       ? `${entry.badgeType} (${entry.badgeScope})`
                       : entry.badgeType}
                   >
-                    {entry.badgeType}{#if entry.badgeScope}
-                      <span class="font-normal opacity-75">
-                        ({entry.badgeScope})
+                    {#snippet children({ props })}
+                      <span
+                        class="min-w-0 truncate rounded px-1.5 py-0.5 text-[0.65rem] font-medium leading-tight {entry.color}"
+                        {...props}
+                      >
+                        {entry.badgeType}{#if entry.badgeScope}
+                          <span class="font-normal opacity-75">
+                            ({entry.badgeScope})
+                          </span>
+                        {/if}
                       </span>
-                    {/if}
-                  </span>
+                    {/snippet}
+                  </Tip>
                 {/if}
                 <time
                   datetime={entry.date}

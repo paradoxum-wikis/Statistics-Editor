@@ -3,6 +3,7 @@
   import { getTargetSkins } from "$lib/utils/towah";
   import CollapsibleSide from "./smol/CollapsibleSide.svelte";
   import SubtleRow from "./smol/SubtleRow.svelte";
+  import Tip from "./smol/Tip.svelte";
   import { CircleDollarSign } from "@lucide/svelte";
   import { parseNumeric } from "$lib/utils/format";
   import { getEffectiveFncKey, getFncValue } from "$lib/neowtext/functions";
@@ -77,12 +78,16 @@
     <div class="grid gap-1.5">
       {#each costRows as row (row.level)}
         <SubtleRow class="flex items-center px-1.5 py-1">
-          <span
-            class="text-[0.7rem] text-muted-foreground min-w-13 max-w-20 shrink-0 overflow-hidden text-ellipsis whitespace-nowrap"
-            title={row.level === 0 ? "Base" : `Slot ${row.level}`}
-          >
-            {row.level === 0 ? row.label : `Upg. ${row.label}`}
-          </span>
+          <Tip content={row.level === 0 ? "Base" : `Slot ${row.level}`}>
+            {#snippet children({ props })}
+              <span
+                class="text-[0.7rem] text-muted-foreground min-w-13 max-w-20 shrink-0 overflow-hidden text-ellipsis whitespace-nowrap"
+                {...props}
+              >
+                {row.level === 0 ? row.label : `Upg. ${row.label}`}
+              </span>
+            {/snippet}
+          </Tip>
           <input
             type="number"
             class="input input-compact"

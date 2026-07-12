@@ -116,33 +116,31 @@
 
   <div class="ms-auto flex min-w-0 items-center gap-2 px-2">
     {#if activeSettings.length > 0}
-      <Tooltip.Provider delayDuration={200}>
-        <div class="flex items-center gap-1">
-          {#each activeSettings as setting (setting.key)}
-            <Tooltip.Root>
-              <Tooltip.Trigger>
-                {#snippet child({ props })}
-                  <IconBtn {...props} class="status-bar-indicator">
-                    <setting.icon size={14} />
-                  </IconBtn>
-                {/snippet}
-              </Tooltip.Trigger>
-              <Tooltip.Portal>
-                <Tooltip.Content
-                  class="tooltip-content"
-                  side="top"
-                  sideOffset={6}
-                >
-                  <p class="text-sm font-medium">{setting.label}</p>
-                  <p class="text-xs text-muted-foreground">
-                    {setting.description}
-                  </p>
-                </Tooltip.Content>
-              </Tooltip.Portal>
-            </Tooltip.Root>
-          {/each}
-        </div>
-      </Tooltip.Provider>
+      <div class="flex items-center gap-1">
+        {#each activeSettings as setting (setting.key)}
+          <Tooltip.Root>
+            <Tooltip.Trigger>
+              {#snippet child({ props })}
+                <IconBtn {...props} class="status-bar-indicator">
+                  <setting.icon size={14} />
+                </IconBtn>
+              {/snippet}
+            </Tooltip.Trigger>
+            <Tooltip.Portal>
+              <Tooltip.Content
+                class="tooltip-content"
+                side="top"
+                sideOffset={6}
+              >
+                <p class="text-sm font-medium">{setting.label}</p>
+                <p class="text-xs text-muted-foreground">
+                  {setting.description}
+                </p>
+              </Tooltip.Content>
+            </Tooltip.Portal>
+          </Tooltip.Root>
+        {/each}
+      </div>
     {/if}
 
     {#if towerStore.sharePreviewId}

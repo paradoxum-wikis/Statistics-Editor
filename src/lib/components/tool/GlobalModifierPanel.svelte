@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Label } from "bits-ui";
   import Btn from "../smol/Btn.svelte";
+  import IconBtn from "../smol/IconBtn.svelte";
   import Switch from "../smol/Switch.svelte";
   import TextInput from "../smol/TextInput.svelte";
   import { modifierStore } from "$lib/stores/modifier.svelte";
@@ -83,14 +84,14 @@
                   modifierStore.setEnabled(index, enabled)}
                 aria-label="Enable {entry.column} modifier"
               />
-              <button
-                type="button"
-                class="inline-flex items-center justify-center rounded-[calc(var(--radius)-0.875rem)_0] p-0.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              <IconBtn
+                class="rounded-[calc(var(--radius)-0.875rem)_0]! p-0.5! text-muted-foreground hover:bg-muted hover:text-foreground"
                 title="Remove"
+                aria-label="Remove"
                 onclick={() => modifierStore.removeEntry(index)}
               >
                 <X size={12} />
-              </button>
+              </IconBtn>
             </div>
           </div>
           <div class="flex gap-1">

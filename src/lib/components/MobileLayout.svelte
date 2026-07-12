@@ -23,6 +23,7 @@
   import LoadingCard from "./smol/LoadingCard.svelte";
   import Btn from "./smol/Btn.svelte";
   import IconBtn from "./smol/IconBtn.svelte";
+  import Tip from "./smol/Tip.svelte";
   import TextInput from "./smol/TextInput.svelte";
 
   import Alert from "./smol/Alert.svelte";
@@ -311,13 +312,17 @@
 
     <!-- Profile -->
     <DropdownMenu.Root>
-      <DropdownMenu.Trigger
-        class="icon-btn"
-        title="Profile"
-        aria-label="Profile"
-      >
-        <User size={20} />
-      </DropdownMenu.Trigger>
+      <Tip content="Profile">
+        {#snippet children({ props })}
+          <DropdownMenu.Trigger
+            class="icon-btn"
+            aria-label="Profile"
+            {...props}
+          >
+            <User size={20} />
+          </DropdownMenu.Trigger>
+        {/snippet}
+      </Tip>
       <DropdownMenu.Content align="center" side="top" class="dropdown-content">
         <DropdownMenu.Group>
           <DropdownMenu.GroupHeading class="px-2 py-1.5 text-sm font-semibold">
@@ -403,9 +408,13 @@
 
     <!-- Tools -->
     <Popover.Root bind:open={toolsOpen}>
-      <Popover.Trigger class="icon-btn" title="Tools" aria-label="Tools">
-        <Wrench size={20} />
-      </Popover.Trigger>
+      <Tip content="Tools">
+        {#snippet children({ props })}
+          <Popover.Trigger class="icon-btn" aria-label="Tools" {...props}>
+            <Wrench size={20} />
+          </Popover.Trigger>
+        {/snippet}
+      </Tip>
       <Popover.Content
         class="popover-content w-auto! min-w-52"
         side="top"

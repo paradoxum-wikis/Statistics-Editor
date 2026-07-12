@@ -2,6 +2,7 @@
   import { onMount, untrack } from "svelte";
   import { Popover } from "bits-ui";
   import Btn from "./smol/Btn.svelte";
+  import Tip from "./smol/Tip.svelte";
   import { Annotation, EditorState } from "@codemirror/state";
   import { lintGutter } from "@codemirror/lint";
   import { EditorView, keymap, lineNumbers } from "@codemirror/view";
@@ -258,13 +259,17 @@
   <div class="flex justify-end gap-2 mb-4">
     {#if !noFetchTowers.has(towerName) && !isCustomTower(towerName)}
       <Popover.Root>
-        <Popover.Trigger
-          class="btn btn-secondary btn-sm"
-          disabled={isFetching || saving}
-          title="Fetch latest wikitext from the Wiki"
-        >
-          {isFetching ? "Fetching..." : "Fetch Latest Data"}
-        </Popover.Trigger>
+        <Tip content="Fetch latest wikitext from the Wiki">
+          {#snippet children({ props })}
+            <Popover.Trigger
+              class="btn btn-secondary btn-sm"
+              disabled={isFetching || saving}
+              {...props}
+            >
+              {isFetching ? "Fetching..." : "Fetch Latest Data"}
+            </Popover.Trigger>
+          {/snippet}
+        </Tip>
         <Popover.Content class="popover-content">
           <div class="space-y-2">
             <h4 class="font-medium leading-none">Confirm Fetch</h4>
@@ -295,18 +300,24 @@
     </Btn>
 
     <Popover.Root>
-      <Popover.Trigger
-        class="btn btn-primary btn-sm"
-        disabled={!canSave ||
-          !towerStore.isDirty ||
-          saving ||
-          !!towerStore.sharePreviewId}
-        title={towerStore.sharePreviewId
+      <Tip
+        content={towerStore.sharePreviewId
           ? "Exit share preview or apply from the visual editor first"
           : "Save source as profile-specific override"}
       >
-        {saving ? "Saving..." : "Save Override"}
-      </Popover.Trigger>
+        {#snippet children({ props })}
+          <Popover.Trigger
+            class="btn btn-primary btn-sm"
+            disabled={!canSave ||
+              !towerStore.isDirty ||
+              saving ||
+              !!towerStore.sharePreviewId}
+            {...props}
+          >
+            {saving ? "Saving..." : "Save Override"}
+          </Popover.Trigger>
+        {/snippet}
+      </Tip>
       <Popover.Content class="popover-content">
         <div class="space-y-2">
           <h4 class="font-medium leading-none">Confirm Override</h4>

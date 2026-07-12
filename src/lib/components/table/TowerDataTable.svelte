@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { Tooltip } from "bits-ui";
   import { fly } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
   import { renderCellHtml } from "$lib/neowtext/render";
@@ -58,102 +57,98 @@
   );
 </script>
 
-<Tooltip.Provider delayDuration={150}>
-  <div
-    class="table-container {!isFirst
-      ? 'extra-table-container'
-      : ''} {settingsStore.minTableWidth ? 'min-content' : ''}"
-    in:fly={isFirst
-      ? { y: 8, duration: 160, easing: cubicOut }
-      : { duration: 0 }}
-  >
-    <table class="table {settingsStore.minTableWidth ? 'min-content' : ''}">
-      <thead class="table-head">
-        {#if config.tableName}
-          <tr>
-            <th colspan={config.headers.length} class="table-name-header">
-              <RenderedHtml html={renderCellHtml(config.tableName, true)} />
-            </th>
-          </tr>
-        {/if}
+<div
+  class="table-container {!isFirst
+    ? 'extra-table-container'
+    : ''} {settingsStore.minTableWidth ? 'min-content' : ''}"
+  in:fly={isFirst ? { y: 8, duration: 160, easing: cubicOut } : { duration: 0 }}
+>
+  <table class="table {settingsStore.minTableWidth ? 'min-content' : ''}">
+    <thead class="table-head">
+      {#if config.tableName}
         <tr>
-          {#each config.headers as header, hIdx (header)}
-            <th
-              scope="col"
-              class={header === "Level"
-                ? "table-header-sticky px-2"
-                : "table-header whitespace-nowrap"}
-            >
-              <CellRefs
-                value={config.rawHeaders?.[hIdx] || header}
-                readOnly={true}
-                tokens={fTokens}
-                {getRefNum}
-              />
-            </th>
+          <th colspan={config.headers.length} class="table-name-header">
+            <RenderedHtml html={renderCellHtml(config.tableName, true)} />
+          </th>
+        </tr>
+      {/if}
+      <tr>
+        {#each config.headers as header, hIdx (header)}
+          <th
+            scope="col"
+            class={header === "Level"
+              ? "table-header-sticky px-2"
+              : "table-header whitespace-nowrap"}
+          >
+            <CellRefs
+              value={config.rawHeaders?.[hIdx] || header}
+              readOnly={true}
+              tokens={fTokens}
+              {getRefNum}
+            />
+          </th>
+        {/each}
+      </tr>
+    </thead>
+    <tbody class="table-body">
+      {#each displayRows as row, rowIdx (rowIdx)}
+        <tr class="table-row">
+          {#each config.headers as header, hIdx (`${hIdx}:${header}`)}
+            {#if header === "Level"}
+              <td class="table-cell-sticky">
+                {row[header] ?? rowIdx}
+              </td>
+            {:else}
+              {@const editable = isCellEditable(config, header)}
+              {@const isMoney = config.moneyColumns.includes(header)}
+              {@const rawValue = getEditableCellRawValue(
+                config,
+                rowIdx,
+                header,
+              )}
+              {@const deltaInfo = showDiff
+                ? getDeltaForCell(
+                    baseline,
+                    compareRows[rowIdx]?.[header],
+                    config.skinName,
+                    config.tableIdx,
+                    rowIdx,
+                    header,
+                    !editable,
+                  )
+                : { delta: null, className: "", cellClass: "" }}
+              <td
+                class="table-data {deltaInfo.cellClass} {editable
+                  ? 'editable-cell'
+                  : 'readonly-cell'} {settingsStore.hideCellWrapper
+                  ? 'compact-cell'
+                  : 'spacious-cell'}"
+              >
+                <TowerTableCell
+                  value={displayCellValue(
+                    globalModifier,
+                    header,
+                    cellDisplaySource(row[header], rawValue, fTokens),
+                    fTokens,
+                  )}
+                  {rawValue}
+                  {editable}
+                  {disabled}
+                  {isMoney}
+                  readOnlyValue={!editable}
+                  tokens={fTokens}
+                  {deltaInfo}
+                  {getRefNum}
+                  commit={(value) => commit(config, rowIdx, header, value)}
+                />
+              </td>
+            {/if}
           {/each}
         </tr>
-      </thead>
-      <tbody class="table-body">
-        {#each displayRows as row, rowIdx (rowIdx)}
-          <tr class="table-row">
-            {#each config.headers as header, hIdx (`${hIdx}:${header}`)}
-              {#if header === "Level"}
-                <td class="table-cell-sticky">
-                  {row[header] ?? rowIdx}
-                </td>
-              {:else}
-                {@const editable = isCellEditable(config, header)}
-                {@const isMoney = config.moneyColumns.includes(header)}
-                {@const rawValue = getEditableCellRawValue(
-                  config,
-                  rowIdx,
-                  header,
-                )}
-                {@const deltaInfo = showDiff
-                  ? getDeltaForCell(
-                      baseline,
-                      compareRows[rowIdx]?.[header],
-                      config.skinName,
-                      config.tableIdx,
-                      rowIdx,
-                      header,
-                      !editable,
-                    )
-                  : { delta: null, className: "", cellClass: "" }}
-                <td
-                  class="table-data {deltaInfo.cellClass} {editable
-                    ? 'editable-cell'
-                    : 'readonly-cell'} {settingsStore.hideCellWrapper
-                    ? 'compact-cell'
-                    : 'spacious-cell'}"
-                >
-                  <TowerTableCell
-                    value={displayCellValue(
-                      globalModifier,
-                      header,
-                      cellDisplaySource(row[header], rawValue, fTokens),
-                      fTokens,
-                    )}
-                    {rawValue}
-                    {editable}
-                    {disabled}
-                    {isMoney}
-                    readOnlyValue={!editable}
-                    tokens={fTokens}
-                    {deltaInfo}
-                    {getRefNum}
-                    commit={(value) => commit(config, rowIdx, header, value)}
-                  />
-                </td>
-              {/if}
-            {/each}
-          </tr>
-        {/each}
-      </tbody>
-    </table>
-  </div>
-</Tooltip.Provider>
+      {/each}
+    </tbody>
+  </table>
+</div>
 
 <style>
   .table-container {

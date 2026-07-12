@@ -1,5 +1,6 @@
 <script>
   import { onMount } from "svelte";
+  import { Tooltip } from "bits-ui";
   import { analytics } from "$lib/services/analytics";
   import Toaster from "$lib/components/smol/Toaster.svelte";
   import "./layout.css";
@@ -34,5 +35,7 @@
   />
 </svelte:head>
 
-{@render children()}
+<Tooltip.Provider delayDuration={200} skipDelayDuration={300}>
+  {@render children()}
+</Tooltip.Provider>
 <Toaster />

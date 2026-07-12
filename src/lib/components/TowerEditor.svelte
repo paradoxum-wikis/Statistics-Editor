@@ -2,6 +2,7 @@
   import { Tabs, Popover } from "bits-ui";
   import Separator from "./smol/Separator.svelte";
   import Btn from "./smol/Btn.svelte";
+  import Tip from "./smol/Tip.svelte";
   import type Tower from "$lib/towerComponents/tower";
   import type SkinData from "$lib/towerComponents/skinData";
   import { settingsStore } from "$lib/stores/settings.svelte";
@@ -419,13 +420,14 @@
     <Separator class="mt-4" />
     <div class="tower-editor-actions flex justify-end gap-2">
       <Popover.Root bind:open={shareOpen} onOpenChange={onShareOpenChange}>
-        <Popover.Trigger
-          class="btn btn-secondary"
-          title="Create a short link to share this tower's stats"
-        >
-          <span class="max-md:hidden">Share URL</span>
-          <span class="hidden max-md:inline">Share</span>
-        </Popover.Trigger>
+        <Tip content="Create a short link to share this tower's stats">
+          {#snippet children({ props })}
+            <Popover.Trigger class="btn btn-secondary" {...props}>
+              <span class="max-md:hidden">Share URL</span>
+              <span class="hidden max-md:inline">Share</span>
+            </Popover.Trigger>
+          {/snippet}
+        </Tip>
         <Popover.Content class="popover-content w-80">
           <div class="space-y-3">
             <p class="text-sm text-muted-foreground">
@@ -525,14 +527,18 @@
       </Btn>
       {#if towerStore.sharePreviewId}
         <Popover.Root>
-          <Popover.Trigger
-            class="btn btn-primary tower-editor-actions-primary"
-            disabled={!towerStore.isDirty}
-            title="Write these stats to your current profile"
-          >
-            <span class="max-md:hidden">Apply to Profile</span>
-            <span class="hidden max-md:inline">Apply</span>
-          </Popover.Trigger>
+          <Tip content="Write these stats to your current profile">
+            {#snippet children({ props })}
+              <Popover.Trigger
+                class="btn btn-primary tower-editor-actions-primary"
+                disabled={!towerStore.isDirty}
+                {...props}
+              >
+                <span class="max-md:hidden">Apply to Profile</span>
+                <span class="hidden max-md:inline">Apply</span>
+              </Popover.Trigger>
+            {/snippet}
+          </Tip>
           <Popover.Content class="popover-content">
             <div class="space-y-2">
               <h4 class="font-medium leading-none">Apply to Profile?</h4>
