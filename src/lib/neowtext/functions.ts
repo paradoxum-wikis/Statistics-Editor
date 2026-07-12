@@ -364,6 +364,29 @@ function sumSeriesThroughLevel(
 }
 
 /**
+ * True when the var body is a semicolon list of numbers (FNC-COST-) and not a formula.
+ */
+function isNumericArrayBody(raw: string): boolean {
+  const s = stripRefs(raw).trim();
+  if (!s) return true;
+  if (/\{\{|#expr/i.test(s)) return false;
+
+  if (!s.includes(";")) return !Number.isNaN(parseNumeric(s));
+
+  for (const part of s.split(";")) {
+    const t = part.trim();
+    if (t === "") continue;
+    if (Number.isNaN(parseNumeric(t))) return false;
+  }
+  return true;
+}
+
+export type TableCache = Record<
+  string,
+  Record<number, Record<string, string | number>>
+>;
+
+/**
  * $FNC-TOTALPRICE$ links with $FNC-COST$.
  * $FNC-TOTAL-X$ links with any array $VAR$ / $PVP-VAR$.
  */
@@ -371,10 +394,14 @@ export function resolveFNC(
   name: string,
   level: number | string,
   tokens: Record<string, string>,
-  _isPvp: boolean,
+  isPvp: boolean,
   branchOverride?: string,
   branchMap?: Record<string, string>,
   variantPrefix?: string,
+  row: Record<string, string | number> = {},
+  tableCache?: TableCache,
+  applyRofToCache = false,
+  depth = 0,
 ): number | undefined {
   const upper = name.toUpperCase();
 
@@ -393,21 +420,45 @@ export function resolveFNC(
     }
   }
 
-  const series = (tokens[seriesKey] ?? "").split(";");
+  const raw = tokens[seriesKey] ?? "";
 
-  return sumSeriesThroughLevel(
-    series,
-    level,
-    tokens,
-    branchOverride,
-    branchMap,
-  );
+  if (upper === "TOTALPRICE" || isNumericArrayBody(raw)) {
+    return sumSeriesThroughLevel(
+      raw.split(";"),
+      level,
+      tokens,
+      branchOverride,
+      branchMap,
+    );
+  }
+
+  // Formula series can't be split on ';'
+  const numericLevel = parseLevelNumber(level);
+  let total = 0;
+  for (let i = 0; i <= numericLevel; i++) {
+    const res = resolveToken(
+      seriesKey,
+      i,
+      { ...row, Level: i },
+      tokens,
+      isPvp,
+      depth + 1,
+      tableCache,
+      applyRofToCache,
+      false,
+      branchOverride,
+      branchMap,
+      variantPrefix,
+    );
+    if (typeof res === "number") {
+      if (Number.isFinite(res)) total += res;
+    } else if (res !== undefined) {
+      const n = parseNumeric(res);
+      if (!Number.isNaN(n)) total += n;
+    }
+  }
+  return total;
 }
-
-export type TableCache = Record<
-  string,
-  Record<number, Record<string, string | number>>
->;
 
 /**
  * Resolves a token ($FNC-NAME$ / $FSE-NAME$, $nVar$, or $Var$) to a value,
@@ -518,6 +569,10 @@ export function resolveToken(
       activeBranch,
       cachedBranchMap,
       variantPrefix,
+      row,
+      tableCache,
+      applyRofToCache,
+      depth,
     );
   }
 
