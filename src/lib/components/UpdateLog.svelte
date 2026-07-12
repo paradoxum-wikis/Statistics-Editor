@@ -7,13 +7,14 @@
     badgeType: string | null;
     badgeScope: string | null;
     color: string | null;
+    breaking: boolean;
     message: string;
     url: string;
   };
 
   type UpdateLogCache = { entries: Entry[]; failed: boolean };
 
-  const CONVENTIONAL = /^(\w+)(?:\(([^)]+)\))?!?:\s*(.+)$/;
+  const CONVENTIONAL = /^(\w+)(?:\(([^)]+)\))?(!)?:\s*(.+)$/;
 
   const TYPE_LABELS: Record<string, string> = {
     feat: "feature",
@@ -45,6 +46,13 @@
       .join(" ");
     const color = TYPE_COLORS[name] ?? TYPE_COLORS.chore;
     return { badgeType, badgeScope: scope, color };
+  }
+
+  function badgeTip(entry: Entry) {
+    const type = entry.breaking
+      ? `${entry.badgeType} [Breaking Change]`
+      : entry.badgeType!;
+    return entry.badgeScope ? `${type} (${entry.badgeScope})` : type;
   }
 
   async function loadUpdateLog(): Promise<UpdateLogCache> {
@@ -82,7 +90,8 @@
               badgeType: badge.badgeType,
               badgeScope: badge.badgeScope,
               color: badge.color,
-              message: match?.[3] ?? subject,
+              breaking: match?.[3] === "!",
+              message: match?.[4] ?? subject,
               url: item.html_url,
             };
           }),
@@ -175,17 +184,13 @@
             >
               <div class="mb-1 flex min-w-0 items-start justify-between gap-2">
                 {#if entry.badgeType}
-                  <Tip
-                    content={entry.badgeScope
-                      ? `${entry.badgeType} (${entry.badgeScope})`
-                      : entry.badgeType}
-                  >
+                  <Tip content={badgeTip(entry)}>
                     {#snippet children({ props })}
                       <span
                         class="min-w-0 truncate rounded px-1.5 py-0.5 text-[0.65rem] font-medium leading-tight {entry.color}"
                         {...props}
                       >
-                        {entry.badgeType}{#if entry.badgeScope}
+                        {entry.badgeType}{#if entry.breaking}!{/if}{#if entry.badgeScope}
                           <span class="font-normal opacity-75">
                             ({entry.badgeScope})
                           </span>
