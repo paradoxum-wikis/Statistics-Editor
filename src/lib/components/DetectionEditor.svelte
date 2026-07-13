@@ -8,6 +8,8 @@
   import { Check, ChevronDown, ScanEye } from "@lucide/svelte";
   import CollapsibleSide from "./smol/CollapsibleSide.svelte";
   import SubtleRow from "./smol/SubtleRow.svelte";
+  import { stripRefs } from "$lib/utils/format";
+  import { mkCellKey } from "$lib/neowtext/directives";
 
   let open = $state(true);
   let skinData = $derived(
@@ -68,10 +70,19 @@
     if (!currentSkin) return;
 
     for (const skin of getTargetSkins(tower, currentSkin)) {
-      const totalLevels = skin.levels.levels.length;
-      for (let i = 0; i < totalLevels; i++) {
-        const shouldHave = startLevel !== null && i >= startLevel;
-        skin.setDetection(i, type, shouldHave, false);
+      const headers =
+        skin.headers.length > 0 ? skin.headers : skin.levels.attributes;
+      const header = headers.find((h) => stripRefs(h) === type);
+      if (header) {
+        for (let i = 0; i < skin.levels.levels.length; i++) {
+          towerStore.captureBaselineCell(
+            mkCellKey(skin.name, 0, i, header),
+            skin.levels.getCell(i, header),
+          );
+        }
+      }
+      for (let i = 0; i < skin.levels.levels.length; i++) {
+        skin.setDetection(i, type, startLevel !== null && i >= startLevel, false);
       }
       skin.createData();
     }

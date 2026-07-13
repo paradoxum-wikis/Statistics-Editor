@@ -5,8 +5,10 @@
   import SubtleRow from "./smol/SubtleRow.svelte";
   import Tip from "./smol/Tip.svelte";
   import { CircleDollarSign } from "@lucide/svelte";
-  import { parseNumeric } from "$lib/utils/format";
+  import { parseNumeric, stripRefs } from "$lib/utils/format";
   import { getEffectiveFncKey, getFncValue } from "$lib/neowtext/functions";
+  import { mkCellKey } from "$lib/neowtext/directives";
+  import type SkinData from "$lib/towerComponents/skinData";
 
   type CostRow = {
     level: number;
@@ -19,6 +21,21 @@
     towerStore.selectedData?.getSkin(towerStore.selectedSkinName),
   );
 
+  function costKeyFor(skin: SkinData): string {
+    return skin.isPvp &&
+      getFncValue(skin.formulaTokens, "PVP-COST") !== undefined
+      ? getEffectiveFncKey(skin.formulaTokens, "PVP-COST")
+      : getEffectiveFncKey(skin.formulaTokens, "COST", skin.variantPrefix);
+  }
+
+  function costAt(skin: SkinData, level: number): number {
+    const num = parseNumeric(
+      (skin.formulaTokens[costKeyFor(skin)] || "").split(";")[level]?.trim() ||
+        "0",
+    );
+    return Number.isNaN(num) ? 0 : num;
+  }
+
   let costRows = $derived.by((): CostRow[] => {
     towerStore.refreshTrigger;
     if (!skinData?.formulaTokens) return [];
@@ -27,19 +44,7 @@
     const upgrades = skinData.upgrades ?? [];
     const rows: CostRow[] = [];
 
-    const costKey =
-      skinData.isPvp &&
-      getFncValue(skinData.formulaTokens, "PVP-COST") !== undefined
-        ? getEffectiveFncKey(skinData.formulaTokens, "PVP-COST")
-        : getEffectiveFncKey(skinData.formulaTokens, "COST");
-
-    const costArr = (skinData.formulaTokens[costKey] || "")
-      .split(";")
-      .map((s) => s.trim());
-
     for (let i = 0; i < levels.length; i++) {
-      const costStr = costArr[i];
-      const num = parseNumeric(costStr || "0");
       const label =
         i === 0
           ? "Base"
@@ -48,7 +53,7 @@
                 ? upgrades[i - 1].upgradeData.Level
                 : i,
             );
-      rows.push({ level: i, label, cost: isNaN(num) ? 0 : num });
+      rows.push({ level: i, label, cost: costAt(skinData, i) });
     }
 
     return rows;
@@ -61,6 +66,24 @@
     if (!currentSkin) return;
 
     for (const skin of getTargetSkins(tower, currentSkin)) {
+      const headers =
+        skin.headers.length > 0 ? skin.headers : skin.levels.attributes;
+      const costHeader = headers.find((h) => stripRefs(h) === "Cost");
+      if (costHeader) {
+        towerStore.captureBaselineCell(
+          mkCellKey(skin.name, 0, level, costHeader),
+          costAt(skin, level),
+        );
+      }
+      const totalHeader = headers.find((h) => stripRefs(h) === "Total Price");
+      if (totalHeader) {
+        for (let i = level; i < skin.levels.levels.length; i++) {
+          towerStore.captureBaselineCell(
+            mkCellKey(skin.name, 0, i, totalHeader),
+            skin.levels.getCell(i, totalHeader),
+          );
+        }
+      }
       skin.setCost(level, value);
     }
 
