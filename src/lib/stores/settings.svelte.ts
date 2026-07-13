@@ -8,6 +8,7 @@ import {
   SquareDashedBottom,
   Superscript,
 } from "@lucide/svelte";
+import { analytics } from "$lib/services/analytics";
 
 export type SettingTab = "editor" | "appearance" | "advanced";
 
@@ -236,12 +237,17 @@ class SettingsStore {
       this.assignBoolean("restoreRefOnClearEdit", false);
       writeBoolean(SETTING_DEFS.restoreRefOnClearEdit.storageKey, false);
     }
+    analytics.track("setting_change", {
+      setting_name: key,
+      setting_value: String(value),
+    });
   }
 
   setTheme(value: "light" | "dark" | "system") {
     this.theme = value;
     writeStringSetting(THEME_SETTING, value);
     this.applyTheme(value);
+    analytics.track("theme_change", { theme: value });
   }
 
   private applyTheme(theme: "light" | "dark" | "system") {

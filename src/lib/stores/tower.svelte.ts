@@ -15,6 +15,7 @@ import {
   stripSeDiff,
 } from "$lib/neowtext/directives";
 import { fetchShare, parseShareRef } from "$lib/services/shareTower";
+import { analytics } from "$lib/services/analytics";
 
 const RECENT_KEY = "tdse_recent_towers";
 const RECENT_MAX = 8;
@@ -44,6 +45,7 @@ class TowerStore {
   isDirty = $state(false);
   recentNames = $state<string[]>(readRecentTowers());
   #lastLoadedName = $state<string | null>(null);
+  #lastTrackedSelect: string | null = null;
 
   selectedSkinName = $state<string>("Regular");
 
@@ -203,6 +205,14 @@ class TowerStore {
         if (settingsStore.debugMode)
           console.log(`Loaded tower data for ${name}`);
         this.#touchRecent(name);
+        if (this.#lastTrackedSelect !== name) {
+          this.#lastTrackedSelect = name;
+          analytics.track("select_content", {
+            content_type: "tower",
+            content_id: name,
+            source: this.effectiveWikitextSource,
+          });
+        }
         return true;
       } else {
         console.error(`Failed to load tower: ${name}`);
@@ -389,6 +399,10 @@ class TowerStore {
           : skins[0] || "";
       }
 
+      analytics.track("share_import", {
+        tower_name: towerName,
+        success: true,
+      });
       return true;
     } finally {
       this.isLoading = false;
@@ -459,6 +473,7 @@ class TowerStore {
   save(diffBaseline: Record<string, unknown> = {}): void {
     if (this.manager && this.selectedData) {
       const name = this.selectedData.name;
+      const fromShare = !!this.sharePreviewId;
 
       if (this.sharePreviewId && name) {
         const lower = name.toLowerCase();
@@ -501,11 +516,19 @@ class TowerStore {
             this.names = updated;
           });
         }
+
+        analytics.track("tower_save", {
+          tower_name: name,
+          has_diff: Object.keys(diffBaseline).length > 0,
+          from_share: fromShare,
+        });
       }
     }
   }
 
   async discardChanges(): Promise<boolean> {
+    analytics.track("tower_discard", { tower_name: this.selectedName });
+
     if (this.sharePreviewId) {
       if (this.isDirty) return await this.#reloadShareSnapshot();
       return await this.exitSharePreview();
@@ -551,6 +574,7 @@ class TowerStore {
 
     if (!addCustomTower(trimmed, this.names)) return null;
     this.names = await this.manager.getTowerNames(true);
+    analytics.track("tower_create", { tower_name: trimmed });
     return trimmed;
   }
 
@@ -562,6 +586,7 @@ class TowerStore {
     this.manager.deleteTower(name);
     this.names = await this.manager.getTowerNames(true);
     this.unload();
+    analytics.track("tower_delete", { tower_name: name });
     return true;
   }
 
@@ -600,6 +625,7 @@ class TowerStore {
       console.log(`[TowerStore] Baseline cleared for reset.`);
 
     const result = await this.load(name);
+    if (result) analytics.track("tower_reset", { tower_name: name });
     return result;
   }
 
@@ -626,6 +652,7 @@ class TowerStore {
     this.selectedData = null;
     this.selectedName = "";
     this.#lastLoadedName = null;
+    this.#lastTrackedSelect = null;
     this.effectiveWikitext = "";
     this.effectiveWikitextSource = "";
     this.originalWikitext = "";

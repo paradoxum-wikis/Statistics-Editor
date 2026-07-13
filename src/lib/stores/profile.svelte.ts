@@ -1,5 +1,6 @@
 import TowerManager from "$lib/towerComponents/towerManager";
 import { settingsStore } from "$lib/stores/settings.svelte";
+import { analytics } from "$lib/services/analytics";
 
 const CURRENT_PROFILE_KEY = "tds_current_profile";
 
@@ -34,6 +35,7 @@ class ProfileStore {
     }
     this.current = name;
     localStorage.setItem(CURRENT_PROFILE_KEY, name);
+    analytics.track("profile_action", { action: "switch" });
     return true;
   }
 
@@ -51,6 +53,7 @@ class ProfileStore {
     this.list = TowerManager.getProfiles();
     this.current = trimmed;
     localStorage.setItem(CURRENT_PROFILE_KEY, trimmed);
+    analytics.track("profile_action", { action: "create" });
     return true;
   }
 
@@ -70,6 +73,7 @@ class ProfileStore {
       this.current = "Default";
       localStorage.setItem(CURRENT_PROFILE_KEY, "Default");
     }
+    analytics.track("profile_action", { action: "delete" });
     return true;
   }
 }

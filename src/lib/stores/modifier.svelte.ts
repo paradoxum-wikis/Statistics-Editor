@@ -1,5 +1,6 @@
 import type { GlobalModifier } from "$lib/utils/globalModifier";
 import { columnKeysEqual, parseNumeric } from "$lib/utils/format";
+import { analytics } from "$lib/services/analytics";
 
 class ModifierStore {
   entries = $state<GlobalModifier["entries"]>([]);
@@ -16,6 +17,7 @@ class ModifierStore {
       ...this.entries,
       { column: trimmed, delta: 0, percent: 0, enabled: true },
     ];
+    analytics.track("global_modifier_add", { column: trimmed });
     return true;
   }
 

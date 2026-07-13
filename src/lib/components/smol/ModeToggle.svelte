@@ -2,6 +2,7 @@
   import { tick } from "svelte";
   import { FileBraces, Table } from "@lucide/svelte";
   import { towerStore } from "$lib/stores/tower.svelte";
+  import { analytics } from "$lib/services/analytics";
 
   let {
     mode = $bindable<"cells" | "wiki">("cells"),
@@ -15,6 +16,7 @@
 
   async function switchToCells() {
     mode = "cells";
+    analytics.track("editor_mode", { mode: "cells" });
     await tick();
     await new Promise<void>((resolve) =>
       requestAnimationFrame(() => resolve()),
@@ -25,6 +27,7 @@
   function switchToWiki() {
     towerStore.guaraWikitextSynced();
     mode = "wiki";
+    analytics.track("editor_mode", { mode: "wiki" });
   }
 </script>
 

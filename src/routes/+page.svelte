@@ -6,6 +6,7 @@
   import { profileStore } from "$lib/stores/profile.svelte";
   import { settingsStore } from "$lib/stores/settings.svelte";
   import { parseShareRef } from "$lib/services/shareTower";
+  import { analytics } from "$lib/services/analytics";
   import DesktopLayout from "$lib/components/DesktopLayout.svelte";
   import MobileLayout from "$lib/components/MobileLayout.svelte";
 
@@ -25,8 +26,18 @@
       try {
         const ok = await towerStore.importFromShare(shareId);
         if (ok) url.searchParams.set("tower", towerStore.selectedName);
-        else alert("Failed to import shared tower.");
+        else {
+          analytics.track("share_import", {
+            tower_name: shareId,
+            success: false,
+          });
+          alert("Failed to import shared tower.");
+        }
       } catch (e) {
+        analytics.track("share_import", {
+          tower_name: shareId,
+          success: false,
+        });
         alert(
           e instanceof Error ? e.message : "Failed to import shared tower.",
         );

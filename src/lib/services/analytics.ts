@@ -1,102 +1,67 @@
-export class AnalyticsService {
-  private consentKey = "analyticsConsent";
-  private trackingId = "G-D48H2PL948";
-  private initialized = false;
+type EventParams = Record<string, string | number | boolean>;
 
-  constructor() {
-    if (typeof window === "undefined") return;
+declare global {
+  interface Window {
+    dataLayer: IArguments[];
+    gtag: (...args: unknown[]) => void;
   }
+}
 
-  public async init() {
-    if (typeof window === "undefined" || this.initialized) return;
-    this.initialized = true;
-    this.setupGtag();
+const CONSENT_KEY = "analyticsConsent";
+const TRACKING_ID = "G-D48H2PL948";
 
-    const storedConsent = localStorage.getItem(this.consentKey);
-    if (storedConsent === null) {
-      this.setConsent(true);
-    } else {
-      this.updateConsentMode(storedConsent === "true");
-    }
+let initialized = false;
 
-    this.setupEventListeners();
-  }
+export const analytics = {
+  init() {
+    if (initialized) return;
+    initialized = true;
 
-  private setupGtag() {
-    (window as any).dataLayer = (window as any).dataLayer || [];
-    (window as any).gtag = function () {
-      (window as any).dataLayer.push(arguments);
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function gtag() {
+      window.dataLayer.push(arguments);
     };
 
-    (window as any).gtag("consent", "default", {
+    window.gtag("consent", "default", {
       analytics_storage: "granted",
     });
 
     const script = document.createElement("script");
     script.async = true;
-    script.src = `https://www.googletagmanager.com/gtag/js?id=${this.trackingId}`;
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${TRACKING_ID}`;
     document.head.appendChild(script);
 
-    (window as any).gtag("js", new Date());
-    (window as any).gtag("config", this.trackingId, {
+    window.gtag("js", new Date());
+    window.gtag("config", TRACKING_ID, {
       allow_google_signals: false,
       allow_ad_personalization_signals: false,
       cookie_expires: 0,
     });
-  }
 
-  private updateConsentMode(granted: boolean) {
-    if (typeof (window as any).gtag === "function") {
-      (window as any).gtag("consent", "update", {
-        analytics_storage: granted ? "granted" : "denied",
-      });
-    }
-  }
+    analytics.setConsent(localStorage.getItem(CONSENT_KEY) !== "false");
+    analytics.setLayout();
+    window.addEventListener("resize", () => analytics.setLayout());
+  },
 
-  public setConsent(granted: boolean) {
-    localStorage.setItem(this.consentKey, granted ? "true" : "false");
-    this.updateConsentMode(granted);
+  setConsent(granted: boolean) {
+    localStorage.setItem(CONSENT_KEY, String(granted));
+    window.gtag("consent", "update", {
+      analytics_storage: granted ? "granted" : "denied",
+    });
     document.dispatchEvent(
-      new CustomEvent("analyticsConsentChanged", {
-        detail: { granted },
-      }),
+      new CustomEvent("analyticsConsentChanged", { detail: { granted } }),
     );
-  }
+  },
 
-  public trackEvent(
-    category: string,
-    action: string,
-    label?: string,
-    value?: number,
-  ) {
-    if (typeof (window as any).gtag === "function") {
-      (window as any).gtag("event", action, {
-        event_category: category,
-        event_label: label,
-        value: value,
-      });
-    }
-  }
+  track(name: string, params?: EventParams) {
+    window.gtag("event", name, params);
+  },
 
-  private setupEventListeners() {
-    (window as any).trackEvent = this.trackEvent.bind(this);
-
-    document.addEventListener("towerSelected", (e: any) => {
-      if (e.detail?.towerName) {
-        this.trackEvent("Tower", "Selected", e.detail.towerName);
-      }
+  setLayout() {
+    window.gtag("set", "user_properties", {
+      app_layout: window.matchMedia("(min-width: 768px)").matches
+        ? "desktop"
+        : "mobile",
     });
-
-    document.addEventListener("calculationSystemChanged", (e: any) => {
-      if (e.detail?.tower?.calculationSystem) {
-        this.trackEvent(
-          "Settings",
-          "CalculationSystemChanged",
-          e.detail.tower.calculationSystem,
-        );
-      }
-    });
-  }
-}
-
-export const analytics = new AnalyticsService();
+  },
+};

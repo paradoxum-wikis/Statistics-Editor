@@ -9,6 +9,7 @@
   } from "$lib/towerComponents/towers";
   import { towerStore } from "$lib/stores/tower.svelte";
   import { profileStore } from "$lib/stores/profile.svelte";
+  import { analytics } from "$lib/services/analytics";
   import TextInput from "./smol/TextInput.svelte";
 
   let {
@@ -56,6 +57,9 @@
 
   function pick(name: string) {
     if (!name || name === selected) return;
+    if (query.trim()) {
+      analytics.track("search", { search_term: query.trim() });
+    }
     onSelect(name);
     if (variant === "compact") {
       query = "";

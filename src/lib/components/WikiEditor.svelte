@@ -20,6 +20,7 @@
   import { setWikiOverride } from "$lib/neowtext/wikiSource";
   import { noFetchTowers } from "$lib/services/fetchTowerWiki";
   import { isCustomTower } from "$lib/towerComponents/customTowers";
+  import { analytics } from "$lib/services/analytics";
 
   const syncFromStoreAnnotation = Annotation.define<boolean>();
   const editorTheme = EditorView.theme({
@@ -214,11 +215,23 @@
         setWikiOverride(profileStore.current, towerName, wikitext);
         towerStore.isDirty = false;
         await towerStore.forceReload();
+        analytics.track("wiki_fetch", {
+          tower_name: towerName,
+          success: true,
+        });
       } else {
+        analytics.track("wiki_fetch", {
+          tower_name: towerName,
+          success: false,
+        });
         alert("Failed to fetch wikitext from the Wiki.");
       }
     } catch (e) {
       console.error(e);
+      analytics.track("wiki_fetch", {
+        tower_name: towerName,
+        success: false,
+      });
       alert("Error fetching from Wiki.");
     } finally {
       isFetching = false;

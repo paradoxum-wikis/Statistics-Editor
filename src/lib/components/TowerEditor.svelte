@@ -10,6 +10,7 @@
   import { modifierStore } from "$lib/stores/modifier.svelte";
   import { noFetchTowers } from "$lib/services/fetchTowerWiki";
   import { createShare, sharePageUrl } from "$lib/services/shareTower";
+  import { analytics } from "$lib/services/analytics";
   import { toast } from "$lib/toast";
   import { isCustomTower } from "$lib/towerComponents/customTowers";
   import { mkCellKey, stripSeDiff } from "$lib/neowtext/directives";
@@ -278,12 +279,30 @@
       const neowtext = towerStore.buildShareNeowtext(collectChangedBaseline());
       if (!neowtext?.trim()) {
         shareError = "Nothing to share for this tower.";
+        analytics.track("share", {
+          method: "link",
+          content_type: "tower",
+          item_id: tower.name,
+          success: false,
+        });
         return;
       }
       const id = await createShare(neowtext, tower.name);
       shareLink = sharePageUrl(id);
+      analytics.track("share", {
+        method: "link",
+        content_type: "tower",
+        item_id: tower.name,
+        success: true,
+      });
     } catch (e) {
       shareError = e instanceof Error ? e.message : "Share failed.";
+      analytics.track("share", {
+        method: "link",
+        content_type: "tower",
+        item_id: tower.name,
+        success: false,
+      });
     } finally {
       isSharing = false;
     }
@@ -322,11 +341,23 @@
         const skin = towerStore.selectedSkinName;
         if (refreshed && skin && !towerStore.baselineLocked)
           setBaselineForSkin(refreshed, skin);
+        analytics.track("wiki_fetch", {
+          tower_name: tower.name,
+          success: true,
+        });
       } else {
+        analytics.track("wiki_fetch", {
+          tower_name: tower.name,
+          success: false,
+        });
         alert("Failed to fetch wikitext from the Wiki.");
       }
     } catch (e) {
       console.error(e);
+      analytics.track("wiki_fetch", {
+        tower_name: tower.name,
+        success: false,
+      });
       alert("Error fetching from Wiki.");
     } finally {
       isFetching = false;
@@ -374,7 +405,14 @@
     {/if}
     <Tabs.Root
       value={towerStore.selectedSkinName}
-      onValueChange={(v) => (towerStore.selectedSkinName = v)}
+      onValueChange={(v) => {
+        if (!v || !tower) return;
+        towerStore.selectedSkinName = v;
+        analytics.track("skin_change", {
+          tower_name: tower.name,
+          skin_name: v,
+        });
+      }}
     >
       <Tabs.List
         class="mb-4 flex gap-2 rounded-[var(--radius)_0] bg-muted p-1 px-2"
