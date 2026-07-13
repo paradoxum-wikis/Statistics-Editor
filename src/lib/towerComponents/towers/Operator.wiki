@@ -3,12 +3,14 @@ $DPS$ = (Damage * Burst Count)  / (Burst Cooldown + (Firerate * Burst Count))
 $DPS2$ = Damage / Firerate
 $CE$ = Total Price / DPS
 $TP$ = $FNC-TOTALPRICE$
+$TE$ = $FNC-TOTAL-EXP$
 $FNC-COST$ = 300; 325; 500; 1250; 2100; 3350; 6400
 $FSE-DETECTION$ = 1; ; 2
-$EXP$ = {{#expr:floor(75 * 1.075^(Level - 1))}}
+$EXP$ = {{#expr:floor(75 * 1.075^(Level - 1) * (Level > 0))}}
 $FSE-UPGRADE$ = Tactical Gear; Convergent Forces; Cyber-Enforcer; Synchronized Vision; Threat Detection Sentinel; 1000-THR E.M.
 $FSE-UPGRADEICON$ = 70928079601135; 114583008682832; 104986848983674; 76868080888172; 83041543058774; 119843960971904
 $FSE-CATEGORY$ = Evolved
+$R$ = $FNC-RECURSION$
 $DREF$ = <ref name=dps>Calculated as (Damage × Burst Count) ÷ (Cooldown + (Firerate × Burst Count)).</ref>
 </var>
 <div class="mobile-tabber"><tabber>
@@ -40,47 +42,47 @@ $DREF$ = <ref name=dps>Calculated as (Damage × Burst Count) ÷ (Cooldown + (Fir
 |-
 ! Level !! Exp !! Total Exp
 |-
-| 0 || {{Exp|0}} || {{Exp|0}}
+| 0 || {{Exp|0}} || {{Exp|$TE$}}$R$
 |-
-| 1 || {{Exp|$EXP$}} || {{Exp|75}}
+| 1 || {{Exp|$EXP$}}$R$ || $R$
 |-
-| 2 || {{Exp|$EXP$}} || {{Exp|155}}
+| 2 || $R$ || $R$
 |-
-| 3 || {{Exp|$EXP$}} || {{Exp|241}}
+| 3 || $R$ || $R$
 |-
-| 4 || {{Exp|$EXP$}} || {{Exp|334}}
+| 4 || $R$ || $R$
 |-
-| 5 || {{Exp|$EXP$}} || {{Exp|434}}
+| 5 || $R$ || $R$
 |-
-| 6 || {{Exp|$EXP$}} || {{Exp|541}}
+| 6 || $R$ || $R$
 |-
-| 7 || {{Exp|$EXP$}} || {{Exp|656}}
+| 7 || $R$ || $R$
 |-
-| 8 || {{Exp|$EXP$}} || {{Exp|780}}
+| 8 || $R$ || $R$
 |-
-| 9 || {{Exp|$EXP$}} || {{Exp|913}}
+| 9 || $R$ || $R$
 |-
-| 10 || {{Exp|$EXP$}} || {{Exp|1,056}}
+| 10 || $R$ || $R$
 |-
-| 11 || {{Exp|$EXP$}} || {{Exp|1,210}}
+| 11 || $R$ || $R$
 |-
-| 12 || {{Exp|$EXP$}} || {{Exp|1,376}}
+| 12 || $R$ || $R$
 |-
-| 13 || {{Exp|$EXP$}} || {{Exp|1,554}}
+| 13 || $R$ || $R$
 |-
-| 14 || {{Exp|$EXP$}} || {{Exp|1,746}}
+| 14 || $R$ || $R$
 |-
-| 15 || {{Exp|$EXP$}} || {{Exp|1,952}}
+| 15 || $R$ || $R$
 |-
-| 16 || {{Exp|$EXP$}} || {{Exp|2,173}}
+| 16 || $R$ || $R$
 |-
-| 17 || {{Exp|$EXP$}} || {{Exp|2,411}}
+| 17 || $R$ || $R$
 |-
-| 18 || {{Exp|$EXP$}} || {{Exp|2,667}}
+| 18 || $R$ || $R$
 |-
-| 19 || {{Exp|$EXP$}} || {{Exp|2,942}}
+| 19 || $R$ || $R$
 |-
-| 20 || {{Exp|$EXP$}} || {{Exp|3,238}}
+| 20 || $R$ || $R$
 |}
 </div>
 <!-- @/se-ignore -->

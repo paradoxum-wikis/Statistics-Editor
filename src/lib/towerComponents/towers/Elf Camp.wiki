@@ -52,7 +52,7 @@ $BDREF$ = <ref>For the [[Bomber Elf (Unit)|Bomber Elf]], the explosion on death 
 |-
 | 2 || [[Cannoneer Elf]] || 30 || 5 || N/A || 25 || 0.5 || N/A || 22 || 4 || $DPS$ || $RDPS$
 |-
-| 3 || [[Gunner Elf]] || 40 || 4 || 6 || 30 || 0.208 || 1 || 22 || 4 || $BDPS$ || $RDPS$
+| 3 || [[Gunner Elf]] || 40 || 4 || 6 || 30 || 0.2 || 1 || 22 || 4 || $BDPS$ || $RDPS$
 |-
 | 4 || [[Gunner Elf]]$GREF$ || 50 || 6 || 6 || 30 || 0.2 || 1 || 25 || 4 || $BDPS$ || $RDPS$
 |}

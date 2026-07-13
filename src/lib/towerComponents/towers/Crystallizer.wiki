@@ -8,6 +8,7 @@ $FNC-COST$ = 2000; 800; 2350; 5000; 8500; 22500
 $FSE-DETECTION$ = ; ;
 $FSE-UPGRADE$ = Better Production; Durable Minerals; High Radiation; Larger Isotopes; Nuclear Silo
 $FSE-UPGRADEICON$ = 0; 0; 0; 0; 0
+$FSE-CATEGORY$ = Unavailable
 $FNC-ROFBUG$ = Firerate
 </var>
 <div class="overflow-box">
