@@ -11,7 +11,11 @@ import {
 } from "$lib/neowtext/functions";
 import type { TableData } from "$lib/neowtext/parser";
 import { settingsStore } from "$lib/stores/settings.svelte";
-import { stripRefs, syncRefOnlyCellToken } from "$lib/utils/format";
+import {
+  normalizeColumnKey,
+  stripRefs,
+  syncRefOnlyCellToken,
+} from "$lib/utils/format";
 
 type FormulaToken = string; // e.g. "$DPS$", "$DPS2$"
 type FormulaTokenMap = Record<string, string>; // token -> expression
@@ -178,7 +182,7 @@ class SkinData {
     ) => {
       if (!tableName || !headers.length) return;
 
-      const cleanName = stripRefs(tableName).trim();
+      const cleanName = normalizeColumnKey(tableName);
       const indexCol =
         indexOverrides[cleanName] || indexOverrides[tableName] || headers[0];
 

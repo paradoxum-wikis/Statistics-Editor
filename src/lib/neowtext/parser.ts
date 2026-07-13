@@ -276,7 +276,7 @@ function parseTable(
   applyVariables: (text: string) => string,
 ): TableData | null {
   const lines = tableContent.split("\n");
-  const name = applyVariables(extractTableName(lines));
+  const name = extractTableName(lines);
   const headers: string[] = [];
   const rawHeaders: string[] = [];
   const rows: Record<string, string | number>[] = [];

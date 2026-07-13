@@ -608,6 +608,8 @@ function forEachSkinRefSource(
       fn(s, config, rowIdx, tokens);
     };
 
+    register(config.tableName, 0);
+
     for (let i = 0; i < config.headers.length; i++) {
       register(config.rawHeaders?.[i] ?? config.headers[i], 0);
     }

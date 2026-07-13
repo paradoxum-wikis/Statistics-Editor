@@ -21,7 +21,11 @@ import {
   isCustomTower,
   removeCustomTower,
 } from "./customTowers";
-import { isEditableRefSuffixCell, stripRefs } from "$lib/utils/format";
+import {
+  isEditableRefSuffixCell,
+  normalizeColumnKey,
+  stripRefs,
+} from "$lib/utils/format";
 import {
   embedSeDirectives,
   extractDirectives,
@@ -256,7 +260,7 @@ export default class TowerManager {
         const cache: TableCache = {};
         for (const table of tables) {
           if (!table.name) continue;
-          const cleanName = stripRefs(table.name).trim();
+          const cleanName = normalizeColumnKey(table.name);
           const indexCol =
             indexOverrides[cleanName] ||
             indexOverrides[table.name] ||

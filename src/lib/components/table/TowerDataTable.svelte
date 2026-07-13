@@ -1,7 +1,6 @@
 <script lang="ts">
   import { fly } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
-  import { renderCellHtml } from "$lib/neowtext/render";
   import type { GlobalModifier } from "$lib/utils/globalModifier";
   import {
     cellDisplaySource,
@@ -15,7 +14,6 @@
   } from "$lib/towerTable";
   import { settingsStore } from "$lib/stores/settings.svelte";
   import CellRefs from "./CellRefs.svelte";
-  import RenderedHtml from "./RenderedHtml.svelte";
   import TowerTableCell from "./TowerTableCell.svelte";
 
   let {
@@ -68,7 +66,12 @@
       {#if config.tableName}
         <tr>
           <th colspan={config.headers.length} class="table-name-header">
-            <RenderedHtml html={renderCellHtml(config.tableName, true)} />
+            <CellRefs
+              value={config.tableName}
+              readOnly={true}
+              tokens={fTokens}
+              {getRefNum}
+            />
           </th>
         </tr>
       {/if}
