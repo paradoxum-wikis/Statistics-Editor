@@ -8,10 +8,18 @@
 
   let { children } = $props();
 
+  const siteName = "TDS Statistics Editor";
+  const siteUrl = "https://se.tds.wiki/";
+  const description =
+    "Edit and balance towers for the Roblox game Tower Defense Simulator and export it to the wiki!";
+  const ogImage = `${siteUrl}ogimg.png`;
+  const ogImageAlt =
+    "TDS Statistics Editor - modify, balance, or just, mess around!";
+
   const pageTitle = $derived(
     towerStore.selectedName
-      ? `${towerStore.selectedName} | TDS Statistics Editor`
-      : "TDS Statistics Editor",
+      ? `${towerStore.selectedName} | ${siteName}`
+      : siteName,
   );
 
   onMount(() => {
@@ -21,6 +29,28 @@
 
 <svelte:head>
   <title>{pageTitle}</title>
+  <meta name="description" content={description} />
+  <link rel="canonical" href={siteUrl} />
+
+  <meta property="og:title" content={pageTitle} />
+  <meta property="og:description" content={description} />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content={siteUrl} />
+  <meta property="og:site_name" content={siteName} />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:image" content={ogImage} />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content={ogImageAlt} />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@isALTEREGOout" />
+  <meta name="twitter:image:alt" content={ogImageAlt} />
+
+  <meta name="theme-color" content="#33577a" />
+  <meta name="apple-mobile-web-app-title" content="TDS:SE" />
+
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="icon" href="/favicon.ico" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
