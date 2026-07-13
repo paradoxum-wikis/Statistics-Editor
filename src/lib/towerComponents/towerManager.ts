@@ -175,27 +175,12 @@ export default class TowerManager {
         if (custom) return "";
 
         try {
-          const url = new URL(`./towers/${name}.wiki`, import.meta.url).href;
-          if (this.debug())
-            console.log(`[TowerManager] Fetching wikitext from: ${url}`);
-          const res = await fetch(`${url}?t=${Date.now()}`);
-          if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
-          const text = await res.text();
-          if (this.debug()) console.log("[TowerManager] Fetch successful");
-          return text;
-        } catch (e) {
-          console.warn(
-            "[TowerManager] Fetch failed, falling back to loader:",
-            e,
-          );
-          try {
-            if (wikitextLoader) {
-              const loaded = await wikitextLoader();
-              if (loaded) return loaded as string;
-            }
-          } catch (loaderErr) {
-            console.warn("[TowerManager] Loader failed:", loaderErr);
+          if (wikitextLoader) {
+            const loaded = await wikitextLoader();
+            if (loaded) return loaded as string;
           }
+        } catch (e) {
+          console.warn("[TowerManager] Loader failed:", e);
         }
 
         try {
