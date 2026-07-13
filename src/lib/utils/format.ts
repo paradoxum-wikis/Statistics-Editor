@@ -127,7 +127,7 @@ export function parseNumeric(v: string | number): number {
  */
 export function formatNumber(n: number): string {
   if (!Number.isFinite(n)) return String(n);
-  return n.toLocaleString(undefined, { maximumFractionDigits: 10 });
+  return n.toLocaleString("en-US", { maximumFractionDigits: 10 });
 }
 
 /**
@@ -137,7 +137,7 @@ export function formatReadOnly(v: unknown): string {
   if (v === undefined || v === null || v === "") return "-";
   const n = typeof v === "number" ? v : parseNumeric(String(v));
   return Number.isFinite(n)
-    ? n.toLocaleString(undefined, { maximumFractionDigits: 2 })
+    ? n.toLocaleString("en-US", { maximumFractionDigits: 2 })
     : stripRefs(v);
 }
 

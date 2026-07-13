@@ -293,7 +293,7 @@ function formatNumberLike(input: string, useGrouping: boolean): string {
   const n = Number(parsed);
   if (!Number.isFinite(n)) return stripRefs(input).trim();
 
-  return n.toLocaleString(undefined, {
+  return n.toLocaleString("en-US", {
     useGrouping,
     maximumFractionDigits: 20,
   });
