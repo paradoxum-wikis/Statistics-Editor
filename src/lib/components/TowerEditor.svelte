@@ -270,8 +270,15 @@
     shareError = null;
   }
 
+  const canShareUrl = $derived(!towerStore.isDirty);
+  const shareUrlTip = $derived(
+    towerStore.isDirty
+      ? "There are unsaved changes. Save or clear before sharing a link"
+      : "Create a short link to share this tower's stats",
+  );
+
   async function handleShare() {
-    if (!tower || isSharing) return;
+    if (!tower || isSharing || towerStore.isDirty) return;
     isSharing = true;
     shareError = null;
     shareLink = null;
@@ -309,6 +316,10 @@
   }
 
   function onShareOpenChange(open: boolean) {
+    if (open && towerStore.isDirty) {
+      shareOpen = false;
+      return;
+    }
     if (!open) resetShareState();
     else if (!shareLink && !shareError && !isSharing) void handleShare();
   }
@@ -458,12 +469,21 @@
     <Separator class="mt-4" />
     <div class="tower-editor-actions flex justify-end gap-2">
       <Popover.Root bind:open={shareOpen} onOpenChange={onShareOpenChange}>
-        <Tip content="Create a short link to share this tower's stats">
+        <Tip content={shareUrlTip}>
           {#snippet children({ props })}
-            <Popover.Trigger class="btn btn-secondary" {...props}>
-              <span class="max-md:hidden">Share URL</span>
-              <span class="hidden max-md:inline">Share</span>
-            </Popover.Trigger>
+            {#if canShareUrl}
+              <Popover.Trigger class="btn btn-secondary" {...props}>
+                <span class="max-md:hidden">Share URL</span>
+                <span class="hidden max-md:inline">Share</span>
+              </Popover.Trigger>
+            {:else}
+              <span class="inline-flex" {...props}>
+                <button type="button" class="btn btn-secondary" disabled>
+                  <span class="max-md:hidden">Share URL</span>
+                  <span class="hidden max-md:inline">Share</span>
+                </button>
+              </span>
+            {/if}
           {/snippet}
         </Tip>
         <Popover.Content class="popover-content w-80">
