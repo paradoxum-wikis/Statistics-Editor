@@ -74,9 +74,7 @@
   let toolsOpen = $state(false);
   let modifierOpen = $state(false);
 
-  const isPageNotFound = $derived(page.status >= 400);
-  const isTowerNotFound = $derived(towerStore.missingTower);
-  const isNotFound = $derived(isPageNotFound || isTowerNotFound);
+  const isNotFound = $derived(page.status >= 400 || towerStore.missingTower);
 
   async function performGoHome() {
     sidebarOpen = false;
@@ -267,11 +265,7 @@
   <main class="min-h-0 flex-1 overflow-x-auto overflow-y-auto p-4 pb-16">
     {#key `${isClient}-${isNotFound}-${towerStore.isLoading}-${towerStore.selectedName ?? ""}-${editorMode}`}
       {#if isNotFound}
-        <NotFoundView
-          onHome={goHome}
-          tower={isTowerNotFound && !isPageNotFound}
-          status={page.status}
-        />
+        <NotFoundView onHome={goHome} tower={!!page.params.name} />
       {:else if isClient && !towerStore.selectedData && !towerStore.isLoading}
         <HomeView onSelect={handleSelect} />
       {:else}

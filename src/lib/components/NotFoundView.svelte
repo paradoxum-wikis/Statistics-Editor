@@ -2,11 +2,9 @@
   let {
     onHome,
     tower,
-    status,
   }: {
     onHome: () => void;
     tower: boolean;
-    status: number;
   } = $props();
 </script>
 
@@ -22,7 +20,7 @@
     <p
       class="unisans text-[min(22vw,11rem)] leading-none font-black text-destructive"
     >
-      {status}
+      404
     </p>
   </div>
 

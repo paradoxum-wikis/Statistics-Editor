@@ -22,23 +22,20 @@
     "TDS Statistics Editor - modify, balance, or just, mess around!";
 
   const towerName = $derived(towerStore.selectedName || page.params.name || "");
+  const notFound = $derived(page.status >= 400 || towerStore.missingTower);
   const pageTitle = $derived(
-    page.status >= 400
+    notFound
       ? `404 Not Found | ${siteName}`
-      : towerStore.missingTower
-        ? `Tower Not Found | ${siteName}`
-        : towerName
-          ? `${towerName} | ${siteName}`
-          : siteName,
+      : towerName
+        ? `${towerName} | ${siteName}`
+        : siteName,
   );
   const description = $derived(
-    page.status >= 400
+    notFound
       ? "Sorry, the page you're looking for doesn't exist."
-      : towerStore.missingTower
-        ? "That tower isn't available in the TDS Statistics Editor."
-        : towerName
-          ? `Edit ${towerName} stats in the TDS Statistics Editor for the Roblox game Tower Defense Simulator!`
-          : defaultDescription,
+      : towerName
+        ? `Edit ${towerName} stats in the TDS Statistics Editor for the Roblox game Tower Defense Simulator!`
+        : defaultDescription,
   );
 
   onMount(async () => {

@@ -51,22 +51,18 @@
       });
   });
 
-  const isPageNotFound = $derived(page.status >= 400);
-  const isTowerNotFound = $derived(towerStore.missingTower);
-  const isNotFound = $derived(isPageNotFound || isTowerNotFound);
+  const isNotFound = $derived(page.status >= 400 || towerStore.missingTower);
 
   const mainKey = $derived(
     !isClient
       ? "init"
-      : isPageNotFound
+      : isNotFound
         ? "not-found"
-        : isTowerNotFound
-          ? "tower-missing"
-          : towerStore.selectedName
-            ? `tower:${towerStore.selectedName}`
-            : towerStore.isLoading
-              ? "loading"
-              : "intro",
+        : towerStore.selectedName
+          ? `tower:${towerStore.selectedName}`
+          : towerStore.isLoading
+            ? "loading"
+            : "intro",
   );
 
   async function performGoHome() {
@@ -391,11 +387,7 @@
       >
         {#key mainKey}
           {#if isNotFound}
-            <NotFoundView
-              onHome={goHome}
-              tower={isTowerNotFound && !isPageNotFound}
-              status={page.status}
-            />
+            <NotFoundView onHome={goHome} tower={!!page.params.name} />
           {:else if isClient && !towerStore.selectedData && !towerStore.isLoading}
             <HomeView onSelect={handleSelect} />
           {:else}
