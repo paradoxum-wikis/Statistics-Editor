@@ -2,11 +2,15 @@
   import { onMount } from "svelte";
   import { Tooltip } from "bits-ui";
   import { analytics } from "$lib/services/analytics";
+  import { bootstrap } from "$lib/bootstrap";
   import { towerStore } from "$lib/stores/tower.svelte";
+  import DesktopLayout from "$lib/components/DesktopLayout.svelte";
+  import MobileLayout from "$lib/components/MobileLayout.svelte";
   import Toaster from "$lib/components/smol/Toaster.svelte";
   import "./layout.css";
 
   let { children } = $props();
+  let isClient = $state(false);
 
   const siteName = "TDS Statistics Editor";
   const siteUrl = "https://se.tds.wiki/";
@@ -22,8 +26,10 @@
       : siteName,
   );
 
-  onMount(() => {
+  onMount(async () => {
     analytics.init();
+    await bootstrap();
+    isClient = true;
   });
 </script>
 
@@ -72,7 +78,20 @@
   />
 </svelte:head>
 
+<svelte:window
+  onbeforeunload={(e) => {
+    if (!towerStore.isDirty) return;
+    e.preventDefault();
+  }}
+/>
+
 <Tooltip.Provider delayDuration={200} skipDelayDuration={300}>
   {@render children()}
+  <div class="hidden md:flex h-screen flex-col">
+    <DesktopLayout {isClient} />
+  </div>
+  <div class="md:hidden">
+    <MobileLayout {isClient} />
+  </div>
 </Tooltip.Provider>
 <Toaster />

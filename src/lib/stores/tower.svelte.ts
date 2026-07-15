@@ -1,5 +1,5 @@
 import { goto } from "$app/navigation";
-import { page } from "$app/state";
+import { resolve } from "$app/paths";
 import TowerManager from "$lib/towerComponents/towerManager";
 import type Tower from "$lib/towerComponents/tower";
 import { settingsStore } from "$lib/stores/settings.svelte";
@@ -592,10 +592,7 @@ class TowerStore {
 
   async confirmDeleteTower(): Promise<boolean> {
     if (!(await this.deleteTower())) return false;
-
-    const url = new URL(page.url);
-    url.searchParams.delete("tower");
-    goto(url, { keepFocus: true, noScroll: true });
+    goto(resolve("/"), { keepFocus: true, noScroll: true });
     return true;
   }
 

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
-  import { page } from "$app/state";
+  import { resolve } from "$app/paths";
   import { cubicOut } from "svelte/easing";
   import { fly } from "svelte/transition";
 
@@ -60,21 +60,18 @@
   );
 
   async function performGoHome() {
-    const url = new URL(page.url);
-    const hadTowerParam = url.searchParams.has("tower");
     towerStore.unload();
-
-    if (hadTowerParam) url.searchParams.delete("tower");
     editorMode = "cells";
-    await goto(url, { keepFocus: true, noScroll: true });
+    await goto(resolve("/"), { keepFocus: true, noScroll: true });
   }
 
   async function performTowerSelect(tower: string) {
     const success = await towerStore.load(tower);
     if (success) {
-      const url = new URL(page.url);
-      url.searchParams.set("tower", tower);
-      await goto(url, { keepFocus: true, noScroll: true });
+      await goto(resolve("/tower/[name]", { name: tower }), {
+        keepFocus: true,
+        noScroll: true,
+      });
     }
   }
 
