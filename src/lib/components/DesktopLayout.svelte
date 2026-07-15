@@ -78,7 +78,7 @@
   async function performTowerSelect(tower: string) {
     const success = await towerStore.load(tower);
     if (success) {
-      await goto(resolve("/tower/[name]", { name: tower }), {
+      await goto(resolve("/tower/[name]", { name: towerStore.selectedName }), {
         keepFocus: true,
         noScroll: true,
       });
@@ -86,7 +86,11 @@
   }
 
   async function handleSelect(itemValue: string | undefined) {
-    if (!itemValue || itemValue === towerStore.selectedName) return;
+    if (
+      !itemValue ||
+      itemValue.toLowerCase() === towerStore.selectedName.toLowerCase()
+    )
+      return;
     if (towerStore.isDirty) {
       requestDiscard({ type: "switch-tower", tower: itemValue });
       return;

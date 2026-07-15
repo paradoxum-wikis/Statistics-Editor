@@ -21,7 +21,7 @@
   const ogImageAlt =
     "TDS Statistics Editor - modify, balance, or just, mess around!";
 
-  const towerName = $derived(page.params.name);
+  const towerName = $derived(towerStore.selectedName || page.params.name || "");
   const pageTitle = $derived(
     page.status >= 400
       ? `404 Not Found | ${siteName}`

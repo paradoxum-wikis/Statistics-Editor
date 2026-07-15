@@ -37,6 +37,13 @@ const wikitextFiles = import.meta.glob("./towers/*.wiki", {
   import: "default",
 });
 
+const wikiFileByLower = new Map(
+  Object.keys(wikitextFiles).map((path) => {
+    const base = path.slice("./towers/".length, -".wiki".length);
+    return [base.toLowerCase(), path] as const;
+  }),
+);
+
 export default class TowerManager {
   towerNames: string[] = [];
   towers: { [name: string]: Tower } = {};
@@ -126,43 +133,54 @@ export default class TowerManager {
   }
 
   clearCache(name: string): void {
+    name = name.trim().toLowerCase();
     if (this.debug()) console.log(`[TowerManager] clearing cache for ${name}`);
     if (this.towers[name]) delete this.towers[name];
   }
 
   resetTower(name: string): void {
     if (!this.dataKey) return;
+    name = name.trim().toLowerCase();
 
     clearWikiOverride(this.dataKey ?? "Default", name);
     this.clearCache(name);
   }
 
   deleteTower(name: string): void {
+    name = name.trim().toLowerCase();
     if (!isCustomTower(name)) return;
 
     removeCustomTower(name);
     clearTowerWikiOverrides(name);
     this.clearCache(name);
-    this.towerNames = this.towerNames.filter((n) => n !== name);
+    this.towerNames = this.towerNames.filter((n) => n.toLowerCase() !== name);
   }
 
   async getTower(
     name: string,
     opts?: { wikitext?: string; ephemeral?: boolean },
   ): Promise<Tower | null> {
+    const requested = name.trim();
+    if (!requested) return null;
+    const lower = requested.toLowerCase();
     const ephemeral = opts?.ephemeral === true;
-    if (!ephemeral && this.towers[name]) {
+    if (!ephemeral && this.towers[lower]) {
       if (this.debug())
-        console.log(`[TowerManager] Returning cached tower for ${name}`);
-      return this.towers[name];
+        console.log(`[TowerManager] Returning cached tower for ${requested}`);
+      return this.towers[lower];
     }
 
     if (this.debug())
-      console.log(`[TowerManager] Loading tower ${name} (no cache)`);
+      console.log(`[TowerManager] Loading tower ${requested} (no cache)`);
 
-    const wikitextLoader = wikitextFiles[`./towers/${name}.wiki`];
-    const custom = isCustomTower(name);
+    const wikiPath = wikiFileByLower.get(lower);
+    const wikitextLoader = wikiPath ? wikitextFiles[wikiPath] : undefined;
+    const custom = isCustomTower(requested);
     if (!wikitextLoader && !custom && opts?.wikitext === undefined) return null;
+
+    name = wikiPath
+      ? wikiPath.slice("./towers/".length, -".wiki".length)
+      : (getCustomTowers().find((n) => n.toLowerCase() === lower) ?? requested);
 
     let currentSource = "";
     let currentText = "";
@@ -794,7 +812,7 @@ export default class TowerManager {
       });
 
       if (ephemeral) return towerData;
-      return (this.towers[name] = towerData);
+      return (this.towers[lower] = towerData);
     } catch (err) {
       console.error("Failed to load wikitext for", name, ":", err);
       const towerData = new Tower(name, {});
@@ -806,7 +824,7 @@ export default class TowerManager {
         editorMemo: memo,
       });
       if (ephemeral) return towerData;
-      return (this.towers[name] = towerData);
+      return (this.towers[lower] = towerData);
     }
   }
 

@@ -126,7 +126,7 @@ class TowerStore {
    * Loads a tower by name, skipping if already loaded.
    */
   async load(name: string): Promise<boolean> {
-    if (!this.manager || !name) {
+    if (!this.manager || !name.trim()) {
       this.selectedData = null;
       this.effectiveWikitext = "";
       this.effectiveWikitextSource = "";
@@ -147,7 +147,10 @@ class TowerStore {
       this.#shareSnapshotWikitext = "";
     }
 
-    if (name === this.#lastLoadedName) {
+    if (
+      this.#lastLoadedName &&
+      this.#lastLoadedName.toLowerCase() === name.trim().toLowerCase()
+    ) {
       this.missingTower = false;
       return true;
     }
@@ -162,8 +165,8 @@ class TowerStore {
       const tower = await this.manager.getTower(name);
       if (tower) {
         this.selectedData = tower;
-        this.selectedName = name;
-        this.#lastLoadedName = name;
+        this.selectedName = tower.name;
+        this.#lastLoadedName = tower.name;
 
         const skins = tower.skinNames;
         if (!skins.includes(this.selectedSkinName)) {
@@ -192,7 +195,7 @@ class TowerStore {
         ).diffBaseline;
         if (savedDiff && Object.keys(savedDiff).length > 0) {
           this.baseline = savedDiff;
-          this.baselineTowerId = name;
+          this.baselineTowerId = tower.name;
           this.baselineSkinName = null;
           this.baselineLocked = true;
           if (settingsStore.debugMode)
@@ -207,13 +210,13 @@ class TowerStore {
         }
 
         if (settingsStore.debugMode)
-          console.log(`Loaded tower data for ${name}`);
-        this.#touchRecent(name);
-        if (this.#lastTrackedSelect !== name) {
-          this.#lastTrackedSelect = name;
+          console.log(`Loaded tower data for ${tower.name}`);
+        this.#touchRecent(tower.name);
+        if (this.#lastTrackedSelect !== tower.name) {
+          this.#lastTrackedSelect = tower.name;
           analytics.track("select_content", {
             content_type: "tower",
-            content_id: name,
+            content_id: tower.name,
             source: this.effectiveWikitextSource,
           });
         }
@@ -364,8 +367,8 @@ class TowerStore {
       if (!tower) return false;
 
       this.selectedData = tower;
-      this.selectedName = towerName;
-      this.#lastLoadedName = `share:${towerName}:${shareId}`;
+      this.selectedName = tower.name;
+      this.#lastLoadedName = `share:${tower.name}:${shareId}`;
       this.#shareSnapshotWikitext = share.neowtext;
       this.sharePreviewId = shareId;
       this.missingTower = false;
@@ -426,7 +429,7 @@ class TowerStore {
     this.#lastLoadedName = null;
     this.manager?.clearCache(name);
 
-    if (name && this.names.includes(name)) {
+    if (name && this.names.some((n) => n.toLowerCase() === name.toLowerCase())) {
       await goto(resolve("/tower/[name]", { name }), {
         replaceState: true,
         keepFocus: true,
@@ -526,9 +529,9 @@ class TowerStore {
         if (this.sharePreviewId) {
           this.sharePreviewId = null;
           this.#shareSnapshotWikitext = "";
-          this.#lastLoadedName = this.selectedData.name;
+          this.#lastLoadedName = this.selectedName;
           // so reload does not re-import over the applied profile data
-          goto(resolve("/tower/[name]", { name }), {
+          goto(resolve("/tower/[name]", { name: this.selectedName }), {
             replaceState: true,
             keepFocus: true,
             noScroll: true,

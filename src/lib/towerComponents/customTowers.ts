@@ -18,7 +18,8 @@ export function getCustomTowers(): string[] {
 }
 
 export function isCustomTower(name: string): boolean {
-  return getCustomTowers().includes(name);
+  const lower = name.trim().toLowerCase();
+  return getCustomTowers().some((n) => n.toLowerCase() === lower);
 }
 
 export function addCustomTower(
@@ -43,7 +44,8 @@ export function addCustomTower(
 
 export function removeCustomTower(name: string): void {
   if (!canUseLocalStorage() || !isCustomTower(name)) return;
-  const next = getCustomTowers().filter((n) => n !== name);
+  const lower = name.trim().toLowerCase();
+  const next = getCustomTowers().filter((n) => n.toLowerCase() !== lower);
   localStorage.setItem(CUSTOM_TOWERS_KEY, JSON.stringify(next));
 }
 

@@ -3,7 +3,7 @@ import { settingsStore } from "$lib/stores/settings.svelte";
 const WIKI_OVERRIDE_PREFIX = "tds_wiki_override::";
 
 function overrideKey(profileName: string, towerName: string): string {
-  return `${WIKI_OVERRIDE_PREFIX}${profileName}::${towerName}`;
+  return `${WIKI_OVERRIDE_PREFIX}${profileName}::${towerName.trim().toLowerCase()}`;
 }
 
 function canUseLocalStorage(): boolean {
@@ -104,7 +104,7 @@ export function clearProfileWikiOverrides(profileName: string): void {
 export function clearTowerWikiOverrides(towerName: string): void {
   if (!canUseLocalStorage()) return;
 
-  const suffix = `::${towerName}`;
+  const suffix = `::${towerName.trim().toLowerCase()}`;
   for (let i = localStorage.length - 1; i >= 0; i--) {
     const key = localStorage.key(i);
     if (key?.startsWith(WIKI_OVERRIDE_PREFIX) && key.endsWith(suffix)) {

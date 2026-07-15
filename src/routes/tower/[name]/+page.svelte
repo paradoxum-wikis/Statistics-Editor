@@ -14,12 +14,11 @@
 
     const shareParam = page.url.searchParams.get("share");
     const shareId = shareParam ? parseShareRef(shareParam) : null;
+    const sameTower =
+      towerStore.selectedName.toLowerCase() === name.trim().toLowerCase();
 
     if (shareId) {
-      if (
-        towerStore.sharePreviewId === shareId &&
-        towerStore.selectedName === name
-      ) {
+      if (towerStore.sharePreviewId === shareId && sameTower) {
         return;
       }
       try {
@@ -38,7 +37,7 @@
           return;
         }
         const imported = towerStore.selectedName;
-        if (imported !== name) {
+        if (imported.toLowerCase() !== name.trim().toLowerCase()) {
           const path = resolve("/tower/[name]", { name: imported });
           await goto(
             resolve(
@@ -66,7 +65,7 @@
     }
 
     // load() clears sharePreviewId, hence, keep an active share snapshot
-    if (towerStore.sharePreviewId && towerStore.selectedName === name) return;
+    if (towerStore.sharePreviewId && sameTower) return;
     await towerStore.load(name);
   }
 
