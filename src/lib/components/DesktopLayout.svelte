@@ -51,18 +51,22 @@
       });
   });
 
-  const isNotFound = $derived(page.status >= 400);
+  const isPageNotFound = $derived(page.status >= 400);
+  const isTowerNotFound = $derived(towerStore.missingTower);
+  const isNotFound = $derived(isPageNotFound || isTowerNotFound);
 
   const mainKey = $derived(
     !isClient
       ? "init"
-      : isNotFound
+      : isPageNotFound
         ? "not-found"
-        : towerStore.selectedName
-          ? `tower:${towerStore.selectedName}`
-          : towerStore.isLoading
-            ? "loading"
-            : "intro",
+        : isTowerNotFound
+          ? "tower-missing"
+          : towerStore.selectedName
+            ? `tower:${towerStore.selectedName}`
+            : towerStore.isLoading
+              ? "loading"
+              : "intro",
   );
 
   async function performGoHome() {
@@ -383,7 +387,10 @@
       >
         {#key mainKey}
           {#if isNotFound}
-            <NotFoundView onHome={goHome} />
+            <NotFoundView
+              onHome={goHome}
+              kind={isTowerNotFound && !isPageNotFound ? "tower" : "page"}
+            />
           {:else if isClient && !towerStore.selectedData && !towerStore.isLoading}
             <HomeView onSelect={handleSelect} />
           {:else}

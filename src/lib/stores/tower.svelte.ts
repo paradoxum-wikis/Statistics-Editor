@@ -43,6 +43,7 @@ class TowerStore {
   selectedData = $state<Tower | null>(null);
   isLoading = $state(false);
   isDirty = $state(false);
+  missingTower = $state(false);
   recentNames = $state<string[]>(readRecentTowers());
   #lastLoadedName = $state<string | null>(null);
   #lastTrackedSelect: string | null = null;
@@ -137,6 +138,7 @@ class TowerStore {
       this.baseline = {};
       this.baselineTowerId = null;
       this.baselineSkinName = null;
+      this.missingTower = false;
       return false;
     }
 
@@ -146,6 +148,7 @@ class TowerStore {
     }
 
     if (name === this.#lastLoadedName) {
+      this.missingTower = false;
       return true;
     }
 
@@ -153,6 +156,7 @@ class TowerStore {
     if (settingsStore.debugMode) console.time(`Load tower ${name}`);
     this.isLoading = true;
     this.selectedData = null;
+    this.missingTower = false;
 
     try {
       const tower = await this.manager.getTower(name);
@@ -217,6 +221,8 @@ class TowerStore {
       } else {
         console.error(`Failed to load tower: ${name}`);
         this.selectedData = null;
+        this.selectedName = "";
+        this.#lastLoadedName = null;
         this.effectiveWikitext = "";
         this.effectiveWikitextSource = "";
         this.originalWikitext = "";
@@ -227,6 +233,7 @@ class TowerStore {
         this.baseline = {};
         this.baselineTowerId = null;
         this.baselineSkinName = null;
+        this.missingTower = true;
         return false;
       }
     } finally {
@@ -361,6 +368,7 @@ class TowerStore {
       this.#lastLoadedName = `share:${towerName}:${shareId}`;
       this.#shareSnapshotWikitext = share.neowtext;
       this.sharePreviewId = shareId;
+      this.missingTower = false;
 
       const anyTower = tower as unknown as {
         sourceWikitext?: string;
@@ -678,6 +686,7 @@ class TowerStore {
     this.baseline = {};
     this.baselineTowerId = null;
     this.baselineSkinName = null;
+    this.missingTower = false;
   }
 
   #touchRecent(name: string): void {
