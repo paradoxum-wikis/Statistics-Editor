@@ -21,8 +21,13 @@
         try {
           const ok = await towerStore.importFromShare(shareId);
           if (ok) {
+            const path = resolve("/tower/[name]", {
+              name: towerStore.selectedName,
+            });
             await goto(
-              resolve("/tower/[name]", { name: towerStore.selectedName }),
+              resolve(
+                `${path}?share=${encodeURIComponent(shareId)}` as `/tower/${string}`,
+              ),
               { replaceState: true, keepFocus: true, noScroll: true },
             );
             return;

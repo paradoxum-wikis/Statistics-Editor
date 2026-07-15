@@ -4,6 +4,7 @@
   import { Tooltip } from "bits-ui";
   import { analytics } from "$lib/services/analytics";
   import { bootstrap } from "$lib/bootstrap";
+  import { towerStore } from "$lib/stores/tower.svelte";
   import DesktopLayout from "$lib/components/DesktopLayout.svelte";
   import MobileLayout from "$lib/components/MobileLayout.svelte";
   import Toaster from "$lib/components/smol/Toaster.svelte";

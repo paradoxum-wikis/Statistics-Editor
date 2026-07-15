@@ -419,11 +419,21 @@ class TowerStore {
     this.manager?.clearCache(name);
 
     if (name && this.names.includes(name)) {
-      return await this.load(name);
-    } else {
-      this.unload();
+      await goto(resolve("/tower/[name]", { name }), {
+        replaceState: true,
+        keepFocus: true,
+        noScroll: true,
+      });
       return true;
     }
+
+    this.unload();
+    await goto(resolve("/"), {
+      replaceState: true,
+      keepFocus: true,
+      noScroll: true,
+    });
+    return true;
   }
 
   async #reloadShareSnapshot(): Promise<boolean> {
@@ -509,6 +519,12 @@ class TowerStore {
           this.sharePreviewId = null;
           this.#shareSnapshotWikitext = "";
           this.#lastLoadedName = this.selectedData.name;
+          // so reload does not re-import over the applied profile data
+          goto(resolve("/tower/[name]", { name }), {
+            replaceState: true,
+            keepFocus: true,
+            noScroll: true,
+          });
         }
 
         if (name) {
