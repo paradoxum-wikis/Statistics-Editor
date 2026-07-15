@@ -26,7 +26,7 @@
     page.status >= 400
       ? `404 Not Found | ${siteName}`
       : towerStore.missingTower
-        ? `Tower not found | ${siteName}`
+        ? `Tower Not Found | ${siteName}`
         : towerName
           ? `${towerName} | ${siteName}`
           : siteName,
