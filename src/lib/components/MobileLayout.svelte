@@ -269,7 +269,8 @@
       {#if isNotFound}
         <NotFoundView
           onHome={goHome}
-          kind={isTowerNotFound && !isPageNotFound ? "tower" : "page"}
+          tower={isTowerNotFound && !isPageNotFound}
+          status={page.status}
         />
       {:else if isClient && !towerStore.selectedData && !towerStore.isLoading}
         <HomeView onSelect={handleSelect} />

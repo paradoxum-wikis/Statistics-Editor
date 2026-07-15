@@ -1,23 +1,13 @@
 <script lang="ts">
   let {
     onHome,
-    kind = "page",
+    tower,
+    status,
   }: {
     onHome: () => void;
-    kind?: "page" | "tower";
+    tower: boolean;
+    status: number;
   } = $props();
-
-  const code = $derived(kind === "tower" ? "200" : "404");
-  const quote = $derived(
-    kind === "tower"
-      ? "Stuck in some idea dump that the writer scrapped."
-      : "Hello? Communicator's acting up... This doesn't feel right. Can you hea-RRrR",
-  );
-  const message = $derived(
-    kind === "tower"
-      ? "This tower doesn't exist, or at least, it used to, but is unfortunately no longer."
-      : "Sorry, the page you're looking for doesn't exist. It's either been moved or deleted.",
-  );
 </script>
 
 <div
@@ -32,16 +22,20 @@
     <p
       class="unisans text-[min(22vw,11rem)] leading-none font-black text-destructive"
     >
-      {code}
+      {status}
     </p>
   </div>
 
   <p class="max-w-3xl text-base text-muted-foreground italic sm:text-lg">
-    "{quote}"
+    "{tower
+      ? "Stuck in some idea dump that the writer scrapped."
+      : "Hello? Communicator's acting up... This doesn't feel right. Can you hea-RRrR"}"
   </p>
 
   <p class="max-w-md text-sm sm:text-base">
-    {message}
+    {tower
+      ? "This tower doesn't exist, or at least, it used to, but is unfortunately no longer."
+      : "Sorry, the page you're looking for doesn't exist. It's either been moved or deleted."}
   </p>
 
   <button type="button" class="btn btn-primary" onclick={onHome}>
