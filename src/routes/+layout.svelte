@@ -1,9 +1,9 @@
 <script>
   import { onMount } from "svelte";
+  import { page } from "$app/state";
   import { Tooltip } from "bits-ui";
   import { analytics } from "$lib/services/analytics";
   import { bootstrap } from "$lib/bootstrap";
-  import { towerStore } from "$lib/stores/tower.svelte";
   import DesktopLayout from "$lib/components/DesktopLayout.svelte";
   import MobileLayout from "$lib/components/MobileLayout.svelte";
   import Toaster from "$lib/components/smol/Toaster.svelte";
@@ -14,16 +14,20 @@
 
   const siteName = "TDS Statistics Editor";
   const siteUrl = "https://se.tds.wiki/";
-  const description =
+  const defaultDescription =
     "Edit and balance towers for the Roblox game Tower Defense Simulator and export it to the wiki!";
   const ogImage = `${siteUrl}ogimg.png`;
   const ogImageAlt =
     "TDS Statistics Editor - modify, balance, or just, mess around!";
 
+  const towerName = $derived(page.params.name);
   const pageTitle = $derived(
-    towerStore.selectedName
-      ? `${towerStore.selectedName} | ${siteName}`
-      : siteName,
+    towerName ? `${towerName} | ${siteName}` : siteName,
+  );
+  const description = $derived(
+    towerName
+      ? `Edit ${towerName} stats in the TDS Statistics Editor for the Roblox game Tower Defense Simulator!`
+      : defaultDescription,
   );
 
   onMount(async () => {
