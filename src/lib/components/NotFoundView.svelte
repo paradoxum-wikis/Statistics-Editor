@@ -1,6 +1,4 @@
 <script lang="ts">
-  import ForOhFor from "$lib/assets/404.png";
-
   let {
     onHome,
     kind = "page",
@@ -26,8 +24,8 @@
   class="flex min-h-full flex-col items-center justify-center gap-4 py-8 text-center"
 >
   <div class="flex items-center justify-center gap-4 sm:gap-6">
-    <img
-      src={ForOhFor}
+    <enhanced:img
+      src="$lib/assets/404.png"
       alt=""
       class="w-[min(22vw,11rem)] shrink-0 select-none"
     />

@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Attachment } from "svelte/attachments";
-  import MoneyIcon from "$lib/assets/Income.png";
+  import MoneyIcon from "$lib/assets/Income.png?enhanced";
   import { settingsStore } from "$lib/stores/settings.svelte";
   import { formatNumber } from "$lib/utils/format";
   import { formatDelta, type DeltaInfo } from "$lib/towerTable";
@@ -45,7 +45,7 @@
 
 {#snippet body()}
   {#if isMoney}
-    <img
+    <enhanced:img
       src={MoneyIcon}
       alt=""
       class="money-icon {editable ? 'money-icon-input' : ''}"

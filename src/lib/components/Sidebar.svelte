@@ -10,20 +10,21 @@
   import { settingsStore } from "$lib/stores/settings.svelte";
   import { applyRofBug, toNumericValue, getRofBugVer } from "$lib/utils/format";
 
-  import DamageIcon from "$lib/assets/Damage.png";
-  import CooldownIcon from "$lib/assets/Cooldown.png";
-  import IncomeIcon from "$lib/assets/Income.png";
-  import RangeIcon from "$lib/assets/Range.png";
-  import HiddenIcon from "$lib/assets/HiddenDetection.png";
-  import FlyingIcon from "$lib/assets/FlyingDetection.png";
-  import LeadIcon from "$lib/assets/LeadDetection.png";
+  import type { Picture } from "@sveltejs/enhanced-img";
+  import DamageIcon from "$lib/assets/Damage.png?enhanced";
+  import CooldownIcon from "$lib/assets/Cooldown.png?enhanced";
+  import IncomeIcon from "$lib/assets/Income.png?enhanced";
+  import RangeIcon from "$lib/assets/Range.png?enhanced";
+  import HiddenIcon from "$lib/assets/HiddenDetection.png?enhanced";
+  import FlyingIcon from "$lib/assets/FlyingDetection.png?enhanced";
+  import LeadIcon from "$lib/assets/LeadDetection.png?enhanced";
 
   type SummaryLine = {
     kind: "change" | "grant";
     stat: string;
     from?: string | number | null;
     to?: string | number | null;
-    icon?: string;
+    icon?: Picture;
   };
 
   let { class: className }: { class?: string } = $props();
@@ -71,7 +72,7 @@
       : "none",
   );
 
-  const STATS_BY_ICON: Array<[icon: string, stats: string[]]> = [
+  const STATS_BY_ICON: Array<[icon: Picture, stats: string[]]> = [
     [DamageIcon, ["Damage"]],
     [CooldownIcon, ["Cooldown", "Tick", "Firerate"]],
     [IncomeIcon, ["Income"]],
@@ -81,7 +82,7 @@
     [LeadIcon, ["Lead"]],
   ];
 
-  const ICON_BY_STAT: Record<string, string> = Object.fromEntries(
+  const ICON_BY_STAT: Record<string, Picture> = Object.fromEntries(
     STATS_BY_ICON.flatMap(([icon, stats]) => stats.map((s) => [s, icon])),
   );
 

@@ -2,6 +2,7 @@
   import { Tabs } from "bits-ui";
   import { fade } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
+  import type { Picture } from "@sveltejs/enhanced-img";
   import WikiBanner from "./smol/WikiBanner.svelte";
   import Separator from "./smol/Separator.svelte";
   import { stripRefs } from "$lib/utils/format";
@@ -24,7 +25,7 @@
         stat: string;
         from?: string | number | null;
         to?: string | number | null;
-        icon?: string;
+        icon?: Picture;
       }>;
     };
     upgradeLevels?: string[];
@@ -155,12 +156,14 @@
                   <div class="upgrade-summary-line">
                     <span class="upgrade-summary-marker">
                       {#if line.icon}
-                        <img
+                        <enhanced:img
                           src={line.icon}
                           alt={stripRefs(line.stat)}
-                          class={isDetectionStat(line.stat)
-                            ? "dark:invert-0 invert"
-                            : ""}
+                          class="mt-[0.05em] block size-[1em] {isDetectionStat(
+                            line.stat,
+                          )
+                            ? 'dark:invert-0 invert'
+                            : ''}"
                         />
                       {:else}
                         <span class="upgrade-summary-bullet">●</span>
@@ -218,13 +221,6 @@
     justify-content: center;
     align-items: flex-start;
     padding-top: 0.1em;
-  }
-
-  .upgrade-summary-marker > img {
-    width: 1em;
-    height: 1em;
-    display: block;
-    margin-top: 0.05em;
   }
 
   .upgrade-summary-bullet {

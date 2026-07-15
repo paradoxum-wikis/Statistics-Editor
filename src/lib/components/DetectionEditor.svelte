@@ -1,9 +1,9 @@
 <script lang="ts">
   import { towerStore } from "$lib/stores/tower.svelte";
   import { getTargetSkins } from "$lib/utils/towah";
-  import HiddenIcon from "$lib/assets/HiddenDetection.png";
-  import LeadIcon from "$lib/assets/LeadDetection.png";
-  import FlyingIcon from "$lib/assets/FlyingDetection.png";
+  import HiddenIcon from "$lib/assets/HiddenDetection.png?enhanced";
+  import LeadIcon from "$lib/assets/LeadDetection.png?enhanced";
+  import FlyingIcon from "$lib/assets/FlyingDetection.png?enhanced";
   import { Select } from "bits-ui";
   import { Check, ChevronDown, ScanEye } from "@lucide/svelte";
   import CollapsibleSide from "./smol/CollapsibleSide.svelte";
@@ -102,7 +102,7 @@
       {#each detectionTypes as detection (detection.type)}
         <SubtleRow class="flex items-center justify-between p-1">
           <div class="flex items-center gap-1.5 px-1">
-            <img
+            <enhanced:img
               src={detection.icon}
               alt="{detection.type} Detection"
               class="w-5 h-5 dark:invert-0 invert"
