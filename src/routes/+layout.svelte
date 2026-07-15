@@ -23,12 +23,18 @@
 
   const towerName = $derived(page.params.name);
   const pageTitle = $derived(
-    towerName ? `${towerName} | ${siteName}` : siteName,
+    page.status >= 400
+      ? `404 Not Found | ${siteName}`
+      : towerName
+        ? `${towerName} | ${siteName}`
+        : siteName,
   );
   const description = $derived(
-    towerName
-      ? `Edit ${towerName} stats in the TDS Statistics Editor for the Roblox game Tower Defense Simulator!`
-      : defaultDescription,
+    page.status >= 400
+      ? "Sorry, the page you're looking for doesn't exist."
+      : towerName
+        ? `Edit ${towerName} stats in the TDS Statistics Editor for the Roblox game Tower Defense Simulator!`
+        : defaultDescription,
   );
 
   onMount(async () => {

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
+  import { page } from "$app/state";
   import { cubicOut } from "svelte/easing";
   import { fly } from "svelte/transition";
 
@@ -10,6 +11,7 @@
   import Sidebar from "./Sidebar.svelte";
   import TowerEditor from "./TowerEditor.svelte";
   import HomeView from "./HomeView.svelte";
+  import NotFoundView from "./NotFoundView.svelte";
   import TowerPicker from "./TowerPicker.svelte";
   import StatusBar from "./StatusBar.svelte";
   import SettingsModal from "./SettingsModal.svelte";
@@ -49,14 +51,18 @@
       });
   });
 
+  const isNotFound = $derived(page.status >= 400);
+
   const mainKey = $derived(
     !isClient
       ? "init"
-      : towerStore.selectedName
-        ? `tower:${towerStore.selectedName}`
-        : towerStore.isLoading
-          ? "loading"
-          : "intro",
+      : isNotFound
+        ? "not-found"
+        : towerStore.selectedName
+          ? `tower:${towerStore.selectedName}`
+          : towerStore.isLoading
+            ? "loading"
+            : "intro",
   );
 
   async function performGoHome() {
@@ -376,7 +382,9 @@
         class:overflow-x-auto={!!towerStore.selectedData}
       >
         {#key mainKey}
-          {#if isClient && !towerStore.selectedData && !towerStore.isLoading}
+          {#if isNotFound}
+            <NotFoundView onHome={goHome} />
+          {:else if isClient && !towerStore.selectedData && !towerStore.isLoading}
             <HomeView onSelect={handleSelect} />
           {:else}
             <div in:fly={{ y: 8, duration: 160, easing: cubicOut }}>
