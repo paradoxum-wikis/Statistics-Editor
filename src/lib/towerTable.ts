@@ -312,48 +312,6 @@ export function buildDisplayRowsCache(
   return cache;
 }
 
-export function rebuildBaselineForSkin(
-  tower: Tower,
-  skinName: string,
-  rofInfo: RofInfo,
-  globalModifier: GlobalModifier,
-): Record<string, string | number | boolean> {
-  const skinData = tower.getSkin(skinName);
-  if (!skinData) return {};
-
-  const headers =
-    skinData.headers.length > 0 ? skinData.headers : skinData.levels.attributes;
-  const next: Record<string, string | number | boolean> = {};
-
-  for (let i = 0; i < skinData.levels.levels.length; i++) {
-    for (const header of headers) {
-      next[mkCellKey(skinName, 0, i, header)] =
-        header === "Level" ? i : skinData.levels.getCell(i, header);
-    }
-  }
-
-  skinData.extraTables?.forEach((extTable, idx) => {
-    const tableIdx = idx + 1;
-    const config = buildTableConfigForSkin(tower, skinName, tableIdx, idx);
-    if (!config) return;
-    const resolvedRows = buildDisplayRows(
-      config,
-      rofInfo,
-      globalModifier,
-      false,
-      false,
-    );
-    for (let i = 0; i < resolvedRows.length; i++) {
-      for (const header of extTable.headers) {
-        next[mkCellKey(skinName, tableIdx, i, header)] =
-          header === "Level" ? i : resolvedRows[i][header];
-      }
-    }
-  });
-
-  return next;
-}
-
 function getCellFormulaToken(
   config: TableConfig,
   rowIdx: number,

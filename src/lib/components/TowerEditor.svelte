@@ -28,7 +28,6 @@
     buildSkinRefState,
     getCompareValueForKey as getCompareValueFromCache,
     refEntryKey,
-    rebuildBaselineForSkin,
     tableCacheKey,
     type TableConfig,
   } from "$lib/towerTable";
@@ -99,23 +98,6 @@
   let isSharing = $state(false);
   let shareLink = $state<string | null>(null);
   let shareError = $state<string | null>(null);
-
-  function setBaselineForSkin(t: Tower, skinName: string) {
-    if (settingsStore.debugMode) {
-      console.log(
-        `[TowerEditor] Rebuilding baseline for ${t.name} (skin: ${skinName})`,
-      );
-    }
-    towerStore.baseline = rebuildBaselineForSkin(
-      t,
-      skinName,
-      rofInfo,
-      modifier,
-    );
-    towerStore.baselineTowerId = t.name;
-    towerStore.baselineSkinName = skinName;
-    towerStore.baselineLocked = false;
-  }
 
   function parseEditValue(value: string): string | number | boolean {
     if (value === "true") return true;
@@ -229,8 +211,6 @@
       );
     }
     await towerStore.discardChanges();
-    if (tower && selectedSkinName && !towerStore.baselineLocked)
-      setBaselineForSkin(tower, selectedSkinName);
     towerStore.refresh();
   }
 
@@ -348,10 +328,6 @@
         towerStore.isDirty = false;
         await towerStore.forceReload();
 
-        const refreshed = towerStore.selectedData;
-        const skin = towerStore.selectedSkinName;
-        if (refreshed && skin && !towerStore.baselineLocked)
-          setBaselineForSkin(refreshed, skin);
         analytics.track("wiki_fetch", {
           tower_name: tower.name,
           success: true,

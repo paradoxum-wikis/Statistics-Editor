@@ -8,7 +8,10 @@ import {
   guaraCustomTower,
   isCustomTower,
 } from "$lib/towerComponents/customTowers";
-import { mergeBaselineOnTowerDiff } from "$lib/utils/towah";
+import {
+  collectCompareValues,
+  mergeBaselineOnTowerDiff,
+} from "$lib/utils/towah";
 import {
   embedSeDirectives,
   extractSeMemo,
@@ -190,24 +193,11 @@ class TowerStore {
         this.editorMemo = loadedMemo;
         this.#originalEditorMemo = loadedMemo;
 
-        const savedDiff = (
-          tower as unknown as { diffBaseline?: Record<string, unknown> }
-        ).diffBaseline;
-        if (savedDiff && Object.keys(savedDiff).length > 0) {
-          this.baseline = savedDiff;
-          this.baselineTowerId = tower.name;
-          this.baselineSkinName = null;
-          this.baselineLocked = true;
-          if (settingsStore.debugMode)
-            console.log(
-              `[TowerStore] Loaded @se-diff baseline (${Object.keys(savedDiff).length} cells)`,
-            );
-        } else {
-          this.baseline = {};
-          this.baselineTowerId = null;
-          this.baselineSkinName = null;
-          this.baselineLocked = false;
-        }
+        this.#applyBaseline(
+          tower,
+          (tower as unknown as { diffBaseline?: Record<string, unknown> })
+            .diffBaseline,
+        );
 
         if (settingsStore.debugMode)
           console.log(`Loaded tower data for ${tower.name}`);
@@ -390,18 +380,7 @@ class TowerStore {
       this.editorMemo = loadedMemo;
       this.#originalEditorMemo = loadedMemo;
 
-      const savedDiff = anyTower.diffBaseline;
-      if (savedDiff && Object.keys(savedDiff).length > 0) {
-        this.baseline = savedDiff;
-        this.baselineTowerId = towerName;
-        this.baselineSkinName = null;
-        this.baselineLocked = true;
-      } else {
-        this.baseline = {};
-        this.baselineTowerId = null;
-        this.baselineSkinName = null;
-        this.baselineLocked = false;
-      }
+      this.#applyBaseline(tower, anyTower.diffBaseline);
 
       const skins = tower.skinNames;
       if (!skins.includes(this.selectedSkinName)) {
@@ -429,7 +408,10 @@ class TowerStore {
     this.#lastLoadedName = null;
     this.manager?.clearCache(name);
 
-    if (name && this.names.some((n) => n.toLowerCase() === name.toLowerCase())) {
+    if (
+      name &&
+      this.names.some((n) => n.toLowerCase() === name.toLowerCase())
+    ) {
       await goto(resolve("/tower/[name]", { name }), {
         replaceState: true,
         keepFocus: true,
@@ -474,18 +456,7 @@ class TowerStore {
     this.editorMemo = loadedMemo;
     this.#originalEditorMemo = loadedMemo;
 
-    const savedDiff = anyTower.diffBaseline;
-    if (savedDiff && Object.keys(savedDiff).length > 0) {
-      this.baseline = savedDiff;
-      this.baselineTowerId = this.selectedName;
-      this.baselineSkinName = null;
-      this.baselineLocked = true;
-    } else {
-      this.baseline = {};
-      this.baselineTowerId = null;
-      this.baselineSkinName = null;
-      this.baselineLocked = false;
-    }
+    this.#applyBaseline(tower, anyTower.diffBaseline);
 
     this.refresh();
     return true;
@@ -578,9 +549,11 @@ class TowerStore {
       changed = true;
     }
 
-    if (Object.keys(this.baseline).length > 0) {
-      this.baseline = {};
-      this.baselineLocked = false;
+    if (
+      this.selectedData &&
+      (Object.keys(this.baseline).length > 0 || this.baselineLocked)
+    ) {
+      this.#applyBaseline(this.selectedData);
       changed = true;
     }
 
@@ -690,6 +663,29 @@ class TowerStore {
     this.baselineTowerId = null;
     this.baselineSkinName = null;
     this.missingTower = false;
+  }
+
+  #applyBaseline(
+    tower: Tower,
+    savedDiff?: Record<string, unknown> | null,
+  ): void {
+    const current = collectCompareValues(tower);
+    if (savedDiff && Object.keys(savedDiff).length > 0) {
+      // fill rest so formula cells are trackable
+      this.baseline = { ...current, ...savedDiff };
+      this.baselineTowerId = tower.name;
+      this.baselineSkinName = null;
+      this.baselineLocked = true;
+      if (settingsStore.debugMode)
+        console.log(
+          `[TowerStore] Loaded @se-diff baseline (${Object.keys(savedDiff).length} cells, ${Object.keys(this.baseline).length} total)`,
+        );
+      return;
+    }
+    this.baseline = current;
+    this.baselineTowerId = tower.name;
+    this.baselineSkinName = null;
+    this.baselineLocked = false;
   }
 
   #touchRecent(name: string): void {
