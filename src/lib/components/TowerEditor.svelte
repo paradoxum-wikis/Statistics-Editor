@@ -447,19 +447,15 @@
       <Popover.Root bind:open={shareOpen} onOpenChange={onShareOpenChange}>
         <Tip content={shareUrlTip}>
           {#snippet children({ props })}
-            {#if canShareUrl}
-              <Popover.Trigger class="btn btn-secondary" {...props}>
+            <span class="inline-flex" {...props}>
+              <Popover.Trigger
+                class="btn btn-secondary"
+                disabled={!canShareUrl}
+              >
                 <span class="max-md:hidden">Share URL</span>
                 <span class="hidden max-md:inline">Share</span>
               </Popover.Trigger>
-            {:else}
-              <span class="inline-flex" {...props}>
-                <button type="button" class="btn btn-secondary" disabled>
-                  <span class="max-md:hidden">Share URL</span>
-                  <span class="hidden max-md:inline">Share</span>
-                </button>
-              </span>
-            {/if}
+            </span>
           {/snippet}
         </Tip>
         <Popover.Content class="popover-content w-80">
