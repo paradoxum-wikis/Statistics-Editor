@@ -9,6 +9,10 @@ import {
   columnKeysEqual,
 } from "$lib/utils/format";
 import { settingsStore } from "$lib/stores/settings.svelte";
+import {
+  getTableCacheRowAt,
+  type TableRowCache,
+} from "$lib/neowtext/levelKeys";
 
 function parseLevelNumber(level: number | string): number {
   const parsed = typeof level === "number" ? level : parseInt(level, 10);
@@ -157,6 +161,7 @@ function getCachedTableRow(
   tableCache: TableCache | undefined,
   tableName: string,
   level: number,
+  branch?: string,
 ): Record<string, string | number> | undefined {
   if (!tableCache) return undefined;
 
@@ -165,7 +170,7 @@ function getCachedTableRow(
   const keys = [tableName.trim(), raw, noSpace];
 
   for (const key of keys) {
-    const row = tableCache[key]?.[level];
+    const row = getTableCacheRowAt(tableCache[key], level, branch);
     if (row) return row;
   }
   return undefined;
@@ -381,10 +386,7 @@ function isNumericArrayBody(raw: string): boolean {
   return true;
 }
 
-export type TableCache = Record<
-  string,
-  Record<number, Record<string, string | number>>
->;
+export type TableCache = Record<string, TableRowCache>;
 
 /**
  * $FNC-TOTALPRICE$ links with $FNC-COST$.
@@ -583,7 +585,12 @@ export function resolveToken(
     const numLevel = parseLevelNumber(level);
     const tableName = tableNameRaw.trim();
     const columnName = columnNameRaw.trim();
-    const cached = getCachedTableRow(tableCache, tableName, numLevel);
+    const cached = getCachedTableRow(
+      tableCache,
+      tableName,
+      numLevel,
+      activeBranch,
+    );
 
     if (cached) {
       const cacheContext = maybeApplyRofToCachedRow(
@@ -757,7 +764,12 @@ export function resolveToken(
       (match, tname, col) => {
         const tableName = tname.trim();
         const columnName = col.trim();
-        const cached = getCachedTableRow(tableCache, tableName, numLevel);
+        const cached = getCachedTableRow(
+          tableCache,
+          tableName,
+          numLevel,
+          activeBranch,
+        );
         const cacheContext = cached
           ? maybeApplyRofToCachedRow(cached, tokens, applyRofToCache)
           : undefined;
@@ -770,6 +782,7 @@ export function resolveToken(
             token,
             level,
             numLevel,
+            activeBranch,
             tableName,
             columnName,
             cacheHit: cached !== undefined,

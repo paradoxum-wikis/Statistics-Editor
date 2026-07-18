@@ -8,6 +8,10 @@ import {
   type TableCache,
 } from "$lib/neowtext/functions";
 import {
+  indexRowsByLevelKeys,
+  type TableRowCache,
+} from "$lib/neowtext/levelKeys";
+import {
   DETECTION_TYPES,
   getSchemaIndex,
   getSchemaParent,
@@ -274,18 +278,10 @@ export default class TowerManager {
             indexOverrides[cleanName] ||
             indexOverrides[table.name] ||
             table.headers[0];
-          const tCache: Record<number, Record<string, string | number>> = {};
-          for (const row of table.rows) {
-            const s = String(row[indexCol] ?? "");
-            const range = s.match(/^(\d+)[^\d]+(\d+)$/);
-            if (range) {
-              for (let l = parseInt(range[1]); l <= parseInt(range[2]); l++)
-                tCache[l] = row;
-            } else {
-              const n = parseInt(s);
-              if (!isNaN(n)) tCache[n] = row;
-            }
-          }
+          const tCache: TableRowCache = indexRowsByLevelKeys(
+            table.rows,
+            indexCol,
+          );
           cache[table.name] = tCache;
           cache[cleanName] = tCache;
           cache[cleanName.replace(/\s+/g, "")] = tCache;

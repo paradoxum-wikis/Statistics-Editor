@@ -10,6 +10,7 @@ import {
   resolveToken,
   type TableCache,
 } from "$lib/neowtext/functions";
+import { indexRowsByLevelKeys } from "$lib/neowtext/levelKeys";
 import {
   DETECTION_TYPES,
   type DetectionFlags,
@@ -200,21 +201,8 @@ class SkinData {
       const indexCol =
         indexOverrides[cleanName] || indexOverrides[tableName] || headers[0];
 
-      const tCache: Record<number, Record<string, string | number>> = {};
-      for (const row of rows) {
-        const s = String(row[indexCol] ?? "");
-        const range = s.match(/^(\d+)[^\d]+(\d+)$/);
-        if (range) {
-          for (let l = parseInt(range[1]); l <= parseInt(range[2]); l++) {
-            tCache[l] = row;
-          }
-        } else {
-          const n = parseInt(s);
-          if (!isNaN(n)) tCache[n] = row;
-        }
-      }
-
-      this.tableCache[tableName] = tCache;
+      this.tableCache[tableName] = indexRowsByLevelKeys(rows, indexCol);
+      const tCache = this.tableCache[tableName];
       this.tableCache[cleanName] = tCache;
       this.tableCache[cleanName.replace(/\s+/g, "")] = tCache;
     };
