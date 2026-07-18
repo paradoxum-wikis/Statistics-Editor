@@ -1,7 +1,5 @@
 <script lang="ts">
-  import { onMount } from "svelte";
   import { Dialog, Tabs } from "bits-ui";
-  import { ChartLine } from "@lucide/svelte";
   import Switch from "$lib/components/smol/Switch.svelte";
   import {
     settingsStore,
@@ -9,28 +7,10 @@
     type BooleanSetting,
     type SettingTab,
   } from "$lib/stores/settings.svelte";
-  import { analytics } from "$lib/services/analytics";
 
   const SETTING_TABS: SettingTab[] = ["editor", "appearance", "advanced"];
 
   let { open = $bindable(false) } = $props();
-  let analyticsEnabled = $state(false);
-
-  onMount(() => {
-    analyticsEnabled = localStorage.getItem("analyticsConsent") === "true";
-    const handler = (e: CustomEvent<{ granted: boolean }>) => {
-      analyticsEnabled = e.detail.granted;
-    };
-    document.addEventListener(
-      "analyticsConsentChanged",
-      handler as EventListener,
-    );
-    return () =>
-      document.removeEventListener(
-        "analyticsConsentChanged",
-        handler as EventListener,
-      );
-  });
 </script>
 
 {#snippet settingRow(
@@ -126,36 +106,6 @@
                   {/each}
                 </div>
               {/each}
-
-              {#if tab === "advanced"}
-                <div
-                  class="flex items-center justify-between gap-2 rounded-[var(--radius)_0] border border-border bg-card p-4"
-                >
-                  <div class="flex items-center gap-3">
-                    <div
-                      class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border bg-background"
-                    >
-                      <ChartLine class="h-5 w-5 text-foreground" />
-                    </div>
-                    <div class="space-y-1">
-                      <label
-                        for="analytics-toggle"
-                        class="text-sm font-medium leading-none"
-                      >
-                        Analytics
-                      </label>
-                      <p class="text-xs text-muted-foreground">
-                        Help us improve by sharing anonymous usage data.
-                      </p>
-                    </div>
-                  </div>
-                  <Switch
-                    id="analytics-toggle"
-                    bind:checked={analyticsEnabled}
-                    onCheckedChange={(v: boolean) => analytics.setConsent(v)}
-                  />
-                </div>
-              {/if}
             </div>
           </Tabs.Content>
         {/each}

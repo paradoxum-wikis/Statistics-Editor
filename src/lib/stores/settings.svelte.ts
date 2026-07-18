@@ -1,6 +1,7 @@
 import type { Component } from "svelte";
 import {
   Bug,
+  ChartLine,
   Diff,
   Eraser,
   Columns2,
@@ -102,6 +103,15 @@ const SETTING_DEFS = {
     label: "Debug Mode",
     description: "Enables detailed logging in the console.",
   },
+  analyticsConsent: {
+    storageKey: "analyticsConsent",
+    default: true,
+    id: "analytics-toggle",
+    tab: "advanced",
+    icon: ChartLine,
+    label: "Analytics",
+    description: "Help us improve by sharing anonymous usage data.",
+  },
 } as const satisfies Record<string, BooleanSettingDef>;
 
 export type BooleanSettingKey = keyof typeof SETTING_DEFS;
@@ -173,6 +183,7 @@ class SettingsStore {
     SETTING_DEFS.restoreRefOnClearEdit.default,
   );
   rofBug = $state<boolean>(SETTING_DEFS.rofBug.default);
+  analyticsConsent = $state<boolean>(SETTING_DEFS.analyticsConsent.default);
   theme = $state(THEME_SETTING.default);
 
   private assignBoolean(key: BooleanSettingKey, value: boolean) {
@@ -200,6 +211,9 @@ class SettingsStore {
         break;
       case "debugMode":
         this.debugMode = value;
+        break;
+      case "analyticsConsent":
+        this.analyticsConsent = value;
         break;
     }
   }
@@ -243,21 +257,29 @@ class SettingsStore {
         return this.hideCellWrapper;
       case "debugMode":
         return this.debugMode;
+      case "analyticsConsent":
+        return this.analyticsConsent;
     }
   }
 
   setBoolean(key: BooleanSettingKey, value: boolean): void {
     this.assignBoolean(key, value);
     const def = SETTING_DEFS[key];
-    writeBoolean(def.storageKey, value);
+    if (key === "analyticsConsent") {
+      analytics.setConsent(value);
+    } else {
+      writeBoolean(def.storageKey, value);
+    }
     if (key === "clearOnEdit" && !value) {
       this.assignBoolean("restoreRefOnClearEdit", false);
       writeBoolean(SETTING_DEFS.restoreRefOnClearEdit.storageKey, false);
     }
-    analytics.track("setting_change", {
-      setting_name: key,
-      setting_value: String(value),
-    });
+    if (key !== "analyticsConsent") {
+      analytics.track("setting_change", {
+        setting_name: key,
+        setting_value: String(value),
+      });
+    }
   }
 
   setTheme(value: "light" | "dark" | "system") {
