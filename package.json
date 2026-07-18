@@ -13,6 +13,7 @@
     "prepare": "bunx svelte-kit sync || true",
     "check": "bunx svelte-kit sync && bunx svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "bunx svelte-kit sync && bunx svelte-check --tsconfig ./tsconfig.json --watch",
+    "test": "bun test",
     "format": "bunx prettier --write ."
   },
   "devDependencies": {
