@@ -6,17 +6,15 @@ import {
   getFncValue,
   resolveToken,
   type TableCache,
-} from "$lib/neowtext/functions";
-import {
-  indexRowsByLevelKeys,
-  type TableRowCache,
-} from "$lib/neowtext/levelKeys";
-import {
   DETECTION_TYPES,
   getSchemaIndex,
   getSchemaParent,
   parseDetectionArray,
-} from "$lib/neowtext/detection";
+} from "$lib/neowtext/functions";
+import {
+  indexRowsByLevelKeys,
+  type TableRowCache,
+} from "$lib/neowtext/tableCache";
 import { parseWikitext, type TableData } from "$lib/neowtext/parser";
 import { patchWikitext } from "$lib/neowtext/patcher";
 import {

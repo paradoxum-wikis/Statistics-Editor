@@ -15,8 +15,8 @@
     type DetectionType,
     levelsOnBranch,
     schemaBranches,
-  } from "$lib/neowtext/detection";
-  import { getFncValue } from "$lib/neowtext/functions";
+    getFncValue,
+  } from "$lib/neowtext/functions";
   import type SkinData from "$lib/towerComponents/skinData";
 
   let open = $state(true);

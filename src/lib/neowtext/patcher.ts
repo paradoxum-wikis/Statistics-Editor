@@ -6,7 +6,7 @@ import {
   flagsFromSkinJson,
   parseSchema,
   serializeDetectionFlags,
-} from "./detection";
+} from "./functions";
 
 /**
  * Updates the given source wikitext with data from the Tower instance.

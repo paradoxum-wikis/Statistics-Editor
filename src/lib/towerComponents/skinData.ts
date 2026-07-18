@@ -9,9 +9,6 @@ import {
   getFncValue,
   resolveToken,
   type TableCache,
-} from "$lib/neowtext/functions";
-import { indexRowsByLevelKeys } from "$lib/neowtext/levelKeys";
-import {
   DETECTION_TYPES,
   type DetectionFlags,
   type DetectionType,
@@ -23,7 +20,8 @@ import {
   parseSchema,
   schemaBranches,
   serializeDetectionFlags,
-} from "$lib/neowtext/detection";
+} from "$lib/neowtext/functions";
+import { indexRowsByLevelKeys } from "$lib/neowtext/tableCache";
 import type { TableData } from "$lib/neowtext/parser";
 import { settingsStore } from "$lib/stores/settings.svelte";
 import {
