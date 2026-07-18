@@ -269,6 +269,7 @@
   .readonly-cell {
     color: var(--muted-foreground);
     font-style: italic;
+    cursor: not-allowed;
   }
 
   .diff-positive {
