@@ -7,6 +7,12 @@ import {
   resolveToken,
   type TableCache,
 } from "$lib/neowtext/functions";
+import {
+  DETECTION_TYPES,
+  getSchemaIndex,
+  getSchemaParent,
+  parseDetectionArray,
+} from "$lib/neowtext/detection";
 import { parseWikitext, type TableData } from "$lib/neowtext/parser";
 import { patchWikitext } from "$lib/neowtext/patcher";
 import {
@@ -418,88 +424,14 @@ export default class TowerManager {
           formulaTokens[getDefaultFncKey("BRANCH")] = variantBranch;
         }
 
-        const getIndex = (lvl: number, branch: string) => {
-          if (!schema) return lvl;
-          const trunkLetter = schema[0] || "N";
-          const tBranch = branch || trunkLetter;
-          let tLvl = 0;
-          const bLvls: Record<string, number> = {};
-          for (let i = 0; i < schema.length; i++) {
-            const letter = schema[i] || trunkLetter;
-            if (letter === trunkLetter) {
-              if (tBranch === trunkLetter && tLvl === lvl) return i;
-              tLvl++;
-            } else {
-              if (bLvls[letter] === undefined) bLvls[letter] = tLvl;
-              if (tBranch === letter && bLvls[letter] === lvl) return i;
-              bLvls[letter]++;
-            }
-          }
-          return -1;
-        };
+        const getIndex = getSchemaIndex.bind(null, schema);
+        const getParent = getSchemaParent.bind(null, schema);
 
-        const globalDetections = Array.from(
-          { length: schema ? schema.length : rows.length },
-          () => ({ Hidden: false, Lead: false, Flying: false }),
+        const globalDetections = parseDetectionArray(
+          detects,
+          schema,
+          schema ? schema.length : rows.length,
         );
-
-        const branchNamesList = [
-          schema ? schema[0] || "N" : "N",
-          ...(schema
-            ? Array.from(new Set(schema)).filter(
-                (x) => x !== (schema[0] || "N"),
-              )
-            : []),
-        ];
-
-        for (let i = 0; i < detects.length; i++) {
-          const s = detects[i]?.trim();
-          if (!s) continue;
-          const lvl = Number(s);
-          if (!Number.isFinite(lvl)) continue;
-
-          const branchIdx = Math.floor(i / 3);
-          const typeIdx = i % 3;
-
-          const branch = branchNamesList[branchIdx] || branchNamesList[0];
-          const type = ["Hidden", "Lead", "Flying"][typeIdx];
-
-          const globalIdx = getIndex(
-            lvl,
-            branch === branchNamesList[0] ? "" : branch,
-          );
-          if (globalIdx >= 0 && globalIdx < globalDetections.length) {
-            globalDetections[globalIdx][type as "Hidden" | "Lead" | "Flying"] =
-              true;
-          }
-        }
-
-        const getParent = (idx: number) => {
-          if (idx <= 0) return -1;
-          if (!schema) return idx - 1;
-          const trunkLetter = schema[0] || "N";
-          const letter = schema[idx];
-          if (letter === trunkLetter) return idx - 1;
-
-          const firstOccur = schema.indexOf(letter);
-          if (idx === firstOccur) {
-            return schema.lastIndexOf(trunkLetter);
-          } else {
-            return idx - 1;
-          }
-        };
-
-        for (let i = 0; i < globalDetections.length; i++) {
-          const parentIdx = getParent(i);
-          if (parentIdx >= 0) {
-            if (globalDetections[parentIdx].Hidden)
-              globalDetections[i].Hidden = true;
-            if (globalDetections[parentIdx].Lead)
-              globalDetections[i].Lead = true;
-            if (globalDetections[parentIdx].Flying)
-              globalDetections[i].Flying = true;
-          }
-        }
 
         const cellFormulaTokens: Record<string, Record<string, string>> = {};
         let prevPrice = 0;
@@ -575,7 +507,7 @@ export default class TowerManager {
                 ? globalDetections[parentIdx]
                 : { Hidden: false, Lead: false, Flying: false };
 
-            for (const type of ["Hidden", "Lead", "Flying"] as const) {
+            for (const type of DETECTION_TYPES) {
               if (gd[type]) {
                 detections[type] = true;
                 if (!parentGd[type] && this.debug()) {
@@ -732,7 +664,7 @@ export default class TowerManager {
                     ? globalDetections[parentIdx]
                     : { Hidden: false, Lead: false, Flying: false };
 
-                for (const type of ["Hidden", "Lead", "Flying"] as const) {
+                for (const type of DETECTION_TYPES) {
                   if (gd[type]) {
                     detections[type] = true;
                     if (!parentGd[type] && this.debug()) {

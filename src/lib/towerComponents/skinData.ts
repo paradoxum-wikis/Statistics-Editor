@@ -4,11 +4,25 @@ import Upgrade from "./upgrade";
 import Levels from "./levels";
 import Locator from "./locator";
 import {
+  getDefaultFncKey,
   getEffectiveFncKey,
   getFncValue,
   resolveToken,
   type TableCache,
 } from "$lib/neowtext/functions";
+import {
+  DETECTION_TYPES,
+  type DetectionFlags,
+  type DetectionType,
+  effectiveDetectionStart,
+  extractDetectionGains,
+  flagsFromSkinJson,
+  gainsToDetectArray,
+  parseDetectionArray,
+  parseSchema,
+  schemaBranches,
+  serializeDetectionFlags,
+} from "$lib/neowtext/detection";
 import type { TableData } from "$lib/neowtext/parser";
 import { settingsStore } from "$lib/stores/settings.svelte";
 import {
@@ -480,6 +494,96 @@ class SkinData {
     }
   }
 
+  getSchema(): string[] | null {
+    return parseSchema(getFncValue(this.formulaTokens, "SCHEMA"));
+  }
+
+  getDetectionGains(): Record<string, Partial<Record<DetectionType, number>>> {
+    return extractDetectionGains(this.detectionFlags(), this.getSchema());
+  }
+
+  detectionFlags(): DetectionFlags[] {
+    return flagsFromSkinJson(
+      {
+        Defaults: this.data.Defaults,
+        Upgrades: this.data.Upgrades,
+      },
+      this.getSchema(),
+    );
+  }
+
+  getEffectiveDetectionStart(
+    type: DetectionType,
+    branch: string,
+  ): number | null {
+    return effectiveDetectionStart(
+      this.detectionFlags(),
+      this.getSchema(),
+      branch,
+      type,
+    );
+  }
+
+  private applyDetectionFlags(flags: DetectionFlags[], rebuild: boolean) {
+    for (let i = 0; i < flags.length; i++) {
+      for (const type of DETECTION_TYPES) {
+        const value = flags[i][type];
+        if (i === 0) this.defaults.setDetection(type, value);
+        else if (this.upgrades[i - 1])
+          this.upgrades[i - 1].setDetection(type, value);
+      }
+    }
+    this.syncDetectionToken();
+    if (rebuild) this.createData();
+  }
+
+  syncDetectionToken() {
+    const schema = this.getSchema();
+    const detStr = serializeDetectionFlags(this.detectionFlags(), schema);
+    const key = this.isPvp
+      ? getDefaultFncKey("DETECTION", this.variantPrefix || "PVP")
+      : getEffectiveFncKey(
+          this.formulaTokens,
+          "DETECTION",
+          this.variantPrefix || undefined,
+        );
+
+    this.formulaTokens[key] = detStr;
+    if (this.data.FormulaTokens) this.data.FormulaTokens[key] = detStr;
+  }
+
+  setDetectionStart(
+    type: DetectionType,
+    branch: string,
+    startLevel: number | null,
+    rebuild: boolean = true,
+  ) {
+    const schema = this.getSchema();
+    const branches = schemaBranches(schema);
+    const b = branch || branches[0];
+    const slotCount = schema?.length ?? 1 + this.upgrades.length;
+
+    const gains = this.getDetectionGains() as Record<
+      string,
+      Partial<Record<DetectionType, number | null>>
+    >;
+    for (const br of branches) {
+      if (!gains[br]) gains[br] = {};
+    }
+    if (startLevel === null) delete gains[b][type];
+    else gains[b][type] = startLevel;
+
+    // Unmapped levels (like wrong letter) are dropped by parseDetectionArray
+    const flags = parseDetectionArray(
+      gainsToDetectArray(gains, schema).split(";"),
+      schema,
+      slotCount,
+    );
+
+    if (this.isPvp) this.pvpOwnedDetectionTypes.add(type);
+    this.applyDetectionFlags(flags, rebuild);
+  }
+
   setDetection(
     level: number,
     name: string,
@@ -496,6 +600,7 @@ class SkinData {
       this.pvpOwnedDetectionTypes.add(name);
     }
 
+    this.syncDetectionToken();
     if (rebuild) this.createData();
   }
 }

@@ -1,7 +1,12 @@
 import type Tower from "$lib/towerComponents/tower";
 import type { TableData } from "./parser";
 import { serializeTable, serializeVariables } from "./serializer";
-import { getDefaultFncKey } from "./functions";
+import { getDefaultFncKey, getFncValue } from "./functions";
+import {
+  flagsFromSkinJson,
+  parseSchema,
+  serializeDetectionFlags,
+} from "./detection";
 
 /**
  * Updates the given source wikitext with data from the Tower instance.
@@ -94,63 +99,45 @@ function buildVariablesMap(tower: Tower): Record<string, string> {
 
   preserveTokens(baseSkin);
 
+  const schema = parseSchema(
+    getFncValue(baseSkin?.formulaTokens ?? {}, "SCHEMA"),
+  );
+
   const extractFncArrays = (skinJson: any) => {
     const costs: string[] = [];
     const upgrades: string[] = [];
     const icons: string[] = [];
 
-    const detects = { Hidden: -1, Lead: -1, Flying: -1 };
-    const curDetects = { Hidden: false, Lead: false, Flying: false };
-
     costs.push(skinJson.Defaults?.Price?.toString() ?? "0");
-    if (skinJson.Defaults?.Detections) {
-      for (const type of ["Hidden", "Lead", "Flying"]) {
-        if (skinJson.Defaults.Detections[type]) {
-          detects[type as keyof typeof detects] = 0;
-          curDetects[type as keyof typeof curDetects] = true;
-        }
-      }
-    }
 
     if (skinJson.Upgrades) {
-      skinJson.Upgrades.forEach((up: any, idx: number) => {
-        const lvl = idx + 1;
+      skinJson.Upgrades.forEach((up: any) => {
         costs.push(up.Cost?.toString() ?? "0");
         upgrades.push(up.Title ?? "");
         icons.push(up.Image ?? "");
-
-        if (up.Stats?.Detections) {
-          for (const type of ["Hidden", "Lead", "Flying"]) {
-            if (
-              up.Stats.Detections[type] &&
-              !curDetects[type as keyof typeof curDetects]
-            ) {
-              detects[type as keyof typeof detects] = lvl;
-              curDetects[type as keyof typeof curDetects] = true;
-            }
-          }
-        }
       });
     }
 
-    const detStr = [
-      detects.Hidden !== -1 ? detects.Hidden : "",
-      detects.Lead !== -1 ? detects.Lead : "",
-      detects.Flying !== -1 ? detects.Flying : "",
-    ].join("; ");
+    const detStr = serializeDetectionFlags(
+      flagsFromSkinJson(skinJson, schema),
+      schema,
+    );
 
     return {
       costStr: costs.join("; "),
       upgradeStr: upgrades.join("; "),
       iconStr: icons.join("; "),
-      detStr: detStr,
+      detStr,
     };
   };
+
+  const hasDetections = (detStr: string) =>
+    detStr.split(";").some((s) => s.trim() !== "");
 
   const baseFnc = baseSkinJson ? extractFncArrays(baseSkinJson) : null;
   if (baseFnc) {
     if (baseFnc.costStr) variables[getDefaultFncKey("COST")] = baseFnc.costStr;
-    if (baseFnc.detStr && baseFnc.detStr !== "; ; ")
+    if (hasDetections(baseFnc.detStr))
       variables[getDefaultFncKey("DETECTION")] = baseFnc.detStr;
     if (baseFnc.upgradeStr)
       variables[getDefaultFncKey("UPGRADE")] = baseFnc.upgradeStr;
@@ -177,7 +164,7 @@ function buildVariablesMap(tower: Tower): Record<string, string> {
     if (variant.costStr !== baseFnc.costStr)
       variables[getDefaultFncKey("COST", prefix)] = variant.costStr;
 
-    if (variant.detStr !== baseFnc.detStr && variant.detStr !== "; ; ")
+    if (variant.detStr !== baseFnc.detStr && hasDetections(variant.detStr))
       variables[getDefaultFncKey("DETECTION", prefix)] = variant.detStr;
 
     if (variant.upgradeStr !== baseFnc.upgradeStr)
