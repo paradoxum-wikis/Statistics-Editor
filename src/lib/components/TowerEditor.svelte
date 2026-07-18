@@ -401,7 +401,7 @@
         });
       }}
     >
-      {#if availableSkins.length > 1}
+      {#if availableSkins.length > 1 || settingsStore.alwaysShowSkinTabs}
         <Tabs.List
           class="mb-4 flex gap-2 rounded-[var(--radius)_0] bg-muted p-1 px-2"
         >

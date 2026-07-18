@@ -3,6 +3,7 @@ import {
   Bug,
   Diff,
   Eraser,
+  Columns2,
   Scaling,
   Skull,
   SquareDashedBottom,
@@ -58,10 +59,20 @@ const SETTING_DEFS = {
     storageKey: "tdse_see_delta",
     default: true,
     id: "see-value-difference",
-    tab: "editor",
+    tab: "appearance",
     icon: Diff,
     label: "See Difference by Default",
     description: "Always compare value differences when you open a tower.",
+  },
+  alwaysShowSkinTabs: {
+    storageKey: "tdse_always_skin_tabs",
+    default: false,
+    id: "always-show-skin-tabs",
+    tab: "appearance",
+    icon: Columns2,
+    label: "Always Show Tabs",
+    description:
+      "Keeps the variation tab bar visible even when a tower only has one variation.",
   },
   minTableWidth: {
     storageKey: "tdse_mctw",
@@ -154,6 +165,7 @@ function writeStringSetting<T extends string>(
 class SettingsStore {
   debugMode = $state<boolean>(SETTING_DEFS.debugMode.default);
   seeValueDifference = $state<boolean>(SETTING_DEFS.seeValueDifference.default);
+  alwaysShowSkinTabs = $state<boolean>(SETTING_DEFS.alwaysShowSkinTabs.default);
   hideCellWrapper = $state<boolean>(SETTING_DEFS.hideCellWrapper.default);
   minTableWidth = $state<boolean>(SETTING_DEFS.minTableWidth.default);
   clearOnEdit = $state<boolean>(SETTING_DEFS.clearOnEdit.default);
@@ -176,6 +188,9 @@ class SettingsStore {
         break;
       case "seeValueDifference":
         this.seeValueDifference = value;
+        break;
+      case "alwaysShowSkinTabs":
+        this.alwaysShowSkinTabs = value;
         break;
       case "minTableWidth":
         this.minTableWidth = value;
@@ -220,6 +235,8 @@ class SettingsStore {
         return this.rofBug;
       case "seeValueDifference":
         return this.seeValueDifference;
+      case "alwaysShowSkinTabs":
+        return this.alwaysShowSkinTabs;
       case "minTableWidth":
         return this.minTableWidth;
       case "hideCellWrapper":
