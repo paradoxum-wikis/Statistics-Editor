@@ -49,20 +49,19 @@ export async function fetchFandomProfile(
 ): Promise<FandomProfile> {
   const profileUrl = `https://tds.fandom.com/wikia.php?controller=UserProfile&method=getUserData&format=json&userId=${userId}`;
   const res = await fetch(proxyImageUrl(profileUrl));
-  if (!res.ok) return {};
-  const data = (await res.json()) as {
+  if (!res.ok) throw new Error(`profile fetch failed (${res.status})`);
+  const { userData: u } = (await res.json()) as {
     userData?: {
       avatar?: string;
       localEdits?: number;
       posts?: number;
     };
   };
-  const u = data.userData;
-  if (!u) return {};
+  if (!u) throw new Error("profile missing userData");
   return {
-    avatar: u.avatar || undefined,
-    edits: typeof u.localEdits === "number" ? u.localEdits : undefined,
-    posts: typeof u.posts === "number" ? u.posts : undefined,
+    avatar: u.avatar,
+    edits: u.localEdits,
+    posts: u.posts,
   };
 }
 
@@ -92,7 +91,7 @@ export async function completeFandomAuth(
 }
 
 export async function logoutAuth(): Promise<void> {
-  await api<{ ok: string }>("/aapi/auth/logout", { method: "POST" });
+  await api("/aapi/auth/logout", { method: "POST" });
 }
 
 export function fandomUserPage(username: string): string {
@@ -101,11 +100,7 @@ export function fandomUserPage(username: string): string {
 
 export function formatProfileStats(user: AuthUser): string {
   const parts: string[] = [];
-  if (typeof user.edits === "number") {
-    parts.push(`${user.edits.toLocaleString()} edits`);
-  }
-  if (typeof user.posts === "number") {
-    parts.push(`${user.posts.toLocaleString()} posts`);
-  }
+  if (user.edits != null) parts.push(`${user.edits.toLocaleString()} edits`);
+  if (user.posts != null) parts.push(`${user.posts.toLocaleString()} posts`);
   return parts.join(" · ") || "Fandom account";
 }

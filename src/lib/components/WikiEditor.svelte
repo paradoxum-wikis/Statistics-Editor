@@ -313,6 +313,44 @@
     </Btn>
 
     <Popover.Root>
+      <Popover.Trigger class="btn btn-destructive btn-sm text-white">
+        {towerStore.isCustomSelected() ? "Delete Tower" : "Reset Tower"}
+      </Popover.Trigger>
+      <Popover.Content class="popover-content">
+        <div class="space-y-2">
+          <h4 class="font-medium leading-none">
+            {towerStore.isCustomSelected() ? "Confirm Delete" : "Confirm Reset"}
+          </h4>
+          <p class="text-sm text-muted-foreground">
+            {#if towerStore.isCustomSelected()}
+              Are you sure you want to permanently delete
+              <span class="font-bold">{towerName}</span>? This removes the tower
+              and all saved data across every profile.
+            {:else}
+              Are you sure you want to reset all changes for
+              <span class="font-bold">{towerName}</span>
+              in profile
+              <span class="font-bold">{profileStore.current}</span>? This action
+              cannot be undone.
+            {/if}
+          </p>
+        </div>
+        <div class="mt-4 flex justify-end gap-2">
+          <Popover.Close class="btn btn-outline">Cancel</Popover.Close>
+          <Popover.Close
+            class="btn btn-destructive-fill text-white"
+            onclick={() =>
+              towerStore.isCustomSelected()
+                ? void towerStore.confirmDeleteTower()
+                : void towerStore.reset()}
+          >
+            Confirm
+          </Popover.Close>
+        </div>
+      </Popover.Content>
+    </Popover.Root>
+
+    <Popover.Root>
       <Tip
         content={towerStore.sharePreviewId
           ? "Exit share preview or apply from the visual editor first"

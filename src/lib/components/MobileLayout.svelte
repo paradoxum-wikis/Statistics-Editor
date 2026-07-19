@@ -45,7 +45,6 @@
     Sun,
     Moon,
     SunMoon,
-    RotateCcw,
   } from "@lucide/svelte";
 
   let { isClient }: { isClient: boolean } = $props();
@@ -105,10 +104,6 @@
       return;
     }
     await performTowerSelect(itemValue);
-  }
-
-  async function confirmReset() {
-    await towerStore.reset();
   }
 
   let discardOpen = $state(false);
@@ -255,11 +250,13 @@
         onSelect={handleSelect}
       />
 
-      <ModeToggle
-        bind:mode={editorMode}
-        disableCells={towerStore.selectedData?.isMalformed ?? false}
-      />
-      <AuthMenu />
+      <div class="flex items-center justify-center gap-2">
+        <ModeToggle
+          bind:mode={editorMode}
+          disableCells={towerStore.selectedData?.isMalformed ?? false}
+        />
+        <AuthMenu />
+      </div>
     {/if}
   </header>
 
@@ -514,61 +511,7 @@
             }}
           />
 
-          {#if towerStore.selectedData}
-            <div class="-mx-1 my-1 h-px bg-muted"></div>
-            <Popover.Root>
-              <Popover.Trigger
-                class="dropdown-item w-full justify-start! text-destructive hover:text-destructive!"
-              >
-                {#if towerStore.isCustomSelected()}
-                  <Trash2 class="me-2 h-4 w-4" />
-                  <span>Delete Tower</span>
-                {:else}
-                  <RotateCcw class="me-2 h-4 w-4" />
-                  <span>Reset Tower</span>
-                {/if}
-              </Popover.Trigger>
-              <Popover.Content
-                class="popover-content"
-                side="top"
-                align="start"
-                sideOffset={8}
-              >
-                <div class="space-y-2">
-                  <h4 class="font-medium leading-none">
-                    {towerStore.isCustomSelected()
-                      ? "Confirm Delete"
-                      : "Confirm Reset"}
-                  </h4>
-                  <p class="text-sm text-muted-foreground">
-                    {#if towerStore.isCustomSelected()}
-                      Are you sure you want to permanently delete
-                      <span class="font-bold">{towerStore.selectedName}</span>?
-                      This removes the tower and all saved data across every
-                      profile.
-                    {:else}
-                      Are you sure you want to reset all changes for
-                      <span class="font-bold">{towerStore.selectedName}</span>
-                      in profile
-                      <span class="font-bold">{profileStore.current}</span>?
-                      This action cannot be undone.
-                    {/if}
-                  </p>
-                </div>
-                <div class="flex justify-end mt-4 gap-2">
-                  <Popover.Close class="btn btn-outline">Cancel</Popover.Close>
-                  <Popover.Close
-                    class="btn btn-destructive-fill text-white"
-                    onclick={towerStore.isCustomSelected()
-                      ? () => towerStore.confirmDeleteTower()
-                      : confirmReset}
-                  >
-                    Confirm
-                  </Popover.Close>
-                </div>
-              </Popover.Content>
-            </Popover.Root>
-          {/if}
+
         </div>
       </Popover.Content>
     </Popover.Root>

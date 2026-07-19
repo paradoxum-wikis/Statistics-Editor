@@ -64,7 +64,6 @@
     background: var(--muted);
     padding: 0.25rem;
     border: 1px solid var(--border);
-    margin-inline-end: 0.5rem;
   }
 
   .mode-toggle-btn {

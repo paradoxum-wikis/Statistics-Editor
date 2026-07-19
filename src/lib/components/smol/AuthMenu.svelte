@@ -1,27 +1,23 @@
 <script lang="ts">
-  import { Avatar, Dialog, DropdownMenu } from "bits-ui";
-  import { ExternalLink, LogOut, UserRound } from "@lucide/svelte";
+  import { Dialog, Popover } from "bits-ui";
+  import { BookOpenText, LogOut } from "@lucide/svelte";
   import { authStore } from "$lib/stores/auth.svelte";
   import { fandomUserPage, formatProfileStats } from "$lib/services/fandomAuth";
   import TextInput from "./TextInput.svelte";
+  import Separator from "./Separator.svelte";
+  import avatarPlaceholder from "$lib/assets/Avatar.png";
+
+  const avatarBtn =
+    "inline-flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-muted transition-colors hover:bg-muted/80";
 
   let loginOpen = $state(false);
+  let accountOpen = $state(false);
   let username = $state("");
-
-  const initials = $derived(
-    (() => {
-      const name = authStore.user?.fandom_username?.trim() ?? "";
-      if (!name) return "?";
-      const parts = name.split(/\s+/);
-      if (parts.length >= 2)
-        return (parts[0]![0]! + parts[1]![0]!).toUpperCase();
-      return name.slice(0, 2).toUpperCase();
-    })(),
-  );
 
   const profileStats = $derived(
     authStore.user ? formatProfileStats(authStore.user) : "",
   );
+  const avatarSrc = $derived(authStore.user?.avatar || avatarPlaceholder);
 
   async function onStart() {
     const name = username.trim();
@@ -38,59 +34,54 @@
   }
 
   async function onLogout() {
+    accountOpen = false;
     await authStore.logout();
   }
 </script>
 
 {#if authStore.user}
   {@const user = authStore.user}
-  <DropdownMenu.Root>
-    <DropdownMenu.Trigger
-      class="inline-flex size-9 items-center justify-center overflow-hidden rounded-full border border-border bg-muted transition-colors hover:bg-muted/80"
-      aria-label="Account"
-    >
-      <Avatar.Root
-        class="flex size-full items-center justify-center overflow-hidden rounded-full text-xs font-semibold uppercase"
+  <Popover.Root bind:open={accountOpen}>
+    <Popover.Trigger class={avatarBtn} aria-label="Account">
+      <img
+        src={avatarSrc}
+        alt={user.fandom_username}
+        class="size-full object-cover"
+      />
+    </Popover.Trigger>
+    <Popover.Portal>
+      <Popover.Content
+        class="dropdown-content w-auto! min-w-42"
+        align="end"
+        sideOffset={6}
       >
-        {#if user.avatar}
-          <Avatar.Image
-            src={user.avatar}
-            alt={user.fandom_username}
-            class="size-full object-cover"
-          />
-        {/if}
-        <Avatar.Fallback class="text-muted-foreground"
-          >{initials}</Avatar.Fallback
-        >
-      </Avatar.Root>
-    </DropdownMenu.Trigger>
-    <DropdownMenu.Content align="end" class="dropdown-content min-w-48">
-      <DropdownMenu.Group>
-        <DropdownMenu.GroupHeading class="px-2 py-1.5">
-          <p class="text-sm font-medium">{user.fandom_username}</p>
-          <p class="text-xs text-muted-foreground">{profileStats}</p>
-        </DropdownMenu.GroupHeading>
-      </DropdownMenu.Group>
-      <DropdownMenu.Separator class="-mx-1 my-1 h-px bg-muted" />
-      <DropdownMenu.Item class="dropdown-item">
-        {#snippet child({ props })}
+        <h4 class="mb-1 px-2 pt-1 text-sm font-medium">
+          {user.fandom_username}
+        </h4>
+        <p class="mb-1 px-2 text-xs text-muted-foreground">{profileStats}</p>
+        <Separator class="my-2" />
+        <div class="grid gap-0.5">
           <a
-            {...props}
+            class="dropdown-item w-full justify-start!"
             href={fandomUserPage(user.fandom_username)}
             target="_blank"
             rel="noopener noreferrer"
           >
-            <ExternalLink size={14} />
-            <span>Wiki profile</span>
+            <BookOpenText class="me-2 h-4 w-4" />
+            <span>Wiki Profile</span>
           </a>
-        {/snippet}
-      </DropdownMenu.Item>
-      <DropdownMenu.Item class="dropdown-item" onclick={onLogout}>
-        <LogOut size={14} />
-        <span>Sign out</span>
-      </DropdownMenu.Item>
-    </DropdownMenu.Content>
-  </DropdownMenu.Root>
+          <button
+            type="button"
+            class="dropdown-item w-full justify-start!"
+            onclick={onLogout}
+          >
+            <LogOut class="me-2 h-4 w-4" />
+            <span>Sign out</span>
+          </button>
+        </div>
+      </Popover.Content>
+    </Popover.Portal>
+  </Popover.Root>
 {:else}
   <Dialog.Root
     bind:open={loginOpen}
@@ -99,11 +90,11 @@
     }}
   >
     <Dialog.Trigger
-      class="inline-flex items-center gap-2 rounded-[var(--radius)_0] border border-border px-3 py-2 text-sm font-medium transition-colors duration-250 hover:bg-muted"
+      class={avatarBtn}
+      aria-label="Sign in with Fandom"
       onclick={() => authStore.clearChallenge()}
     >
-      <UserRound size={16} />
-      <span class="hidden sm:inline">Sign in</span>
+      <img src={avatarPlaceholder} alt="" class="size-full object-cover" />
     </Dialog.Trigger>
     <Dialog.Portal>
       <Dialog.Overlay class="dialog-overlay" />
@@ -129,20 +120,6 @@
               }}
             />
           </div>
-          {#if authStore.error}
-            <p class="text-sm text-destructive">{authStore.error}</p>
-          {/if}
-          <div class="flex justify-end gap-2">
-            <Dialog.Close class="btn btn-outline">Cancel</Dialog.Close>
-            <button
-              type="button"
-              class="btn btn-primary"
-              disabled={authStore.busy || !username.trim()}
-              onclick={onStart}
-            >
-              {authStore.busy ? "Checking…" : "Continue"}
-            </button>
-          </div>
         {:else}
           <div class="space-y-3 text-sm">
             <p>
@@ -165,10 +142,24 @@
               >
             </p>
           </div>
-          {#if authStore.error}
-            <p class="text-sm text-destructive">{authStore.error}</p>
-          {/if}
-          <div class="flex justify-end gap-2">
+        {/if}
+
+        {#if authStore.error}
+          <p class="text-sm text-destructive">{authStore.error}</p>
+        {/if}
+
+        <div class="flex justify-end gap-2">
+          {#if !authStore.challenge}
+            <Dialog.Close class="btn btn-outline">Cancel</Dialog.Close>
+            <button
+              type="button"
+              class="btn btn-primary"
+              disabled={authStore.busy || !username.trim()}
+              onclick={onStart}
+            >
+              {authStore.busy ? "Checking…" : "Continue"}
+            </button>
+          {:else}
             <button
               type="button"
               class="btn btn-outline"
@@ -185,8 +176,8 @@
             >
               {authStore.busy ? "Verifying…" : "I've saved"}
             </button>
-          </div>
-        {/if}
+          {/if}
+        </div>
       </Dialog.Content>
     </Dialog.Portal>
   </Dialog.Root>

@@ -16,7 +16,7 @@
   import StatusBar from "./StatusBar.svelte";
   import SettingsModal from "./SettingsModal.svelte";
 
-  import { DropdownMenu, Popover, AlertDialog, Dialog } from "bits-ui";
+  import { DropdownMenu, AlertDialog, Dialog } from "bits-ui";
   import ModeToggle from "./smol/ModeToggle.svelte";
   import AuthMenu from "./smol/AuthMenu.svelte";
   import Card from "./smol/Card.svelte";
@@ -93,12 +93,6 @@
       return;
     }
     await performTowerSelect(itemValue);
-  }
-
-  async function confirmReset() {
-    if (towerStore.selectedData) {
-      await towerStore.reset();
-    }
   }
 
   let discardOpen = $state(false);
@@ -218,27 +212,21 @@
 
     <div class="flex min-w-0 flex-1 flex-col">
       <header
-        class="sticky top-0 z-7 flex items-center justify-between border-b bg-card p-2 px-3"
+        class="sticky top-0 z-7 flex items-center justify-between gap-3 border-b bg-card p-2 px-3"
       >
-        <h1 class="unisans text-3xl font-black text-foreground">
-          {towerStore.selectedName || "TDS Statistics Editor"}
-        </h1>
-        <div class="flex items-center space-x-4">
+        <div class="flex min-w-0 items-center gap-3">
+          <h1 class="unisans truncate text-3xl font-black text-foreground">
+            {towerStore.selectedName || "TDS Statistics Editor"}
+          </h1>
           {#if isClient}
-            <ModeToggle
-              bind:mode={editorMode}
-              disableCells={towerStore.selectedData?.isMalformed ?? false}
-            />
-            <AuthMenu />
-
             <DropdownMenu.Root>
               <DropdownMenu.Trigger
-                class="inline-flex items-center gap-2 rounded-[var(--radius)_0] border border-border px-3 py-2 text-sm font-medium transition-colors duration-250 hover:bg-muted"
+                class="inline-flex shrink-0 items-center gap-2 rounded-[var(--radius)_0] border border-border px-3 py-2 text-sm font-medium transition-colors duration-250 hover:bg-muted"
               >
                 <span>{profileStore.current}</span>
                 <span class="text-xs text-muted-foreground">(Profile)</span>
               </DropdownMenu.Trigger>
-              <DropdownMenu.Content align="end" class="dropdown-content">
+              <DropdownMenu.Content align="start" class="dropdown-content">
                 <DropdownMenu.Group>
                   <DropdownMenu.GroupHeading
                     class="px-2 py-1.5 text-sm font-semibold"
@@ -330,50 +318,15 @@
               </DropdownMenu.Content>
             </DropdownMenu.Root>
           {/if}
+        </div>
 
-          {#if towerStore.selectedData}
-            <Popover.Root>
-              <Popover.Trigger class="btn btn-destructive text-white">
-                {towerStore.isCustomSelected() ? "Delete Tower" : "Reset Tower"}
-              </Popover.Trigger>
-              <Popover.Content class="popover-content">
-                <div class="space-y-2">
-                  <h4 class="font-medium leading-none">
-                    {towerStore.isCustomSelected()
-                      ? "Confirm Delete"
-                      : "Confirm Reset"}
-                  </h4>
-                  <p class="text-sm text-muted-foreground">
-                    {#if towerStore.isCustomSelected()}
-                      Are you sure you want to permanently delete
-                      <span class="font-bold">{towerStore.selectedName}</span>?
-                      This removes the tower and all saved data across every
-                      profile.
-                    {:else}
-                      Are you sure you want to reset all changes for
-                      <span class="font-bold">{towerStore.selectedName}</span>
-                      in profile
-                      <span class="font-bold">{profileStore.current}</span>?
-                      This action cannot be undone.
-                    {/if}
-                  </p>
-                </div>
-                <div class="flex justify-end mt-4 gap-2">
-                  <Popover.Close class="btn btn-outline">Cancel</Popover.Close>
-                  <Popover.Close
-                    class="btn btn-destructive-fill text-white"
-                    onclick={towerStore.isCustomSelected()
-                      ? () => towerStore.confirmDeleteTower()
-                      : confirmReset}
-                  >
-                    Confirm
-                  </Popover.Close>
-                </div>
-              </Popover.Content>
-            </Popover.Root>
-          {/if}
-
+        <div class="flex shrink-0 items-center space-x-2">
           {#if isClient}
+            <ModeToggle
+              bind:mode={editorMode}
+              disableCells={towerStore.selectedData?.isMalformed ?? false}
+            />
+            <AuthMenu />
             <TowerPicker
               variant="compact"
               selected={towerStore.selectedName}
