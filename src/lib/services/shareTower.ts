@@ -97,8 +97,9 @@ export async function createShare(
   if (pending) return pending;
 
   const promise = (async (): Promise<string> => {
-    const res = await fetch(`${SHARE_ORIGIN}/api/shares`, {
+    const res = await fetch(`${SHARE_ORIGIN}/aapi/shares`, {
       method: "POST",
+      credentials: "include",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         neowtext,
@@ -125,7 +126,9 @@ export async function fetchShare(id: string): Promise<ShareRecord> {
   const shareId = parseShareRef(id);
   if (!shareId) throw new Error("Invalid share id");
 
-  const res = await fetch(`${SHARE_ORIGIN}/api/shares/${shareId}`);
+  const res = await fetch(`${SHARE_ORIGIN}/aapi/shares/${shareId}`, {
+    credentials: "include",
+  });
   if (!res.ok) {
     const detail = (await res.text()).trim();
     throw new Error(detail || `Share not found (${res.status})`);
