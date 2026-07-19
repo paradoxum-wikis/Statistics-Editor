@@ -15,6 +15,7 @@ import {
 import {
   embedSeDirectives,
   extractSeMemo,
+  hasSeDiff,
   stripSeDiff,
 } from "$lib/neowtext/directives";
 import { fetchShare, parseShareRef } from "$lib/services/shareTower";
@@ -540,27 +541,14 @@ class TowerStore {
   }
 
   clearDiff(): void {
-    let changed = false;
-
     const eff = this.effectiveWikitext || "";
-    const cleanedEff = stripSeDiff(eff);
-    if (cleanedEff !== eff) {
-      this.effectiveWikitext = cleanedEff;
-      changed = true;
-    }
+    const inSource = hasSeDiff(eff);
+    if (!inSource && !this.baselineLocked) return;
 
-    if (
-      this.selectedData &&
-      (Object.keys(this.baseline).length > 0 || this.baselineLocked)
-    ) {
-      this.#applyBaseline(this.selectedData);
-      changed = true;
-    }
-
-    if (changed) {
-      this.isDirty = true;
-      this.#wikitextStale = false;
-    }
+    if (inSource) this.effectiveWikitext = stripSeDiff(eff);
+    if (this.selectedData) this.#applyBaseline(this.selectedData);
+    this.isDirty = true;
+    this.#wikitextStale = false;
   }
 
   isCustomSelected(): boolean {

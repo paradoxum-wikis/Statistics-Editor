@@ -84,11 +84,16 @@ export function extractSeDiff(text: string): {
     Object.assign(baseline, parseSeDiffPayload(payload));
     return "";
   });
-  return { text: stripped.trimEnd(), baseline };
+  return { text: stripped, baseline };
 }
 
 export function stripSeDiff(text: string): string {
   return extractSeDiff(text).text;
+}
+
+// separate from SE_DIFF_INLINE_RE `g` so lastIndex cannot poison repeated usage.
+export function hasSeDiff(text: string): boolean {
+  return /<!--\s*@se-diff:/i.test(text);
 }
 
 export function extractSeMemo(text: string): {
@@ -100,7 +105,7 @@ export function extractSeMemo(text: string): {
     parts.push(parseSeMemoPayload(payload));
     return "";
   });
-  return { text: stripped.trimEnd(), memo: parts.join("") };
+  return { text: stripped, memo: parts.join("") };
 }
 
 export function stripSeMemo(text: string): string {
@@ -119,7 +124,7 @@ function memoComments(memo: string): string {
   if (json.length <= MEMO_JSON_CHUNK) return comment(memo);
 
   const comments: string[] = [];
-  for (let i = 0; i < memo.length; ) {
+  for (let i = 0; i < memo.length;) {
     let end = Math.min(memo.length, i + 2000);
     let slice = memo.slice(i, end);
     while (JSON.stringify(slice).length > MEMO_JSON_CHUNK && slice.length > 1) {
@@ -135,13 +140,14 @@ export function embedSeDirectives(
   text: string,
   opts: { memo?: string; baseline?: Record<string, unknown> } = {},
 ): string {
-  const stripped = stripSeMeta(text).trimEnd();
+  const body = stripSeMeta(text).replace(/\s+$/, "");
   const tail =
     (opts.memo ? memoComments(opts.memo) : "") +
     (opts.baseline && Object.keys(opts.baseline).length > 0
       ? `<!-- @se-diff:${JSON.stringify(opts.baseline)} -->`
       : "");
-  return tail ? `${stripped}${tail}` : stripped;
+  const out = tail ? `${body}${tail}` : body;
+  return out.length > 0 && !out.endsWith("\n") ? `${out}\n` : out;
 }
 
 /**

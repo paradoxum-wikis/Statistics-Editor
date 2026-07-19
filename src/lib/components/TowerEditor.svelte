@@ -13,7 +13,7 @@
   import { analytics } from "$lib/services/analytics";
   import { toast } from "$lib/toast";
   import { isCustomTower } from "$lib/towerComponents/customTowers";
-  import { mkCellKey, stripSeDiff } from "$lib/neowtext/directives";
+  import { hasSeDiff, mkCellKey } from "$lib/neowtext/directives";
   import {
     getRofBugVer,
     syncRefOnlyCellToken,
@@ -367,7 +367,7 @@
   const hasSavedDiff = $derived.by(() => {
     const text =
       towerStore.originalWikitext || towerStore.effectiveWikitext || "";
-    return stripSeDiff(text) !== text;
+    return hasSeDiff(text) || towerStore.baselineLocked;
   });
 </script>
 
