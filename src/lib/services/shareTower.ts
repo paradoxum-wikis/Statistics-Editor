@@ -8,6 +8,7 @@ export type ShareRecord = {
   id: string;
   neowtext: string;
   tower_name?: string;
+  views?: number;
   created_at?: string;
 };
 
