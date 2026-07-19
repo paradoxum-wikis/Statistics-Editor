@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Dialog, Popover } from "bits-ui";
+  import { AlertDialog, Dialog, Popover } from "bits-ui";
   import { BookOpenText, LogOut } from "@lucide/svelte";
   import { authStore } from "$lib/stores/auth.svelte";
   import { fandomUserPage, formatProfileStats } from "$lib/services/fandomAuth";
@@ -12,6 +12,7 @@
 
   let loginOpen = $state(false);
   let accountOpen = $state(false);
+  let logoutOpen = $state(false);
   let username = $state("");
 
   const profileStats = $derived(
@@ -33,8 +34,13 @@
     }
   }
 
-  async function onLogout() {
+  function requestLogout() {
     accountOpen = false;
+    logoutOpen = true;
+  }
+
+  async function confirmLogout() {
+    logoutOpen = false;
     await authStore.logout();
   }
 </script>
@@ -73,7 +79,7 @@
           <button
             type="button"
             class="dropdown-item w-full justify-start!"
-            onclick={onLogout}
+            onclick={requestLogout}
           >
             <LogOut class="me-2 h-4 w-4" />
             <span>Sign out</span>
@@ -82,6 +88,37 @@
       </Popover.Content>
     </Popover.Portal>
   </Popover.Root>
+
+  <AlertDialog.Root bind:open={logoutOpen}>
+    <AlertDialog.Portal>
+      <AlertDialog.Overlay class="dialog-overlay" />
+      <AlertDialog.Content class="dialog-content">
+        <div class="flex flex-col space-y-2 text-center sm:text-left">
+          <AlertDialog.Title class="text-lg font-semibold">
+            Sign out?
+          </AlertDialog.Title>
+          <AlertDialog.Description class="text-sm text-muted-foreground">
+            Sign out of Fandom account
+            <span class="font-bold">{user.fandom_username}</span>? You can sign
+            back in anytime by verifying on the wiki again.
+          </AlertDialog.Description>
+        </div>
+        <div
+          class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2"
+        >
+          <AlertDialog.Cancel class="btn btn-outline mt-2 sm:mt-0">
+            Cancel
+          </AlertDialog.Cancel>
+          <AlertDialog.Action
+            class="btn btn-destructive-fill text-white"
+            onclick={confirmLogout}
+          >
+            Let me out!
+          </AlertDialog.Action>
+        </div>
+      </AlertDialog.Content>
+    </AlertDialog.Portal>
+  </AlertDialog.Root>
 {:else}
   <Dialog.Root
     bind:open={loginOpen}
@@ -102,18 +139,18 @@
         <Dialog.Title class="dialog-title">Sign in with Fandom</Dialog.Title>
         <Dialog.Description class="dialog-description">
           Prove you own a Fandom account by saving a short verify page on the
-          TDS wiki.
+          Tower Defense Simulator Wiki.
         </Dialog.Description>
 
         {#if !authStore.challenge}
           <div class="space-y-2">
             <label class="text-sm font-medium" for="fandom-username">
-              Fandom username
+              Username
             </label>
             <TextInput
               id="fandom-username"
               type="text"
-              placeholder="YourUsername"
+              placeholder="C'mon, put it here..."
               bind:value={username}
               onkeydown={(e: KeyboardEvent) => {
                 if (e.key === "Enter") void onStart();
@@ -123,7 +160,7 @@
         {:else}
           <div class="space-y-3 text-sm">
             <p>
-              Signed in as wiki user
+              Signed in as wikiling
               <strong>{authStore.challenge.fandom_username}</strong>? Open the
               editor, save (Alt+Shift+S), then confirm here.
             </p>
