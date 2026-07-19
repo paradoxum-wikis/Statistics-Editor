@@ -1,3 +1,4 @@
+import { authStore } from "$lib/stores/auth.svelte";
 import { profileStore } from "$lib/stores/profile.svelte";
 import { settingsStore } from "$lib/stores/settings.svelte";
 import { towerStore } from "$lib/stores/tower.svelte";
@@ -8,7 +9,10 @@ export function bootstrap(): Promise<void> {
   ready ??= (async () => {
     profileStore.init();
     settingsStore.init();
-    await towerStore.init(profileStore.current);
+    await Promise.all([
+      towerStore.init(profileStore.current),
+      authStore.init(),
+    ]);
   })();
   return ready;
 }

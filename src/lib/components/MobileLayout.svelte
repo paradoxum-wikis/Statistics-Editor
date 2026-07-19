@@ -21,6 +21,7 @@
 
   import { DropdownMenu, Popover, AlertDialog, Dialog } from "bits-ui";
   import ModeToggle from "./smol/ModeToggle.svelte";
+  import AuthMenu from "./smol/AuthMenu.svelte";
   import Card from "./smol/Card.svelte";
   import LoadingCard from "./smol/LoadingCard.svelte";
   import Btn from "./smol/Btn.svelte";
@@ -258,6 +259,7 @@
         bind:mode={editorMode}
         disableCells={towerStore.selectedData?.isMalformed ?? false}
       />
+      <AuthMenu />
     {/if}
   </header>
 
