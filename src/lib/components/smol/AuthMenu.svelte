@@ -138,8 +138,8 @@
       <Dialog.Content class="dialog-content max-w-md">
         <Dialog.Title class="dialog-title">Sign in with Fandom</Dialog.Title>
         <Dialog.Description class="dialog-description">
-          Prove you own a Fandom account by saving a short verify page on the
-          Tower Defense Simulator Wiki.
+          Prove you are who you are by saving a verification page on the Tower
+          Defense Simulator Wiki.
         </Dialog.Description>
 
         {#if !authStore.challenge}
