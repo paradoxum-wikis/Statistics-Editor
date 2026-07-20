@@ -45,6 +45,7 @@
     Sun,
     Moon,
     SunMoon,
+    Store,
   } from "@lucide/svelte";
 
   let { isClient }: { isClient: boolean } = $props();
@@ -176,6 +177,11 @@
       return;
     }
     await performGoHome();
+  }
+
+  async function goWorkshop() {
+    toolsOpen = false;
+    await goto(resolve("/workshop"), { keepFocus: true, noScroll: true });
   }
 
   async function confirmCreateProfile() {
@@ -434,6 +440,14 @@
             <span>Home</span>
           </button>
 
+          <button
+            class="dropdown-item w-full justify-start!"
+            onclick={goWorkshop}
+          >
+            <Store class="me-2 h-4 w-4" />
+            <span>Workshop</span>
+          </button>
+
           <Popover.Root>
             <Popover.Trigger class="dropdown-item w-full justify-start!">
               {#if settingsStore.theme === "light"}
@@ -510,8 +524,6 @@
               await performTowerSelect(name);
             }}
           />
-
-
         </div>
       </Popover.Content>
     </Popover.Root>

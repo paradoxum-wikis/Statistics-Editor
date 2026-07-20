@@ -9,7 +9,13 @@
   import { towerStore } from "$lib/stores/tower.svelte";
   import { modifierStore } from "$lib/stores/modifier.svelte";
   import { noFetchTowers } from "$lib/services/fetchTowerWiki";
-  import { createShare, sharePageUrl } from "$lib/services/shareTower";
+  import {
+    createShare,
+    parseShareRef,
+    sharePageUrl,
+  } from "$lib/services/shareTower";
+  import { authStore } from "$lib/stores/auth.svelte";
+  import WorkshopFormDialog from "./workshop/WorkshopFormDialog.svelte";
   import { analytics } from "$lib/services/analytics";
   import { toast } from "$lib/toast";
   import { isCustomTower } from "$lib/towerComponents/customTowers";
@@ -99,6 +105,14 @@
   let isSharing = $state(false);
   let shareLink = $state<string | null>(null);
   let shareError = $state<string | null>(null);
+  let publishOpen = $state(false);
+  let publishShareId = $state<string | null>(null);
+
+  function openPublish() {
+    publishShareId = shareLink ? parseShareRef(shareLink) : null;
+    shareOpen = false;
+    if (publishShareId) publishOpen = true;
+  }
 
   function parseEditValue(value: string): string | number | boolean {
     if (value === "true") return true;
@@ -467,7 +481,7 @@
               view these stats in the editor.
             </p>
             {#if isSharing}
-              <p class="text-sm text-muted-foreground">Creating link…</p>
+              <p class="text-sm text-muted-foreground">Creating link...</p>
             {:else if shareError}
               <p class="text-sm text-destructive">{shareError}</p>
               <div class="flex justify-end">
@@ -483,11 +497,18 @@
                 onclick={(e) => (e.currentTarget as HTMLInputElement).select()}
               />
               <div class="flex justify-end gap-2">
-                <Popover.Close class="btn btn-outline btn-sm"
-                  >Close</Popover.Close
-                >
+                {#if authStore.user}
+                  <Btn size="sm" variant="secondary" onclick={openPublish}>
+                    Publish to Workshop
+                  </Btn>
+                {/if}
                 <Btn size="sm" onclick={copyShareLink}>Copy</Btn>
               </div>
+              {#if !authStore.user}
+                <p class="text-xs text-muted-foreground">
+                  Sign in with Fandom to publish this build to the Workshop.
+                </p>
+              {/if}
             {/if}
           </div>
         </Popover.Content>
@@ -502,7 +523,7 @@
                 {...props}
               >
                 {#if isFetching}
-                  Fetching…
+                  Fetching...
                 {:else}
                   <span class="max-md:hidden">Fetch Latest Data</span>
                   <span class="hidden max-md:inline">Fetch Latest</span>
@@ -658,6 +679,14 @@
 
     <MemosSection />
     <NotesSection notes={skinRefs.notes} />
+    {#if publishShareId}
+      <WorkshopFormDialog
+        mode="create"
+        shareId={publishShareId}
+        towerName={tower.name}
+        bind:open={publishOpen}
+      />
+    {/if}
   {:else}
     <div class="text-center py-8 text-muted-foreground">
       Select a tower to edit its skins.

@@ -20,6 +20,7 @@
   import ModeToggle from "./smol/ModeToggle.svelte";
   import AuthMenu from "./smol/AuthMenu.svelte";
   import Card from "./smol/Card.svelte";
+  import IconBtn from "./smol/IconBtn.svelte";
   import LoadingCard from "./smol/LoadingCard.svelte";
   import Btn from "./smol/Btn.svelte";
   import TextInput from "./smol/TextInput.svelte";
@@ -27,7 +28,7 @@
   import DiscardMessage, {
     type PendingDiscardAction,
   } from "./smol/DiscardMessage.svelte";
-  import { Trash2, Check, X } from "@lucide/svelte";
+  import { Trash2, Check, X, Store } from "@lucide/svelte";
 
   let { isClient }: { isClient: boolean } = $props();
 
@@ -322,6 +323,12 @@
 
         <div class="flex shrink-0 items-center space-x-2">
           {#if isClient}
+            <IconBtn
+              onclick={() => goto(resolve("/workshop"))}
+              title="Workshop"
+            >
+              <Store size={18} />
+            </IconBtn>
             <ModeToggle
               bind:mode={editorMode}
               disableCells={towerStore.selectedData?.isMalformed ?? false}

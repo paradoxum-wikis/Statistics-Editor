@@ -3,6 +3,7 @@ import {
   fetchFandomProfile,
   fetchMe,
   logoutAuth,
+  rememberFandomAvatar,
   startFandomAuth,
   type AuthUser,
   type FandomStart,
@@ -85,7 +86,10 @@ class AuthStore {
 async function withProfile(user: AuthUser | null): Promise<AuthUser | null> {
   if (!user) return null;
   try {
-    return { ...user, ...(await fetchFandomProfile(user.fandom_userid)) };
+    const profile = await fetchFandomProfile(user.fandom_userid);
+    const merged = { ...user, ...profile };
+    rememberFandomAvatar(user.fandom_userid, merged.avatar ?? null);
+    return merged;
   } catch (e) {
     if (settingsStore.debugMode) console.error("[auth] profile", e);
     return user;

@@ -22,6 +22,7 @@
     "TDS Statistics Editor - modify, balance, or just, mess around!";
 
   const towerName = $derived(towerStore.selectedName || page.params.name || "");
+  const isWorkshop = $derived(page.url.pathname.startsWith("/workshop"));
   const notFound = $derived(page.status >= 400 || towerStore.missingTower);
   const pageTitle = $derived(
     notFound
@@ -99,11 +100,13 @@
 
 <Tooltip.Provider delayDuration={200} skipDelayDuration={300}>
   {@render children()}
-  <div class="hidden md:flex h-screen flex-col">
-    <DesktopLayout {isClient} />
-  </div>
-  <div class="md:hidden">
-    <MobileLayout {isClient} />
-  </div>
+  {#if !isWorkshop}
+    <div class="hidden md:flex h-screen flex-col">
+      <DesktopLayout {isClient} />
+    </div>
+    <div class="md:hidden">
+      <MobileLayout {isClient} />
+    </div>
+  {/if}
 </Tooltip.Provider>
 <Toaster />

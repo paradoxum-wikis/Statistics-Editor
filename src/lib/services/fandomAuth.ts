@@ -58,11 +58,90 @@ export async function fetchFandomProfile(
     };
   };
   if (!u) throw new Error("profile missing userData");
+  const avatar = u.avatar?.trim() || undefined;
+  if (avatar) rememberFandomAvatar(userId, avatar);
   return {
-    avatar: u.avatar,
+    avatar,
     edits: u.localEdits,
     posts: u.posts,
   };
+}
+
+const avatarByUser = new Map<number, string | null>();
+const pendingIds = new Set<number>();
+let flushPromise: Promise<void> | null = null;
+
+function avatarDisplayUrl(raw: string | null | undefined): string | null {
+  const u = raw?.trim();
+  if (!u) return null;
+  if (u.includes("/thumbnail/")) return u;
+  return `${u.replace(/\/$/, "")}/thumbnail/width/50/height/50`;
+}
+
+export function rememberFandomAvatar(userId: number, url: string | null) {
+  avatarByUser.set(userId, avatarDisplayUrl(url));
+}
+
+async function fetchAvatarBulk(ids: number[]): Promise<void> {
+  for (let i = 0; i < ids.length; i += 50) {
+    const chunk = ids.slice(i, i + 50);
+    try {
+      const qs = chunk.map((id) => `id=${id}`).join("&");
+      const res = await fetch(
+        proxyImageUrl(
+          `https://services.fandom.com/user-attribute/user/bulk?${qs}`,
+        ),
+      );
+      if (!res.ok) throw new Error(`avatar bulk failed (${res.status})`);
+      const data = (await res.json()) as {
+        users?: Record<string, { avatar?: string }>;
+      };
+      for (const id of chunk) {
+        avatarByUser.set(
+          id,
+          avatarDisplayUrl(data.users?.[String(id)]?.avatar),
+        );
+      }
+    } catch {
+      for (const id of chunk) {
+        if (!avatarByUser.has(id)) avatarByUser.set(id, null);
+      }
+    }
+  }
+}
+
+function enqueueAvatarFetch(ids: number[]): Promise<void> {
+  for (const id of ids) {
+    if (!avatarByUser.has(id)) pendingIds.add(id);
+  }
+  if (pendingIds.size === 0 && !flushPromise) return Promise.resolve();
+  if (!flushPromise) {
+    flushPromise = (async () => {
+      while (pendingIds.size) {
+        const batch = [...pendingIds];
+        pendingIds.clear();
+        const need = batch.filter((id) => !avatarByUser.has(id));
+        if (need.length) await fetchAvatarBulk(need);
+      }
+    })().finally(() => {
+      flushPromise = null;
+    });
+  }
+  return flushPromise;
+}
+
+export async function fetchFandomAvatars(
+  userIds: number[],
+): Promise<Map<number, string | null>> {
+  const unique = [...new Set(userIds)];
+  await enqueueAvatarFetch(unique);
+  const out = new Map<number, string | null>();
+  for (const id of unique) out.set(id, avatarByUser.get(id) ?? null);
+  return out;
+}
+
+export function fetchFandomAvatar(userId: number): Promise<string | null> {
+  return fetchFandomAvatars([userId]).then((m) => m.get(userId) ?? null);
 }
 
 export async function fetchMe(): Promise<AuthUser | null> {
