@@ -22,9 +22,10 @@
   import {
     deleteWorkshopListing,
     listWorkshop,
+    WORKSHOP_TAG_FEATURED,
     WORKSHOP_TAGS,
     type WorkshopListing,
-    type WorkshopTag,
+    type WorkshopListingTag,
   } from "$lib/services/workshop";
   import { toast } from "$lib/toast";
 
@@ -43,7 +44,7 @@
 
   let q = $state("");
   let debouncedQ = $state("");
-  let tag = $state<WorkshopTag | "">("");
+  let tag = $state<WorkshopListingTag | "">("");
   let sort = $state<"new" | "views" | "votes">("new");
   let mineOnly = $state(false);
 
@@ -210,6 +211,11 @@
             onclick={() => ((tag = t), (page = 1))}>{t}</button
           >
         {/each}
+        <button
+          class={chipClass(tag === WORKSHOP_TAG_FEATURED)}
+          onclick={() => ((tag = WORKSHOP_TAG_FEATURED), (page = 1))}
+          >featured</button
+        >
       </div>
 
       <div class="ms-auto flex items-center gap-2">

@@ -35,7 +35,7 @@ export type WorkshopComment = {
 
 export type WorkshopListParams = {
   q?: string;
-  tag?: WorkshopTag | "";
+  tag?: WorkshopListingTag | "";
   sort?: "new" | "views" | "votes";
   page?: number;
   mine?: boolean;
