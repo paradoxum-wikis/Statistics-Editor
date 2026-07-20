@@ -125,7 +125,7 @@
     </Combobox.Portal>
   </Combobox.Root>
 {:else}
-  <div class={["home-picker flex min-h-0 flex-col gap-3", className]}>
+  <div class={["home-picker flex min-h-0 flex-1 flex-col gap-3", className]}>
     <TextInput
       type="search"
       placeholder="Enter a tower name!"
