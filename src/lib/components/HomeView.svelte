@@ -2,6 +2,7 @@
   import TowerPicker from "./TowerPicker.svelte";
   import Supporters from "./smol/Supporters.svelte";
   import SubtleRow from "./smol/SubtleRow.svelte";
+  import { authStore } from "$lib/stores/auth.svelte";
   import ghLogo from "$lib/assets/GitHub.svg?raw";
   import aewLogo from "$lib/assets/AEW.svg?raw";
   import tdswLogo from "$lib/assets/TDSW.svg?raw";
@@ -49,11 +50,12 @@
   ] as const;
 
   const greeting = $derived.by(() => {
+    const lovelyPerson = authStore.user?.fandom_username ?? "editor";
     const hour = new Date().getHours();
-    if (hour >= 5 && hour < 12) return "Good morning, editor!";
-    if (hour >= 12 && hour < 17) return "Good afternoon, editor!";
-    if (hour >= 17 && hour < 22) return "Good evening, editor!";
-    return "Up late, editor? Welcome!";
+    if (hour >= 5 && hour < 12) return `Good morning, ${lovelyPerson}!`;
+    if (hour >= 12 && hour < 17) return `Good afternoon, ${lovelyPerson}!`;
+    if (hour >= 17 && hour < 22) return `Good evening, ${lovelyPerson}!`;
+    return `Up late, ${lovelyPerson}? Welcome!`;
   });
 </script>
 
