@@ -9,6 +9,7 @@
     WORKSHOP_TAG_FEATURED,
     type WorkshopListing,
   } from "$lib/services/workshop";
+  import { timeAgo } from "$lib/utils/workshop";
   import Tip from "../smol/Tip.svelte";
 
   let {
@@ -27,10 +28,6 @@
 
   let imageUrl = $state<string | null>(null);
   let avatarSrc = $state<string | null>(null);
-
-  function initials(name: string) {
-    return name.trim().slice(0, 2).toUpperCase() || "?";
-  }
 
   $effect(() => {
     const ref = listing.image?.trim();
@@ -73,15 +70,6 @@
       cancelled = true;
     };
   });
-
-  function timeAgo(iso: string): string {
-    const s = (Date.now() - new Date(iso).getTime()) / 1000;
-    if (s < 60) return "just now";
-    if (s < 3600) return `${Math.floor(s / 60)}m ago`;
-    if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
-    if (s < 2592000) return `${Math.floor(s / 86400)}d ago`;
-    return new Date(iso).toLocaleDateString();
-  }
 </script>
 
 <article
@@ -183,7 +171,7 @@
           <Avatar.Fallback
             class="flex size-full items-center justify-center text-[8px] font-medium text-muted-foreground"
           >
-            {initials(listing.author.fandom_username)}
+            {listing.author.fandom_username.slice(0, 2).toUpperCase()}
           </Avatar.Fallback>
         </Avatar.Root>
         <span class="truncate">{listing.author.fandom_username}</span>

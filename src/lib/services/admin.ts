@@ -1,4 +1,7 @@
-import type { WorkshopListing } from "$lib/services/workshop";
+import {
+  WORKSHOP_TAG_FEATURED,
+  type WorkshopListing,
+} from "$lib/services/workshop";
 
 export function isAdminUser(
   user: { fandom_userid: number } | null | undefined,
@@ -56,20 +59,12 @@ export function patchAdminListing(
   });
 }
 
-export function setAdminListingPublished(id: string, published: boolean) {
-  return patchAdminListing(id, { published });
-}
-
-export function setAdminListingFeatured(id: string, featured: boolean) {
-  return patchAdminListing(id, { featured });
-}
-
-export function listingIsFeatured(item: { tags: string[] }) {
-  return item.tags.includes("featured");
-}
-
 export function hardDeleteAdminListing(id: string) {
   return api<void>(`/aapi/admin/workshop/${encodeURIComponent(id)}`, {
     method: "DELETE",
   });
+}
+
+export function listingIsFeatured(item: { tags: string[] }) {
+  return item.tags.includes(WORKSHOP_TAG_FEATURED);
 }

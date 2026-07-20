@@ -1,6 +1,5 @@
 export const WORKSHOP_TAGS = ["rework", "rebalance", "new"] as const;
 export type WorkshopTag = (typeof WORKSHOP_TAGS)[number];
-/** Admin-only; stored in tags CSV alongside at most one user category. */
 export const WORKSHOP_TAG_FEATURED = "featured" as const;
 export type WorkshopListingTag = WorkshopTag | typeof WORKSHOP_TAG_FEATURED;
 
@@ -37,7 +36,7 @@ export type WorkshopComment = {
 export type WorkshopListParams = {
   q?: string;
   tag?: WorkshopTag | "";
-  sort?: "new" | "views";
+  sort?: "new" | "views" | "votes";
   page?: number;
   mine?: boolean;
 };
@@ -79,7 +78,9 @@ export async function listWorkshop(params: WorkshopListParams = {}) {
   const qs = new URLSearchParams();
   if (params.q?.trim()) qs.set("q", params.q.trim());
   if (params.tag) qs.set("tag", params.tag);
-  if (params.sort === "views") qs.set("sort", "views");
+  if (params.sort === "views" || params.sort === "votes") {
+    qs.set("sort", params.sort);
+  }
   if (params.page && params.page > 1) qs.set("page", String(params.page));
   if (params.mine) qs.set("mine", "1");
   const q = qs.toString();

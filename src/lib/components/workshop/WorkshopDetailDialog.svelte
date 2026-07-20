@@ -24,6 +24,7 @@
     type WorkshopListing,
   } from "$lib/services/workshop";
   import { settingsStore } from "$lib/stores/settings.svelte";
+  import { timeAgo } from "$lib/utils/workshop";
   import { toast } from "$lib/toast";
   import Alert from "../smol/Alert.svelte";
   import Btn from "../smol/Btn.svelte";
@@ -59,20 +60,9 @@
       ? `${resolve("/tower/[name]", { name: listing.tower_name })}?share=${encodeURIComponent(listing.share_id)}`
       : "#",
   );
-  const featured = $derived(!!listing?.tags.includes(WORKSHOP_TAG_FEATURED));
-
-  function initials(name: string) {
-    return name.trim().slice(0, 2).toUpperCase() || "?";
-  }
-
-  function timeAgo(iso: string): string {
-    const s = (Date.now() - new Date(iso).getTime()) / 1000;
-    if (s < 60) return "just now";
-    if (s < 3600) return `${Math.floor(s / 60)}m ago`;
-    if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
-    if (s < 2592000) return `${Math.floor(s / 86400)}d ago`;
-    return new Date(iso).toLocaleDateString();
-  }
+  const featured = $derived(
+    listing?.tags.includes(WORKSHOP_TAG_FEATURED) ?? false,
+  );
 
   function rememberAvatar(userId: number, url: string) {
     const next = new Map(avatars);
@@ -259,10 +249,6 @@
         <p class="p-5 text-sm text-destructive">{error}</p>
       {:else if listing}
         {@const item = listing}
-        <!--
-          Mobile: one column, entire body scrolls.
-          Desktop: 2-col grid; only the comments list scrolls.
-        -->
         <div
           class="min-h-0 flex-1 overflow-y-auto overscroll-contain md:grid md:grid-cols-[minmax(0,1.25fr)_minmax(18rem,0.9fr)] md:overflow-hidden md:divide-x"
         >
@@ -314,7 +300,7 @@
                   <Avatar.Fallback
                     class="flex size-full items-center justify-center text-xs font-medium text-muted-foreground"
                   >
-                    {initials(item.author.fandom_username)}
+                    {item.author.fandom_username.slice(0, 2).toUpperCase()}
                   </Avatar.Fallback>
                 </Avatar.Root>
                 <div class="min-w-0">
@@ -399,7 +385,6 @@
               </h3>
             </div>
 
-            <!-- mobile: in document flow (parent scrolls). desktop: isolated scroll -->
             <div
               class="space-y-3 p-4 md:min-h-0 md:flex-1 md:overflow-y-auto md:overscroll-contain"
             >
@@ -427,7 +412,7 @@
                         <Avatar.Fallback
                           class="flex size-full items-center justify-center text-[10px] font-medium text-muted-foreground"
                         >
-                          {initials(c.author.fandom_username)}
+                          {c.author.fandom_username.slice(0, 2).toUpperCase()}
                         </Avatar.Fallback>
                       </Avatar.Root>
                       <div class="min-w-0 flex-1">

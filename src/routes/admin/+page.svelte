@@ -16,8 +16,7 @@
     isAdminUser,
     listAdminWorkshop,
     listingIsFeatured,
-    setAdminListingFeatured,
-    setAdminListingPublished,
+    patchAdminListing,
     type AdminListing,
   } from "$lib/services/admin";
   import { settingsStore } from "$lib/stores/settings.svelte";
@@ -88,7 +87,7 @@
 
   async function togglePublished(item: AdminListing) {
     try {
-      await setAdminListingPublished(item.id, !item.published);
+      await patchAdminListing(item.id, { published: !item.published });
       toast.success(item.published ? "Hidden." : "Published.");
       await load();
     } catch (e) {
@@ -100,7 +99,7 @@
   async function toggleFeatured(item: AdminListing) {
     const next = !listingIsFeatured(item);
     try {
-      await setAdminListingFeatured(item.id, next);
+      await patchAdminListing(item.id, { featured: next });
       toast.success(next ? "Featured." : "Unfeatured.");
       await load();
     } catch (e) {

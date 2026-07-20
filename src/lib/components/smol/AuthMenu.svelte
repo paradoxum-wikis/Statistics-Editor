@@ -194,7 +194,7 @@
               disabled={authStore.busy || !username.trim()}
               onclick={onStart}
             >
-              {authStore.busy ? "Checking…" : "Continue"}
+              {authStore.busy ? "Checking..." : "Continue"}
             </button>
           {:else}
             <button
@@ -211,7 +211,7 @@
               disabled={authStore.busy}
               onclick={onComplete}
             >
-              {authStore.busy ? "Verifying…" : "I've saved"}
+              {authStore.busy ? "Verifying..." : "I've saved"}
             </button>
           {/if}
         </div>
