@@ -66,11 +66,7 @@
     return buildUpgradeSummariesForeskin(currentSkin);
   });
 
-  let towerKey = $derived(
-    towerStore.selectedData
-      ? `${towerStore.selectedData.name}:${towerStore.selectedSkinName}`
-      : "none",
-  );
+  let towerKey = $derived(towerStore.selectedData?.name ?? "none");
 
   const STATS_BY_ICON: Array<[icon: Picture, stats: string[]]> = [
     [DamageIcon, ["Damage"]],
@@ -245,6 +241,9 @@
   class={["flex h-full flex-col border-r border-border bg-card", className]}
 >
   <div class="flex flex-1 flex-col overflow-y-auto p-3.5">
+    <WikiBanner />
+    <Separator class="mb-4" />
+
     {#if towerStore.selectedData}
       {#key towerKey}
         <UpgradeViewer
@@ -260,9 +259,6 @@
       <DetectionEditor />
       <CostEditor />
     {:else}
-      <WikiBanner />
-      <Separator class="mb-4" />
-
       <div class="mb-3 flex items-baseline justify-between gap-2">
         <h3 class="text-sm font-semibold">Recent Updates</h3>
         <a

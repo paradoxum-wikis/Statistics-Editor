@@ -3,8 +3,6 @@
   import { fade } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
   import type { Picture } from "@sveltejs/enhanced-img";
-  import WikiBanner from "./smol/WikiBanner.svelte";
-  import Separator from "./smol/Separator.svelte";
   import { stripRefs } from "$lib/utils/format";
   import { renderCellHtml } from "$lib/neowtext/render";
   import { towerStore } from "$lib/stores/tower.svelte";
@@ -109,9 +107,6 @@
     };
   });
 </script>
-
-<WikiBanner />
-<Separator class="mb-4" />
 
 <Tabs.Root bind:value={selectedUpgrade}>
   <Tabs.List class="mb-4 flex space-x-1 overflow-x-auto">
