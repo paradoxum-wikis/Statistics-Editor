@@ -7,7 +7,6 @@
     Eye,
     ThumbsUp,
     Trash2,
-    X,
   } from "@lucide/svelte";
   import avatarPlaceholder from "$lib/assets/Avatar.png";
   import { authStore } from "$lib/stores/auth.svelte";
@@ -27,6 +26,7 @@
   import { timeAgo } from "$lib/utils/workshop";
   import { toast } from "$lib/toast";
   import Alert from "../smol/Alert.svelte";
+  import Modal from "../smol/Modal.svelte";
   import Btn from "../smol/Btn.svelte";
   import Tip from "../smol/Tip.svelte";
 
@@ -215,307 +215,293 @@
   }
 </script>
 
-<Dialog.Root bind:open>
-  <Dialog.Portal>
-    <Dialog.Overlay class="dialog-overlay" />
-    <Dialog.Content
-      class="dialog-content flex! max-h-[92dvh] w-[min(96vw,72rem)] max-w-[min(96vw,72rem)]! flex-col gap-0 overflow-hidden p-0! md:h-[min(92dvh,56rem)]"
+<Modal
+  bind:open
+  class="flex! max-h-[92dvh] w-[min(96vw,72rem)] max-w-[min(96vw,72rem)]! flex-col gap-0 overflow-hidden p-0! md:h-[min(92dvh,56rem)]"
+>
+  <div
+    class="flex shrink-0 items-start gap-3 border-b px-4 py-3 pe-12 sm:px-5 sm:py-4"
+  >
+    <div class="min-w-0">
+      <Dialog.Title class="truncate text-xl font-semibold">
+        {listing?.title ?? (loading ? "Loading..." : "Listing")}
+      </Dialog.Title>
+      {#if listing}
+        <Dialog.Description class="text-sm text-muted-foreground">
+          {listing.tower_name}
+        </Dialog.Description>
+      {:else}
+        <Dialog.Description class="sr-only">Workshop listing</Dialog.Description
+        >
+      {/if}
+    </div>
+  </div>
+
+  {#if loading}
+    <p class="p-5 text-sm text-muted-foreground">Loading details...</p>
+  {:else if error}
+    <p class="p-5 text-sm text-destructive">{error}</p>
+  {:else if listing}
+    {@const item = listing}
+    <div
+      class="min-h-0 flex-1 overflow-y-auto overscroll-contain md:grid md:grid-cols-[minmax(0,1.25fr)_minmax(18rem,0.9fr)] md:overflow-hidden md:divide-x"
     >
       <div
-        class="flex shrink-0 items-start justify-between gap-3 border-b px-4 py-3 sm:px-5 sm:py-4"
+        class="space-y-3 p-4 sm:space-y-4 sm:p-5 md:min-h-0 md:overflow-y-auto md:overscroll-contain"
       >
-        <div class="min-w-0">
-          <Dialog.Title class="truncate text-xl font-semibold">
-            {listing?.title ?? (loading ? "Loading..." : "Listing")}
-          </Dialog.Title>
-          {#if listing}
-            <Dialog.Description class="text-sm text-muted-foreground">
-              {listing.tower_name}
-            </Dialog.Description>
-          {:else}
-            <Dialog.Description class="sr-only"
-              >Workshop listing</Dialog.Description
-            >
-          {/if}
-        </div>
-        <Dialog.Close class="icon-btn shrink-0" aria-label="Close">
-          <X size={16} />
-        </Dialog.Close>
-      </div>
-
-      {#if loading}
-        <p class="p-5 text-sm text-muted-foreground">Loading details...</p>
-      {:else if error}
-        <p class="p-5 text-sm text-destructive">{error}</p>
-      {:else if listing}
-        {@const item = listing}
-        <div
-          class="min-h-0 flex-1 overflow-y-auto overscroll-contain md:grid md:grid-cols-[minmax(0,1.25fr)_minmax(18rem,0.9fr)] md:overflow-hidden md:divide-x"
+        <AspectRatio.Root
+          ratio={16 / 9}
+          class="overflow-hidden rounded-[var(--radius)_0] border bg-muted {featured
+            ? 'border-amber-500/40'
+            : 'border-border'}"
         >
-          <div
-            class="space-y-3 p-4 sm:space-y-4 sm:p-5 md:min-h-0 md:overflow-y-auto md:overscroll-contain"
-          >
-            <AspectRatio.Root
-              ratio={16 / 9}
-              class="overflow-hidden rounded-[var(--radius)_0] border bg-muted {featured
-                ? 'border-amber-500/40'
-                : 'border-border'}"
+          {#if imageUrl}
+            <img src={imageUrl} alt="" class="h-full w-full object-cover" />
+          {:else}
+            <enhanced:img
+              src="$lib/assets/PlaceholderWide.png"
+              alt=""
+              class="h-full w-full object-cover"
+            />
+          {/if}
+        </AspectRatio.Root>
+
+        {#if item.description}
+          <p class="whitespace-pre-wrap text-sm text-foreground/90">
+            {item.description}
+          </p>
+        {/if}
+
+        {#if item.tags.length}
+          <div class="flex flex-wrap gap-1">
+            {#each item.tags as tag (tag)}
+              <span
+                class="rounded-full border px-2 py-0.5 text-xs capitalize {tag ===
+                WORKSHOP_TAG_FEATURED
+                  ? 'border-amber-500/50 bg-amber-500/15 font-medium text-amber-800 dark:text-amber-200'
+                  : 'border-border text-muted-foreground'}">{tag}</span
+              >
+            {/each}
+          </div>
+        {/if}
+
+        <Separator.Root class="h-px w-full bg-border" />
+
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="flex min-w-0 items-center gap-2.5 text-sm">
+            <Avatar.Root
+              class="size-8 shrink-0 overflow-hidden rounded-full border border-border bg-muted"
             >
-              {#if imageUrl}
-                <img src={imageUrl} alt="" class="h-full w-full object-cover" />
-              {:else}
-                <enhanced:img
-                  src="$lib/assets/PlaceholderWide.png"
-                  alt=""
-                  class="h-full w-full object-cover"
-                />
-              {/if}
-            </AspectRatio.Root>
-
-            {#if item.description}
-              <p class="whitespace-pre-wrap text-sm text-foreground/90">
-                {item.description}
+              <Avatar.Image
+                src={authorAvatar ?? avatarPlaceholder}
+                alt={item.author.fandom_username}
+                class="size-full object-cover"
+              />
+              <Avatar.Fallback
+                class="flex size-full items-center justify-center text-xs font-medium text-muted-foreground"
+              >
+                {item.author.fandom_username.slice(0, 2).toUpperCase()}
+              </Avatar.Fallback>
+            </Avatar.Root>
+            <div class="min-w-0">
+              <p class="truncate font-medium">
+                {item.author.fandom_username}
               </p>
-            {/if}
-
-            {#if item.tags.length}
-              <div class="flex flex-wrap gap-1">
-                {#each item.tags as tag (tag)}
-                  <span
-                    class="rounded-full border px-2 py-0.5 text-xs capitalize {tag ===
-                    WORKSHOP_TAG_FEATURED
-                      ? 'border-amber-500/50 bg-amber-500/15 font-medium text-amber-800 dark:text-amber-200'
-                      : 'border-border text-muted-foreground'}">{tag}</span
-                  >
-                {/each}
-              </div>
-            {/if}
-
-            <Separator.Root class="h-px w-full bg-border" />
-
-            <div class="flex flex-wrap items-center justify-between gap-3">
-              <div class="flex min-w-0 items-center gap-2.5 text-sm">
-                <Avatar.Root
-                  class="size-8 shrink-0 overflow-hidden rounded-full border border-border bg-muted"
-                >
-                  <Avatar.Image
-                    src={authorAvatar ?? avatarPlaceholder}
-                    alt={item.author.fandom_username}
-                    class="size-full object-cover"
-                  />
-                  <Avatar.Fallback
-                    class="flex size-full items-center justify-center text-xs font-medium text-muted-foreground"
-                  >
-                    {item.author.fandom_username.slice(0, 2).toUpperCase()}
-                  </Avatar.Fallback>
-                </Avatar.Root>
-                <div class="min-w-0">
-                  <p class="truncate font-medium">
-                    {item.author.fandom_username}
-                  </p>
-                  <p
-                    class="flex flex-wrap items-center gap-x-1.5 text-xs leading-none text-muted-foreground"
-                  >
-                    <Tip content="Views">
-                      {#snippet children({ props })}
-                        <span {...props} class="inline-flex items-center gap-1">
-                          <Eye size={11} class="shrink-0" />
-                          {item.views.toLocaleString()}
-                        </span>
-                      {/snippet}
-                    </Tip>
-                    <span aria-hidden="true">·</span>
-                    <Tip
-                      content={`Uploaded at ${new Date(item.created_at).toLocaleString()}`}
-                    >
-                      {#snippet children({ props })}
-                        <span {...props} class="inline-flex items-center gap-1">
-                          <CalendarPlus size={11} class="shrink-0" />
-                          {timeAgo(item.created_at)}
-                        </span>
-                      {/snippet}
-                    </Tip>
-                    <span aria-hidden="true">·</span>
-                    <Tip
-                      content={`Updated at ${new Date(item.updated_at).toLocaleString()}`}
-                    >
-                      {#snippet children({ props })}
-                        <span {...props} class="inline-flex items-center gap-1">
-                          <CalendarClock size={11} class="shrink-0" />
-                          {timeAgo(item.updated_at)}
-                        </span>
-                      {/snippet}
-                    </Tip>
-                  </p>
-                </div>
-              </div>
-
-              <div class="flex flex-wrap items-center gap-2">
+              <p
+                class="flex flex-wrap items-center gap-x-1.5 text-xs leading-none text-muted-foreground"
+              >
+                <Tip content="Views">
+                  {#snippet children({ props })}
+                    <span {...props} class="inline-flex items-center gap-1">
+                      <Eye size={11} class="shrink-0" />
+                      {item.views.toLocaleString()}
+                    </span>
+                  {/snippet}
+                </Tip>
+                <span aria-hidden="true">·</span>
                 <Tip
-                  content={authStore.user
+                  content={`Uploaded at ${new Date(item.created_at).toLocaleString()}`}
+                >
+                  {#snippet children({ props })}
+                    <span {...props} class="inline-flex items-center gap-1">
+                      <CalendarPlus size={11} class="shrink-0" />
+                      {timeAgo(item.created_at)}
+                    </span>
+                  {/snippet}
+                </Tip>
+                <span aria-hidden="true">·</span>
+                <Tip
+                  content={`Updated at ${new Date(item.updated_at).toLocaleString()}`}
+                >
+                  {#snippet children({ props })}
+                    <span {...props} class="inline-flex items-center gap-1">
+                      <CalendarClock size={11} class="shrink-0" />
+                      {timeAgo(item.updated_at)}
+                    </span>
+                  {/snippet}
+                </Tip>
+              </p>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <Tip
+              content={authStore.user
+                ? item.voted
+                  ? "Remove upvote"
+                  : "Upvote"
+                : "Sign in to upvote"}
+            >
+              {#snippet children({ props })}
+                <Toggle.Root
+                  {...props}
+                  pressed={item.voted}
+                  disabled={voteBusy}
+                  aria-label={authStore.user
                     ? item.voted
                       ? "Remove upvote"
                       : "Upvote"
                     : "Sign in to upvote"}
+                  class="btn btn-sm inline-flex items-center gap-1.5 data-[state=off]:btn-outline data-[state=on]:btn-primary"
+                  onPressedChange={() => void onVote()}
                 >
-                  {#snippet children({ props })}
-                    <Toggle.Root
-                      {...props}
-                      pressed={item.voted}
-                      disabled={voteBusy}
-                      aria-label={authStore.user
-                        ? item.voted
-                          ? "Remove upvote"
-                          : "Upvote"
-                        : "Sign in to upvote"}
-                      class="btn btn-sm inline-flex items-center gap-1.5 data-[state=off]:btn-outline data-[state=on]:btn-primary"
-                      onPressedChange={() => void onVote()}
-                    >
-                      <ThumbsUp size={14} />
-                      {item.votes.toLocaleString()}
-                    </Toggle.Root>
-                  {/snippet}
-                </Tip>
-                <Tip content="View this build’s stats in the editor">
-                  {#snippet children({ props })}
-                    <a
-                      {...props}
-                      class="btn btn-secondary btn-sm"
-                      href={openHref}
-                    >
-                      View tower in Editor
-                    </a>
-                  {/snippet}
-                </Tip>
-              </div>
-            </div>
+                  <ThumbsUp size={14} />
+                  {item.votes.toLocaleString()}
+                </Toggle.Root>
+              {/snippet}
+            </Tip>
+            <Tip content="View this build’s stats in the editor">
+              {#snippet children({ props })}
+                <a {...props} class="btn btn-secondary btn-sm" href={openHref}>
+                  View tower in Editor
+                </a>
+              {/snippet}
+            </Tip>
           </div>
-
-          <aside
-            class="flex flex-col border-t md:min-h-0 md:overflow-hidden md:border-t-0"
-          >
-            <div class="shrink-0 border-b px-4 py-3">
-              <h3 class="text-sm font-semibold">
-                Comments
-                {#if comments.length}
-                  <span class="font-normal text-muted-foreground"
-                    >({comments.length})</span
-                  >
-                {/if}
-              </h3>
-            </div>
-
-            <div
-              class="space-y-3 p-4 md:min-h-0 md:flex-1 md:overflow-y-auto md:overscroll-contain"
-            >
-              {#if commentsLoading && comments.length === 0}
-                <p class="text-xs text-muted-foreground">Loading comments...</p>
-              {:else if commentsError}
-                <p class="text-xs text-destructive">{commentsError}</p>
-              {:else if comments.length === 0}
-                <p class="text-xs text-muted-foreground">
-                  No comments yet, why not share your thoughts?
-                </p>
-              {:else}
-                <ul class="space-y-3">
-                  {#each comments as c (c.id)}
-                    <li class="flex gap-2">
-                      <Tip content="{c.author.fandom_username} on the TDS Wiki">
-                        {#snippet children({ props })}
-                          <a
-                            {...props}
-                            href={fandomUserPage(c.author.fandom_username)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            class="mt-0.5 shrink-0 rounded-full outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring"
-                          >
-                            <Avatar.Root
-                              class="size-6 overflow-hidden rounded-full border border-border bg-muted"
-                            >
-                              <Avatar.Image
-                                src={avatars.get(c.author.fandom_userid) ??
-                                  avatarPlaceholder}
-                                alt={c.author.fandom_username}
-                                class="size-full object-cover"
-                              />
-                              <Avatar.Fallback
-                                class="flex size-full items-center justify-center text-[10px] font-medium text-muted-foreground"
-                              >
-                                {c.author.fandom_username
-                                  .slice(0, 2)
-                                  .toUpperCase()}
-                              </Avatar.Fallback>
-                            </Avatar.Root>
-                          </a>
-                        {/snippet}
-                      </Tip>
-                      <div class="min-w-0 flex-1">
-                        <div
-                          class="flex items-baseline justify-between gap-2 text-xs"
-                        >
-                          <a
-                            href={fandomUserPage(c.author.fandom_username)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            class="font-medium text-link hover:underline"
-                            >{c.author.fandom_username}</a
-                          >
-                          <span class="shrink-0 text-muted-foreground"
-                            >{timeAgo(c.created_at)}</span
-                          >
-                        </div>
-                        <p
-                          class="mt-0.5 whitespace-pre-wrap text-sm text-foreground/90"
-                        >
-                          {c.body}
-                        </p>
-                        {#if c.mine}
-                          <button
-                            type="button"
-                            class="mt-1 inline-flex items-center gap-1 text-xs text-destructive hover:underline"
-                            onclick={() => askDeleteComment(c)}
-                          >
-                            <Trash2 size={11} />
-                            Delete
-                          </button>
-                        {/if}
-                      </div>
-                    </li>
-                  {/each}
-                </ul>
-              {/if}
-            </div>
-
-            <div class="shrink-0 space-y-2 border-t p-3 sm:p-4">
-              {#if authStore.user}
-                <textarea
-                  class="input h-auto min-h-12 w-full resize-none py-2 text-sm"
-                  placeholder="Write a comment..."
-                  maxlength="1000"
-                  rows="2"
-                  bind:value={commentBody}
-                  disabled={commentBusy}></textarea>
-                <div class="flex justify-end">
-                  <Btn
-                    size="sm"
-                    disabled={commentBusy || !commentBody.trim()}
-                    onclick={onComment}
-                  >
-                    {commentBusy ? "Posting..." : "Post Comment"}
-                  </Btn>
-                </div>
-              {:else}
-                <p class="text-xs text-muted-foreground text-center">
-                  Sign in with Fandom to upvote or comment.
-                </p>
-              {/if}
-            </div>
-          </aside>
         </div>
-      {/if}
-    </Dialog.Content>
-  </Dialog.Portal>
-</Dialog.Root>
+      </div>
+
+      <aside
+        class="flex flex-col border-t md:min-h-0 md:overflow-hidden md:border-t-0"
+      >
+        <div class="shrink-0 border-b px-4 py-3">
+          <h3 class="text-sm font-semibold">
+            Comments
+            {#if comments.length}
+              <span class="font-normal text-muted-foreground"
+                >({comments.length})</span
+              >
+            {/if}
+          </h3>
+        </div>
+
+        <div
+          class="space-y-3 p-4 md:min-h-0 md:flex-1 md:overflow-y-auto md:overscroll-contain"
+        >
+          {#if commentsLoading && comments.length === 0}
+            <p class="text-xs text-muted-foreground">Loading comments...</p>
+          {:else if commentsError}
+            <p class="text-xs text-destructive">{commentsError}</p>
+          {:else if comments.length === 0}
+            <p class="text-xs text-muted-foreground">
+              No comments yet, why not share your thoughts?
+            </p>
+          {:else}
+            <ul class="space-y-3">
+              {#each comments as c (c.id)}
+                <li class="flex gap-2">
+                  <Tip content="{c.author.fandom_username} on the TDS Wiki">
+                    {#snippet children({ props })}
+                      <a
+                        {...props}
+                        href={fandomUserPage(c.author.fandom_username)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="mt-0.5 shrink-0 rounded-full outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring"
+                      >
+                        <Avatar.Root
+                          class="size-6 overflow-hidden rounded-full border border-border bg-muted"
+                        >
+                          <Avatar.Image
+                            src={avatars.get(c.author.fandom_userid) ??
+                              avatarPlaceholder}
+                            alt={c.author.fandom_username}
+                            class="size-full object-cover"
+                          />
+                          <Avatar.Fallback
+                            class="flex size-full items-center justify-center text-[10px] font-medium text-muted-foreground"
+                          >
+                            {c.author.fandom_username.slice(0, 2).toUpperCase()}
+                          </Avatar.Fallback>
+                        </Avatar.Root>
+                      </a>
+                    {/snippet}
+                  </Tip>
+                  <div class="min-w-0 flex-1">
+                    <div
+                      class="flex items-baseline justify-between gap-2 text-xs"
+                    >
+                      <a
+                        href={fandomUserPage(c.author.fandom_username)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="font-medium text-link hover:underline"
+                        >{c.author.fandom_username}</a
+                      >
+                      <span class="shrink-0 text-muted-foreground"
+                        >{timeAgo(c.created_at)}</span
+                      >
+                    </div>
+                    <p
+                      class="mt-0.5 whitespace-pre-wrap text-sm text-foreground/90"
+                    >
+                      {c.body}
+                    </p>
+                    {#if c.mine}
+                      <button
+                        type="button"
+                        class="mt-1 inline-flex items-center gap-1 text-xs text-destructive hover:underline"
+                        onclick={() => askDeleteComment(c)}
+                      >
+                        <Trash2 size={11} />
+                        Delete
+                      </button>
+                    {/if}
+                  </div>
+                </li>
+              {/each}
+            </ul>
+          {/if}
+        </div>
+
+        <div class="shrink-0 space-y-2 border-t p-3 sm:p-4">
+          {#if authStore.user}
+            <textarea
+              class="input h-auto min-h-12 w-full resize-none py-2 text-sm"
+              placeholder="Write a comment..."
+              maxlength="1000"
+              rows="2"
+              bind:value={commentBody}
+              disabled={commentBusy}></textarea>
+            <div class="flex justify-end">
+              <Btn
+                size="sm"
+                disabled={commentBusy || !commentBody.trim()}
+                onclick={onComment}
+              >
+                {commentBusy ? "Posting..." : "Post Comment"}
+              </Btn>
+            </div>
+          {:else}
+            <p class="text-xs text-muted-foreground text-center">
+              Sign in with Fandom to upvote or comment.
+            </p>
+          {/if}
+        </div>
+      </aside>
+    </div>
+  {/if}
+</Modal>
 
 <Alert
   bind:open={deleteOpen}

@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { Dialog, Tabs } from "bits-ui";
+  import { Tabs } from "bits-ui";
+  import Modal from "$lib/components/smol/Modal.svelte";
   import Switch from "$lib/components/smol/Switch.svelte";
   import {
     settingsStore,
@@ -52,71 +53,58 @@
   </div>
 {/snippet}
 
-<Dialog.Root bind:open>
-  <Dialog.Portal>
-    <Dialog.Overlay class="dialog-overlay"></Dialog.Overlay>
-    <Dialog.Content class="dialog-content sm:max-w-2xl">
-      <div class="flex flex-col space-y-1.5 text-center sm:text-start">
-        <Dialog.Title class="dialog-title">
-          <h2>Settings</h2>
-        </Dialog.Title>
-        <Dialog.Description class="dialog-description">
-          Please change them to your heart's content.
-        </Dialog.Description>
-      </div>
+<Modal
+  bind:open
+  title="Settings"
+  description="Please change them to your heart's content."
+  class="sm:max-w-2xl"
+>
+  <Tabs.Root value="editor">
+    <Tabs.List
+      class="mb-4 flex w-full rounded-[var(--radius)_0] border border-border bg-muted p-1"
+    >
+      <Tabs.Trigger
+        value="editor"
+        class="flex-1 rounded-[calc(var(--radius)-0.25rem)_0] px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
+        >Editor</Tabs.Trigger
+      >
+      <Tabs.Trigger
+        value="appearance"
+        class="flex-1 rounded-[calc(var(--radius)-0.25rem)_0] px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
+        >Appearance</Tabs.Trigger
+      >
+      <Tabs.Trigger
+        value="advanced"
+        class="flex-1 rounded-[calc(var(--radius)-0.25rem)_0] px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
+        >Advanced</Tabs.Trigger
+      >
+    </Tabs.List>
 
-      <Tabs.Root value="editor">
-        <Tabs.List
-          class="mb-4 flex w-full rounded-[var(--radius)_0] border border-border bg-muted p-1"
-        >
-          <Tabs.Trigger
-            value="editor"
-            class="flex-1 rounded-[calc(var(--radius)-0.25rem)_0] px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
-            >Editor</Tabs.Trigger
-          >
-          <Tabs.Trigger
-            value="appearance"
-            class="flex-1 rounded-[calc(var(--radius)-0.25rem)_0] px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
-            >Appearance</Tabs.Trigger
-          >
-          <Tabs.Trigger
-            value="advanced"
-            class="flex-1 rounded-[calc(var(--radius)-0.25rem)_0] px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
-            >Advanced</Tabs.Trigger
-          >
-        </Tabs.List>
+    {#each SETTING_TABS as tab (tab)}
+      <Tabs.Content value={tab}>
+        <div class="grid gap-4 py-2">
+          {#each settingGroupsForTab(tab) as group (group.parent.key)}
+            <div class="relative flex flex-col">
+              {@render settingRow(group.parent)}
 
-        {#each SETTING_TABS as tab (tab)}
-          <Tabs.Content value={tab}>
-            <div class="grid gap-4 py-2">
-              {#each settingGroupsForTab(tab) as group (group.parent.key)}
-                <div class="relative flex flex-col">
-                  {@render settingRow(group.parent)}
-
-                  {#each group.children as child (child.key)}
-                    {@const parentEnabled = settingsStore.getBoolean(
-                      group.parent.key,
-                    )}
-                    <div
-                      class="setting-child-wrap"
-                      class:setting-child-wrap-revealed={parentEnabled}
-                    >
-                      {@render settingRow(child, true, parentEnabled)}
-                    </div>
-                  {/each}
+              {#each group.children as child (child.key)}
+                {@const parentEnabled = settingsStore.getBoolean(
+                  group.parent.key,
+                )}
+                <div
+                  class="setting-child-wrap"
+                  class:setting-child-wrap-revealed={parentEnabled}
+                >
+                  {@render settingRow(child, true, parentEnabled)}
                 </div>
               {/each}
             </div>
-          </Tabs.Content>
-        {/each}
-      </Tabs.Root>
-
-      <div class="flex items-center justify-end">
-        <Dialog.Close class="btn btn-secondary btn-sm">Close</Dialog.Close>
-      </div>
-    </Dialog.Content>
-  </Dialog.Portal>
-</Dialog.Root>
+          {/each}
+        </div>
+      </Tabs.Content>
+    {/each}
+  </Tabs.Root>
+</Modal>
 
 <style>
   .setting-child-wrap {

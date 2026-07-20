@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
-  import { Dialog } from "bits-ui";
+  import Modal from "./Modal.svelte";
 
   let {
     open = $bindable(false),
@@ -32,7 +32,6 @@
     if (!nextOpen && open && !confirming) {
       onCancel?.();
     }
-    open = nextOpen;
   }
 
   async function handleConfirm() {
@@ -43,34 +42,35 @@
   }
 </script>
 
-<Dialog.Root {open} onOpenChange={handleOpenChange}>
-  <Dialog.Portal>
-    <Dialog.Overlay class="dialog-overlay"></Dialog.Overlay>
-    <Dialog.Content class="dialog-content">
-      <div class="flex flex-col space-y-2 text-center sm:text-start">
-        <Dialog.Title class="text-lg font-semibold">
-          {title}
-        </Dialog.Title>
-        <Dialog.Description class="text-sm text-muted-foreground">
-          {#if body}
-            {@render body()}
-          {:else}
-            {description}
-          {/if}
-        </Dialog.Description>
-      </div>
-      <div
-        class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2"
+<Modal
+  bind:open
+  {title}
+  description={body ? undefined : description}
+  onOpenChange={handleOpenChange}
+>
+  {#if body}
+    <div class="text-center text-sm text-muted-foreground sm:text-start">
+      {@render body()}
+    </div>
+  {/if}
+
+  {#snippet footer()}
+    <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
+      <button
+        type="button"
+        class={cancelClass}
+        onclick={() => {
+          onCancel?.();
+          open = false;
+        }}
       >
-        <Dialog.Close class={cancelClass} onclick={onCancel}>
-          {cancelLabel}
-        </Dialog.Close>
-        {#if confirmLabel}
-          <button type="button" class={confirmClass} onclick={handleConfirm}>
-            {confirmLabel}
-          </button>
-        {/if}
-      </div>
-    </Dialog.Content>
-  </Dialog.Portal>
-</Dialog.Root>
+        {cancelLabel}
+      </button>
+      {#if confirmLabel}
+        <button type="button" class={confirmClass} onclick={handleConfirm}>
+          {confirmLabel}
+        </button>
+      {/if}
+    </div>
+  {/snippet}
+</Modal>

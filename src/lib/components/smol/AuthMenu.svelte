@@ -1,8 +1,10 @@
 <script lang="ts">
-  import { AlertDialog, Dialog, Popover } from "bits-ui";
+  import { Popover } from "bits-ui";
   import { BookOpenText, LogOut } from "@lucide/svelte";
   import { authStore } from "$lib/stores/auth.svelte";
   import { fandomUserPage, formatProfileStats } from "$lib/services/fandomAuth";
+  import Alert from "./Alert.svelte";
+  import Modal from "./Modal.svelte";
   import TextInput from "./TextInput.svelte";
   import Separator from "./Separator.svelte";
   import avatarPlaceholder from "$lib/assets/Avatar.png";
@@ -89,133 +91,121 @@
     </Popover.Portal>
   </Popover.Root>
 
-  <AlertDialog.Root bind:open={logoutOpen}>
-    <AlertDialog.Portal>
-      <AlertDialog.Overlay class="dialog-overlay" />
-      <AlertDialog.Content class="dialog-content">
-        <div class="flex flex-col space-y-2 text-center sm:text-left">
-          <AlertDialog.Title class="text-lg font-semibold">
-            Sign out?
-          </AlertDialog.Title>
-          <AlertDialog.Description class="text-sm text-muted-foreground">
-            Sign out of Fandom account
-            <span class="font-bold">{user.fandom_username}</span>? You can sign
-            back in anytime by verifying on the wiki again.
-          </AlertDialog.Description>
-        </div>
-        <div
-          class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2"
-        >
-          <AlertDialog.Cancel class="btn btn-outline mt-2 sm:mt-0">
-            Cancel
-          </AlertDialog.Cancel>
-          <AlertDialog.Action
-            class="btn btn-destructive-fill text-white"
-            onclick={confirmLogout}
-          >
-            Let me out!
-          </AlertDialog.Action>
-        </div>
-      </AlertDialog.Content>
-    </AlertDialog.Portal>
-  </AlertDialog.Root>
+  {#snippet logoutBody()}
+    Sign out of Fandom account
+    <span class="font-bold">{user.fandom_username}</span>? You can sign back in
+    anytime by verifying on the wiki again.
+  {/snippet}
+
+  <Alert
+    bind:open={logoutOpen}
+    title="Sign out?"
+    body={logoutBody}
+    confirmLabel="Let me out!"
+    confirmClass="btn btn-destructive-fill text-white"
+    onConfirm={confirmLogout}
+  />
 {:else}
-  <Dialog.Root
+  <Modal
     bind:open={loginOpen}
-    onOpenChange={(open) => {
-      if (!open) authStore.clearChallenge();
+    title="Sign in with Fandom"
+    description="Prove you are who you are by saving a verification page on the Tower Defense Simulator Wiki."
+    class="max-w-md"
+    onOpenChange={(next) => {
+      if (!next) authStore.clearChallenge();
     }}
   >
-    <Dialog.Trigger
-      class={avatarBtn}
-      aria-label="Sign in with Fandom"
-      onclick={() => authStore.clearChallenge()}
-    >
-      <img src={avatarPlaceholder} alt="" class="size-full object-cover" />
-    </Dialog.Trigger>
-    <Dialog.Portal>
-      <Dialog.Overlay class="dialog-overlay" />
-      <Dialog.Content class="dialog-content max-w-md">
-        <Dialog.Title class="dialog-title">Sign in with Fandom</Dialog.Title>
-        <Dialog.Description class="dialog-description">
-          Prove you are who you are by saving a verification page on the Tower
-          Defense Simulator Wiki.
-        </Dialog.Description>
+    {#snippet trigger({ props })}
+      <button
+        type="button"
+        class={avatarBtn}
+        aria-label="Sign in with Fandom"
+        {...props}
+      >
+        <img src={avatarPlaceholder} alt="" class="size-full object-cover" />
+      </button>
+    {/snippet}
 
+    {#if !authStore.challenge}
+      <div class="space-y-2">
+        <label class="text-sm font-medium" for="fandom-username">
+          Username
+        </label>
+        <TextInput
+          id="fandom-username"
+          type="text"
+          placeholder="C'mon, put it here..."
+          bind:value={username}
+          onkeydown={(e: KeyboardEvent) => {
+            if (e.key === "Enter") void onStart();
+          }}
+        />
+      </div>
+    {:else}
+      <div class="space-y-3 text-sm">
+        <p>
+          Signed in as wikiling
+          <strong>{authStore.challenge.fandom_username}</strong>? Open the
+          editor, save (Alt+Shift+S), then confirm here.
+        </p>
+        <a
+          class="btn btn-primary inline-flex w-full justify-center"
+          href={authStore.challenge.edit_url}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Open Fandom editor
+        </a>
+        <p class="text-xs text-muted-foreground break-all">
+          Summary must be:
+          <code class="rounded bg-muted px-1"
+            >{authStore.challenge.summary}</code
+          >
+        </p>
+      </div>
+    {/if}
+
+    {#if authStore.error}
+      <p class="text-sm text-destructive">{authStore.error}</p>
+    {/if}
+
+    {#snippet footer()}
+      <div class="flex justify-end gap-2">
         {#if !authStore.challenge}
-          <div class="space-y-2">
-            <label class="text-sm font-medium" for="fandom-username">
-              Username
-            </label>
-            <TextInput
-              id="fandom-username"
-              type="text"
-              placeholder="C'mon, put it here..."
-              bind:value={username}
-              onkeydown={(e: KeyboardEvent) => {
-                if (e.key === "Enter") void onStart();
-              }}
-            />
-          </div>
+          <button
+            type="button"
+            class="btn btn-outline"
+            onclick={() => (loginOpen = false)}
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            disabled={authStore.busy || !username.trim()}
+            onclick={onStart}
+          >
+            {authStore.busy ? "Checking..." : "Continue"}
+          </button>
         {:else}
-          <div class="space-y-3 text-sm">
-            <p>
-              Signed in as wikiling
-              <strong>{authStore.challenge.fandom_username}</strong>? Open the
-              editor, save (Alt+Shift+S), then confirm here.
-            </p>
-            <a
-              class="btn btn-primary inline-flex w-full justify-center"
-              href={authStore.challenge.edit_url}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Open Fandom editor
-            </a>
-            <p class="text-xs text-muted-foreground break-all">
-              Summary must be:
-              <code class="rounded bg-muted px-1"
-                >{authStore.challenge.summary}</code
-              >
-            </p>
-          </div>
+          <button
+            type="button"
+            class="btn btn-outline"
+            disabled={authStore.busy}
+            onclick={() => authStore.clearChallenge()}
+          >
+            Back
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            disabled={authStore.busy}
+            onclick={onComplete}
+          >
+            {authStore.busy ? "Verifying..." : "I've saved"}
+          </button>
         {/if}
-
-        {#if authStore.error}
-          <p class="text-sm text-destructive">{authStore.error}</p>
-        {/if}
-
-        <div class="flex justify-end gap-2">
-          {#if !authStore.challenge}
-            <Dialog.Close class="btn btn-outline">Cancel</Dialog.Close>
-            <button
-              type="button"
-              class="btn btn-primary"
-              disabled={authStore.busy || !username.trim()}
-              onclick={onStart}
-            >
-              {authStore.busy ? "Checking..." : "Continue"}
-            </button>
-          {:else}
-            <button
-              type="button"
-              class="btn btn-outline"
-              disabled={authStore.busy}
-              onclick={() => authStore.clearChallenge()}
-            >
-              Back
-            </button>
-            <button
-              type="button"
-              class="btn btn-primary"
-              disabled={authStore.busy}
-              onclick={onComplete}
-            >
-              {authStore.busy ? "Verifying..." : "I've saved"}
-            </button>
-          {/if}
-        </div>
-      </Dialog.Content>
-    </Dialog.Portal>
-  </Dialog.Root>
+      </div>
+    {/snippet}
+  </Modal>
 {/if}

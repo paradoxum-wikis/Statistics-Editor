@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { Dialog } from "bits-ui";
-  import { X } from "@lucide/svelte";
   import { authStore } from "$lib/stores/auth.svelte";
   import {
     fetchShare,
@@ -17,6 +15,7 @@
   import { analytics } from "$lib/services/analytics";
   import { settingsStore } from "$lib/stores/settings.svelte";
   import { toast } from "$lib/toast";
+  import Modal from "../smol/Modal.svelte";
   import TextInput from "../smol/TextInput.svelte";
   import Btn from "../smol/Btn.svelte";
 
@@ -158,171 +157,159 @@
   }
 </script>
 
-<Dialog.Root bind:open>
-  <Dialog.Portal>
-    <Dialog.Overlay class="dialog-overlay" />
-    <Dialog.Content class="dialog-content max-h-[90vh] overflow-y-auto">
-      <Dialog.Title class="dialog-title">
-        {mode === "edit" ? "Edit Listing" : "Publish to Workshop"}
-      </Dialog.Title>
-      <Dialog.Description class="dialog-description -my-2">
-        {mode === "edit"
-          ? "Update card metadata, or point it at a newer Share Link."
-          : "Hopefully your work is at least serviceable..."}
-      </Dialog.Description>
-
-      {#if !authStore.user}
-        <p class="text-sm text-muted-foreground">
-          Sign in with Fandom first, you can find the login prompt in the top
-          bar as an avatar icon.
-        </p>
-      {:else}
-        <div class="space-y-3">
-          {#if verified}
-            <div class="space-y-1">
-              <span class="text-sm font-medium">Share Link</span>
-              <div
-                class="flex items-center justify-between gap-2 rounded-[var(--radius)_0] border border-border bg-muted/50 px-3 py-2 text-sm"
-              >
-                <span class="truncate font-medium">{verified.tower_name}</span>
-                <span class="shrink-0 font-mono text-xs text-muted-foreground">
-                  {sharePageUrl(verified.id)}
-                </span>
-              </div>
-            </div>
-          {/if}
-
-          {#if !verified || mode === "edit"}
-            <div class="space-y-1">
-              <label class="text-sm font-medium" for="workshop-share-input">
-                {#if mode === "edit"}
-                  Replace Share Link
-                  <span class="font-normal text-muted-foreground"
-                    >(optional)</span
-                  >
-                {:else}
-                  Share link
-                {/if}
-              </label>
-              <div class="flex gap-2">
-                <TextInput
-                  id="workshop-share-input"
-                  class="input-short"
-                  placeholder="https://tds.wiki/s/..."
-                  bind:value={shareInput}
-                  onkeydown={(e: KeyboardEvent) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      void checkShare();
-                    }
-                  }}
-                />
-                <Btn
-                  variant="outline"
-                  size="sm"
-                  disabled={!shareDirty || checking}
-                  onclick={checkShare}
-                >
-                  {checking ? "Checking..." : "Check"}
-                </Btn>
-              </div>
-            </div>
-          {/if}
-
-          <div class="space-y-1">
-            <div class="flex items-baseline justify-between">
-              <label class="text-sm font-medium" for="workshop-title-input"
-                >Title</label
-              >
-              <span class="text-xs text-muted-foreground"
-                >{title.trim().length}/80</span
-              >
-            </div>
-            <TextInput
-              id="workshop-title-input"
-              class="input-short"
-              placeholder="Accel rework but actually balanced"
-              maxlength="80"
-              bind:value={title}
-            />
-          </div>
-
-          <div class="space-y-1">
-            <div class="flex items-baseline justify-between">
-              <label class="text-sm font-medium" for="workshop-desc-input"
-                >Description</label
-              >
-              <span class="text-xs text-muted-foreground"
-                >{description.trim().length}/500</span
-              >
-            </div>
-            <textarea
-              id="workshop-desc-input"
-              class="input h-auto min-h-20 resize-none py-2"
-              placeholder="Tell everyone about your delightful creation!"
-              maxlength="500"
-              rows="3"
-              bind:value={description}></textarea>
-          </div>
-
-          <div class="space-y-1">
-            <label class="text-sm font-medium" for="workshop-image-input"
-              >Image <span class="font-normal text-muted-foreground"
-                >(optional)</span
-              ></label
-            >
-            <TextInput
-              id="workshop-image-input"
-              class="input-short"
-              placeholder="File:Place.png · Roblox Asset ID · https://..."
-              maxlength="512"
-              bind:value={image}
-            />
-          </div>
-
-          <div class="space-y-1">
-            <span class="text-sm font-medium">Tag</span>
-            <div class="flex flex-wrap gap-1.5">
-              {#each WORKSHOP_TAGS as t (t)}
-                {@const active = tag === t}
-                <button
-                  type="button"
-                  class="rounded-full border px-3 py-0.5 text-xs capitalize transition-colors {active
-                    ? 'border-primary bg-primary text-primary-foreground'
-                    : 'border-border text-muted-foreground hover:bg-muted'}"
-                  aria-pressed={active}
-                  onclick={() => (tag = t)}
-                >
-                  {t}
-                </button>
-              {/each}
-            </div>
+<Modal
+  bind:open
+  title={mode === "edit" ? "Edit Listing" : "Publish to Workshop"}
+  description={mode === "edit"
+    ? "Update card metadata, or point it at a newer Share Link."
+    : "Hopefully your work is at least serviceable..."}
+  class="max-h-[90vh] overflow-y-auto"
+>
+  {#if !authStore.user}
+    <p class="text-sm text-muted-foreground">
+      Sign in with Fandom first, you can find the login prompt in the top bar as
+      an avatar icon.
+    </p>
+  {:else}
+    <div class="space-y-3">
+      {#if verified}
+        <div class="space-y-1">
+          <span class="text-sm font-medium">Share Link</span>
+          <div
+            class="flex items-center justify-between gap-2 rounded-[var(--radius)_0] border border-border bg-muted/50 px-3 py-2 text-sm"
+          >
+            <span class="truncate font-medium">{verified.tower_name}</span>
+            <span class="shrink-0 font-mono text-xs text-muted-foreground">
+              {sharePageUrl(verified.id)}
+            </span>
           </div>
         </div>
       {/if}
 
-      {#if error}
-        <p class="text-sm text-destructive">{error}</p>
+      {#if !verified || mode === "edit"}
+        <div class="space-y-1">
+          <label class="text-sm font-medium" for="workshop-share-input">
+            {#if mode === "edit"}
+              Replace Share Link
+              <span class="font-normal text-muted-foreground">(optional)</span>
+            {:else}
+              Share link
+            {/if}
+          </label>
+          <div class="flex gap-2">
+            <TextInput
+              id="workshop-share-input"
+              class="input-short"
+              placeholder="https://tds.wiki/s/..."
+              bind:value={shareInput}
+              onkeydown={(e: KeyboardEvent) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  void checkShare();
+                }
+              }}
+            />
+            <Btn
+              variant="outline"
+              size="sm"
+              disabled={!shareDirty || checking}
+              onclick={checkShare}
+            >
+              {checking ? "Checking..." : "Check"}
+            </Btn>
+          </div>
+        </div>
       {/if}
 
-      <div class="flex justify-end gap-2">
-        <Dialog.Close class="btn btn-outline">Cancel</Dialog.Close>
-        {#if authStore.user}
-          <Btn variant="primary" disabled={!canSubmit} onclick={submit}>
-            {busy
-              ? mode === "edit"
-                ? "Saving..."
-                : "Publishing..."
-              : mode === "edit"
-                ? "Save changes"
-                : "Publish"}
-          </Btn>
-        {/if}
+      <div class="space-y-1">
+        <div class="flex items-baseline justify-between">
+          <label class="text-sm font-medium" for="workshop-title-input"
+            >Title</label
+          >
+          <span class="text-xs text-muted-foreground"
+            >{title.trim().length}/80</span
+          >
+        </div>
+        <TextInput
+          id="workshop-title-input"
+          class="input-short"
+          placeholder="Accel rework but actually balanced"
+          maxlength="80"
+          bind:value={title}
+        />
       </div>
 
-      <Dialog.Close class="icon-btn absolute right-3 top-3" aria-label="Close">
-        <X size={16} />
-      </Dialog.Close>
-    </Dialog.Content>
-  </Dialog.Portal>
-</Dialog.Root>
+      <div class="space-y-1">
+        <div class="flex items-baseline justify-between">
+          <label class="text-sm font-medium" for="workshop-desc-input"
+            >Description</label
+          >
+          <span class="text-xs text-muted-foreground"
+            >{description.trim().length}/500</span
+          >
+        </div>
+        <textarea
+          id="workshop-desc-input"
+          class="input h-auto min-h-20 resize-none py-2"
+          placeholder="Tell everyone about your delightful creation!"
+          maxlength="500"
+          rows="3"
+          bind:value={description}></textarea>
+      </div>
+
+      <div class="space-y-1">
+        <label class="text-sm font-medium" for="workshop-image-input">
+          Image
+          <span class="font-normal text-muted-foreground">(optional)</span>
+        </label>
+        <TextInput
+          id="workshop-image-input"
+          class="input-short"
+          placeholder="File:Place.png · Roblox Asset ID · https://..."
+          maxlength="512"
+          bind:value={image}
+        />
+      </div>
+
+      <div class="space-y-1">
+        <span class="text-sm font-medium">Tag</span>
+        <div class="flex flex-wrap gap-1.5">
+          {#each WORKSHOP_TAGS as t (t)}
+            {@const active = tag === t}
+            <button
+              type="button"
+              class="rounded-full border px-3 py-0.5 text-xs capitalize transition-colors {active
+                ? 'border-primary bg-primary text-primary-foreground'
+                : 'border-border text-muted-foreground hover:bg-muted'}"
+              aria-pressed={active}
+              onclick={() => (tag = t)}
+            >
+              {t}
+            </button>
+          {/each}
+        </div>
+      </div>
+    </div>
+  {/if}
+
+  {#if error}
+    <p class="text-sm text-destructive">{error}</p>
+  {/if}
+
+  {#snippet footer()}
+    <div class="flex justify-end gap-2">
+      <Btn variant="outline" onclick={() => (open = false)}>Cancel</Btn>
+      {#if authStore.user}
+        <Btn variant="primary" disabled={!canSubmit} onclick={submit}>
+          {busy
+            ? mode === "edit"
+              ? "Saving..."
+              : "Publishing..."
+            : mode === "edit"
+              ? "Save changes"
+              : "Publish"}
+        </Btn>
+      {/if}
+    </div>
+  {/snippet}
+</Modal>

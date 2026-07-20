@@ -19,9 +19,10 @@
   import GlobalModifierModal from "./tool/GlobalModifierModal.svelte";
   import CreateTower from "./tool/CreateTower.svelte";
 
-  import { DropdownMenu, Popover, AlertDialog, Dialog } from "bits-ui";
+  import { DropdownMenu, Popover } from "bits-ui";
   import ModeToggle from "./smol/ModeToggle.svelte";
   import AuthMenu from "./smol/AuthMenu.svelte";
+  import Modal from "./smol/Modal.svelte";
   import Card from "./smol/Card.svelte";
   import LoadingCard from "./smol/LoadingCard.svelte";
   import Btn from "./smol/Btn.svelte";
@@ -36,7 +37,6 @@
   import {
     Check,
     Trash2,
-    X,
     PanelLeft,
     User,
     Wrench,
@@ -264,8 +264,7 @@
       <div class="flex items-center justify-center gap-2">
         <IconBtn
           onclick={() =>
-            goto(resolve("/workshop"), { keepFocus: true, noScroll: true })
-          }
+            goto(resolve("/workshop"), { keepFocus: true, noScroll: true })}
           title="Workshop"
         >
           <Store size={20} />
@@ -371,51 +370,51 @@
         </DropdownMenu.Group>
         <DropdownMenu.Separator class="-mx-1 my-1 h-px bg-muted" />
 
-        <Dialog.Root bind:open={createProfileOpen}>
-          <Dialog.Trigger
-            class="dropdown-item w-full text-start"
-            onclick={openCreateProfileDialog}
-          >
-            <span>+ Create Profile</span>
-          </Dialog.Trigger>
+        <Modal
+          bind:open={createProfileOpen}
+          title="Create Profile"
+          description="Enter a name for the new profile."
+          onOpenChange={(v) => {
+            if (v) openCreateProfileDialog();
+          }}
+        >
+          {#snippet trigger({ props })}
+            <button
+              type="button"
+              class="dropdown-item w-full text-start"
+              {...props}
+            >
+              <span>+ Create Profile</span>
+            </button>
+          {/snippet}
 
-          <Dialog.Portal>
-            <Dialog.Overlay class="dialog-overlay" />
-            <Dialog.Content class="dialog-content">
-              <Dialog.Title class="dialog-title">Create Profile</Dialog.Title>
-              <Dialog.Description class="dialog-description">
-                Enter a name for the new profile.
-              </Dialog.Description>
+          <div class="space-y-2">
+            <TextInput
+              type="text"
+              placeholder="My Profile"
+              bind:value={newProfileName}
+              onkeydown={handleCreateProfileInputKeydown}
+            />
+          </div>
 
-              <div class="space-y-2">
-                <TextInput
-                  type="text"
-                  placeholder="My Profile"
-                  bind:value={newProfileName}
-                  onkeydown={handleCreateProfileInputKeydown}
-                />
-              </div>
-
-              <div class="flex justify-end gap-2">
-                <Dialog.Close class="btn btn-outline">Cancel</Dialog.Close>
-                <Btn
-                  variant="primary"
-                  onclick={confirmCreateProfile}
-                  disabled={!newProfileName.trim()}
-                >
-                  Create
-                </Btn>
-              </div>
-
-              <Dialog.Close
-                class="icon-btn absolute right-3 top-3"
-                aria-label="Close"
+          {#snippet footer()}
+            <div class="flex justify-end gap-2">
+              <Btn
+                variant="outline"
+                onclick={() => (createProfileOpen = false)}
               >
-                <X size={16} />
-              </Dialog.Close>
-            </Dialog.Content>
-          </Dialog.Portal>
-        </Dialog.Root>
+                Cancel
+              </Btn>
+              <Btn
+                variant="primary"
+                onclick={confirmCreateProfile}
+                disabled={!newProfileName.trim()}
+              >
+                Create
+              </Btn>
+            </div>
+          {/snippet}
+        </Modal>
 
         {#if profileStore.current !== "Default"}
           <DropdownMenu.Item
@@ -555,33 +554,18 @@
   onCancel={cancelDiscard}
 />
 
-<AlertDialog.Root bind:open={deleteProfileOpen}>
-  <AlertDialog.Portal>
-    <AlertDialog.Overlay class="dialog-overlay" />
-    <AlertDialog.Content class="dialog-content">
-      <div class="flex flex-col space-y-2 text-center sm:text-start">
-        <AlertDialog.Title class="text-lg font-semibold">
-          Are you absolutely sure?
-        </AlertDialog.Title>
-        <AlertDialog.Description class="text-sm text-muted-foreground">
-          This action cannot be undone. This will permanently delete the profile
-          <span class="font-bold text-foreground">{profileToDelete}</span>
-          and remove all data associated with it.
-        </AlertDialog.Description>
-      </div>
-      <div
-        class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2"
-      >
-        <AlertDialog.Cancel class="btn btn-outline mt-2 sm:mt-0">
-          Cancel
-        </AlertDialog.Cancel>
-        <AlertDialog.Action
-          class="btn btn-destructive-fill text-white"
-          onclick={confirmDeleteProfile}
-        >
-          Delete
-        </AlertDialog.Action>
-      </div>
-    </AlertDialog.Content>
-  </AlertDialog.Portal>
-</AlertDialog.Root>
+{#snippet deleteProfileBody()}
+  This action cannot be undone. This will permanently delete the profile
+  <span class="font-bold text-foreground">{profileToDelete}</span>
+  and remove all data associated with it.
+{/snippet}
+
+<Alert
+  bind:open={deleteProfileOpen}
+  title="Are you absolutely sure?"
+  body={deleteProfileBody}
+  confirmLabel="Delete"
+  confirmClass="btn btn-destructive-fill text-white"
+  onConfirm={confirmDeleteProfile}
+  onCancel={() => (profileToDelete = null)}
+/>
