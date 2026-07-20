@@ -35,7 +35,7 @@ export type WorkshopComment = {
 
 export type WorkshopListParams = {
   q?: string;
-  tag?: WorkshopListingTag | "";
+  tags?: WorkshopListingTag[];
   sort?: "new" | "views" | "votes";
   page?: number;
   mine?: boolean;
@@ -77,7 +77,7 @@ function json(method: string, body: unknown): RequestInit {
 export async function listWorkshop(params: WorkshopListParams = {}) {
   const qs = new URLSearchParams();
   if (params.q?.trim()) qs.set("q", params.q.trim());
-  if (params.tag) qs.set("tag", params.tag);
+  if (params.tags) for (const t of params.tags) qs.append("tag", t);
   if (params.sort === "views" || params.sort === "votes") {
     qs.set("sort", params.sort);
   }

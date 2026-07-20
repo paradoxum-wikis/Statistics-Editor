@@ -44,7 +44,7 @@
 
   let q = $state("");
   let debouncedQ = $state("");
-  let tag = $state<WorkshopListingTag | "">("");
+  let tags = $state<WorkshopListingTag[]>([]);
   let sort = $state<"new" | "views" | "votes">("new");
   let mineOnly = $state(false);
 
@@ -68,7 +68,7 @@
     try {
       const res = await listWorkshop({
         q: debouncedQ,
-        tag,
+        tags,
         sort,
         mine: mineOnly,
         page,
@@ -102,7 +102,7 @@
 
   $effect(() => {
     debouncedQ;
-    tag;
+    tags;
     sort;
     mineOnly;
     page;
@@ -113,6 +113,11 @@
     return active
       ? "rounded-full border border-primary bg-primary px-3 py-0.5 text-xs capitalize text-primary-foreground"
       : "rounded-full border border-border px-3 py-0.5 text-xs capitalize text-muted-foreground transition-colors hover:bg-muted";
+  }
+
+  function toggleTag(t: WorkshopListingTag) {
+    tags = tags.includes(t) ? tags.filter((x) => x !== t) : [...tags, t];
+    page = 1;
   }
 
   async function goBack() {
@@ -202,19 +207,20 @@
 
       <div class="flex flex-wrap gap-1.5">
         <button
-          class={chipClass(tag === "")}
-          onclick={() => ((tag = ""), (page = 1))}>All</button
+          class={chipClass(tags.length === 0)}
+          onclick={() => ((tags = []), (page = 1))}>All</button
         >
         {#each WORKSHOP_TAGS as t (t)}
           <button
-            class={chipClass(tag === t)}
-            onclick={() => ((tag = t), (page = 1))}>{t}</button
+            class={chipClass(tags.includes(t))}
+            aria-pressed={tags.includes(t)}
+            onclick={() => toggleTag(t)}>{t}</button
           >
         {/each}
         <button
-          class={chipClass(tag === WORKSHOP_TAG_FEATURED)}
-          onclick={() => ((tag = WORKSHOP_TAG_FEATURED), (page = 1))}
-          >featured</button
+          class={chipClass(tags.includes(WORKSHOP_TAG_FEATURED))}
+          aria-pressed={tags.includes(WORKSHOP_TAG_FEATURED)}
+          onclick={() => toggleTag(WORKSHOP_TAG_FEATURED)}>featured</button
         >
       </div>
 
@@ -278,7 +284,7 @@
         <Store class="mx-auto text-muted-foreground" size={32} />
         <p class="font-medium">Nothing here yet...</p>
         <p class="text-sm text-muted-foreground">
-          {mineOnly || q.trim() || tag
+          {mineOnly || q.trim() || tags.length
             ? "Perhaps, try different a filter?"
             : "Be the first to publish a build!"}
         </p>
