@@ -501,14 +501,21 @@
                   <Btn size="sm" variant="secondary" onclick={openPublish}>
                     Publish to Workshop
                   </Btn>
+                {:else}
+                  <Tip
+                    content="Sign in with Fandom to publish this build to the Workshop."
+                  >
+                    {#snippet children({ props })}
+                      <span class="inline-flex" {...props}>
+                        <Btn size="sm" variant="secondary" disabled>
+                          Publish to Workshop
+                        </Btn>
+                      </span>
+                    {/snippet}
+                  </Tip>
                 {/if}
                 <Btn size="sm" onclick={copyShareLink}>Copy</Btn>
               </div>
-              {#if !authStore.user}
-                <p class="text-xs text-muted-foreground">
-                  Sign in with Fandom to publish this build to the Workshop.
-                </p>
-              {/if}
             {/if}
           </div>
         </Popover.Content>
