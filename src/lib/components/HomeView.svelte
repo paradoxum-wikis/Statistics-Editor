@@ -97,7 +97,7 @@
 </div>
 
 <footer
-  class="mt-8 border-t border-border pt-5 text-center text-sm text-muted-foreground"
+  class="mt-8 border-t border-border pt-5 pb-16 md:pb-4 text-center text-sm text-muted-foreground"
 >
   <p>
     The TDS Statistics Editor is maintained by Paradoxum Wikis. It is not
