@@ -1,9 +1,10 @@
 <script lang="ts">
-  import { resolve } from "$app/paths";
-  import { Eye, Pencil, Trash2 } from "@lucide/svelte";
+  import { Avatar } from "bits-ui";
+  import { Eye, Pencil, ThumbsUp, Trash2 } from "@lucide/svelte";
   import avatarPlaceholder from "$lib/assets/Avatar.png";
   import { fetchFandomAvatar } from "$lib/services/fandomAuth";
   import { imageLoader } from "$lib/services/imageLoader";
+  import { settingsStore } from "$lib/stores/settings.svelte";
   import {
     WORKSHOP_TAG_FEATURED,
     type WorkshopListing,
@@ -11,21 +12,24 @@
 
   let {
     listing,
+    onOpen,
     onEdit,
     onUnpublish,
   }: {
     listing: WorkshopListing;
+    onOpen?: (listing: WorkshopListing) => void;
     onEdit?: (listing: WorkshopListing) => void;
     onUnpublish?: (listing: WorkshopListing) => void;
   } = $props();
 
-  const openHref = $derived(
-    `${resolve("/tower/[name]", { name: listing.tower_name })}?share=${encodeURIComponent(listing.share_id)}`,
-  );
   const featured = $derived(listing.tags.includes(WORKSHOP_TAG_FEATURED));
 
   let imageUrl = $state<string | null>(null);
-  let avatarSrc = $state(avatarPlaceholder);
+  let avatarSrc = $state<string | null>(null);
+
+  function initials(name: string) {
+    return name.trim().slice(0, 2).toUpperCase() || "?";
+  }
 
   $effect(() => {
     const ref = listing.image?.trim();
@@ -39,9 +43,15 @@
       return;
     }
     let cancelled = false;
-    imageLoader.loadImage(listing.id, 0, ref).then((url) => {
-      if (!cancelled) imageUrl = url;
-    });
+    imageLoader
+      .loadImage(listing.id, 0, ref)
+      .then((url) => {
+        if (!cancelled) imageUrl = url;
+      })
+      .catch((e) => {
+        if (settingsStore.debugMode) console.error("[workshop] card image", e);
+        if (!cancelled) imageUrl = null;
+      });
     return () => {
       cancelled = true;
     };
@@ -49,11 +59,15 @@
 
   $effect(() => {
     const userId = listing.author.fandom_userid;
-    avatarSrc = avatarPlaceholder;
+    avatarSrc = null;
     let cancelled = false;
-    fetchFandomAvatar(userId).then((url) => {
-      if (!cancelled && url) avatarSrc = url;
-    });
+    fetchFandomAvatar(userId)
+      .then((url) => {
+        if (!cancelled && url) avatarSrc = url;
+      })
+      .catch((e) => {
+        if (settingsStore.debugMode) console.error("[workshop] card avatar", e);
+      });
     return () => {
       cancelled = true;
     };
@@ -71,11 +85,18 @@
 
 <article
   class="relative flex flex-col gap-2 overflow-hidden rounded-[var(--radius)_0] border bg-card transition-colors duration-250 {featured
-    ? 'border-amber-500/50 bg-amber-500/[0.04] hover:bg-amber-500/[0.08]'
+    ? 'border-amber-500/50 bg-amber-500/4 hover:bg-amber-500/8'
     : 'border-border hover:bg-muted/40'}"
 >
+  <button
+    type="button"
+    class="absolute inset-0 z-0 cursor-pointer outline-none"
+    aria-label={`Open ${listing.title}`}
+    onclick={() => onOpen?.(listing)}
+  ></button>
+
   {#if imageUrl}
-    <div class="aspect-video w-full bg-muted">
+    <div class="pointer-events-none aspect-video w-full bg-muted">
       <img
         src={imageUrl}
         alt=""
@@ -85,29 +106,26 @@
     </div>
   {/if}
 
-  <div class="flex flex-col gap-2 p-4 pt-1">
+  <div class="pointer-events-none flex flex-col gap-2 p-4 pt-1">
     <div class="flex items-start justify-between gap-2">
       <div class="min-w-0">
-        <h3 class="truncate font-semibold">
-          <a
-            href={openHref}
-            class="outline-none after:absolute after:inset-0 after:content-['']"
-            >{listing.title}</a
-          >
-        </h3>
+        <h3 class="truncate font-semibold">{listing.title}</h3>
         <p class="truncate text-sm text-muted-foreground">
           {listing.tower_name}
         </p>
       </div>
       {#if listing.mine && (onEdit || onUnpublish)}
-        <div class="relative z-7 flex shrink-0 gap-0.5">
+        <div class="pointer-events-auto relative z-7 flex shrink-0 gap-0.5">
           {#if onEdit}
             <button
               type="button"
               class="icon-btn p-1.5"
               title="Edit"
               aria-label="Edit listing"
-              onclick={() => onEdit(listing)}
+              onclick={(e) => {
+                e.stopPropagation();
+                onEdit(listing);
+              }}
             >
               <Pencil size={14} />
             </button>
@@ -118,7 +136,10 @@
               class="icon-btn p-1.5 text-destructive"
               title="Unpublish"
               aria-label="Unpublish listing"
-              onclick={() => onUnpublish(listing)}
+              onclick={(e) => {
+                e.stopPropagation();
+                onUnpublish(listing);
+              }}
             >
               <Trash2 size={14} />
             </button>
@@ -140,8 +161,7 @@
             class="rounded-full border px-2 py-0.5 text-xs capitalize {tag ===
             WORKSHOP_TAG_FEATURED
               ? 'border-amber-500/50 bg-amber-500/15 font-medium text-amber-800 dark:text-amber-200'
-              : 'border-border text-muted-foreground'}"
-            >{tag}</span
+              : 'border-border text-muted-foreground'}">{tag}</span
           >
         {/each}
       </div>
@@ -151,16 +171,29 @@
       class="mt-auto flex items-center justify-between gap-2 pt-1 text-xs text-muted-foreground"
     >
       <span class="flex min-w-0 items-center gap-1.5">
-        <img
-          src={avatarSrc}
-          alt=""
-          class="size-4 shrink-0 rounded-full object-cover"
-          loading="lazy"
-        />
+        <Avatar.Root
+          class="size-4 shrink-0 overflow-hidden rounded-full border border-border bg-muted"
+        >
+          <Avatar.Image
+            src={avatarSrc ?? avatarPlaceholder}
+            alt=""
+            class="size-full object-cover"
+          />
+          <Avatar.Fallback
+            class="flex size-full items-center justify-center text-[8px] font-medium text-muted-foreground"
+          >
+            {initials(listing.author.fandom_username)}
+          </Avatar.Fallback>
+        </Avatar.Root>
         <span class="truncate">{listing.author.fandom_username}</span>
       </span>
       <span class="flex shrink-0 items-center gap-1.5">
-        <span class="flex items-center gap-1">
+        <span class="flex items-center gap-1" title="Upvotes">
+          <ThumbsUp size={12} />
+          {listing.votes.toLocaleString()}
+        </span>
+        <span aria-hidden="true">·</span>
+        <span class="flex items-center gap-1" title="Share views">
           <Eye size={12} />
           {listing.views.toLocaleString()}
         </span>

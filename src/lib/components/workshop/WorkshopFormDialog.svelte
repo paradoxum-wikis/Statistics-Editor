@@ -15,6 +15,7 @@
     type WorkshopTag,
   } from "$lib/services/workshop";
   import { analytics } from "$lib/services/analytics";
+  import { settingsStore } from "$lib/stores/settings.svelte";
   import { toast } from "$lib/toast";
   import TextInput from "../smol/TextInput.svelte";
   import Btn from "../smol/Btn.svelte";
@@ -105,6 +106,7 @@
       shareInput = "";
       if (!title.trim()) title = share.tower_name;
     } catch (e) {
+      if (settingsStore.debugMode) console.error("[workshop] check share", e);
       error = e instanceof Error ? e.message : "Couldn't load that share.";
     } finally {
       checking = false;
@@ -144,6 +146,7 @@
       onSaved?.();
       open = false;
     } catch (e) {
+      if (settingsStore.debugMode) console.error("[workshop] publish", e);
       error = e instanceof Error ? e.message : "Something went wrong.";
       if (mode === "create") {
         analytics.track("workshop_publish", {
@@ -207,7 +210,7 @@
                 <TextInput
                   id="workshop-share-input"
                   class="input-short"
-                  placeholder="https://tds.wiki/s/…"
+                  placeholder="https://tds.wiki/s/..."
                   bind:value={shareInput}
                   onkeydown={(e: KeyboardEvent) => {
                     if (e.key === "Enter") {
@@ -222,7 +225,7 @@
                   disabled={!shareDirty || checking}
                   onclick={checkShare}
                 >
-                  {checking ? "Checking…" : "Check"}
+                  {checking ? "Checking..." : "Check"}
                 </Btn>
               </div>
             </div>
@@ -314,8 +317,8 @@
           <Btn variant="primary" disabled={!canSubmit} onclick={submit}>
             {busy
               ? mode === "edit"
-                ? "Saving…"
-                : "Publishing…"
+                ? "Saving..."
+                : "Publishing..."
               : mode === "edit"
                 ? "Save changes"
                 : "Publish"}

@@ -12,9 +12,11 @@
   import LoadingCard from "$lib/components/smol/LoadingCard.svelte";
   import TextInput from "$lib/components/smol/TextInput.svelte";
   import WorkshopCard from "$lib/components/workshop/WorkshopCard.svelte";
+  import WorkshopDetailDialog from "$lib/components/workshop/WorkshopDetailDialog.svelte";
   import WorkshopFormDialog from "$lib/components/workshop/WorkshopFormDialog.svelte";
   import { isAdminUser } from "$lib/services/admin";
   import { fetchFandomAvatars } from "$lib/services/fandomAuth";
+  import { settingsStore } from "$lib/stores/settings.svelte";
   import {
     deleteWorkshopListing,
     listWorkshop,
@@ -42,6 +44,8 @@
   let editTarget = $state<WorkshopListing | null>(null);
   let unpublishOpen = $state(false);
   let unpublishTarget = $state<WorkshopListing | null>(null);
+  let detailOpen = $state(false);
+  let detailId = $state<string | null>(null);
 
   const totalPages = $derived(Math.max(1, Math.ceil(total / pageSize)));
   let fetchSeq = 0;
@@ -62,12 +66,14 @@
       items = res.items;
       total = res.total;
       pageSize = res.page_size;
-      // one bulk avatar hop for the page (cards share the session cache)
       void fetchFandomAvatars(
         res.items.map((item) => item.author.fandom_userid),
-      );
+      ).catch((e) => {
+        if (settingsStore.debugMode) console.error("[workshop] avatars", e);
+      });
     } catch (e) {
       if (seq !== fetchSeq) return;
+      if (settingsStore.debugMode) console.error("[workshop] list", e);
       error = e instanceof Error ? e.message : "Failed to load Workshop.";
     } finally {
       if (seq === fetchSeq) loading = false;
@@ -109,6 +115,11 @@
     await goto(resolve("/"), { keepFocus: true, noScroll: true });
   }
 
+  function openDetail(listing: WorkshopListing) {
+    detailId = listing.id;
+    detailOpen = true;
+  }
+
   function openEdit(listing: WorkshopListing) {
     editTarget = listing;
     editOpen = true;
@@ -119,6 +130,12 @@
     unpublishOpen = true;
   }
 
+  function onDetailChanged(listing: WorkshopListing) {
+    items = items.map((it) =>
+      it.id === listing.id ? { ...it, ...listing } : it,
+    );
+  }
+
   async function confirmUnpublish() {
     if (!unpublishTarget) return;
     try {
@@ -126,6 +143,7 @@
       toast.success("Listing unpublished.");
       await load();
     } catch (e) {
+      if (settingsStore.debugMode) console.error("[workshop] unpublish", e);
       toast.error(e instanceof Error ? e.message : "Couldn't unpublish.");
     } finally {
       unpublishTarget = null;
@@ -170,7 +188,7 @@
       <div class="relative w-full max-w-xs">
         <TextInput
           class="input-short pl-7"
-          placeholder="Search title, tower, or author…"
+          placeholder="Search title, tower, or author..."
           bind:value={q}
         />
       </div>
@@ -232,6 +250,7 @@
           {#each items as item (item.id)}
             <WorkshopCard
               listing={item}
+              onOpen={openDetail}
               onEdit={openEdit}
               onUnpublish={askUnpublish}
             />
@@ -261,6 +280,12 @@
     {/if}
   </main>
 </div>
+
+<WorkshopDetailDialog
+  bind:open={detailOpen}
+  bind:listingId={detailId}
+  onChanged={onDetailChanged}
+/>
 
 <WorkshopFormDialog mode="create" bind:open={publishOpen} onSaved={load} />
 {#if editTarget}

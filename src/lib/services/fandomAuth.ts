@@ -1,4 +1,5 @@
 import { proxyImageUrl } from "$lib/services/imageLoader";
+import { settingsStore } from "$lib/stores/settings.svelte";
 
 export type AuthUser = {
   id: number;
@@ -102,7 +103,8 @@ async function fetchAvatarBulk(ids: number[]): Promise<void> {
           avatarDisplayUrl(data.users?.[String(id)]?.avatar),
         );
       }
-    } catch {
+    } catch (e) {
+      if (settingsStore.debugMode) console.error("[fandom] avatar bulk", e);
       for (const id of chunk) {
         if (!avatarByUser.has(id)) avatarByUser.set(id, null);
       }
