@@ -24,6 +24,7 @@ import {
   loadEffectiveWikitext,
   setWikiOverride,
 } from "$lib/neowtext/wikiSource";
+import { settingsStore } from "$lib/stores/settings.svelte";
 import {
   getCustomTowers,
   isCustomTower,
@@ -68,7 +69,8 @@ export default class TowerManager {
         localStorage.getItem("tds_profiles") || '["Default"]',
       );
       return Array.isArray(profiles) ? profiles : ["Default"];
-    } catch {
+    } catch (e) {
+      if (settingsStore.debugMode) console.error("[TowerManager] profiles", e);
       return ["Default"];
     }
   }

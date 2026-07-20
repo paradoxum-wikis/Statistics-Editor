@@ -55,9 +55,9 @@ function parseSeDiffPayload(raw: string): Record<string, unknown> {
     if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
       return parsed as Record<string, unknown>;
     }
-  } catch {
+  } catch (e) {
     if (settingsStore.debugMode) {
-      console.log(`[parseSeDiffPayload] Invalid payload: ${raw}`);
+      console.error("[parseSeDiffPayload] Invalid payload:", raw, e);
     }
   }
   return {};
@@ -67,9 +67,9 @@ function parseSeMemoPayload(raw: string): string {
   try {
     const parsed: unknown = JSON.parse(raw.trim());
     if (typeof parsed === "string") return parsed;
-  } catch {
+  } catch (e) {
     if (settingsStore.debugMode) {
-      console.log(`[parseSeMemoPayload] Invalid payload: ${raw}`);
+      console.error("[parseSeMemoPayload] Invalid payload:", raw, e);
     }
   }
   return "";

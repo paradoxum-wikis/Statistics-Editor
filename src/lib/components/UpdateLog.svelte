@@ -1,4 +1,6 @@
 <script lang="ts" module>
+  import { settingsStore } from "$lib/stores/settings.svelte";
+
   type Entry = {
     sha: string;
     date: string;
@@ -96,7 +98,8 @@
             };
           }),
         };
-      } catch {
+      } catch (e) {
+        if (settingsStore.debugMode) console.error("[UpdateLog] load", e);
         cache = { entries: [], failed: true };
       }
 

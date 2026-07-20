@@ -1,3 +1,5 @@
+import { settingsStore } from "$lib/stores/settings.svelte";
+
 export type Profile = {
   name: string;
   avatar: string;
@@ -67,7 +69,8 @@ export function loadSupporters(): Promise<SupportersData> {
       const res = await fetch("https://bin.t7ru.link/fol/supporters.json");
       if (!res.ok) throw new Error();
       cache = parseSupportersData(await res.json());
-    } catch {
+    } catch (e) {
+      if (settingsStore.debugMode) console.error("[supporters] load", e);
       cache = { profile: null, supporters: [] };
     }
     return cache;

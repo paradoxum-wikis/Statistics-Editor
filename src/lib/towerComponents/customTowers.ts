@@ -1,3 +1,5 @@
+import { settingsStore } from "$lib/stores/settings.svelte";
+
 const CUSTOM_TOWERS_KEY = "tdse_custom_towers";
 
 function canUseLocalStorage(): boolean {
@@ -12,7 +14,8 @@ export function getCustomTowers(): string[] {
     return Array.isArray(parsed)
       ? parsed.filter((n): n is string => typeof n === "string" && !!n.trim())
       : [];
-  } catch {
+  } catch (e) {
+    if (settingsStore.debugMode) console.error("[customTowers] read", e);
     return [];
   }
 }

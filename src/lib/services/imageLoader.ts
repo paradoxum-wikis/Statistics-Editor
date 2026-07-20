@@ -7,6 +7,7 @@
  * This was ported from the old Statistics Editor
  */
 import { mwWikiFileUrl, mwSetBaseUrl } from "mediawiki-file-url";
+import { settingsStore } from "$lib/stores/settings.svelte";
 
 mwSetBaseUrl("https://static.wikia.nocookie.net/tower-defense-sim/images/");
 
@@ -44,7 +45,8 @@ export function resolveWikiFileUrl(imageIdStr: string): string | null {
 
   try {
     return mwWikiFileUrl(s);
-  } catch {
+  } catch (e) {
+    if (settingsStore.debugMode) console.error("[imageLoader] wiki file url", e);
     return null;
   }
 }
@@ -54,7 +56,8 @@ export function isDirectImageUrl(url: string): boolean {
   if (!/^https?:\/\//i.test(u)) return false;
   try {
     return RE_IMAGE_EXT.test(new URL(u).pathname);
-  } catch {
+  } catch (e) {
+    if (settingsStore.debugMode) console.error("[imageLoader] parse url", e);
     return RE_IMAGE_EXT.test(u);
   }
 }
@@ -166,7 +169,8 @@ class ImageLoaderService {
             await cache.delete(metaKey);
             return null;
           }
-        } catch {
+        } catch (e) {
+          this.warn("Cache meta parse failed:", e);
           await cache.delete(cacheKey);
           await cache.delete(metaKey);
           return null;
