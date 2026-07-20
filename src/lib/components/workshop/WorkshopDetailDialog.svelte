@@ -252,7 +252,9 @@
         <div
           class="min-h-0 flex-1 overflow-y-auto overscroll-contain md:grid md:grid-cols-[minmax(0,1.25fr)_minmax(18rem,0.9fr)] md:overflow-hidden md:divide-x"
         >
-          <div class="space-y-3 p-4 sm:space-y-4 sm:p-5 md:overflow-hidden">
+          <div
+            class="space-y-3 p-4 sm:space-y-4 sm:p-5 md:min-h-0 md:overflow-y-auto md:overscroll-contain"
+          >
             {#if imageUrl}
               <AspectRatio.Root
                 ratio={16 / 9}
@@ -265,9 +267,7 @@
             {/if}
 
             {#if item.description}
-              <p
-                class="whitespace-pre-wrap text-sm text-foreground/90 md:line-clamp-6"
-              >
+              <p class="whitespace-pre-wrap text-sm text-foreground/90">
                 {item.description}
               </p>
             {/if}
