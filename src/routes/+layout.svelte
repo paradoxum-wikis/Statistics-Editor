@@ -23,9 +23,9 @@
     "TDS Statistics Editor - modify, balance, or just, mess around!";
 
   const towerName = $derived(towerStore.selectedName || page.params.name || "");
+  const isWorkshop = $derived(page.url.pathname.startsWith("/workshop"));
   const isStandalone = $derived(
-    page.url.pathname.startsWith("/workshop") ||
-      page.url.pathname.startsWith("/admin"),
+    isWorkshop || page.url.pathname.startsWith("/admin"),
   );
   const notFound = $derived(page.status >= 400 || towerStore.missingTower);
   const pageTitle = $derived(
@@ -33,14 +33,25 @@
       ? `404 Not Found | ${siteName}`
       : towerName
         ? `${towerName} | ${siteName}`
-        : siteName,
+        : isWorkshop
+          ? `Workshop | ${siteName}`
+          : siteName,
   );
   const description = $derived(
     notFound
       ? "Sorry, the page you're looking for doesn't exist."
       : towerName
         ? `Edit ${towerName} stats in the TDS Statistics Editor for the Roblox game Tower Defense Simulator!`
-        : defaultDescription,
+        : isWorkshop
+          ? "Make, browse and share community tower stats in the TDS Statistics Editor Workshop!"
+          : defaultDescription,
+  );
+  const pageUrl = $derived(
+    towerName
+      ? `${siteUrl}tower/${encodeURIComponent(towerName)}`
+      : isWorkshop
+        ? `${siteUrl}workshop`
+        : siteUrl,
   );
 
   onMount(async () => {
@@ -53,12 +64,12 @@
 <svelte:head>
   <title>{pageTitle}</title>
   <meta name="description" content={description} />
-  <link rel="canonical" href={siteUrl} />
+  <link rel="canonical" href={pageUrl} />
 
   <meta property="og:title" content={pageTitle} />
   <meta property="og:description" content={description} />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content={siteUrl} />
+  <meta property="og:url" content={pageUrl} />
   <meta property="og:site_name" content={siteName} />
   <meta property="og:locale" content="en_US" />
   <meta property="og:image" content={ogImage} />
@@ -68,7 +79,10 @@
   <meta property="og:image:alt" content={ogImageAlt} />
 
   <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={pageTitle} />
+  <meta name="twitter:description" content={description} />
   <meta name="twitter:site" content="@isALTEREGOout" />
+  <meta name="twitter:image" content={ogImage} />
   <meta name="twitter:image:alt" content={ogImageAlt} />
 
   <meta name="theme-color" content="#33577a" />

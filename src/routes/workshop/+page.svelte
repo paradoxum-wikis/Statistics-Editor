@@ -47,9 +47,7 @@
   let sort = $state<"new" | "views" | "votes">("new");
   let mineOnly = $state(false);
 
-  const sortLabel = $derived(
-    SORT_OPTIONS.find((o) => o.value === sort)!.label,
-  );
+  const sortLabel = $derived(SORT_OPTIONS.find((o) => o.value === sort)!.label);
 
   let publishOpen = $state(false);
   let editOpen = $state(false);
@@ -162,10 +160,6 @@
     }
   }
 </script>
-
-<svelte:head>
-  <title>Workshop | TDS Statistics Editor</title>
-</svelte:head>
 
 <div class="flex h-screen flex-col bg-background" in:fade={{ duration: 140 }}>
   <header
