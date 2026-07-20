@@ -167,10 +167,10 @@
       <Dialog.Title class="dialog-title">
         {mode === "edit" ? "Edit Listing" : "Publish to Workshop"}
       </Dialog.Title>
-      <Dialog.Description class="dialog-description">
+      <Dialog.Description class="dialog-description -my-2">
         {mode === "edit"
-          ? "Update card metadata, or point it at a newer share."
-          : "The share is what people open; the card is how they find it."}
+          ? "Update card metadata, or point it at a newer Share Link."
+          : "Hopefully your work is at least serviceable..."}
       </Dialog.Description>
 
       {#if !authStore.user}
@@ -280,10 +280,6 @@
               maxlength="512"
               bind:value={image}
             />
-            <p class="text-xs text-muted-foreground">
-              Same formats as upgrade images: wiki File:/Image:, Roblox id, or
-              direct URL.
-            </p>
           </div>
 
           <div class="space-y-1">

@@ -166,7 +166,7 @@
     class="sticky top-0 z-7 flex items-center justify-between gap-3 border-b bg-card p-2 px-3"
   >
     <div class="flex min-w-0 items-center gap-3">
-      <IconBtn onclick={goBack} title="Back to the editor">
+      <IconBtn onclick={goBack} title="Back to Editor">
         <ArrowLeft size={18} />
       </IconBtn>
       <h1 class="unisans truncate text-3xl font-black text-foreground">
