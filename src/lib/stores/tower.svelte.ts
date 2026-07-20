@@ -18,7 +18,11 @@ import {
   hasSeDiff,
   stripSeDiff,
 } from "$lib/neowtext/directives";
-import { fetchShare, parseShareRef } from "$lib/services/shareTower";
+import {
+  fetchShare,
+  parseShareRef,
+  type ShareOwner,
+} from "$lib/services/shareTower";
 import { analytics } from "$lib/services/analytics";
 
 const RECENT_KEY = "tdse_recent_towers";
@@ -32,7 +36,8 @@ function readRecentTowers(): string[] {
     return Array.isArray(parsed)
       ? parsed.filter((n): n is string => typeof n === "string" && !!n.trim())
       : [];
-  } catch {
+  } catch (e) {
+    if (settingsStore.debugMode) console.error("[tower] recent towers", e);
     return [];
   }
 }
@@ -77,6 +82,7 @@ class TowerStore {
   effectiveWikitextSource = $state<"override" | "base" | "share" | "">("");
 
   sharePreviewId = $state<string | null>(null);
+  shareOwner = $state.raw<ShareOwner | null>(null);
   #shareSnapshotWikitext = "";
 
   /**
@@ -113,6 +119,7 @@ class TowerStore {
     this.baselineSkinName = null;
     this.baselineLocked = false;
     this.sharePreviewId = null;
+    this.shareOwner = null;
     this.#shareSnapshotWikitext = "";
     const previousSelection = this.selectedName;
     this.selectedName = "";
@@ -138,6 +145,7 @@ class TowerStore {
       this.isDirty = false;
       this.#wikitextStale = false;
       this.sharePreviewId = null;
+      this.shareOwner = null;
       this.#shareSnapshotWikitext = "";
       this.baseline = {};
       this.baselineTowerId = null;
@@ -148,6 +156,7 @@ class TowerStore {
 
     if (this.sharePreviewId) {
       this.sharePreviewId = null;
+      this.shareOwner = null;
       this.#shareSnapshotWikitext = "";
     }
 
@@ -345,6 +354,7 @@ class TowerStore {
     this.isLoading = true;
     this.selectedData = null;
     this.sharePreviewId = null;
+    this.shareOwner = null;
     this.#shareSnapshotWikitext = "";
     this.baseline = {};
     this.baselineTowerId = null;
@@ -362,6 +372,7 @@ class TowerStore {
       this.#lastLoadedName = `share:${tower.name}:${shareId}`;
       this.#shareSnapshotWikitext = share.neowtext;
       this.sharePreviewId = shareId;
+      this.shareOwner = share.owner ?? null;
       this.missingTower = false;
 
       const anyTower = tower as unknown as {
@@ -405,6 +416,7 @@ class TowerStore {
 
     const name = this.selectedName;
     this.sharePreviewId = null;
+    this.shareOwner = null;
     this.#shareSnapshotWikitext = "";
     this.#lastLoadedName = null;
     this.manager?.clearCache(name);
@@ -500,6 +512,7 @@ class TowerStore {
         }
         if (this.sharePreviewId) {
           this.sharePreviewId = null;
+          this.shareOwner = null;
           this.#shareSnapshotWikitext = "";
           this.#lastLoadedName = this.selectedName;
           // so reload does not re-import over the applied profile data
@@ -646,6 +659,7 @@ class TowerStore {
     this.editorMemo = "";
     this.#originalEditorMemo = "";
     this.sharePreviewId = null;
+    this.shareOwner = null;
     this.#shareSnapshotWikitext = "";
     this.baseline = {};
     this.baselineTowerId = null;

@@ -2,6 +2,7 @@
   import { Tabs, Popover } from "bits-ui";
   import Separator from "./smol/Separator.svelte";
   import Btn from "./smol/Btn.svelte";
+  import Switch from "./smol/Switch.svelte";
   import Tip from "./smol/Tip.svelte";
   import type Tower from "$lib/towerComponents/tower";
   import type SkinData from "$lib/towerComponents/skinData";
@@ -105,6 +106,7 @@
   let isSharing = $state(false);
   let shareLink = $state<string | null>(null);
   let shareError = $state<string | null>(null);
+  let shareAsOwner = $state(true);
   let publishOpen = $state(false);
   let publishShareId = $state<string | null>(null);
 
@@ -289,7 +291,11 @@
         });
         return;
       }
-      const id = await createShare(neowtext, tower.name);
+      const id = await createShare(
+        neowtext,
+        tower.name,
+        !!authStore.user && shareAsOwner,
+      );
       shareLink = sharePageUrl(id);
       analytics.track("share", {
         method: "link",
@@ -392,8 +398,15 @@
         class="flex flex-wrap items-center justify-between gap-2 rounded-[var(--radius)_0] border border-sky-500/30 bg-sky-500/10 px-3 py-2"
       >
         <p class="text-sm text-sky-950 dark:text-sky-100">
-          You are viewing a shared tower, your data stays unchanged until you
-          explicitly apply.
+          {#if towerStore.shareOwner}
+            You are viewing a tower shared by
+            <span class="font-semibold"
+              >{towerStore.shareOwner.fandom_username}</span
+            >. Your data stays unchanged until you explicitly apply.
+          {:else}
+            You are viewing a shared tower, your data stays unchanged until you
+            explicitly apply.
+          {/if}
         </p>
         <Btn
           variant="outline"
@@ -480,6 +493,20 @@
               Share this lovely tower with a short link! Anyone who opens it can
               view these stats in the editor.
             </p>
+            {#if authStore.user}
+              <label class="flex items-center justify-between gap-3 text-sm">
+                <span class="min-w-0 leading-snug">
+                  Have my account own this link
+                </span>
+                <Switch
+                  size="sm"
+                  bind:checked={shareAsOwner}
+                  onCheckedChange={() => {
+                    if (shareLink && !isSharing) void handleShare();
+                  }}
+                />
+              </label>
+            {/if}
             {#if isSharing}
               <p class="text-sm text-muted-foreground">Creating link...</p>
             {:else if shareError}
