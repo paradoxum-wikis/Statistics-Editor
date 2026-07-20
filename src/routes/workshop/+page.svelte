@@ -13,6 +13,7 @@
   import TextInput from "$lib/components/smol/TextInput.svelte";
   import WorkshopCard from "$lib/components/workshop/WorkshopCard.svelte";
   import WorkshopFormDialog from "$lib/components/workshop/WorkshopFormDialog.svelte";
+  import { isAdminUser } from "$lib/services/admin";
   import { fetchFandomAvatars } from "$lib/services/fandomAuth";
   import {
     deleteWorkshopListing,
@@ -149,6 +150,11 @@
       </h1>
     </div>
     <div class="flex shrink-0 items-center space-x-2">
+      {#if isAdminUser(authStore.user)}
+        <Btn variant="outline" onclick={() => goto(resolve("/admin"))}>
+          Admin
+        </Btn>
+      {/if}
       <Btn variant="secondary" onclick={() => (publishOpen = true)}>
         <span class="inline-flex items-center gap-1.5">
           <Plus size={14} />
