@@ -292,7 +292,7 @@
     {:else}
       <div class:opacity-60={loading} class="transition-opacity">
         <div
-          class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4"
+          class="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5"
         >
           {#each items as item (item.id)}
             <WorkshopCard
