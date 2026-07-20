@@ -3,7 +3,7 @@
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import { cubicOut } from "svelte/easing";
-  import { fade, fly } from "svelte/transition";
+  import { fly } from "svelte/transition";
 
   import { towerStore } from "$lib/stores/tower.svelte";
   import { profileStore } from "$lib/stores/profile.svelte";
@@ -62,9 +62,7 @@
         ? "not-found"
         : towerStore.selectedName
           ? `tower:${towerStore.selectedName}`
-          : towerStore.isLoading
-            ? "loading"
-            : "intro",
+          : "intro",
   );
 
   async function performGoHome() {
@@ -350,7 +348,10 @@
         class:overflow-x-auto={!!towerStore.selectedData}
       >
         {#key mainKey}
-          <div class="h-full min-h-0" in:fade={{ duration: 140 }}>
+          <div
+            class="h-full min-h-0"
+            in:fly={{ y: 12, duration: 160, easing: cubicOut }}
+          >
             {#if isNotFound}
               <NotFoundView onHome={goHome} tower={!!page.params.name} />
             {:else if isClient && !towerStore.selectedData && !towerStore.isLoading}

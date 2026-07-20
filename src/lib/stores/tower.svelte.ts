@@ -173,6 +173,7 @@ class TowerStore {
     this.isLoading = true;
     this.selectedData = null;
     this.missingTower = false;
+    this.selectedName = name.trim();
 
     try {
       const tower = await this.manager.getTower(name);

@@ -77,6 +77,16 @@
 
   const isNotFound = $derived(page.status >= 400 || towerStore.missingTower);
 
+  const mainKey = $derived(
+    !isClient
+      ? "init"
+      : isNotFound
+        ? "not-found"
+        : towerStore.selectedName
+          ? `tower:${towerStore.selectedName}`
+          : "intro",
+  );
+
   async function performGoHome() {
     sidebarOpen = false;
     towerStore.unload();
@@ -271,16 +281,17 @@
 
   <!-- Main Content -->
   <main class="min-h-0 flex-1 overflow-x-auto overflow-y-auto p-4 pb-16">
-    {#key `${isClient}-${isNotFound}-${towerStore.isLoading}-${towerStore.selectedName ?? ""}`}
-      <div class="h-full min-h-0" in:fade={{ duration: 140 }}>
+    {#key mainKey}
+      <div
+        class="h-full min-h-0"
+        in:fly={{ y: 12, duration: 160, easing: cubicOut }}
+      >
         {#if isNotFound}
           <NotFoundView onHome={goHome} tower={!!page.params.name} />
         {:else if isClient && !towerStore.selectedData && !towerStore.isLoading}
           <HomeView onSelect={handleSelect} />
         {:else if !isClient}
-          <LoadingCard
-            message="Engineer is setting up the editor for you..."
-          />
+          <LoadingCard message="Engineer is setting up the editor for you..." />
         {:else if towerStore.selectedData}
           {#key editorMode}
             <div in:fly={{ y: 8, duration: 160, easing: cubicOut }}>
@@ -291,9 +302,7 @@
                 <WikiEditor towerName={towerStore.selectedName} open={true} />
               {:else if wikiEditorLoadFailed}
                 <Card class="p-8 text-center">
-                  <p class="text-red-600">
-                    Failed to load the source editor.
-                  </p>
+                  <p class="text-red-600">Failed to load the source editor.</p>
                 </Card>
               {:else}
                 <LoadingCard
