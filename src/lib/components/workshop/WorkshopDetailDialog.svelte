@@ -1,7 +1,14 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
   import { AspectRatio, Avatar, Dialog, Separator, Toggle } from "bits-ui";
-  import { Eye, ThumbsUp, Trash2, X } from "@lucide/svelte";
+  import {
+    CalendarClock,
+    CalendarPlus,
+    Eye,
+    ThumbsUp,
+    Trash2,
+    X,
+  } from "@lucide/svelte";
   import avatarPlaceholder from "$lib/assets/Avatar.png";
   import { authStore } from "$lib/stores/auth.svelte";
   import { fetchFandomAvatar } from "$lib/services/fandomAuth";
@@ -20,6 +27,7 @@
   import { toast } from "$lib/toast";
   import Alert from "../smol/Alert.svelte";
   import Btn from "../smol/Btn.svelte";
+  import Tip from "../smol/Tip.svelte";
 
   let {
     open = $bindable(false),
@@ -208,7 +216,8 @@
       await deleteWorkshopComment(listing.id, deleteTarget.id);
       comments = comments.filter((x) => x.id !== deleteTarget!.id);
     } catch (e) {
-      if (settingsStore.debugMode) console.error("[workshop] delete comment", e);
+      if (settingsStore.debugMode)
+        console.error("[workshop] delete comment", e);
       toast.error(e instanceof Error ? e.message : "Couldn't delete comment.");
     } finally {
       deleteTarget = null;
@@ -249,6 +258,7 @@
       {:else if error}
         <p class="p-5 text-sm text-destructive">{error}</p>
       {:else if listing}
+        {@const item = listing}
         <!--
           Mobile: one column, entire body scrolls.
           Desktop: 2-col grid; only the comments list scrolls.
@@ -268,17 +278,17 @@
               </AspectRatio.Root>
             {/if}
 
-            {#if listing.description}
+            {#if item.description}
               <p
                 class="whitespace-pre-wrap text-sm text-foreground/90 md:line-clamp-6"
               >
-                {listing.description}
+                {item.description}
               </p>
             {/if}
 
-            {#if listing.tags.length}
+            {#if item.tags.length}
               <div class="flex flex-wrap gap-1">
-                {#each listing.tags as tag (tag)}
+                {#each item.tags as tag (tag)}
                   <span
                     class="rounded-full border px-2 py-0.5 text-xs capitalize {tag ===
                     WORKSHOP_TAG_FEATURED
@@ -298,39 +308,63 @@
                 >
                   <Avatar.Image
                     src={authorAvatar ?? avatarPlaceholder}
-                    alt={listing.author.fandom_username}
+                    alt={item.author.fandom_username}
                     class="size-full object-cover"
                   />
                   <Avatar.Fallback
                     class="flex size-full items-center justify-center text-xs font-medium text-muted-foreground"
                   >
-                    {initials(listing.author.fandom_username)}
+                    {initials(item.author.fandom_username)}
                   </Avatar.Fallback>
                 </Avatar.Root>
                 <div class="min-w-0">
                   <p class="truncate font-medium">
-                    {listing.author.fandom_username}
+                    {item.author.fandom_username}
                   </p>
-                  <p class="text-xs text-muted-foreground">
-                    <span class="inline-flex items-center gap-1">
-                      <Eye size={11} />
-                      {listing.views.toLocaleString()}
-                    </span>
-                    <span aria-hidden="true"> · </span>
-                    <span title={new Date(listing.created_at).toLocaleString()}
-                      >{timeAgo(listing.created_at)}</span
+                  <p
+                    class="flex flex-wrap items-center gap-x-1.5 text-xs leading-none text-muted-foreground"
+                  >
+                    <Tip content="Views">
+                      {#snippet children({ props })}
+                        <span {...props} class="inline-flex items-center gap-1">
+                          <Eye size={11} class="shrink-0" />
+                          {item.views.toLocaleString()}
+                        </span>
+                      {/snippet}
+                    </Tip>
+                    <span aria-hidden="true">·</span>
+                    <Tip
+                      content={`Uploaded at ${new Date(item.created_at).toLocaleString()}`}
                     >
+                      {#snippet children({ props })}
+                        <span {...props} class="inline-flex items-center gap-1">
+                          <CalendarPlus size={11} class="shrink-0" />
+                          {timeAgo(item.created_at)}
+                        </span>
+                      {/snippet}
+                    </Tip>
+                    <span aria-hidden="true">·</span>
+                    <Tip
+                      content={`Updated at ${new Date(item.updated_at).toLocaleString()}`}
+                    >
+                      {#snippet children({ props })}
+                        <span {...props} class="inline-flex items-center gap-1">
+                          <CalendarClock size={11} class="shrink-0" />
+                          {timeAgo(item.updated_at)}
+                        </span>
+                      {/snippet}
+                    </Tip>
                   </p>
                 </div>
               </div>
 
               <div class="flex flex-wrap items-center gap-2">
                 <Toggle.Root
-                  pressed={listing.voted}
+                  pressed={item.voted}
                   disabled={voteBusy}
-                  aria-label={listing.voted ? "Remove upvote" : "Upvote"}
+                  aria-label={item.voted ? "Remove upvote" : "Upvote"}
                   title={authStore.user
-                    ? listing.voted
+                    ? item.voted
                       ? "Remove upvote"
                       : "Upvote"
                     : "Sign in to upvote"}
@@ -338,7 +372,7 @@
                   onPressedChange={() => void onVote()}
                 >
                   <ThumbsUp size={14} />
-                  {listing.votes.toLocaleString()}
+                  {item.votes.toLocaleString()}
                 </Toggle.Root>
                 <a
                   class="btn btn-secondary btn-sm"

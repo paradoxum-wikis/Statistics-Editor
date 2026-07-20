@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Avatar } from "bits-ui";
-  import { Eye, Pencil, ThumbsUp, Trash2 } from "@lucide/svelte";
+  import { CalendarClock, Eye, Pencil, ThumbsUp, Trash2 } from "@lucide/svelte";
   import avatarPlaceholder from "$lib/assets/Avatar.png";
   import { fetchFandomAvatar } from "$lib/services/fandomAuth";
   import { imageLoader } from "$lib/services/imageLoader";
@@ -9,6 +9,7 @@
     WORKSHOP_TAG_FEATURED,
     type WorkshopListing,
   } from "$lib/services/workshop";
+  import Tip from "../smol/Tip.svelte";
 
   let {
     listing,
@@ -187,20 +188,37 @@
         </Avatar.Root>
         <span class="truncate">{listing.author.fandom_username}</span>
       </span>
-      <span class="flex shrink-0 items-center gap-1.5">
-        <span class="flex items-center gap-1" title="Upvotes">
-          <ThumbsUp size={12} />
-          {listing.votes.toLocaleString()}
-        </span>
-        <span aria-hidden="true">·</span>
-        <span class="flex items-center gap-1" title="Share views">
-          <Eye size={12} />
-          {listing.views.toLocaleString()}
-        </span>
-        <span aria-hidden="true">·</span>
-        <span title={new Date(listing.created_at).toLocaleString()}
-          >{timeAgo(listing.created_at)}</span
+      <span
+        class="pointer-events-auto relative z-7 flex shrink-0 items-center gap-1.5 leading-none"
+      >
+        <Tip content="Upvotes">
+          {#snippet children({ props })}
+            <span {...props} class="inline-flex items-center gap-1">
+              <ThumbsUp size={12} class="shrink-0" />
+              {listing.votes.toLocaleString()}
+            </span>
+          {/snippet}
+        </Tip>
+        <span class="leading-none" aria-hidden="true">·</span>
+        <Tip content="Views">
+          {#snippet children({ props })}
+            <span {...props} class="inline-flex items-center gap-1">
+              <Eye size={12} class="shrink-0" />
+              {listing.views.toLocaleString()}
+            </span>
+          {/snippet}
+        </Tip>
+        <span class="leading-none" aria-hidden="true">·</span>
+        <Tip
+          content={`Updated ${new Date(listing.updated_at).toLocaleString()}`}
         >
+          {#snippet children({ props })}
+            <span {...props} class="inline-flex items-center gap-1">
+              <CalendarClock size={12} class="shrink-0" />
+              {timeAgo(listing.updated_at)}
+            </span>
+          {/snippet}
+        </Tip>
       </span>
     </div>
   </div>

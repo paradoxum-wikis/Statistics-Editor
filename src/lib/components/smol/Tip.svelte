@@ -36,7 +36,7 @@
 
 <style>
   :global(.tip) {
-    z-index: 47;
+    z-index: 57;
     max-width: 14rem;
     border-radius: calc(var(--radius) - 0.25rem) 0;
     border: 1px solid var(--border);
