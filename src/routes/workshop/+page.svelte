@@ -1,7 +1,8 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
-  import { ArrowLeft, Plus, Store } from "@lucide/svelte";
+  import { Select } from "bits-ui";
+  import { ArrowLeft, Check, ChevronDown, Plus, Store } from "@lucide/svelte";
   import { authStore } from "$lib/stores/auth.svelte";
   import { towerStore } from "$lib/stores/tower.svelte";
   import AuthMenu from "$lib/components/smol/AuthMenu.svelte";
@@ -26,6 +27,12 @@
   } from "$lib/services/workshop";
   import { toast } from "$lib/toast";
 
+  const SORT_OPTIONS = [
+    { value: "new", label: "Newest" },
+    { value: "views", label: "Most Viewed" },
+    { value: "votes", label: "Most Upvoted" },
+  ] as const;
+
   let items = $state<WorkshopListing[]>([]);
   let total = $state(0);
   let page = $state(1);
@@ -36,8 +43,12 @@
   let q = $state("");
   let debouncedQ = $state("");
   let tag = $state<WorkshopTag | "">("");
-  let sort = $state<"new" | "views">("new");
+  let sort = $state<"new" | "views" | "votes">("new");
   let mineOnly = $state(false);
+
+  const sortLabel = $derived(
+    SORT_OPTIONS.find((o) => o.value === sort)!.label,
+  );
 
   let publishOpen = $state(false);
   let editOpen = $state(false);
@@ -213,15 +224,44 @@
             onclick={() => ((mineOnly = !mineOnly), (page = 1))}>Mine</button
           >
         {/if}
-        <select
-          class="input input-short w-auto"
-          bind:value={sort}
-          onchange={() => (page = 1)}
-          aria-label="Sort listings"
+        <Select.Root
+          type="single"
+          items={[...SORT_OPTIONS]}
+          value={sort}
+          onValueChange={(val) => {
+            if (!val || val === sort) return;
+            sort = val as typeof sort;
+            page = 1;
+          }}
         >
-          <option value="new">Newest</option>
-          <option value="views">Most viewed</option>
-        </select>
+          <Select.Trigger
+            class="select-trigger w-auto gap-1.5"
+            aria-label="Sort listings"
+          >
+            <span class="truncate">{sortLabel}</span>
+            <ChevronDown class="size-3.5 shrink-0 opacity-50" />
+          </Select.Trigger>
+          <Select.Portal>
+            <Select.Content class="select-content min-w-36" sideOffset={5}>
+              <Select.Viewport class="p-1">
+                {#each SORT_OPTIONS as option (option.value)}
+                  <Select.Item
+                    class="select-item"
+                    value={option.value}
+                    label={option.label}
+                  >
+                    {#snippet children({ selected })}
+                      {option.label}
+                      {#if selected}
+                        <Check class="ms-auto size-3.5 shrink-0" />
+                      {/if}
+                    {/snippet}
+                  </Select.Item>
+                {/each}
+              </Select.Viewport>
+            </Select.Content>
+          </Select.Portal>
+        </Select.Root>
       </div>
     </div>
 
