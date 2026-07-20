@@ -16,10 +16,14 @@
     hardDeleteAdminListing,
     isAdminUser,
     listAdminWorkshop,
-    listingIsFeatured,
     patchAdminListing,
     type AdminListing,
   } from "$lib/services/admin";
+  import {
+    WORKSHOP_TAG_FEATURED,
+    WORKSHOP_TAGS,
+    type WorkshopListingTag,
+  } from "$lib/services/workshop";
   import { settingsStore } from "$lib/stores/settings.svelte";
   import { toast } from "$lib/toast";
 
@@ -97,14 +101,13 @@
     }
   }
 
-  async function toggleFeatured(item: AdminListing) {
-    const next = !listingIsFeatured(item);
+  async function setTags(item: AdminListing, tags: WorkshopListingTag[]) {
     try {
-      await patchAdminListing(item.id, { featured: next });
-      toast.success(next ? "Featured." : "Unfeatured.");
+      await patchAdminListing(item.id, { tags });
+      toast.success("Tags updated.");
       await load();
     } catch (e) {
-      if (settingsStore.debugMode) console.error("[admin] featured", e);
+      if (settingsStore.debugMode) console.error("[admin] tags", e);
       toast.error(e instanceof Error ? e.message : "Update failed.");
     }
   }
@@ -212,12 +215,15 @@
                 <th class="px-3 py-2 font-medium">Tower</th>
                 <th class="px-3 py-2 font-medium">Author</th>
                 <th class="px-3 py-2 font-medium">Views</th>
+                <th class="px-3 py-2 font-medium">Tags</th>
                 <th class="px-3 py-2 font-medium">Status</th>
                 <th class="px-3 py-2 font-medium">Actions</th>
               </tr>
             </thead>
             <tbody>
               {#each items as item (item.id)}
+                {@const cat = WORKSHOP_TAGS.find((t) => item.tags.includes(t))}
+                {@const featured = item.tags.includes(WORKSHOP_TAG_FEATURED)}
                 <tr class="border-b border-border last:border-0">
                   <td class="max-w-48 truncate px-3 py-2 font-medium">
                     {item.title}
@@ -234,20 +240,49 @@
                   >
                   <td class="px-3 py-2">
                     <div class="flex flex-wrap gap-1">
-                      <span
-                        class="rounded-full border px-2 py-0.5 text-xs {item.published
-                          ? 'border-border text-foreground'
-                          : 'border-destructive/40 text-destructive'}"
-                      >
-                        {item.published ? "live" : "hidden"}
-                      </span>
-                      {#if listingIsFeatured(item)}
-                        <span
-                          class="rounded-full border border-amber-500/50 bg-amber-500/15 px-2 py-0.5 text-xs font-medium text-amber-800 dark:text-amber-200"
-                          >featured</span
+                      {#each WORKSHOP_TAGS as t (t)}
+                        <button
+                          type="button"
+                          class="rounded-full border px-2 py-0.5 text-xs capitalize transition-colors {cat ===
+                          t
+                            ? 'border-primary bg-primary text-primary-foreground'
+                            : 'border-border text-muted-foreground hover:bg-muted'}"
+                          aria-pressed={cat === t}
+                          onclick={() =>
+                            setTags(
+                              item,
+                              featured ? [t, WORKSHOP_TAG_FEATURED] : [t],
+                            )}
                         >
-                      {/if}
+                          {t}
+                        </button>
+                      {/each}
+                      <button
+                        type="button"
+                        class="rounded-full border px-2 py-0.5 text-xs transition-colors {featured
+                          ? 'border-amber-500/50 bg-amber-500/15 font-medium text-amber-800 dark:text-amber-200'
+                          : 'border-border text-muted-foreground hover:bg-muted'}"
+                        aria-pressed={featured}
+                        disabled={!cat}
+                        onclick={() =>
+                          cat &&
+                          setTags(
+                            item,
+                            featured ? [cat] : [cat, WORKSHOP_TAG_FEATURED],
+                          )}
+                      >
+                        featured
+                      </button>
                     </div>
+                  </td>
+                  <td class="px-3 py-2">
+                    <span
+                      class="rounded-full border px-2 py-0.5 text-xs {item.published
+                        ? 'border-border text-foreground'
+                        : 'border-destructive/40 text-destructive'}"
+                    >
+                      {item.published ? "live" : "hidden"}
+                    </span>
                   </td>
                   <td class="px-3 py-2">
                     <div class="flex flex-wrap gap-1">
@@ -257,16 +292,6 @@
                         onclick={() => togglePublished(item)}
                       >
                         {item.published ? "Hide" : "Show"}
-                      </Btn>
-                      <Btn
-                        size="sm"
-                        variant="outline"
-                        class={listingIsFeatured(item)
-                          ? "border-amber-500/50 text-amber-800 dark:text-amber-200"
-                          : ""}
-                        onclick={() => toggleFeatured(item)}
-                      >
-                        {listingIsFeatured(item) ? "Unfeature" : "Feature"}
                       </Btn>
                       <Btn
                         size="sm"
@@ -283,7 +308,7 @@
               {:else}
                 <tr>
                   <td
-                    colspan="6"
+                    colspan="7"
                     class="px-3 py-8 text-center text-muted-foreground"
                     >Nothing here.</td
                   >

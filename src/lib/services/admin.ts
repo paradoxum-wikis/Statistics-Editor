@@ -1,6 +1,6 @@
 import {
-  WORKSHOP_TAG_FEATURED,
   type WorkshopListing,
+  type WorkshopListingTag,
 } from "$lib/services/workshop";
 
 export function isAdminUser(
@@ -50,7 +50,7 @@ export async function listAdminWorkshop(
 
 export function patchAdminListing(
   id: string,
-  body: { published?: boolean; featured?: boolean },
+  body: { published?: boolean; tags?: WorkshopListingTag[] },
 ) {
   return api<void>(`/aapi/admin/workshop/${encodeURIComponent(id)}`, {
     method: "PATCH",
@@ -63,8 +63,4 @@ export function hardDeleteAdminListing(id: string) {
   return api<void>(`/aapi/admin/workshop/${encodeURIComponent(id)}`, {
     method: "DELETE",
   });
-}
-
-export function listingIsFeatured(item: { tags: string[] }) {
-  return item.tags.includes(WORKSHOP_TAG_FEATURED);
 }
