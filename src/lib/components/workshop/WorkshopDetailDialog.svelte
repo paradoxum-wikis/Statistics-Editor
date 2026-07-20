@@ -11,10 +11,7 @@
   } from "@lucide/svelte";
   import avatarPlaceholder from "$lib/assets/Avatar.png";
   import { authStore } from "$lib/stores/auth.svelte";
-  import {
-    fandomUserPage,
-    fetchFandomAvatar,
-  } from "$lib/services/fandomAuth";
+  import { fandomUserPage, fetchFandomAvatar } from "$lib/services/fandomAuth";
   import { imageLoader } from "$lib/services/imageLoader";
   import {
     createWorkshopComment,
@@ -482,7 +479,7 @@
                   </Btn>
                 </div>
               {:else}
-                <p class="text-xs text-muted-foreground">
+                <p class="text-xs text-muted-foreground text-center">
                   Sign in with Fandom to upvote or comment.
                 </p>
               {/if}
