@@ -10,6 +10,7 @@
     type WorkshopListing,
   } from "$lib/services/workshop";
   import { timeAgo } from "$lib/utils/workshop";
+  import IconBtn from "../smol/IconBtn.svelte";
   import Tip from "../smol/Tip.svelte";
 
   let {
@@ -106,32 +107,30 @@
       {#if listing.mine && (onEdit || onUnpublish)}
         <div class="pointer-events-auto relative z-7 flex shrink-0 gap-0.5">
           {#if onEdit}
-            <button
-              type="button"
-              class="icon-btn p-1.5"
+            <IconBtn
+              class="p-1.5"
               title="Edit"
               aria-label="Edit listing"
-              onclick={(e) => {
+              onclick={(e: MouseEvent) => {
                 e.stopPropagation();
                 onEdit(listing);
               }}
             >
               <Pencil size={14} />
-            </button>
+            </IconBtn>
           {/if}
           {#if onUnpublish}
-            <button
-              type="button"
-              class="icon-btn p-1.5 text-destructive"
+            <IconBtn
+              class="p-1.5 text-destructive"
               title="Unpublish"
               aria-label="Unpublish listing"
-              onclick={(e) => {
+              onclick={(e: MouseEvent) => {
                 e.stopPropagation();
                 onUnpublish(listing);
               }}
             >
               <Trash2 size={14} />
-            </button>
+            </IconBtn>
           {/if}
         </div>
       {/if}

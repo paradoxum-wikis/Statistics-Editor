@@ -8,6 +8,7 @@
   import { Check, ChevronDown, ScanEye } from "@lucide/svelte";
   import CollapsibleSide from "./smol/CollapsibleSide.svelte";
   import SubtleRow from "./smol/SubtleRow.svelte";
+  import Tip from "./smol/Tip.svelte";
   import { stripRefs } from "$lib/utils/format";
   import { mkCellKey } from "$lib/neowtext/directives";
   import {
@@ -217,12 +218,16 @@
                 {@const value =
                   selectedGains[detection.type][col.letter] ?? "none"}
                 <div class="flex items-center justify-between gap-2 px-1">
-                  <span
-                    class="text-[0.7rem] text-muted-foreground min-w-0 truncate"
-                    title={col.label}
-                  >
-                    {col.label}
-                  </span>
+                  <Tip content={col.label}>
+                    {#snippet children({ props })}
+                      <span
+                        {...props}
+                        class="min-w-0 truncate text-[0.7rem] text-muted-foreground"
+                      >
+                        {col.label}
+                      </span>
+                    {/snippet}
+                  </Tip>
                   {@render levelSelect(
                     detection.type,
                     col.letter,

@@ -345,28 +345,38 @@
               </div>
 
               <div class="flex flex-wrap items-center gap-2">
-                <Toggle.Root
-                  pressed={item.voted}
-                  disabled={voteBusy}
-                  aria-label={item.voted ? "Remove upvote" : "Upvote"}
-                  title={authStore.user
+                <Tip
+                  content={authStore.user
                     ? item.voted
                       ? "Remove upvote"
                       : "Upvote"
                     : "Sign in to upvote"}
-                  class="btn btn-sm inline-flex items-center gap-1.5 data-[state=off]:btn-outline data-[state=on]:btn-primary"
-                  onPressedChange={() => void onVote()}
                 >
-                  <ThumbsUp size={14} />
-                  {item.votes.toLocaleString()}
-                </Toggle.Root>
-                <a
-                  class="btn btn-secondary btn-sm"
-                  href={openHref}
-                  title="View this build’s stats in the editor"
-                >
-                  View tower in Editor
-                </a>
+                  {#snippet children({ props })}
+                    <Toggle.Root
+                      {...props}
+                      pressed={item.voted}
+                      disabled={voteBusy}
+                      aria-label={authStore.user
+                        ? item.voted
+                          ? "Remove upvote"
+                          : "Upvote"
+                        : "Sign in to upvote"}
+                      class="btn btn-sm inline-flex items-center gap-1.5 data-[state=off]:btn-outline data-[state=on]:btn-primary"
+                      onPressedChange={() => void onVote()}
+                    >
+                      <ThumbsUp size={14} />
+                      {item.votes.toLocaleString()}
+                    </Toggle.Root>
+                  {/snippet}
+                </Tip>
+                <Tip content="View this build’s stats in the editor">
+                  {#snippet children({ props })}
+                    <a {...props} class="btn btn-secondary btn-sm" href={openHref}>
+                      View tower in Editor
+                    </a>
+                  {/snippet}
+                </Tip>
               </div>
             </div>
           </div>
@@ -400,29 +410,37 @@
                 <ul class="space-y-3">
                   {#each comments as c (c.id)}
                     <li class="flex gap-2">
-                      <a
-                        href={fandomUserPage(c.author.fandom_username)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="mt-0.5 shrink-0 rounded-full outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring"
-                        title="{c.author.fandom_username} on the TDS Wiki"
+                      <Tip
+                        content="{c.author.fandom_username} on the TDS Wiki"
                       >
-                        <Avatar.Root
-                          class="size-6 overflow-hidden rounded-full border border-border bg-muted"
-                        >
-                          <Avatar.Image
-                            src={avatars.get(c.author.fandom_userid) ??
-                              avatarPlaceholder}
-                            alt={c.author.fandom_username}
-                            class="size-full object-cover"
-                          />
-                          <Avatar.Fallback
-                            class="flex size-full items-center justify-center text-[10px] font-medium text-muted-foreground"
+                        {#snippet children({ props })}
+                          <a
+                            {...props}
+                            href={fandomUserPage(c.author.fandom_username)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="mt-0.5 shrink-0 rounded-full outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring"
                           >
-                            {c.author.fandom_username.slice(0, 2).toUpperCase()}
-                          </Avatar.Fallback>
-                        </Avatar.Root>
-                      </a>
+                            <Avatar.Root
+                              class="size-6 overflow-hidden rounded-full border border-border bg-muted"
+                            >
+                              <Avatar.Image
+                                src={avatars.get(c.author.fandom_userid) ??
+                                  avatarPlaceholder}
+                                alt={c.author.fandom_username}
+                                class="size-full object-cover"
+                              />
+                              <Avatar.Fallback
+                                class="flex size-full items-center justify-center text-[10px] font-medium text-muted-foreground"
+                              >
+                                {c.author.fandom_username
+                                  .slice(0, 2)
+                                  .toUpperCase()}
+                              </Avatar.Fallback>
+                            </Avatar.Root>
+                          </a>
+                        {/snippet}
+                      </Tip>
                       <div class="min-w-0 flex-1">
                         <div
                           class="flex items-baseline justify-between gap-2 text-xs"
