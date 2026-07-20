@@ -179,11 +179,6 @@
     await performGoHome();
   }
 
-  async function goWorkshop() {
-    toolsOpen = false;
-    await goto(resolve("/workshop"), { keepFocus: true, noScroll: true });
-  }
-
   async function confirmCreateProfile() {
     const name = newProfileName.trim();
     if (!name) return;
@@ -257,6 +252,14 @@
       />
 
       <div class="flex items-center justify-center gap-2">
+        <IconBtn
+          onclick={() =>
+            goto(resolve("/workshop"), { keepFocus: true, noScroll: true })
+          }
+          title="Workshop"
+        >
+          <Store size={20} />
+        </IconBtn>
         <ModeToggle
           bind:mode={editorMode}
           disableCells={towerStore.selectedData?.isMalformed ?? false}
@@ -438,14 +441,6 @@
           <button class="dropdown-item w-full justify-start!" onclick={goHome}>
             <House class="me-2 h-4 w-4" />
             <span>Home</span>
-          </button>
-
-          <button
-            class="dropdown-item w-full justify-start!"
-            onclick={goWorkshop}
-          >
-            <Store class="me-2 h-4 w-4" />
-            <span>Workshop</span>
           </button>
 
           <Popover.Root>

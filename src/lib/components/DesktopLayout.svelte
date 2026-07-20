@@ -324,10 +324,12 @@
         <div class="flex shrink-0 items-center space-x-2">
           {#if isClient}
             <IconBtn
-              onclick={() => goto(resolve("/workshop"))}
+              onclick={() =>
+                goto(resolve("/workshop"), { keepFocus: true, noScroll: true })
+              }
               title="Workshop"
             >
-              <Store size={18} />
+              <Store size={20} />
             </IconBtn>
             <ModeToggle
               bind:mode={editorMode}
