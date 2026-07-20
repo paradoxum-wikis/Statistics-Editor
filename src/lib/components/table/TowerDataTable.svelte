@@ -59,7 +59,7 @@
   class="table-container {!isFirst
     ? 'extra-table-container'
     : ''} {settingsStore.minTableWidth ? 'min-content' : ''}"
-  in:fly={isFirst ? { y: 8, duration: 160, easing: cubicOut } : { duration: 0 }}
+  in:fly={{ y: 8, duration: 160, easing: cubicOut }}
 >
   <table class="table {settingsStore.minTableWidth ? 'min-content' : ''}">
     <thead class="table-head">
