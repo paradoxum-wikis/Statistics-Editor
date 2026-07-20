@@ -45,12 +45,27 @@ export async function listAdminWorkshop(
   }>(`/aapi/admin/workshop${q ? `?${q}` : ""}`);
 }
 
-export function setAdminListingPublished(id: string, published: boolean) {
+export function patchAdminListing(
+  id: string,
+  body: { published?: boolean; featured?: boolean },
+) {
   return api<void>(`/aapi/admin/workshop/${encodeURIComponent(id)}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ published }),
+    body: JSON.stringify(body),
   });
+}
+
+export function setAdminListingPublished(id: string, published: boolean) {
+  return patchAdminListing(id, { published });
+}
+
+export function setAdminListingFeatured(id: string, featured: boolean) {
+  return patchAdminListing(id, { featured });
+}
+
+export function listingIsFeatured(item: { tags: string[] }) {
+  return item.tags.includes("featured");
 }
 
 export function hardDeleteAdminListing(id: string) {

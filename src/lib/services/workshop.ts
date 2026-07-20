@@ -1,12 +1,15 @@
 export const WORKSHOP_TAGS = ["rework", "rebalance", "new"] as const;
 export type WorkshopTag = (typeof WORKSHOP_TAGS)[number];
+/** Admin-only; stored in tags CSV alongside at most one user category. */
+export const WORKSHOP_TAG_FEATURED = "featured" as const;
+export type WorkshopListingTag = WorkshopTag | typeof WORKSHOP_TAG_FEATURED;
 
 export type WorkshopListing = {
   id: string;
   share_id: string;
   title: string;
   description: string;
-  tags: WorkshopTag[];
+  tags: WorkshopListingTag[];
   image?: string;
   tower_name: string;
   views: number;

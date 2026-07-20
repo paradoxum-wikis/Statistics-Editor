@@ -4,7 +4,10 @@
   import avatarPlaceholder from "$lib/assets/Avatar.png";
   import { fetchFandomAvatar } from "$lib/services/fandomAuth";
   import { imageLoader } from "$lib/services/imageLoader";
-  import type { WorkshopListing } from "$lib/services/workshop";
+  import {
+    WORKSHOP_TAG_FEATURED,
+    type WorkshopListing,
+  } from "$lib/services/workshop";
 
   let {
     listing,
@@ -19,6 +22,7 @@
   const openHref = $derived(
     `${resolve("/tower/[name]", { name: listing.tower_name })}?share=${encodeURIComponent(listing.share_id)}`,
   );
+  const featured = $derived(listing.tags.includes(WORKSHOP_TAG_FEATURED));
 
   let imageUrl = $state<string | null>(null);
   let avatarSrc = $state(avatarPlaceholder);
@@ -66,7 +70,9 @@
 </script>
 
 <article
-  class="relative flex flex-col gap-2 overflow-hidden rounded-[var(--radius)_0] border border-border bg-card transition-colors duration-250 hover:bg-muted/40"
+  class="relative flex flex-col gap-2 overflow-hidden rounded-[var(--radius)_0] border bg-card transition-colors duration-250 {featured
+    ? 'border-amber-500/50 bg-amber-500/[0.04] hover:bg-amber-500/[0.08]'
+    : 'border-border hover:bg-muted/40'}"
 >
   {#if imageUrl}
     <div class="aspect-video w-full bg-muted">
@@ -131,7 +137,10 @@
       <div class="flex flex-wrap gap-1">
         {#each listing.tags as tag (tag)}
           <span
-            class="rounded-full border border-border px-2 py-0.5 text-xs capitalize text-muted-foreground"
+            class="rounded-full border px-2 py-0.5 text-xs capitalize {tag ===
+            WORKSHOP_TAG_FEATURED
+              ? 'border-amber-500/50 bg-amber-500/15 font-medium text-amber-800 dark:text-amber-200'
+              : 'border-border text-muted-foreground'}"
             >{tag}</span
           >
         {/each}
@@ -150,13 +159,14 @@
         />
         <span class="truncate">{listing.author.fandom_username}</span>
       </span>
-      <span class="flex shrink-0 items-center gap-2">
+      <span class="flex shrink-0 items-center gap-1.5">
         <span class="flex items-center gap-1">
           <Eye size={12} />
           {listing.views.toLocaleString()}
         </span>
-        <span title={new Date(listing.updated_at).toLocaleString()}
-          >{timeAgo(listing.updated_at)}</span
+        <span aria-hidden="true">·</span>
+        <span title={new Date(listing.created_at).toLocaleString()}
+          >{timeAgo(listing.created_at)}</span
         >
       </span>
     </div>

@@ -15,6 +15,8 @@
     hardDeleteAdminListing,
     isAdminUser,
     listAdminWorkshop,
+    listingIsFeatured,
+    setAdminListingFeatured,
     setAdminListingPublished,
     type AdminListing,
   } from "$lib/services/admin";
@@ -86,6 +88,17 @@
     try {
       await setAdminListingPublished(item.id, !item.published);
       toast.success(item.published ? "Hidden." : "Published.");
+      await load();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Update failed.");
+    }
+  }
+
+  async function toggleFeatured(item: AdminListing) {
+    const next = !listingIsFeatured(item);
+    try {
+      await setAdminListingFeatured(item.id, next);
+      toast.success(next ? "Featured." : "Unfeatured.");
       await load();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Update failed.");
@@ -210,13 +223,21 @@
                   >{item.views.toLocaleString()}</td
                 >
                 <td class="px-3 py-2">
-                  <span
-                    class="rounded-full border px-2 py-0.5 text-xs {item.published
-                      ? 'border-border text-foreground'
-                      : 'border-destructive/40 text-destructive'}"
-                  >
-                    {item.published ? "live" : "hidden"}
-                  </span>
+                  <div class="flex flex-wrap gap-1">
+                    <span
+                      class="rounded-full border px-2 py-0.5 text-xs {item.published
+                        ? 'border-border text-foreground'
+                        : 'border-destructive/40 text-destructive'}"
+                    >
+                      {item.published ? "live" : "hidden"}
+                    </span>
+                    {#if listingIsFeatured(item)}
+                      <span
+                        class="rounded-full border border-amber-500/50 bg-amber-500/15 px-2 py-0.5 text-xs font-medium text-amber-800 dark:text-amber-200"
+                        >featured</span
+                      >
+                    {/if}
+                  </div>
                 </td>
                 <td class="px-3 py-2">
                   <div class="flex flex-wrap gap-1">
@@ -226,6 +247,16 @@
                       onclick={() => togglePublished(item)}
                     >
                       {item.published ? "Hide" : "Show"}
+                    </Btn>
+                    <Btn
+                      size="sm"
+                      variant="outline"
+                      class={listingIsFeatured(item)
+                        ? "border-amber-500/50 text-amber-800 dark:text-amber-200"
+                        : ""}
+                      onclick={() => toggleFeatured(item)}
+                    >
+                      {listingIsFeatured(item) ? "Unfeature" : "Feature"}
                     </Btn>
                     <Btn
                       size="sm"

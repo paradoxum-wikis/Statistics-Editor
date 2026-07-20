@@ -19,6 +19,13 @@
   import TextInput from "../smol/TextInput.svelte";
   import Btn from "../smol/Btn.svelte";
 
+  function categoryFromTags(tags: string[]): WorkshopTag | "" {
+    for (const t of WORKSHOP_TAGS) {
+      if (tags.includes(t)) return t;
+    }
+    return "";
+  }
+
   let {
     mode,
     open = $bindable(false),
@@ -54,7 +61,7 @@
     if (mode === "edit" && listing) {
       title = listing.title;
       description = listing.description;
-      tag = listing.tags[0] ?? "";
+      tag = categoryFromTags(listing.tags);
       image = listing.image ?? "";
       verified = { id: listing.share_id, tower_name: listing.tower_name };
     } else {
