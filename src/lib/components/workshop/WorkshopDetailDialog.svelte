@@ -11,7 +11,10 @@
   } from "@lucide/svelte";
   import avatarPlaceholder from "$lib/assets/Avatar.png";
   import { authStore } from "$lib/stores/auth.svelte";
-  import { fetchFandomAvatar } from "$lib/services/fandomAuth";
+  import {
+    fandomUserPage,
+    fetchFandomAvatar,
+  } from "$lib/services/fandomAuth";
   import { imageLoader } from "$lib/services/imageLoader";
   import {
     createWorkshopComment,
@@ -400,27 +403,39 @@
                 <ul class="space-y-3">
                   {#each comments as c (c.id)}
                     <li class="flex gap-2">
-                      <Avatar.Root
-                        class="mt-0.5 size-6 shrink-0 overflow-hidden rounded-full border border-border bg-muted"
+                      <a
+                        href={fandomUserPage(c.author.fandom_username)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="mt-0.5 shrink-0 rounded-full outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring"
+                        title="{c.author.fandom_username} on the TDS Wiki"
                       >
-                        <Avatar.Image
-                          src={avatars.get(c.author.fandom_userid) ??
-                            avatarPlaceholder}
-                          alt={c.author.fandom_username}
-                          class="size-full object-cover"
-                        />
-                        <Avatar.Fallback
-                          class="flex size-full items-center justify-center text-[10px] font-medium text-muted-foreground"
+                        <Avatar.Root
+                          class="size-6 overflow-hidden rounded-full border border-border bg-muted"
                         >
-                          {c.author.fandom_username.slice(0, 2).toUpperCase()}
-                        </Avatar.Fallback>
-                      </Avatar.Root>
+                          <Avatar.Image
+                            src={avatars.get(c.author.fandom_userid) ??
+                              avatarPlaceholder}
+                            alt={c.author.fandom_username}
+                            class="size-full object-cover"
+                          />
+                          <Avatar.Fallback
+                            class="flex size-full items-center justify-center text-[10px] font-medium text-muted-foreground"
+                          >
+                            {c.author.fandom_username.slice(0, 2).toUpperCase()}
+                          </Avatar.Fallback>
+                        </Avatar.Root>
+                      </a>
                       <div class="min-w-0 flex-1">
                         <div
                           class="flex items-baseline justify-between gap-2 text-xs"
                         >
-                          <span class="font-medium"
-                            >{c.author.fandom_username}</span
+                          <a
+                            href={fandomUserPage(c.author.fandom_username)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="font-medium text-link hover:underline"
+                            >{c.author.fandom_username}</a
                           >
                           <span class="shrink-0 text-muted-foreground"
                             >{timeAgo(c.created_at)}</span
