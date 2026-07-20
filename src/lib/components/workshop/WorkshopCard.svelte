@@ -85,16 +85,22 @@
     onclick={() => onOpen?.(listing)}
   ></button>
 
-  {#if imageUrl}
-    <div class="pointer-events-none aspect-video w-full bg-muted">
+  <div class="pointer-events-none aspect-video w-full bg-muted">
+    {#if imageUrl}
       <img
         src={imageUrl}
         alt=""
         class="h-full w-full object-cover"
         loading="lazy"
       />
-    </div>
-  {/if}
+    {:else}
+      <enhanced:img
+        src="$lib/assets/PlaceholderWide.png"
+        alt=""
+        class="h-full w-full object-cover"
+      />
+    {/if}
+  </div>
 
   <div class="pointer-events-none flex flex-col gap-2 p-4 pt-1">
     <div class="flex items-start justify-between gap-2">

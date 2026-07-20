@@ -255,16 +255,22 @@
           <div
             class="space-y-3 p-4 sm:space-y-4 sm:p-5 md:min-h-0 md:overflow-y-auto md:overscroll-contain"
           >
-            {#if imageUrl}
-              <AspectRatio.Root
-                ratio={16 / 9}
-                class="overflow-hidden rounded-[var(--radius)_0] border bg-muted {featured
-                  ? 'border-amber-500/40'
-                  : 'border-border'}"
-              >
+            <AspectRatio.Root
+              ratio={16 / 9}
+              class="overflow-hidden rounded-[var(--radius)_0] border bg-muted {featured
+                ? 'border-amber-500/40'
+                : 'border-border'}"
+            >
+              {#if imageUrl}
                 <img src={imageUrl} alt="" class="h-full w-full object-cover" />
-              </AspectRatio.Root>
-            {/if}
+              {:else}
+                <enhanced:img
+                  src="$lib/assets/PlaceholderWide.png"
+                  alt=""
+                  class="h-full w-full object-cover"
+                />
+              {/if}
+            </AspectRatio.Root>
 
             {#if item.description}
               <p class="whitespace-pre-wrap text-sm text-foreground/90">
@@ -372,7 +378,11 @@
                 </Tip>
                 <Tip content="View this build’s stats in the editor">
                   {#snippet children({ props })}
-                    <a {...props} class="btn btn-secondary btn-sm" href={openHref}>
+                    <a
+                      {...props}
+                      class="btn btn-secondary btn-sm"
+                      href={openHref}
+                    >
                       View tower in Editor
                     </a>
                   {/snippet}
@@ -410,9 +420,7 @@
                 <ul class="space-y-3">
                   {#each comments as c (c.id)}
                     <li class="flex gap-2">
-                      <Tip
-                        content="{c.author.fandom_username} on the TDS Wiki"
-                      >
+                      <Tip content="{c.author.fandom_username} on the TDS Wiki">
                         {#snippet children({ props })}
                           <a
                             {...props}
