@@ -81,6 +81,7 @@
   const canSubmit = $derived(
     !!authStore.user &&
       !!verified &&
+      !!tag &&
       title.trim().length > 0 &&
       title.trim().length <= 80 &&
       description.trim().length <= 500 &&
@@ -89,10 +90,6 @@
       !busy &&
       !checking,
   );
-
-  function selectTag(next: WorkshopTag) {
-    tag = tag === next ? "" : next;
-  }
 
   async function checkShare() {
     if (checking || !shareDirty) return;
@@ -114,7 +111,8 @@
   }
 
   async function submit() {
-    if (!canSubmit || !verified) return;
+    if (!canSubmit || !verified || !tag) return;
+    const tags: WorkshopTag[] = [tag];
     busy = true;
     error = null;
     try {
@@ -122,7 +120,7 @@
         await updateWorkshopListing(listing.id, {
           title: title.trim(),
           description: description.trim(),
-          tags: tag ? [tag] : [],
+          tags,
           image: image.trim(),
           ...(verified.id !== listing.share_id
             ? { share_id: verified.id }
@@ -134,7 +132,7 @@
           share_id: verified.id,
           title: title.trim(),
           description: description.trim(),
-          tags: tag ? [tag] : [],
+          tags,
           image: image.trim(),
         });
         toast.success("Published to the Workshop!");
@@ -293,7 +291,7 @@
                     ? 'border-primary bg-primary text-primary-foreground'
                     : 'border-border text-muted-foreground hover:bg-muted'}"
                   aria-pressed={active}
-                  onclick={() => selectTag(t)}
+                  onclick={() => (tag = t)}
                 >
                   {t}
                 </button>
