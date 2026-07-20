@@ -71,6 +71,7 @@
 {#if variant === "compact"}
   <Combobox.Root
     type="single"
+    allowDeselect={false}
     {items}
     value={selected}
     bind:open
