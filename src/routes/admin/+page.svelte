@@ -1,6 +1,7 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
+  import { fade } from "svelte/transition";
   import { ArrowLeft, Trash2 } from "@lucide/svelte";
   import { authStore } from "$lib/stores/auth.svelte";
   import AuthMenu from "$lib/components/smol/AuthMenu.svelte";
@@ -142,17 +143,20 @@
 </svelte:head>
 
 {#if !authStore.ready}
-  <div class="flex h-screen items-center justify-center bg-background p-5">
+  <div
+    class="flex h-screen items-center justify-center bg-background p-5"
+    in:fade={{ duration: 140 }}
+  >
     <LoadingCard message="Loading..." />
   </div>
 {:else if !allowed}
-  <div class="flex h-screen flex-col bg-background">
+  <div class="flex h-screen flex-col bg-background" in:fade={{ duration: 140 }}>
     <main class="min-h-0 flex-1 overflow-y-auto p-5">
       <NotFoundView onHome={goHome} code={403} />
     </main>
   </div>
 {:else}
-  <div class="flex h-screen flex-col bg-background">
+  <div class="flex h-screen flex-col bg-background" in:fade={{ duration: 140 }}>
     <header
       class="sticky top-0 z-7 flex items-center justify-between gap-3 border-b bg-card p-2 px-3"
     >

@@ -275,7 +275,9 @@
       {#if isNotFound}
         <NotFoundView onHome={goHome} tower={!!page.params.name} />
       {:else if isClient && !towerStore.selectedData && !towerStore.isLoading}
-        <HomeView onSelect={handleSelect} />
+        <div in:fade={{ duration: 140 }}>
+          <HomeView onSelect={handleSelect} />
+        </div>
       {:else}
         <div in:fly={{ y: 8, duration: 160, easing: cubicOut }}>
           {#if !isClient}

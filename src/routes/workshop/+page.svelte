@@ -1,6 +1,7 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
+  import { fade } from "svelte/transition";
   import { Select } from "bits-ui";
   import { ArrowLeft, Check, ChevronDown, Plus, Store } from "@lucide/svelte";
   import { authStore } from "$lib/stores/auth.svelte";
@@ -166,7 +167,7 @@
   <title>Workshop | TDS Statistics Editor</title>
 </svelte:head>
 
-<div class="flex h-screen flex-col bg-background">
+<div class="flex h-screen flex-col bg-background" in:fade={{ duration: 140 }}>
   <header
     class="sticky top-0 z-7 flex items-center justify-between gap-3 border-b bg-card p-2 px-3"
   >

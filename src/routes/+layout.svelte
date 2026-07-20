@@ -1,5 +1,6 @@
 <script>
   import { onMount } from "svelte";
+  import { fade } from "svelte/transition";
   import { page } from "$app/state";
   import { Tooltip } from "bits-ui";
   import { analytics } from "$lib/services/analytics";
@@ -104,10 +105,10 @@
 <Tooltip.Provider delayDuration={200} skipDelayDuration={300}>
   {@render children()}
   {#if !isStandalone}
-    <div class="hidden md:flex h-screen flex-col">
+    <div class="hidden md:flex h-screen flex-col" in:fade={{ duration: 140 }}>
       <DesktopLayout {isClient} />
     </div>
-    <div class="md:hidden">
+    <div class="md:hidden" in:fade={{ duration: 140 }}>
       <MobileLayout {isClient} />
     </div>
   {/if}

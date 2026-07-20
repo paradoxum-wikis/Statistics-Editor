@@ -3,7 +3,7 @@
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import { cubicOut } from "svelte/easing";
-  import { fly } from "svelte/transition";
+  import { fade, fly } from "svelte/transition";
 
   import { towerStore } from "$lib/stores/tower.svelte";
   import { profileStore } from "$lib/stores/profile.svelte";
@@ -353,7 +353,9 @@
           {#if isNotFound}
             <NotFoundView onHome={goHome} tower={!!page.params.name} />
           {:else if isClient && !towerStore.selectedData && !towerStore.isLoading}
-            <HomeView onSelect={handleSelect} />
+            <div in:fade={{ duration: 140 }}>
+              <HomeView onSelect={handleSelect} />
+            </div>
           {:else}
             <div in:fly={{ y: 8, duration: 160, easing: cubicOut }}>
               {#if !isClient}
