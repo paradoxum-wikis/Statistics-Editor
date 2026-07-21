@@ -63,6 +63,9 @@
   const featured = $derived(
     listing?.tags.includes(WORKSHOP_TAG_FEATURED) ?? false,
   );
+  const authorPage = $derived(
+    listing ? fandomUserPage(listing.author.fandom_username) : "#",
+  );
 
   function rememberAvatar(userId: number, url: string) {
     const next = new Map(avatars);
@@ -289,24 +292,41 @@
 
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div class="flex min-w-0 items-center gap-2.5 text-sm">
-            <Avatar.Root
-              class="size-8 shrink-0 overflow-hidden rounded-full border border-border bg-muted"
-            >
-              <Avatar.Image
-                src={authorAvatar ?? avatarPlaceholder}
-                alt={item.author.fandom_username}
-                class="size-full object-cover"
-              />
-              <Avatar.Fallback
-                class="flex size-full items-center justify-center text-xs font-medium text-muted-foreground"
-              >
-                {item.author.fandom_username.slice(0, 2).toUpperCase()}
-              </Avatar.Fallback>
-            </Avatar.Root>
+            <Tip content="{item.author.fandom_username} on the TDS Wiki">
+              {#snippet children({ props })}
+                <a
+                  {...props}
+                  href={authorPage}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="shrink-0 rounded-full outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <Avatar.Root
+                    class="size-8 overflow-hidden rounded-full border border-border bg-muted"
+                  >
+                    <Avatar.Image
+                      src={authorAvatar ?? avatarPlaceholder}
+                      alt={item.author.fandom_username}
+                      class="size-full object-cover"
+                    />
+                    <Avatar.Fallback
+                      class="flex size-full items-center justify-center text-xs font-medium text-muted-foreground"
+                    >
+                      {item.author.fandom_username.slice(0, 2).toUpperCase()}
+                    </Avatar.Fallback>
+                  </Avatar.Root>
+                </a>
+              {/snippet}
+            </Tip>
             <div class="min-w-0">
-              <p class="truncate font-medium">
+              <a
+                href={authorPage}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="block truncate font-medium text-link hover:underline"
+              >
                 {item.author.fandom_username}
-              </p>
+              </a>
               <p
                 class="flex flex-wrap items-center gap-x-1.5 text-xs leading-none text-muted-foreground"
               >
