@@ -39,8 +39,11 @@ export function parseShareRef(input: string): string | null {
 async function shareContentHash(
   neowtext: string,
   towerName?: string,
+  ownerUsername?: string,
 ): Promise<string> {
-  const payload = `${towerName?.trim() ?? ""}\n${neowtext}`;
+  const payload = ownerUsername
+    ? `${ownerUsername}\n${towerName?.trim() ?? ""}\n${neowtext}`
+    : `${towerName?.trim() ?? ""}\n${neowtext}`;
   const digest = await crypto.subtle.digest(
     "SHA-256",
     new TextEncoder().encode(payload),
@@ -106,7 +109,8 @@ function rememberOwnedShare(towerName: string, id: string): void {
     map[key] = id;
     sessionStorage.setItem(OWNED_SHARE_KEY, JSON.stringify(map));
   } catch (e) {
-    if (settingsStore.debugMode) console.error("[shareTower] owned map write", e);
+    if (settingsStore.debugMode)
+      console.error("[shareTower] owned map write", e);
   }
 }
 
@@ -115,8 +119,12 @@ export async function createShare(
   towerName?: string,
   own = false,
 ): Promise<string> {
-  own = own && !!authStore.user;
-  const hash = await shareContentHash(neowtext, towerName);
+  const ownerUsername =
+    own && authStore.user?.fandom_username
+      ? authStore.user.fandom_username
+      : undefined;
+  own = !!ownerUsername;
+  const hash = await shareContentHash(neowtext, towerName, ownerUsername);
   const cached = getCachedShareId(hash);
   if (cached) return cached;
 
