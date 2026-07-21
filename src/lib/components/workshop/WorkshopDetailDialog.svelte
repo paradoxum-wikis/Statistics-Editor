@@ -220,7 +220,7 @@
 
 <Modal
   bind:open
-  class="flex! max-h-[92dvh] w-[min(96vw,72rem)] max-w-[min(96vw,72rem)]! flex-col gap-0 overflow-hidden p-0! md:h-[min(92dvh,56rem)]"
+  class="flex! max-h-[92dvh] max-w-6xl! flex-col gap-0 overflow-hidden p-0! md:h-[min(92dvh,56rem)]"
 >
   <div
     class="flex shrink-0 items-start gap-3 border-b px-4 py-3 pe-12 sm:px-5 sm:py-4"

@@ -382,7 +382,7 @@ h4,
   top: 50%;
   z-index: 47;
   display: grid;
-  width: 100%;
+  width: calc(100% - 2rem);
   max-width: 32rem;
   translate: -50% -50%;
   gap: 1rem;
