@@ -14,8 +14,8 @@
   import LoadingCard from "$lib/components/smol/LoadingCard.svelte";
   import TextInput from "$lib/components/smol/TextInput.svelte";
   import WorkshopCard from "$lib/components/workshop/WorkshopCard.svelte";
-  import WorkshopDetailDialog from "$lib/components/workshop/WorkshopDetailDialog.svelte";
-  import WorkshopFormDialog from "$lib/components/workshop/WorkshopFormDialog.svelte";
+  import WorkshopDetailModal from "$lib/components/workshop/WorkshopDetailModal.svelte";
+  import WorkshopFormModal from "$lib/components/workshop/WorkshopFormModal.svelte";
   import { isAdminUser } from "$lib/services/admin";
   import { fetchFandomAvatars } from "$lib/services/fandomAuth";
   import { settingsStore } from "$lib/stores/settings.svelte";
@@ -328,15 +328,15 @@
   </main>
 </div>
 
-<WorkshopDetailDialog
+<WorkshopDetailModal
   bind:open={detailOpen}
   bind:listingId={detailId}
   onChanged={onDetailChanged}
 />
 
-<WorkshopFormDialog mode="create" bind:open={publishOpen} onSaved={load} />
+<WorkshopFormModal mode="create" bind:open={publishOpen} onSaved={load} />
 {#if editTarget}
-  <WorkshopFormDialog
+  <WorkshopFormModal
     mode="edit"
     listing={editTarget}
     bind:open={editOpen}

@@ -16,7 +16,7 @@
     sharePageUrl,
   } from "$lib/services/shareTower";
   import { authStore } from "$lib/stores/auth.svelte";
-  import WorkshopFormDialog from "./workshop/WorkshopFormDialog.svelte";
+  import WorkshopFormModal from "./workshop/WorkshopFormModal.svelte";
   import { analytics } from "$lib/services/analytics";
   import { toast } from "$lib/toast";
   import { isCustomTower } from "$lib/towerComponents/customTowers";
@@ -714,7 +714,7 @@
     <MemosSection />
     <NotesSection notes={skinRefs.notes} />
     {#if publishShareId}
-      <WorkshopFormDialog
+      <WorkshopFormModal
         mode="create"
         shareId={publishShareId}
         towerName={tower.name}
