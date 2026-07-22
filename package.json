@@ -41,6 +41,7 @@
     "codemirror": "^6.0.2",
     "layerchart": "^2.0.2",
     "mediawiki-expr": "^0.0.2",
-    "mediawiki-file-url": "^0.4.0"
+    "mediawiki-file-url": "^0.4.0",
+    "vaul-svelte": "^1.0.0-next.7"
   }
 }
