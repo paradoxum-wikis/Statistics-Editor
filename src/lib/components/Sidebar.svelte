@@ -241,8 +241,10 @@
   class={["flex h-full flex-col border-r border-border bg-card", className]}
 >
   <div class="flex flex-1 flex-col overflow-y-auto p-3.5">
-    <WikiBanner />
-    <Separator class="mb-4" />
+    {#if !settingsStore.hideWikiBanner}
+      <WikiBanner />
+      <Separator class="mb-4" />
+    {/if}
 
     {#if towerStore.selectedData}
       {#key towerKey}

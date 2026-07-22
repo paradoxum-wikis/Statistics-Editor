@@ -5,6 +5,7 @@ import {
   Diff,
   Eraser,
   Columns2,
+  ImageOff,
   Scaling,
   Skull,
   SquareDashedBottom,
@@ -94,6 +95,16 @@ const SETTING_DEFS = {
     label: "Compact Cell",
     description: "Uses tighter table cells, making tables leaner in general.",
   },
+  hideWikiBanner: {
+    storageKey: "tdse_hwb",
+    default: false,
+    id: "hide-wiki-banner",
+    tab: "appearance",
+    icon: ImageOff,
+    label: "Hide Wiki Banner",
+    description:
+      "Hides the Tower Defense Simulator Wiki banner at the top of the sidebar.",
+  },
   debugMode: {
     storageKey: "tdse_debug",
     default: false,
@@ -177,6 +188,7 @@ class SettingsStore {
   seeValueDifference = $state<boolean>(SETTING_DEFS.seeValueDifference.default);
   alwaysShowSkinTabs = $state<boolean>(SETTING_DEFS.alwaysShowSkinTabs.default);
   hideCellWrapper = $state<boolean>(SETTING_DEFS.hideCellWrapper.default);
+  hideWikiBanner = $state<boolean>(SETTING_DEFS.hideWikiBanner.default);
   minTableWidth = $state<boolean>(SETTING_DEFS.minTableWidth.default);
   clearOnEdit = $state<boolean>(SETTING_DEFS.clearOnEdit.default);
   restoreRefOnClearEdit = $state<boolean>(
@@ -208,6 +220,9 @@ class SettingsStore {
         break;
       case "hideCellWrapper":
         this.hideCellWrapper = value;
+        break;
+      case "hideWikiBanner":
+        this.hideWikiBanner = value;
         break;
       case "debugMode":
         this.debugMode = value;
@@ -255,6 +270,8 @@ class SettingsStore {
         return this.minTableWidth;
       case "hideCellWrapper":
         return this.hideCellWrapper;
+      case "hideWikiBanner":
+        return this.hideWikiBanner;
       case "debugMode":
         return this.debugMode;
       case "analyticsConsent":
