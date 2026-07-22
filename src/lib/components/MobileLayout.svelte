@@ -3,7 +3,7 @@
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import { cubicOut } from "svelte/easing";
-  import { fade, fly } from "svelte/transition";
+  import { fly } from "svelte/transition";
 
   import { towerStore } from "$lib/stores/tower.svelte";
   import { profileStore } from "$lib/stores/profile.svelte";
@@ -22,6 +22,7 @@
   import CreateTower from "./tool/CreateTower.svelte";
 
   import { DropdownMenu, Popover } from "bits-ui";
+  import { Drawer } from "vaul-svelte";
   import ModeToggle from "./smol/ModeToggle.svelte";
   import AuthMenu from "./smol/AuthMenu.svelte";
   import Modal from "./smol/Modal.svelte";
@@ -231,23 +232,22 @@
 </script>
 
 <div class="flex h-screen flex-col bg-background">
-  <!-- Sidebar Scrim -->
-  {#if sidebarOpen}
-    <div
-      class="dialog-overlay"
-      role="presentation"
-      onclick={() => (sidebarOpen = false)}
-      transition:fade={{ duration: 200 }}
-    ></div>
-  {/if}
-
-  <div
-    class="fixed inset-y-0 left-0 z-57 w-72 transition-transform duration-200 {sidebarOpen
-      ? 'translate-x-0'
-      : '-translate-x-full'}"
+  <Drawer.Root
+    open={sidebarOpen}
+    onOpenChange={(v) => (sidebarOpen = v)}
+    direction="left"
+    shouldScaleBackground={false}
   >
-    <Sidebar class="h-full" />
-  </div>
+    <Drawer.Portal>
+      <Drawer.Overlay class="dialog-overlay" />
+      <Drawer.Content
+        class="fixed inset-y-0 left-0 z-57 flex h-full w-72 max-w-[85vw] flex-col outline-none"
+      >
+        <Drawer.Title class="sr-only">Sidebar</Drawer.Title>
+        <Sidebar class="h-full w-full" />
+      </Drawer.Content>
+    </Drawer.Portal>
+  </Drawer.Root>
 
   <!-- Header -->
   <header

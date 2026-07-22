@@ -129,6 +129,13 @@
       left: 0;
       height: 200%;
     }
+
+    &[data-vaul-drawer-direction="left"]::after {
+      top: 0;
+      right: 100%;
+      bottom: 0;
+      width: 200%;
+    }
   }
 
   :global([data-vaul-handle-hitarea]) {
