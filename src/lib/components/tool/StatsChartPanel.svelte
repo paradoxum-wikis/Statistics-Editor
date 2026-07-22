@@ -209,9 +209,7 @@
   const canAdd = $derived(series.length < MAX_SERIES);
   const canAddCurrent = $derived(canAdd && !!tower && !!towerName);
   const canAddPath = $derived(canAddCurrent && pathScopes.length > 0);
-  const towerItems = $derived(
-    names.filter((n) => n !== towerName).map((n) => ({ value: n, label: n })),
-  );
+  const towerItems = $derived(names.map((n) => ({ value: n, label: n })));
   const canAddTower = $derived(canAdd && towerItems.length > 0);
 
   function onScopeChange(def: ComparatorSeriesDef, v: string) {
