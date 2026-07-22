@@ -20,7 +20,7 @@
 
   const TYPE_LABELS: Record<string, string> = {
     feat: "feature",
-    doc: "documentation",
+    docs: "documentation",
     perf: "performance",
     ci: "continuous integration",
   };
