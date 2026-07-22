@@ -28,13 +28,23 @@
   const TYPE_COLORS: Record<string, string> = {
     feature: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400",
     fix: "bg-red-500/15 text-red-700 dark:text-red-400",
-    perf: "bg-amber-500/15 text-amber-700 dark:text-amber-400",
+    performance: "bg-violet-500/15 text-violet-700 dark:text-violet-400",
     refactor: "bg-yellow-500/15 text-yellow-700 dark:text-yellow-400",
     style: "bg-pink-500/15 text-pink-700 dark:text-pink-400",
     documentation: "bg-sky-500/15 text-sky-700 dark:text-sky-400",
     chore: "bg-zinc-500/15 text-zinc-600 dark:text-zinc-400",
-    performance: "bg-violet-500/15 text-violet-700 dark:text-violet-400",
     "continuous integration": "bg-teal-300/15 text-teal-500 dark:text-teal-200",
+  };
+
+  const TYPE_TIPS: Record<string, string> = {
+    feature: "A new capability was added.",
+    fix: "A problem was corrected.",
+    performance: "Speed or efficiency was improved.",
+    refactor: "Internal structure was reworked without changing behavior.",
+    style: "Appearance or layout was adjusted.",
+    documentation: "Written documentation was updated.",
+    chore: "General maintenance work was done.",
+    "continuous integration": "Scheduled automation was updated.",
   };
 
   let cache: UpdateLogCache | null = null;
@@ -51,10 +61,16 @@
   }
 
   function badgeTip(entry: Entry) {
-    const type = entry.breaking
-      ? `${entry.badgeType} [Breaking Change]`
-      : entry.badgeType!;
-    return entry.badgeScope ? `${type} (${entry.badgeScope})` : type;
+    const key = entry.badgeType!.toLowerCase();
+    let tip = TYPE_TIPS[key] ?? "A change was made.";
+    if (entry.breaking) tip += " May break older saved setups or data.";
+    if (entry.badgeScope) {
+      const scope = entry.badgeScope
+        .toLowerCase()
+        .replace(/(^|[\s/_-])(\w)/g, (_, sep, ch) => sep + ch.toUpperCase());
+      tip += ` Area: ${scope}.`;
+    }
+    return tip;
   }
 
   async function loadUpdateLog(): Promise<UpdateLogCache> {
