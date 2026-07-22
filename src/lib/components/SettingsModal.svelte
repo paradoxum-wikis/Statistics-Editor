@@ -57,7 +57,7 @@
   bind:open
   title="Settings"
   description="Please change them to your heart's content."
-  class="sm:max-w-2xl"
+  class="sm:max-w-2xl max-md:pb-0"
 >
   <Tabs.Root value="editor">
     <Tabs.List

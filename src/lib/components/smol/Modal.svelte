@@ -82,7 +82,6 @@
           className,
         ]}
       >
-        <!-- margin on the handle so consumer p-0 doesn't flush the pill to the edge -->
         <Drawer.Handle
           class="relative mx-auto mt-3 mb-2 h-1 w-10 shrink-0 rounded-full bg-muted-foreground/35"
         />
