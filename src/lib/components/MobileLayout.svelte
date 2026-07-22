@@ -282,7 +282,7 @@
   </header>
 
   <!-- Main Content -->
-  <main class="min-h-0 flex-1 overflow-x-auto overflow-y-auto p-4 pb-16">
+  <main class="min-h-0 flex-1 overflow-x-auto overflow-y-auto p-4 mb-14">
     {#key mainKey}
       <div
         class="h-full min-h-0"
