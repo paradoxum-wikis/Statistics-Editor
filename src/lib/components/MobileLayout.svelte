@@ -241,7 +241,7 @@
     <Drawer.Portal>
       <Drawer.Overlay class="dialog-overlay" />
       <Drawer.Content
-        class="fixed inset-y-0 left-0 z-57 flex h-full w-72 max-w-[85vw] flex-col outline-none"
+        class="fixed inset-y-0 left-0 z-57 flex h-full w-72 max-w-[85vw] flex-col bg-card outline-none"
       >
         <Drawer.Title class="sr-only">Sidebar</Drawer.Title>
         <Sidebar class="h-full w-full" />
