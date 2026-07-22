@@ -29,7 +29,7 @@ export type ComparatorSeriesDef = {
   towerName: string;
   skinName: string;
   scopeId: string;
-  metric: string;
+  metrics: string[];
 };
 
 export type ComparatorSeriesResult = {
@@ -42,12 +42,14 @@ export type ComparatorSeriesResult = {
 
 export type ComparatorSeriesRow = {
   def: ComparatorSeriesDef;
-  color: string;
+  colors: string[];
   scopeItems: { value: string; label: string }[];
   metricItems: { value: string; label: string }[];
 };
 
 export const MAX_SERIES = 4;
+export const MAX_METRICS = 6;
+export const CHART_COLORS = MAX_SERIES * MAX_METRICS; // match --chart-1...N in layout.css
 export const X_CASH = "__cash__";
 export const X_LEVEL = "__level__";
 export const X_COST = "__cost__";
@@ -60,64 +62,14 @@ export const X_AXIS_OPTIONS: { key: ComparatorXKey; label: string }[] = [
   { key: X_COST, label: "Upgrade Cost" },
 ];
 
-const BASE_CHARTS = 5;
-const TIERS = 3;
+// Coprime with 24 → consecutive lines jump ~105° of hue on a 15°-step wheel.
+const CHART_STRIDE = 7;
 
-let paletteCache: { theme: string; colors: string[] } | null = null;
-
-function themeKey(): string {
-  if (typeof document === "undefined") return "ssr";
-  return document.documentElement.classList.contains("dark") ? "dark" : "light";
-}
-
-function resolveChartRgb(i: number): [number, number, number] | null {
-  if (typeof document === "undefined") return null;
-  const probe = document.createElement("span");
-  probe.style.color = `var(--chart-${i})`;
-  probe.style.position = "absolute";
-  probe.style.visibility = "hidden";
-  document.body.appendChild(probe);
-  const raw = getComputedStyle(probe).color;
-  probe.remove();
-  const m = raw.match(
-    /rgba?\(\s*([\d.]+)\s*[, ]\s*([\d.]+)\s*[, ]\s*([\d.]+)/i,
-  );
-  if (!m) return null;
-  return [Number(m[1]), Number(m[2]), Number(m[3])];
-}
-
-function mixRgb(
-  a: [number, number, number],
-  b: [number, number, number],
-  t: number,
-): string {
-  const ch = (i: number) => Math.round(a[i] + (b[i] - a[i]) * t);
-  return `rgb(${ch(0)} ${ch(1)} ${ch(2)})`;
-}
-
-function palette(): string[] {
-  const theme = themeKey();
-  if (paletteCache?.theme === theme) return paletteCache.colors;
-  const colors: string[] = [];
-  for (let tier = 0; tier < TIERS; tier++) {
-    for (let b = 1; b <= BASE_CHARTS; b++) {
-      const rgb = resolveChartRgb(b);
-      if (!rgb) {
-        colors.push(`var(--chart-${b})`);
-        continue;
-      }
-      if (tier === 0) colors.push(`rgb(${rgb[0]} ${rgb[1]} ${rgb[2]})`);
-      else if (tier === 1) colors.push(mixRgb(rgb, [255, 255, 255], 0.38));
-      else colors.push(mixRgb(rgb, [0, 0, 0], 0.28));
-    }
-  }
-  paletteCache = { theme, colors };
-  return colors;
-}
-
-export function chartColorAt(i: number): string {
-  const p = palette();
-  return p[((i % p.length) + p.length) % p.length];
+export function chartColorAt(seriesIndex: number, metricIndex = 0): string {
+  const slot = seriesIndex * MAX_METRICS + metricIndex;
+  const i =
+    (((slot * CHART_STRIDE) % CHART_COLORS) + CHART_COLORS) % CHART_COLORS;
+  return `var(--chart-${i + 1})`;
 }
 
 function headerLabel(h: string): string {
@@ -244,7 +196,11 @@ function getTowerCtx(
   return ctx;
 }
 
-function rowsFor(ctx: TowerCtx, skinName: string, cfg: TableConfig): TableRow[] {
+function rowsFor(
+  ctx: TowerCtx,
+  skinName: string,
+  cfg: TableConfig,
+): TableRow[] {
   return ctx.cache.get(tableCacheKey(skinName, cfg.tableIdx)) ?? cfg.rows;
 }
 
@@ -510,10 +466,15 @@ export function buildComparatorChart(
 
   for (let i = 0; i < seriesDefs.length; i++) {
     const { def, tower, displayName } = seriesDefs[i];
-    const color = chartColorAt(i);
+    const selected = def.metrics.slice(0, MAX_METRICS);
 
     if (!tower) {
-      rows.push({ def, color, scopeItems: [], metricItems: [] });
+      rows.push({
+        def,
+        colors: selected.map((_, mi) => chartColorAt(i, mi)),
+        scopeItems: [],
+        metricItems: [],
+      });
       continue;
     }
 
@@ -522,31 +483,36 @@ export function buildComparatorChart(
     const scope = resolveScope(scopes, def.scopeId);
     const ctx = getTowerCtx(memo, tower, def.skinName, rofInfo, modifier);
 
-    let metrics: string[] = [];
-    let points: StatsChartPoint[] = [];
-    if (ctx && scope) {
-      metrics = metricsForScope(ctx, def.skinName, scope);
-      points = pointsForScope(ctx, def.skinName, scope, def.metric, xKey);
+    const available =
+      ctx && scope ? metricsForScope(ctx, def.skinName, scope) : [];
+    const colors: string[] = [];
+
+    for (let mi = 0; mi < selected.length; mi++) {
+      const metric = selected[mi];
+      const color = chartColorAt(i, mi);
+      colors.push(color);
+      if (!ctx || !scope || !metric) continue;
+      const points = pointsForScope(ctx, def.skinName, scope, metric, xKey);
+      for (const p of points) {
+        yVals.push(p.y);
+        data.push(p);
+      }
+      series.push({
+        key: `${def.id}:${metric}`,
+        label: seriesLabel(displayName, scope, metric),
+        color,
+        value: "y",
+        data: points,
+      });
     }
+
+    if (!colors.length) colors.push(chartColorAt(i, 0));
 
     rows.push({
       def,
-      color,
+      colors,
       scopeItems,
-      metricItems: metrics.map((m) => ({ value: m, label: m })),
-    });
-
-    if (!scope) continue;
-    for (const p of points) {
-      yVals.push(p.y);
-      data.push(p);
-    }
-    series.push({
-      key: def.id,
-      label: seriesLabel(displayName, scope, def.metric),
-      color,
-      value: "y",
-      data: points,
+      metricItems: available.map((m) => ({ value: m, label: m })),
     });
   }
 

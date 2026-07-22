@@ -61,6 +61,67 @@
   --link: oklch(0.8008 0.0899 249.49);
 }
 
+:root,
+.dark {
+  --chart-6: oklch(
+    from var(--chart-4) calc(l - 0.007) calc(c + 0.011) calc(h + 99)
+  );
+  --chart-7: oklch(
+    from var(--chart-4) calc(l - 0.018) calc(c - 0.025) calc(h + 34)
+  );
+  --chart-8: oklch(
+    from var(--chart-1) calc(l + 0.1) calc(c + 0.022) calc(h + 179)
+  );
+  --chart-9: oklch(
+    from var(--chart-5) calc(l - 0.088) calc(c + 0.006) calc(h + 96)
+  );
+  --chart-10: oklch(
+    from var(--chart-1) calc(l + 0.019) calc(c + 0.054) calc(h + 271)
+  );
+  --chart-11: oklch(
+    from var(--chart-3) calc(l - 0.072) calc(c - 0.015) calc(h + 169)
+  );
+  --chart-12: oklch(
+    from var(--chart-3) calc(l + 0.047) calc(c + 0.027) calc(h + 197)
+  );
+  --chart-13: oklch(
+    from var(--chart-1) calc(l - 0.079) calc(c - 0.024) calc(h + 90)
+  );
+  --chart-14: oklch(
+    from var(--chart-3) calc(l + 0.062) calc(c + 0.06) calc(h + 292)
+  );
+  --chart-15: oklch(
+    from var(--chart-1) calc(l - 0.048) calc(c - 0.037) calc(h + 293)
+  );
+  --chart-16: oklch(
+    from var(--chart-1) calc(l - 0.1) calc(c - 0.049) calc(h + 25)
+  );
+  --chart-17: oklch(
+    from var(--chart-4) calc(l - 0.1) calc(c - 0.053) calc(h + 344)
+  );
+  --chart-18: oklch(
+    from var(--chart-2) calc(l - 0.031) calc(c - 0.007) calc(h + 297)
+  );
+  --chart-19: oklch(
+    from var(--chart-4) calc(l + 0.023) calc(c - 0.022) calc(h + 57)
+  );
+  --chart-20: oklch(
+    from var(--chart-2) calc(l - 0.05) calc(c + 0.051) calc(h + 128)
+  );
+  --chart-21: oklch(
+    from var(--chart-1) calc(l - 0.073) calc(c + 0.07) calc(h + 303)
+  );
+  --chart-22: oklch(
+    from var(--chart-4) calc(l + 0.059) calc(c + 0.06) calc(h + 294)
+  );
+  --chart-23: oklch(
+    from var(--chart-4) calc(l + 0.1) calc(c - 0.027) calc(h + 260)
+  );
+  --chart-24: oklch(
+    from var(--chart-4) calc(l + 0.074) calc(c - 0.013) calc(h + 197)
+  );
+}
+
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -89,6 +150,25 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
+  --color-chart-6: var(--chart-6);
+  --color-chart-7: var(--chart-7);
+  --color-chart-8: var(--chart-8);
+  --color-chart-9: var(--chart-9);
+  --color-chart-10: var(--chart-10);
+  --color-chart-11: var(--chart-11);
+  --color-chart-12: var(--chart-12);
+  --color-chart-13: var(--chart-13);
+  --color-chart-14: var(--chart-14);
+  --color-chart-15: var(--chart-15);
+  --color-chart-16: var(--chart-16);
+  --color-chart-17: var(--chart-17);
+  --color-chart-18: var(--chart-18);
+  --color-chart-19: var(--chart-19);
+  --color-chart-20: var(--chart-20);
+  --color-chart-21: var(--chart-21);
+  --color-chart-22: var(--chart-22);
+  --color-chart-23: var(--chart-23);
+  --color-chart-24: var(--chart-24);
 }
 
 .lc-root-container {

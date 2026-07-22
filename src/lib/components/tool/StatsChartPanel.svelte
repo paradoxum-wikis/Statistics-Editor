@@ -20,6 +20,7 @@
     buildComparatorChart,
     listMetrics,
     listScopes,
+    MAX_METRICS,
     MAX_SERIES,
     pickDefaultMetric,
     resolveScope,
@@ -134,7 +135,7 @@
     return hi > lo ? [lo, hi] : [autoMin!, autoMax!];
   });
   const selectionKey = $derived(
-    `${comparatorStore.xKey}|${series.map((s) => `${s.id}:${s.scopeId}:${s.metric}:${s.towerName}`).join("|")}`,
+    `${comparatorStore.xKey}|${series.map((s) => `${s.id}:${s.scopeId}:${s.metrics.join(",")}:${s.towerName}`).join("|")}`,
   );
 
   const pathScopes = $derived(
@@ -160,8 +161,8 @@
     const scopes = listScopes(t, skin);
     const scope = scopeId ? resolveScope(scopes, scopeId) : scopes[0];
     if (!scope) return;
-    const metrics = listMetrics(t, skin, scope, rofInfo, modifier);
-    const metric = pickDefaultMetric(metrics, series[0]?.metric);
+    const available = listMetrics(t, skin, scope, rofInfo, modifier);
+    const metric = pickDefaultMetric(available, series[0]?.metrics[0]);
     if (!metric) return;
     comparatorStore.setSeries([
       ...series,
@@ -170,7 +171,7 @@
         towerName: name,
         skinName: skin,
         scopeId: scope.id,
-        metric,
+        metrics: [metric],
       },
     ]);
     analytics.track("stats_comparator", {
@@ -219,18 +220,34 @@
     const skin = skinFor(def);
     const scope = resolveScope(listScopes(t, skin), v);
     if (!scope) return;
-    const metrics = listMetrics(t, skin, scope, rofInfo, modifier);
+    const available = listMetrics(t, skin, scope, rofInfo, modifier);
+    const kept = def.metrics.filter((m) => available.includes(m));
     updateSeries(def.id, {
       scopeId: v,
-      metric: metrics.includes(def.metric)
-        ? def.metric
-        : pickDefaultMetric(metrics),
+      metrics: kept.length ? kept : [pickDefaultMetric(available)].filter(Boolean),
     });
     analytics.track("stats_comparator", {
       action: "change_scope",
       scope_id: v,
       tower_name: def.towerName,
     });
+  }
+
+  function onMetricsChange(def: ComparatorSeriesDef, next: string[]) {
+    const metrics = next.slice(0, MAX_METRICS);
+    if (!metrics.length) return;
+    updateSeries(def.id, { metrics });
+    analytics.track("stats_comparator", {
+      action: "change_metric",
+      metric: metrics.join(","),
+      tower_name: def.towerName,
+    });
+  }
+
+  function metricLabel(metrics: string[]): string {
+    if (!metrics.length) return "Metrics";
+    if (metrics.length === 1) return metrics[0];
+    return `${metrics.length} stats`;
   }
 </script>
 
@@ -437,10 +454,14 @@
         <div
           class="flex flex-wrap items-center gap-1.5 rounded-[var(--radius)_0] border border-border/80 bg-card/30 px-2 py-1.5"
         >
-          <span
-            class="size-2.5 shrink-0 rounded-full"
-            style="background: {row.color}"
-          ></span>
+          <span class="flex shrink-0 items-center gap-0.5">
+            {#each row.colors as c, ci (ci)}
+              <span
+                class="size-2.5 rounded-full"
+                style="background: {c}"
+              ></span>
+            {/each}
+          </span>
           <span
             class="max-w-28 truncate text-xs font-medium"
             title={row.def.towerName}
@@ -491,26 +512,21 @@
           {/if}
 
           <Select.Root
-            type="single"
+            type="multiple"
             items={row.metricItems}
-            value={row.def.metric}
-            onValueChange={(v) => {
-              if (!v) return;
-              updateSeries(row.def.id, { metric: v });
-              analytics.track("stats_comparator", {
-                action: "change_metric",
-                metric: v,
-                tower_name: row.def.towerName,
-              });
-            }}
+            value={row.def.metrics}
+            onValueChange={(v) => onMetricsChange(row.def, v ?? [])}
           >
-            <Select.Trigger class="select-trigger h-7! max-w-36 text-xs">
-              <span class="truncate">{row.def.metric || "Metric"}</span>
+            <Select.Trigger
+              class="select-trigger h-7! max-w-40 text-xs"
+              title={row.def.metrics.join(", ")}
+            >
+              <span class="truncate">{metricLabel(row.def.metrics)}</span>
               <ChevronDown class="ms-1 size-3 opacity-50" />
             </Select.Trigger>
             <Select.Portal>
               <Select.Content
-                class="select-content max-h-55 min-w-32"
+                class="select-content max-h-55 min-w-36"
                 sideOffset={5}
               >
                 <Select.Viewport class="p-1">
@@ -519,6 +535,8 @@
                       class="select-item"
                       value={option.value}
                       label={option.label}
+                      disabled={row.def.metrics.length >= MAX_METRICS &&
+                        !row.def.metrics.includes(option.value)}
                     >
                       {#snippet children({ selected: isSel })}
                         {option.label}
