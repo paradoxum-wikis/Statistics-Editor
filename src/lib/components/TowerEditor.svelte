@@ -22,8 +22,8 @@
   import { isCustomTower } from "$lib/towerComponents/customTowers";
   import { hasSeDiff, mkCellKey } from "$lib/neowtext/directives";
   import {
+    applyRefSuffixEdit,
     getRofBugVer,
-    syncRefOnlyCellToken,
     stripRefs,
     toDisplayNumber,
   } from "$lib/utils/format";
@@ -152,23 +152,24 @@
     if (!row) return;
 
     const parsedValue = parseEditValue(value);
-    const formulaToken =
-      extraTable?.cellFormulaTokens?.[String(rowIdx)]?.[header];
-    if (typeof formulaToken === "string" && typeof parsedValue !== "boolean") {
-      const appendRef =
-        !settingsStore.clearOnEdit || settingsStore.restoreRefOnClearEdit;
-      const synced = syncRefOnlyCellToken(
-        formulaToken,
+    let stored: string | number | boolean = parsedValue;
+    if (typeof parsedValue !== "boolean") {
+      const applied = applyRefSuffixEdit(
+        extraTable?.cellFormulaTokens?.[String(rowIdx)]?.[header],
+        row[header],
         parsedValue,
         skinData.formulaTokens,
-        appendRef,
+        !settingsStore.clearOnEdit || settingsStore.restoreRefOnClearEdit,
       );
-      if (synced) {
-        extraTable.cellFormulaTokens![String(rowIdx)][header] = synced;
+      if (applied) {
+        extraTable.cellFormulaTokens ??= {};
+        extraTable.cellFormulaTokens[String(rowIdx)] ??= {};
+        extraTable.cellFormulaTokens[String(rowIdx)][header] = applied.formula;
+        stored = applied.head;
       }
     }
 
-    row[header] = parsedValue as string | number;
+    row[header] = stored as string | number;
 
     const level = skinData.upgradeLevelForExtraTableCell(
       extraTableIndex,
@@ -177,8 +178,8 @@
     if (level != null) {
       const upgradeStats = skinData.data?.Upgrades?.[level - 1]?.Stats;
       if (upgradeStats && typeof upgradeStats === "object")
-        upgradeStats[header] = parsedValue;
-      skinData.set(level, header, parsedValue);
+        upgradeStats[header] = stored;
+      skinData.set(level, header, stored);
     } else {
       skinData.refreshDerivedData();
     }

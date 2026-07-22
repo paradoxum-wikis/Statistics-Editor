@@ -25,9 +25,9 @@ import { indexRowsByLevelKeys } from "$lib/neowtext/tableCache";
 import type { TableData } from "$lib/neowtext/parser";
 import { settingsStore } from "$lib/stores/settings.svelte";
 import {
+  applyRefSuffixEdit,
   normalizeColumnKey,
   stripRefs,
-  syncRefOnlyCellToken,
 } from "$lib/utils/format";
 
 type FormulaToken = string; // e.g. "$DPS$", "$DPS2$"
@@ -441,33 +441,36 @@ class SkinData {
 
   set(level: number, attribute: string, newValue: any) {
     const levelKey = String(level);
-    const formulaToken = this.cellFormulaTokens[levelKey]?.[attribute];
-    if (typeof formulaToken === "string") {
-      const appendRef =
-        !settingsStore.clearOnEdit || settingsStore.restoreRefOnClearEdit;
-      const synced = syncRefOnlyCellToken(
-        formulaToken,
+    let value = newValue;
+    if (typeof newValue !== "boolean") {
+      const applied = applyRefSuffixEdit(
+        this.cellFormulaTokens[levelKey]?.[attribute],
+        this.get(level, attribute),
         newValue,
         this.formulaTokens,
-        appendRef,
+        !settingsStore.clearOnEdit || settingsStore.restoreRefOnClearEdit,
       );
-      if (synced) {
-        this.cellFormulaTokens[levelKey][attribute] = synced;
+      if (applied) {
+        this.cellFormulaTokens[levelKey] ??= {};
+        this.cellFormulaTokens[levelKey][attribute] = applied.formula;
         if (this.data.CellFormulaTokens) {
-          this.data.CellFormulaTokens[levelKey][attribute] = synced;
+          this.data.CellFormulaTokens[levelKey] ??= {};
+          this.data.CellFormulaTokens[levelKey][attribute] = applied.formula;
         }
+        value = applied.head;
       }
     }
+
     if (level === 0) {
-      this.defaults.set(attribute, newValue);
+      this.defaults.set(attribute, value);
     } else {
-      this.upgrades[level - 1].set(attribute, newValue);
+      this.upgrades[level - 1].set(attribute, value);
     }
 
     // Sync the edited value into `rawRows` anj recompute any derived columns
     // such as DPS, then rebuild Levels so dependent cells update
     if (this.rawRows?.[level] && typeof this.rawRows[level] === "object") {
-      this.rawRows[level][attribute] = newValue;
+      this.rawRows[level][attribute] = value;
     }
     this.refreshDerivedData();
   }

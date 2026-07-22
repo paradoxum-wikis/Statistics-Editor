@@ -3,7 +3,11 @@
   import MoneyIcon from "$lib/assets/Income.png?enhanced";
   import { settingsStore } from "$lib/stores/settings.svelte";
   import { formatNumber } from "$lib/utils/format";
-  import { formatDelta, type DeltaInfo } from "$lib/towerTable";
+  import {
+    formatDelta,
+    type DeltaInfo,
+    type RefTokenRegistry,
+  } from "$lib/towerTable";
   import CellRefs from "./CellRefs.svelte";
 
   let {
@@ -16,6 +20,8 @@
     tokens = {},
     deltaInfo,
     getRefNum,
+    resolveContent,
+    refTokenRegistry,
     commit,
   }: {
     value: string | number | null | undefined;
@@ -27,6 +33,8 @@
     tokens?: Record<string, string>;
     deltaInfo: DeltaInfo;
     getRefNum: (content: string, name?: string | null) => number;
+    resolveContent?: (content: string) => string;
+    refTokenRegistry?: RefTokenRegistry;
     commit: (value: string) => void;
   } = $props();
 
@@ -42,6 +50,17 @@
 
   const focusOnMount: Attachment<HTMLElement> = (node) => node.focus();
 </script>
+
+{#snippet cellRefs(readOnly: boolean)}
+  <CellRefs
+    {value}
+    {readOnly}
+    {tokens}
+    {getRefNum}
+    {resolveContent}
+    {refTokenRegistry}
+  />
+{/snippet}
 
 {#snippet body()}
   {#if isMoney}
@@ -92,16 +111,16 @@
           editing = true;
         }}
       >
-        <CellRefs {value} readOnly={true} {tokens} {getRefNum} />
+        {@render cellRefs(true)}
       </button>
     {/if}
   {:else if isMoney}
     <span class="money-value">
-      <CellRefs {value} readOnly={readOnlyValue} {tokens} {getRefNum} />
+      {@render cellRefs(readOnlyValue)}
     </span>
   {:else}
     <span class="cell-multiline">
-      <CellRefs {value} readOnly={readOnlyValue} {tokens} {getRefNum} />
+      {@render cellRefs(readOnlyValue)}
     </span>
   {/if}
 

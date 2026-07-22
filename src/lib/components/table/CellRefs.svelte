@@ -1,6 +1,7 @@
 <script lang="ts">
   import { renderCellHtml } from "$lib/neowtext/render";
   import { stripRefs } from "$lib/utils/format";
+  import type { RefTokenRegistry } from "$lib/towerTable";
   import Tip from "../smol/Tip.svelte";
   import RenderedHtml from "./RenderedHtml.svelte";
 
@@ -13,16 +14,23 @@
     readOnly,
     tokens = {},
     getRefNum,
+    resolveContent,
+    refTokenRegistry,
   }: {
     value: string | number | null | undefined;
     readOnly: boolean;
     tokens?: Record<string, string>;
     getRefNum: (content: string, name?: string | null) => number;
+    resolveContent?: (content: string) => string;
+    refTokenRegistry?: RefTokenRegistry;
   } = $props();
 
   function refMeta(
     tok: string,
   ): { content: string; name: string | null } | null {
+    const grouped = refTokenRegistry?.byToken.get(tok);
+    if (grouped) return { content: grouped.content, name: grouped.name };
+
     const def = tokens[tok];
     if (typeof def !== "string") return null;
     if (!/<ref\b/i.test(def) || stripRefs(def).trim()) return null;
@@ -80,10 +88,12 @@
       <RenderedHtml html={renderCellHtml(part.text, readOnly)} />
     {/if}
   {:else}
-    {@const n = getRefNum(part.content, part.name)}
+    {@const body = part.content.trim()}
+    {@const tip = resolveContent?.(body) ?? body}
+    {@const n = getRefNum(tip, part.name)}
     <Tip class="max-w-72!" sideOffset={4}>
       {#snippet content()}
-        <RenderedHtml html={renderCellHtml(part.content, true)} />
+        <RenderedHtml html={renderCellHtml(tip, true)} />
       {/snippet}
       {#snippet children({ props })}
         <sup class="ref-sup" {...props}>[{n}]</sup>

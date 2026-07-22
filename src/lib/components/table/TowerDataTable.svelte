@@ -8,6 +8,7 @@
     getDeltaForCell,
     getEditableCellRawValue,
     isCellEditable,
+    resolveRefContent,
     type RefTokenRegistry,
     type TableConfig,
     type TableRow,
@@ -53,6 +54,11 @@
       string
     >,
   );
+
+  function resolveContentFor(rowIdx: number, row: TableRow) {
+    return (content: string) =>
+      resolveRefContent(content, config, rowIdx, row, globalModifier);
+  }
 </script>
 
 <div
@@ -71,6 +77,8 @@
               readOnly={true}
               tokens={fTokens}
               {getRefNum}
+              resolveContent={resolveContentFor(0, displayRows[0] ?? {})}
+              {refTokenRegistry}
             />
           </th>
         </tr>
@@ -88,6 +96,8 @@
               readOnly={true}
               tokens={fTokens}
               {getRefNum}
+              resolveContent={resolveContentFor(0, displayRows[0] ?? {})}
+              {refTokenRegistry}
             />
           </th>
         {/each}
@@ -95,6 +105,7 @@
     </thead>
     <tbody class="table-body">
       {#each displayRows as row, rowIdx (rowIdx)}
+        {@const resolveContent = resolveContentFor(rowIdx, row)}
         <tr class="table-row">
           {#each config.headers as header, hIdx (`${hIdx}:${header}`)}
             {#if header === "Level"}
@@ -142,6 +153,8 @@
                   tokens={fTokens}
                   {deltaInfo}
                   {getRefNum}
+                  {resolveContent}
+                  {refTokenRegistry}
                   commit={(value) => commit(config, rowIdx, header, value)}
                 />
               </td>

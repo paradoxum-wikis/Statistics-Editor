@@ -31,17 +31,17 @@ function startsWithRef(rest: string, tokens: Record<string, string>): boolean {
 }
 
 /**
- * leading number + everything from the first ref onward (ref + any tail).
+ * Leading value (number or N/A) + ref suffix ($REF$ or <ref>).
  */
 function parseEditableRefSuffix(
   value: string,
   tokens: Record<string, string>,
 ): { numeric: string; rest: string } | null {
   const s = value.trim();
-  const numMatch = s.match(/^(-?[\d.,]+)/);
-  if (!numMatch) return null;
-  const numeric = numMatch[1];
-  const rest = s.slice(numeric.length);
+  const headMatch = s.match(/^(N\/A|-?[\d.,]+)/i);
+  if (!headMatch) return null;
+  const numeric = headMatch[1];
+  const rest = s.slice(headMatch[0].length);
   if (!rest || !startsWithRef(rest, tokens)) return null;
   return { numeric, rest };
 }
@@ -52,6 +52,28 @@ export function isEditableRefSuffixCell(
 ): boolean {
   if (typeof value !== "string") return false;
   return parseEditableRefSuffix(value, tokens) !== null;
+}
+
+function refSuffixSource(
+  formulaToken: unknown,
+  previous: unknown,
+  newValue: unknown,
+  tokens: Record<string, string>,
+): string | null {
+  for (const v of [formulaToken, previous, newValue]) {
+    if (typeof v === "string" && isEditableRefSuffixCell(v, tokens)) return v;
+  }
+  return null;
+}
+
+function refSuffixHead(
+  value: string,
+  tokens: Record<string, string>,
+): string | number | null {
+  const parsed = parseEditableRefSuffix(value, tokens);
+  if (!parsed) return null;
+  const n = parseNumeric(parsed.numeric);
+  return Number.isFinite(n) ? n : parsed.numeric;
 }
 
 export function stripRefOnlyVarSuffix(
@@ -65,7 +87,8 @@ export function stripRefOnlyVarSuffix(
   const parsed = parseEditableRefSuffix(value, tokens);
   if (!parsed) return value;
 
-  // see CellRefs handling mid-string refs
+  // drop only the leading pure-ref suffix
+  // leave later text and refs for CellRefs
   let after = parsed.rest;
   after = after.replace(/^(?:<ref\b[^>]*>[\s\S]*?<\/ref>|<ref\b[^>]*\/>)/i, "");
   after = after.replace(/^\$[A-Z0-9_-]+\$/i, (tok) =>
@@ -95,12 +118,34 @@ export function syncRefOnlyCellToken(
   const fromInput = parseEditableRefSuffix(s, tokens);
   if (fromInput) return `${fromInput.numeric}${fromInput.rest}`;
 
+  if (/^n\/a$/i.test(s)) {
+    return appendRef ? `N/A${parsed.rest}` : "N/A";
+  }
+
   if (/^-?[\d.,]+$/.test(s)) {
     return appendRef ? `${s}${parsed.rest}` : s;
   }
 
-  const n = s.match(/^-?[\d.,]+/)?.[0] ?? s;
+  const n = s.match(/^(N\/A|-?[\d.,]+)/i)?.[0] ?? s;
   return appendRef ? `${n}${parsed.rest}` : n;
+}
+
+/**
+ * formula = full token for cft
+ * head = value stored on the row
+ */
+export function applyRefSuffixEdit(
+  formulaToken: unknown,
+  previous: unknown,
+  newValue: string | number,
+  tokens: Record<string, string>,
+  appendRef: boolean,
+): { formula: string; head: string | number } | null {
+  const source = refSuffixSource(formulaToken, previous, newValue, tokens);
+  if (!source) return null;
+  const formula = syncRefOnlyCellToken(source, newValue, tokens, appendRef);
+  if (!formula) return null;
+  return { formula, head: refSuffixHead(formula, tokens) ?? newValue };
 }
 
 export function columnKeysEqual(a: string, b: string): boolean {

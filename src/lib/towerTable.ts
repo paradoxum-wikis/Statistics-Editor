@@ -346,36 +346,42 @@ export function cellDisplaySource(
   tokens: Record<string, string>,
 ): string | number | null | undefined {
   if (value === undefined || value === null) return value;
-  if (typeof value === "string" && /<ref\b|\$[A-Z0-9_-]+\$/i.test(value))
-    return value;
 
+  // row holds head only with formula keeping mid-string $VAR$ and <ref> for CellRefs
   if (typeof formula === "string" && /<ref\b|\$[A-Z0-9_-]+\$/i.test(formula)) {
     const n =
       typeof value === "number"
         ? formatNumber(value)
-        : typeof value === "string" && /^-?[\d.,]+$/.test(value.trim())
+        : typeof value === "string" && /^(N\/A|-?[\d.,]+)$/i.test(value.trim())
           ? value.trim()
           : null;
-    if (n == null) return value as string | number;
-    if (/^-?[\d.,]+/.test(formula)) return formula.replace(/^-?[\d.,]+/, n);
+    if (n == null) return formula;
+    if (/^(N\/A|-?[\d.,]+)/i.test(formula))
+      return formula.replace(/^(N\/A|-?[\d.,]+)/i, n);
 
-    // keep unit suffixes
     let used = false;
-    return formula.replace(/\$[A-Z0-9_-]+\$/gi, (tok) => {
-      const def = tokens[tok];
-      if (
-        typeof def === "string" &&
-        /<ref\b/i.test(def) &&
-        !stripRefs(def).trim()
-      )
-        return tok;
-      if (!used) {
-        used = true;
-        return n;
-      }
-      return "";
-    });
+    return formula.replace(
+      /<ref\b[^>]*>[\s\S]*?<\/ref>|<ref\b[^>]*\/>|\$[A-Z0-9_-]+\$/gi,
+      (m) => {
+        if (m[0] === "<") return m;
+        const def = tokens[m];
+        if (
+          typeof def === "string" &&
+          /<ref\b/i.test(def) &&
+          !stripRefs(def).trim()
+        )
+          return m;
+        if (!used) {
+          used = true;
+          return n;
+        }
+        return "";
+      },
+    );
   }
+
+  if (typeof value === "string" && /<ref\b|\$[A-Z0-9_-]+\$/i.test(value))
+    return value;
 
   return value as string | number;
 }
@@ -735,14 +741,12 @@ export function getRefsFromSources(
   tokens?: Record<string, string>,
   refTokenRegistry?: RefTokenRegistry,
 ): RefEntry[] {
-  const entries = extractRefEntries(
+  return extractRefEntries(
     s1,
     s2,
     tokens ?? formulaTokens(config),
     refTokenRegistry,
-  );
-  return entries.map((entry) => ({
-    ...entry,
+  ).map((entry) => ({
     content: resolveRefContent(
       entry.content,
       config,
@@ -750,33 +754,12 @@ export function getRefsFromSources(
       displayRow,
       globalModifier,
     ),
+    name: entry.name,
   }));
 }
 
-export function getCellRefs(
-  header: string,
-  sourceVal: unknown,
-  config: TableConfig,
-  rowIdx: number,
-  displayRow: TableRow,
-  globalModifier: GlobalModifier,
-  refTokenRegistry?: RefTokenRegistry,
-): RefEntry[] {
-  const cellTok = getCellFormulaToken(config, rowIdx, header);
-  return getRefsFromSources(
-    typeof sourceVal === "string" ? sourceVal : "",
-    cellTok ?? "",
-    config,
-    rowIdx,
-    displayRow,
-    globalModifier,
-    formulaTokens(config),
-    refTokenRegistry,
-  );
-}
-
 export function refEntryKey(content: string, name?: string | null): string {
-  return name ? `n:${name}` : `c:${content}`;
+  return name ? `n:${name}` : `c:${content.trim()}`;
 }
 
 export function getCompareValueForKey(
