@@ -5,6 +5,6 @@
   let { open = $bindable(false) } = $props();
 </script>
 
-<Modal bind:open class="max-h-[85dvh] overflow-y-auto sm:max-w-2xl">
+<Modal bind:open class="sm:max-w-2xl">
   <StatsChartPanel />
 </Modal>

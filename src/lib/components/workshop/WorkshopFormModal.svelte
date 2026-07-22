@@ -163,7 +163,6 @@
   description={mode === "edit"
     ? "Update card metadata, or point it at a newer Share Link."
     : "Hopefully your work is at least serviceable..."}
-  class="max-h-[90vh] overflow-y-auto"
 >
   {#if !authStore.user}
     <p class="text-sm text-muted-foreground">
