@@ -229,6 +229,7 @@
     }
     await towerStore.discardChanges();
     towerStore.refresh();
+    toast.success("Changes discarded.");
   }
 
   function handleClearDiff() {
@@ -239,6 +240,7 @@
     }
     towerStore.clearDiff();
     towerStore.refresh();
+    toast.success("Difference cleared.");
   }
 
   function getCompareValueForKey(key: string): string | number | undefined {
@@ -259,7 +261,18 @@
   }
 
   function handleSave() {
+    const fromShare = !!towerStore.sharePreviewId;
     towerStore.save(collectChangedBaseline());
+    toast.success(fromShare ? "Applied to profile!" : "Changes saved!");
+  }
+
+  async function handleResetOrDelete() {
+    if (towerStore.isCustomSelected()) {
+      if (await towerStore.confirmDeleteTower())
+        toast.success("Tower deleted.");
+    } else if (await towerStore.reset()) {
+      toast.success("Tower reset.");
+    }
   }
 
   function resetShareState() {
@@ -352,12 +365,13 @@
           tower_name: tower.name,
           success: true,
         });
+        toast.success("Fetched latest from the Wiki.");
       } else {
         analytics.track("wiki_fetch", {
           tower_name: tower.name,
           success: false,
         });
-        alert("Failed to fetch wikitext from the Wiki.");
+        toast.error("Failed to fetch Neowtext from the Wiki.");
       }
     } catch (e) {
       console.error(e);
@@ -365,7 +379,7 @@
         tower_name: tower.name,
         success: false,
       });
-      alert("Error fetching from Wiki.");
+      toast.error("Error fetching from Wiki.");
     } finally {
       isFetching = false;
     }
@@ -656,10 +670,7 @@
             <Popover.Close class="btn btn-outline">Cancel</Popover.Close>
             <Popover.Close
               class="btn btn-destructive-fill text-white"
-              onclick={() =>
-                towerStore.isCustomSelected()
-                  ? void towerStore.confirmDeleteTower()
-                  : void towerStore.reset()}
+              onclick={() => void handleResetOrDelete()}
             >
               Confirm
             </Popover.Close>

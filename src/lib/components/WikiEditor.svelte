@@ -21,6 +21,7 @@
   import { noFetchTowers } from "$lib/services/fetchTowerWiki";
   import { isCustomTower } from "$lib/towerComponents/customTowers";
   import { analytics } from "$lib/services/analytics";
+  import { toast } from "$lib/toast";
 
   const syncFromStoreAnnotation = Annotation.define<boolean>();
   const editorTheme = EditorView.theme({
@@ -176,6 +177,7 @@
     await towerStore.discardChanges();
     errorMessage = null;
     setEditorDoc(towerStore.effectiveWikitext);
+    toast.success("Changes discarded.");
   }
 
   function saveOverride() {
@@ -193,11 +195,21 @@
       );
       towerStore.isDirty = false;
       void towerStore.forceReload();
+      toast.success("Override saved!");
     } catch (err) {
       console.error("[WikiEditor] saveOverride error:", err);
       errorMessage = err instanceof Error ? err.message : String(err);
+      toast.error(errorMessage);
     } finally {
       saving = false;
+    }
+  }
+
+  async function handleResetOrDelete() {
+    if (towerStore.isCustomSelected()) {
+      if (await towerStore.confirmDeleteTower()) toast.success("Tower deleted.");
+    } else if (await towerStore.reset()) {
+      toast.success("Tower reset.");
     }
   }
 
@@ -219,12 +231,13 @@
           tower_name: towerName,
           success: true,
         });
+        toast.success("Fetched latest from the Wiki.");
       } else {
         analytics.track("wiki_fetch", {
           tower_name: towerName,
           success: false,
         });
-        alert("Failed to fetch wikitext from the Wiki.");
+        toast.error("Failed to fetch Neowtext from the Wiki.");
       }
     } catch (e) {
       console.error(e);
@@ -232,7 +245,7 @@
         tower_name: towerName,
         success: false,
       });
-      alert("Error fetching from Wiki.");
+      toast.error("Error fetching from Wiki.");
     } finally {
       isFetching = false;
     }
@@ -339,10 +352,7 @@
           <Popover.Close class="btn btn-outline">Cancel</Popover.Close>
           <Popover.Close
             class="btn btn-destructive-fill text-white"
-            onclick={() =>
-              towerStore.isCustomSelected()
-                ? void towerStore.confirmDeleteTower()
-                : void towerStore.reset()}
+            onclick={() => void handleResetOrDelete()}
           >
             Confirm
           </Popover.Close>
