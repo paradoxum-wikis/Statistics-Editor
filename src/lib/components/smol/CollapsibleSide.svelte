@@ -45,8 +45,9 @@
       {/if}
     </span>
     <ChevronDown
-      class="h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform duration-150 ease-in-out"
-      style="transform: rotate({open ? '180deg' : '0deg'})"
+      class="h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform duration-150 ease-in-out {open
+        ? 'rotate-180'
+        : ''}"
     />
   </Col.Trigger>
   <Col.Content forceMount>
