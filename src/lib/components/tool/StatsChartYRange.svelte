@@ -107,7 +107,7 @@
       {#each thumbItems as { index } (index)}
         <Slider.Thumb
           {index}
-          class="block size-3.5 cursor-pointer rounded-full border border-border bg-background shadow-sm outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring data-[active]:scale-95"
+          class="block size-3.5 cursor-pointer rounded-full border border-border bg-background shadow-sm outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring data-active:scale-95"
         />
       {/each}
     {/snippet}

@@ -4,7 +4,6 @@
   import IconBtn from "../smol/IconBtn.svelte";
   import StatsChartPanel from "./StatsChartPanel.svelte";
   import { analytics } from "$lib/services/analytics";
-  import { towerStore } from "$lib/stores/tower.svelte";
 
   let {
     variant = "icon",
@@ -15,13 +14,11 @@
     open?: boolean;
     onOpen?: () => void;
   } = $props();
-
-  const hasTower = $derived(!!towerStore.selectedData);
 </script>
 
 {#if variant === "menu"}
   <button
-    class="dropdown-item w-full justify-start! {hasTower ? '' : 'opacity-60'}"
+    class="dropdown-item w-full justify-start!"
     onclick={() => {
       analytics.track("stats_comparator", { action: "open", source: "mobile" });
       onOpen?.();
