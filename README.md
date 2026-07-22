@@ -21,3 +21,7 @@ Local server:
 ```sh
 bun run dev
 ```
+
+## License
+
+[MIT](./LICENSE)
