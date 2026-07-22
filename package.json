@@ -39,6 +39,7 @@
     "@bhsd/codemirror-wikitext": "^0.10.0",
     "@lucide/svelte": "^1.24.0",
     "codemirror": "^6.0.2",
+    "layerchart": "^2.0.2",
     "mediawiki-expr": "^0.0.2",
     "mediawiki-file-url": "^0.4.0"
   }
