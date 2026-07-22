@@ -184,9 +184,14 @@
       <span
         class="pointer-events-auto relative z-7 flex shrink-0 items-center gap-1.5 leading-none"
       >
-        <Tip content="Upvotes">
+        <Tip content={listing.voted ? "You upvoted this" : "Upvotes"}>
           {#snippet children({ props })}
-            <span {...props} class="inline-flex items-center gap-1">
+            <span
+              {...props}
+              class="inline-flex items-center gap-1 {listing.voted
+                ? 'text-sky-600 dark:text-sky-400'
+                : ''}"
+            >
               <ThumbsUp size={12} class="shrink-0" />
               {listing.votes.toLocaleString()}
             </span>

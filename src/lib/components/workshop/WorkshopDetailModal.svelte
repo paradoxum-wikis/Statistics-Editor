@@ -382,7 +382,9 @@
                       ? "Remove upvote"
                       : "Upvote"
                     : "Sign in to upvote"}
-                  class="btn btn-sm inline-flex items-center gap-1.5 data-[state=off]:btn-outline data-[state=on]:btn-primary"
+                  class="btn btn-sm btn-outline inline-flex items-center gap-1.5 {item.voted
+                    ? 'border-sky-500/50! text-sky-600! dark:text-sky-400!'
+                    : ''}"
                   onPressedChange={() => void onVote()}
                 >
                   <ThumbsUp size={14} />
