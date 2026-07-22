@@ -224,7 +224,9 @@
     const kept = def.metrics.filter((m) => available.includes(m));
     updateSeries(def.id, {
       scopeId: v,
-      metrics: kept.length ? kept : [pickDefaultMetric(available)].filter(Boolean),
+      metrics: kept.length
+        ? kept
+        : [pickDefaultMetric(available)].filter(Boolean),
     });
     analytics.track("stats_comparator", {
       action: "change_scope",
@@ -444,6 +446,11 @@
         >
           Add Current Tower
         </button>
+      {:else}
+        <p class="max-w-67 text-center text-xs text-muted-foreground">
+          Pretty empty, isn't it?<br />Feel free to add a tower from the list,
+          or come back later when you fancy this tool.
+        </p>
       {/if}
     </div>
   {/if}
@@ -456,9 +463,7 @@
         >
           <span class="flex shrink-0 items-center gap-0.5">
             {#each row.colors as c, ci (ci)}
-              <span
-                class="size-2.5 rounded-full"
-                style="background: {c}"
+              <span class="size-2.5 rounded-full" style="background: {c}"
               ></span>
             {/each}
           </span>
