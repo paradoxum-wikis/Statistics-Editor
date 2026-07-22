@@ -4,6 +4,7 @@
   import Tip from "./smol/Tip.svelte";
   import Veperator from "./smol/Veperator.svelte";
   import GlobalModifier from "./tool/GlobalModifier.svelte";
+  import StatsChart from "./tool/StatsChart.svelte";
   import CreateTower from "./tool/CreateTower.svelte";
   import { settingsStore, BOOLEAN_SETTINGS } from "$lib/stores/settings.svelte";
   import { towerStore } from "$lib/stores/tower.svelte";
@@ -112,6 +113,7 @@
     <Veperator />
 
     <GlobalModifier variant="icon" />
+    <StatsChart variant="icon" />
     <CreateTower onCreated={onTowerCreated} />
   </div>
 

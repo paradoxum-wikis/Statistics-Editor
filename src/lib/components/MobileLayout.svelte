@@ -17,6 +17,8 @@
   import SettingsModal from "./SettingsModal.svelte";
   import GlobalModifier from "./tool/GlobalModifier.svelte";
   import GlobalModifierModal from "./tool/GlobalModifierModal.svelte";
+  import StatsChart from "./tool/StatsChart.svelte";
+  import StatsChartModal from "./tool/StatsChartModal.svelte";
   import CreateTower from "./tool/CreateTower.svelte";
 
   import { DropdownMenu, Popover } from "bits-ui";
@@ -74,6 +76,7 @@
 
   let toolsOpen = $state(false);
   let modifierOpen = $state(false);
+  let chartOpen = $state(false);
 
   const isNotFound = $derived(page.status >= 400 || towerStore.missingTower);
 
@@ -518,6 +521,14 @@
             }}
           />
 
+          <StatsChart
+            variant="menu"
+            onOpen={() => {
+              toolsOpen = false;
+              chartOpen = true;
+            }}
+          />
+
           <CreateTower
             variant="menu"
             onCreated={async (name) => {
@@ -533,6 +544,7 @@
 
 <SettingsModal bind:open={settingsOpen} />
 <GlobalModifierModal bind:open={modifierOpen} />
+<StatsChartModal bind:open={chartOpen} />
 
 {#snippet discardBody()}
   {#if pendingDiscardAction}

@@ -91,6 +91,20 @@
   --color-chart-5: var(--chart-5);
 }
 
+.lc-root-container {
+  --color-primary: var(--primary);
+  --color-surface-100: var(--card);
+  --color-surface-200: var(--muted);
+  --color-surface-300: var(--card);
+  --color-surface-content: var(--card-foreground);
+}
+
+.lc-tooltip-container {
+  background: var(--secondary);
+  border-radius: var(--radius) 0;
+  padding: 0.75rem;
+}
+
 @layer base {
   * {
     border-color: var(--border);
@@ -454,7 +468,7 @@ h4,
 }
 
 .select-content {
-  z-index: 27;
+  z-index: 57;
   overflow: hidden;
   border-radius: var(--radius) 0;
   border: 1px solid var(--border);
