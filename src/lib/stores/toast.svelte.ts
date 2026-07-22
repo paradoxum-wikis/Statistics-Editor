@@ -7,25 +7,19 @@ export type ToastItem = {
 };
 
 const MAX_TOASTS = 4;
-const DEFAULT_DURATION = 3000;
+const DURATION = 3777;
 
 class ToastStore {
   items = $state<ToastItem[]>([]);
   private nextId = 0;
   private timers = new Map<number, ReturnType<typeof setTimeout>>();
 
-  push(
-    message: string,
-    color: ToastColor = "info",
-    duration = DEFAULT_DURATION,
-  ) {
+  push(message: string, color: ToastColor = "info") {
     const id = ++this.nextId;
     this.items = [...this.items, { id, message, color }].slice(-MAX_TOASTS);
 
-    if (duration > 0) {
-      const timer = setTimeout(() => this.dismiss(id), duration);
-      this.timers.set(id, timer);
-    }
+    const timer = setTimeout(() => this.dismiss(id), DURATION);
+    this.timers.set(id, timer);
 
     return id;
   }
