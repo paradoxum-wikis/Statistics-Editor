@@ -205,12 +205,22 @@
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.125rem;
-    column-rule: 1px solid var(--border);
-  }
+    /* remove when firefox adds support for gap decors */
+    background: linear-gradient(var(--border), var(--border)) 50% / 1px 100%
+      no-repeat;
 
-  @media (min-width: 768px) {
-    .picker-grid {
+    @media (min-width: 768px) {
       grid-template-columns: repeat(3, minmax(0, 1fr));
+      background:
+        linear-gradient(var(--border), var(--border)) calc(100% / 3) / 1px 100%
+          no-repeat,
+        linear-gradient(var(--border), var(--border)) calc(200% / 3) / 1px 100%
+          no-repeat;
+    }
+
+    @supports (row-rule: 7px solid) {
+      background: none;
+      column-rule: 1px solid var(--border);
     }
   }
 
