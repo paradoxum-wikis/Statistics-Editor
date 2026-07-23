@@ -85,7 +85,7 @@
     onclick={() => onOpen?.(listing)}
   ></button>
 
-  <div class="pointer-events-none aspect-video w-full bg-muted">
+  <div class="pointer-events-none relative aspect-video w-full bg-muted">
     {#if imageUrl}
       <img
         src={imageUrl}
@@ -99,6 +99,20 @@
         alt=""
         class="h-full w-full object-cover"
       />
+    {/if}
+    {#if listing.tags.length}
+      <div
+        class="absolute top-2 right-2 flex max-w-[calc(100%-1rem)] flex-wrap justify-end gap-1"
+      >
+        {#each listing.tags as tag (tag)}
+          <span
+            class="rounded-full border px-2 py-0.5 text-xs capitalize backdrop-blur-xs {tag ===
+            WORKSHOP_TAG_FEATURED
+              ? 'border-amber-500/50 bg-amber-100/70 font-medium text-amber-900 dark:bg-amber-950/70 dark:text-amber-100'
+              : 'border-border bg-card/70 text-muted-foreground'}">{tag}</span
+          >
+        {/each}
+      </div>
     {/if}
   </div>
 
@@ -146,19 +160,6 @@
       <p class="line-clamp-3 text-sm text-muted-foreground">
         {listing.description}
       </p>
-    {/if}
-
-    {#if listing.tags.length}
-      <div class="flex flex-wrap gap-1">
-        {#each listing.tags as tag (tag)}
-          <span
-            class="rounded-full border px-2 py-0.5 text-xs capitalize {tag ===
-            WORKSHOP_TAG_FEATURED
-              ? 'border-amber-500/50 bg-amber-500/15 font-medium text-amber-800 dark:text-amber-200'
-              : 'border-border text-muted-foreground'}">{tag}</span
-          >
-        {/each}
-      </div>
     {/if}
 
     <div
