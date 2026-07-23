@@ -38,7 +38,7 @@
   let items = $state<WorkshopListing[]>([]);
   let total = $state(0);
   let page = $state(1);
-  let pageSize = $state(24);
+  let pageSize = $state(20);
   let loading = $state(true);
   let error = $state<string | null>(null);
 
