@@ -355,7 +355,7 @@ export function cellDisplaySource(
         : typeof value === "string" && /^(N\/A|-?[\d.,]+)$/i.test(value.trim())
           ? value.trim()
           : null;
-    if (n == null) return formula;
+    if (n == null) return value as string | number;
     if (/^(N\/A|-?[\d.,]+)/i.test(formula))
       return formula.replace(/^(N\/A|-?[\d.,]+)/i, n);
 

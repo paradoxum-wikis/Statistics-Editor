@@ -575,7 +575,9 @@ export function resolveToken(
     }
 
     const result = evaluateFormula(val, context);
-    return Number.isNaN(result) ? undefined : result;
+    // fragment var expansion
+    if (!Number.isNaN(result)) return result;
+    return val;
   }
 
   return undefined;
