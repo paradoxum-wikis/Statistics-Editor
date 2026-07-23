@@ -1,4 +1,9 @@
-import { parseNumeric, stripRefs, toNumericValue } from "$lib/utils/format";
+import {
+  normalizeColumnKey,
+  parseNumeric,
+  stripRefs,
+  toNumericValue,
+} from "$lib/utils/format";
 import {
   buildActiveSkinTables,
   buildDisplayRowsCache,
@@ -73,7 +78,7 @@ export function chartColorAt(seriesIndex: number, metricIndex = 0): string {
 }
 
 function headerLabel(h: string): string {
-  return stripRefs(h).trim();
+  return normalizeColumnKey(h);
 }
 
 function extractCostArray(
@@ -225,7 +230,7 @@ export function listScopes(tower: Tower, skinName: string): ComparatorScope[] {
         {
           kind: "linear" as const,
           id: "linear",
-          label: skin.tableName || "Master",
+          label: normalizeColumnKey(skin.tableName) || "Master",
         },
       ];
 
@@ -236,7 +241,7 @@ export function listScopes(tower: Tower, skinName: string): ComparatorScope[] {
       kind: "table",
       id: `table:${i + 1}`,
       tableIdx: i + 1,
-      label: ext.name || `Table ${i + 1}`,
+      label: normalizeColumnKey(ext.name) || `Table ${i + 1}`,
     });
   }
   return scopes;
