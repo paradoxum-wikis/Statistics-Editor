@@ -39,6 +39,7 @@ export type WorkshopListParams = {
   sort?: "new" | "views" | "votes";
   page?: number;
   mine?: boolean;
+  spotlight?: boolean;
 };
 
 export type WorkshopWriteInput = {
@@ -76,13 +77,17 @@ function json(method: string, body: unknown): RequestInit {
 
 export async function listWorkshop(params: WorkshopListParams = {}) {
   const qs = new URLSearchParams();
-  if (params.q?.trim()) qs.set("q", params.q.trim());
-  if (params.tags) for (const t of params.tags) qs.append("tag", t);
-  if (params.sort === "views" || params.sort === "votes") {
-    qs.set("sort", params.sort);
+  if (params.spotlight) {
+    qs.set("spotlight", "1");
+  } else {
+    if (params.q?.trim()) qs.set("q", params.q.trim());
+    if (params.tags) for (const t of params.tags) qs.append("tag", t);
+    if (params.sort === "views" || params.sort === "votes") {
+      qs.set("sort", params.sort);
+    }
+    if (params.page && params.page > 1) qs.set("page", String(params.page));
+    if (params.mine) qs.set("mine", "1");
   }
-  if (params.page && params.page > 1) qs.set("page", String(params.page));
-  if (params.mine) qs.set("mine", "1");
   const q = qs.toString();
   return api<{
     items: WorkshopListing[];

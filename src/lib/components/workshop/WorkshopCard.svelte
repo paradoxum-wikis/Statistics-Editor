@@ -18,11 +18,13 @@
     onOpen,
     onEdit,
     onUnpublish,
+    compact = false,
   }: {
     listing: WorkshopListing;
     onOpen?: (listing: WorkshopListing) => void;
     onEdit?: (listing: WorkshopListing) => void;
     onUnpublish?: (listing: WorkshopListing) => void;
+    compact?: boolean;
   } = $props();
 
   const featured = $derived(listing.tags.includes(WORKSHOP_TAG_FEATURED));
@@ -74,7 +76,9 @@
 </script>
 
 <article
-  class="relative flex flex-col gap-2 overflow-hidden rounded-[var(--radius)_0] border bg-card transition-colors duration-250 {featured
+  class="relative flex overflow-hidden rounded-[var(--radius)_0] border bg-card transition-colors duration-250 {compact
+    ? 'flex-row gap-0'
+    : 'flex-col gap-2'} {featured
     ? 'border-amber-500/50 bg-amber-500/4 hover:bg-amber-500/8'
     : 'border-border hover:bg-muted/40'}"
 >
@@ -85,22 +89,26 @@
     onclick={() => onOpen?.(listing)}
   ></button>
 
-  <div class="pointer-events-none relative aspect-video w-full bg-muted">
+  <div
+    class="pointer-events-none relative shrink-0 bg-muted {compact
+      ? 'w-[38%] min-h-24 self-stretch sm:w-[34%]'
+      : 'aspect-video w-full'}"
+  >
     {#if imageUrl}
       <img
         src={imageUrl}
         alt=""
-        class="h-full w-full object-cover"
+        class="h-full w-full object-cover {compact ? 'absolute inset-0' : ''}"
         loading="lazy"
       />
     {:else}
       <enhanced:img
         src="$lib/assets/PlaceholderWide.png"
         alt=""
-        class="h-full w-full object-cover"
+        class="h-full w-full object-cover {compact ? 'absolute inset-0' : ''}"
       />
     {/if}
-    {#if listing.tags.length}
+    {#if !compact && listing.tags.length}
       <div
         class="absolute top-2 right-2 flex max-w-[calc(100%-1rem)] flex-wrap justify-end gap-1"
       >
@@ -116,11 +124,21 @@
     {/if}
   </div>
 
-  <div class="pointer-events-none flex flex-col gap-2 p-4 pt-1">
+  <div
+    class="pointer-events-none flex min-w-0 flex-1 flex-col {compact
+      ? 'justify-center gap-1 p-2.5 sm:p-3'
+      : 'gap-2 p-4 pt-1'}"
+  >
     <div class="flex items-start justify-between gap-2">
       <div class="min-w-0">
-        <h3 class="truncate font-semibold">{listing.title}</h3>
-        <p class="truncate text-sm text-muted-foreground">
+        <h3 class="truncate font-semibold {compact ? 'text-sm' : ''}">
+          {listing.title}
+        </h3>
+        <p
+          class="truncate text-muted-foreground {compact
+            ? 'text-xs'
+            : 'text-sm'}"
+        >
           {listing.tower_name}
         </p>
       </div>
@@ -157,13 +175,32 @@
     </div>
 
     {#if listing.description}
-      <p class="line-clamp-3 text-sm text-muted-foreground">
+      <p
+        class="text-muted-foreground {compact
+          ? 'line-clamp-1 text-xs'
+          : 'line-clamp-3 text-sm'}"
+      >
         {listing.description}
       </p>
     {/if}
 
+    {#if compact && listing.tags.length}
+      <div class="flex flex-wrap gap-1">
+        {#each listing.tags as tag (tag)}
+          <span
+            class="rounded-full border px-1.5 py-0.5 text-[0.65rem] capitalize {tag ===
+            WORKSHOP_TAG_FEATURED
+              ? 'border-amber-500/50 bg-amber-100/70 font-medium text-amber-900 dark:bg-amber-950/70 dark:text-amber-100'
+              : 'border-border bg-muted/70 text-muted-foreground'}">{tag}</span
+          >
+        {/each}
+      </div>
+    {/if}
+
     <div
-      class="mt-auto flex items-center justify-between gap-2 pt-1 text-xs text-muted-foreground"
+      class="mt-auto flex items-center justify-between gap-2 text-xs text-muted-foreground {compact
+        ? 'pt-0.5'
+        : 'pt-1'}"
     >
       <span class="flex min-w-0 items-center gap-1.5">
         <Avatar.Root
@@ -207,17 +244,19 @@
             </span>
           {/snippet}
         </Tip>
-        <span class="leading-none" aria-hidden="true">·</span>
-        <Tip
-          content={`Updated ${new Date(listing.updated_at).toLocaleString()}`}
-        >
-          {#snippet children({ props })}
-            <span {...props} class="inline-flex items-center gap-1">
-              <CalendarClock size={12} class="shrink-0" />
-              {timeAgo(listing.updated_at)}
-            </span>
-          {/snippet}
-        </Tip>
+        {#if !compact}
+          <span class="leading-none" aria-hidden="true">·</span>
+          <Tip
+            content={`Updated ${new Date(listing.updated_at).toLocaleString()}`}
+          >
+            {#snippet children({ props })}
+              <span {...props} class="inline-flex items-center gap-1">
+                <CalendarClock size={12} class="shrink-0" />
+                {timeAgo(listing.updated_at)}
+              </span>
+            {/snippet}
+          </Tip>
+        {/if}
       </span>
     </div>
   </div>

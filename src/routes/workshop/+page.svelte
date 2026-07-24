@@ -16,6 +16,7 @@
   import WorkshopCard from "$lib/components/workshop/WorkshopCard.svelte";
   import WorkshopDetailModal from "$lib/components/workshop/WorkshopDetailModal.svelte";
   import WorkshopFormModal from "$lib/components/workshop/WorkshopFormModal.svelte";
+  import WorkshopSpotlight from "$lib/components/workshop/WorkshopSpotlight.svelte";
   import { isAdminUser } from "$lib/services/admin";
   import { fetchFandomAvatars } from "$lib/services/fandomAuth";
   import { settingsStore } from "$lib/stores/settings.svelte";
@@ -36,6 +37,7 @@
   ] as const;
 
   let items = $state<WorkshopListing[]>([]);
+  let spotlight = $state<WorkshopListing[]>([]);
   let total = $state(0);
   let page = $state(1);
   let pageSize = $state(20);
@@ -60,6 +62,16 @@
 
   const totalPages = $derived(Math.max(1, Math.ceil(total / pageSize)));
   let fetchSeq = 0;
+
+  async function loadSpotlight() {
+    const res = await listWorkshop({ spotlight: true });
+    spotlight = res.items;
+    void fetchFandomAvatars(
+      res.items.map((i) => i.author.fandom_userid),
+    ).catch((e) => {
+      if (settingsStore.debugMode) console.error("[workshop] avatars", e);
+    });
+  }
 
   async function load() {
     const seq = ++fetchSeq;
@@ -90,6 +102,12 @@
       if (seq === fetchSeq) loading = false;
     }
   }
+
+  $effect(() => {
+    void loadSpotlight().catch((e) => {
+      if (settingsStore.debugMode) console.error("[workshop] spotlight", e);
+    });
+  });
 
   $effect(() => {
     const value = q;
@@ -147,9 +165,10 @@
   }
 
   function onDetailChanged(listing: WorkshopListing) {
-    items = items.map((it) =>
-      it.id === listing.id ? { ...it, ...listing } : it,
-    );
+    const patch = (it: WorkshopListing) =>
+      it.id === listing.id ? { ...it, ...listing } : it;
+    items = items.map(patch);
+    spotlight = spotlight.map(patch);
   }
 
   async function confirmUnpublish() {
@@ -196,6 +215,10 @@
   </header>
 
   <main class="min-h-0 flex-1 overflow-y-auto p-5">
+    {#if spotlight.length}
+      <WorkshopSpotlight items={spotlight} onOpen={openDetail} />
+    {/if}
+
     <div class="mb-4 flex flex-wrap items-center gap-2">
       <div class="relative w-full max-w-xs">
         <TextInput
@@ -280,7 +303,7 @@
         <Btn class="mt-3" variant="outline" onclick={load}>Retry</Btn>
       </Card>
     {:else if items.length === 0}
-      <Card class="space-y-2 p-8 text-center">
+      <Card class="flex flex-col gap-2 p-8 text-center">
         <Store class="mx-auto text-muted-foreground" size={32} />
         <p class="font-medium">Nothing here yet...</p>
         <p class="text-sm text-muted-foreground">
