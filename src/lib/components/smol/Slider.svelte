@@ -4,6 +4,7 @@
   import IconBtn from "./IconBtn.svelte";
 
   const GAP_PX = 12; // gap-3
+  const TRANSITION_MS = 300;
 
   interface Props {
     items: T[];
@@ -29,10 +30,14 @@
 
   let index = $state(0);
   let perView = $state(1);
-  let animating = $state(true);
+  let animating = $state(false);
   let paused = $state(false);
   let viewportEl = $state<HTMLDivElement | null>(null);
+  let trackEl = $state<HTMLDivElement | null>(null);
   let cardPx = $state(0);
+
+  let wrapping = false;
+  let wrapTimer: ReturnType<typeof setTimeout> | null = null;
 
   const stepPx = $derived(cardPx > 0 ? cardPx + GAP_PX : 0);
   const trackItems = $derived(
@@ -40,53 +45,65 @@
       ? [...items, ...items.slice(0, Math.min(perView, items.length))]
       : [],
   );
-  const activeDot = $derived(
-    items.length ? ((index % items.length) + items.length) % items.length : 0,
-  );
+  const activeDot = $derived(items.length ? index % items.length : 0);
+
+  function clearWrapTimer() {
+    if (wrapTimer == null) return;
+    clearTimeout(wrapTimer);
+    wrapTimer = null;
+  }
 
   function measure() {
-    const el = viewportEl;
-    if (!el || el.clientWidth <= 0) return;
-    cardPx = (el.clientWidth - GAP_PX * (perView - 1)) / perView;
+    const vp = viewportEl;
+    if (!vp || vp.clientWidth <= 0) return;
+    cardPx = (vp.clientWidth - GAP_PX * (perView - 1)) / perView;
+  }
+
+  function snapFromClone() {
+    clearWrapTimer();
+    wrapping = false;
+    if (index < items.length) return;
+    animating = false;
+    index -= items.length;
+    void trackEl?.offsetWidth;
   }
 
   function goTo(i: number, withAnim = true) {
+    if (!items.length) return;
+    const clamped = Math.max(0, Math.min(i, items.length));
     animating = withAnim;
-    index = i;
+    index = clamped;
+    clearWrapTimer();
+
+    if (clamped >= items.length && withAnim) {
+      wrapping = true;
+      wrapTimer = setTimeout(snapFromClone, TRANSITION_MS + 50);
+    } else {
+      wrapping = false;
+    }
   }
 
   function next() {
-    if (items.length < 2) return;
+    if (items.length < 2 || stepPx <= 0 || wrapping) return;
     goTo(index + 1);
   }
 
   function prev() {
-    if (items.length < 2) return;
-    if (index === 0) {
-      goTo(items.length, false);
-      requestAnimationFrame(() => {
-        void viewportEl?.offsetWidth;
-        goTo(items.length - 1);
-      });
+    if (items.length < 2 || stepPx <= 0 || wrapping) return;
+    if (index > 0) {
+      goTo(index - 1);
       return;
     }
-    goTo(index - 1);
+    wrapping = true;
+    animating = false;
+    index = items.length;
+    void trackEl?.offsetWidth;
+    requestAnimationFrame(() => goTo(items.length - 1, true));
   }
 
   function onTransitionEnd(e: TransitionEvent) {
     if (e.target !== e.currentTarget || e.propertyName !== "transform") return;
-    if (index < items.length) return;
-    goTo(index - items.length, false);
-  }
-
-  function applyPerView(wide: boolean) {
-    const n = wide ? Math.min(maxPerView, Math.max(1, items.length)) : 1;
-    if (n !== perView) {
-      perView = n;
-      index = 0;
-      animating = false;
-    }
-    measure();
+    snapFromClone();
   }
 
   $effect(() => {
@@ -94,10 +111,25 @@
     maxPerView;
     if (typeof window === "undefined") return;
     const mq = window.matchMedia("(min-width: 640px)");
-    const sync = () => applyPerView(mq.matches);
+    const sync = () => {
+      const n = mq.matches
+        ? Math.min(maxPerView, Math.max(1, items.length))
+        : 1;
+      if (n !== perView) {
+        perView = n;
+        index = 0;
+        animating = false;
+        wrapping = false;
+        clearWrapTimer();
+      }
+      measure();
+    };
     sync();
     mq.addEventListener("change", sync);
-    return () => mq.removeEventListener("change", sync);
+    return () => {
+      mq.removeEventListener("change", sync);
+      clearWrapTimer();
+    };
   });
 
   $effect(() => {
@@ -111,7 +143,9 @@
 
   $effect(() => {
     if (paused || items.length < 2 || autoplayMs <= 0) return;
-    const id = window.setInterval(next, autoplayMs);
+    const id = window.setInterval(() => {
+      if (!wrapping) next();
+    }, autoplayMs);
     return () => clearInterval(id);
   });
 </script>
@@ -151,7 +185,9 @@
                     : 'bg-muted-foreground/35 hover:bg-muted-foreground/55'}"
                   aria-label={`Slide ${i + 1}`}
                   aria-current={i === activeDot ? "true" : undefined}
-                  onclick={() => goTo(i)}
+                  onclick={() => {
+                    if (!wrapping) goTo(i);
+                  }}
                 ></button>
               {/each}
             </div>
@@ -170,10 +206,11 @@
 
     <div bind:this={viewportEl} class="overflow-hidden">
       <div
-        class="flex gap-3 will-change-transform {animating
+        bind:this={trackEl}
+        class="flex will-change-transform {animating
           ? 'transition-transform duration-300 ease-out'
           : ''}"
-        style="transform: translate3d(-{index * stepPx}px,0,0)"
+        style="gap: {GAP_PX}px; transform: translate3d(-{index * stepPx}px,0,0)"
         ontransitionend={onTransitionEnd}
       >
         {#each trackItems as item, ti (`${getKey(item)}-${ti}`)}
