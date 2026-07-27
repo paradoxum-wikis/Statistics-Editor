@@ -1,8 +1,8 @@
 <var>
 $DPS$ = Damage / Firerate
 $TDPS$ = Thorns Damage / Thorns Tick
-$CE$ = $TP$ / $DPS$
-$TCE$ = $TP$ / $TDPS$
+$CE$ = $TP$ / DPS
+$TCE$ = $TP$ / Thorns DPS
 $TP$ = $FNC-TOTALPRICE$
 $TED$ = Thorns Damage * (Thorns Duration / Thorns Tick)
 $FNC-COST$ = 2000; 625; 1500; 4000; 8750; 24300
@@ -37,7 +37,7 @@ $DREF$ = <ref>DPS assumes thorns only hit one enemy.</ref>
 {| class="wikitable stats-table"
 ! colspan="10" |Thorns Stats
 |-
-! Level !! Total Price !! Thorns Damage !! Thorns Range !! Thorns Duration !! Thorns Slowdown !! Thorns Tick !! Total Elapsed Damage$TREF$ !! Thorns DPS$DREF$ || Cost Efficiency
+! Level !! Total Price !! Thorns Damage !! Thorns Range !! Thorns Duration !! Thorns Slowdown !! Thorns Tick !! Total Elapsed Damage$TREF$ !! Thorns DPS$DREF$ !! Cost Efficiency
 |-
 | 0 || {{Money|$TP$}} || 2 || 12  || 8 || 15% || 0.25 || $TED$ || $TDPS$ || {{Money|$TCE$}}
 |-

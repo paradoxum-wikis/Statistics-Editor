@@ -49,11 +49,11 @@ $CREF$ =<ref>Damage is 0% of the regular damage.</ref>
 |-
 ! Level !! Total Price !! Bomb Damage$IREF$ !! Firerate !! Range !! Explosion Range !! Slowdown Time !! Slowdown per Hit !! Max Slowdown !! Defense Melt !! Max Hits !! DPS$DREF$ !! Cost Efficiency
 |-
-| 2 || {{Money|$TP$}} || $IDMG$ || 1 || 13 || 6 || 3 || 30% || 50% || 0% || 4 || $DPS$ || {{Money|$CE$}}
+| 2 || {{Money|$TP$}} || $IDMG$ || 1 || 13 || 6 || 3 || 25% || 25% || 0% || 4 || $DPS$ || {{Money|$CE$}}
 |-
-| 3 || {{Money|$TP$}} || $IDMG$ || 1 || 13 || 7 || 3 || 40% || 50% || 1% || 4 || $DPS$ || {{Money|$CE$}}
+| 3 || {{Money|$TP$}} || $IDMG$ || 1 || 13 || 7 || 3 || 25% || 25% || 1% || 4 || $DPS$ || {{Money|$CE$}}
 |-
-| 4 || {{Money|$TP$}} || $IDMG$ || 0.6 || 16 || 7 || 3 || 50% || 50% || 1% || 4 || $DPS$ || {{Money|$CE$}}
+| 4 || {{Money|$TP$}} || $IDMG$ || 0.6 || 16 || 7 || 3 || 25% || 25% || 1% || 4 || $DPS$ || {{Money|$CE$}}
 |}
 </div>
 |-|Poison Bomb =

@@ -15,11 +15,11 @@ $DREF$ = <ref name=dps>DPS does not consider projectile travel time.<br/>DPS ass
 {| class="wikitable stats-table"
 ! Level !! Total Price !! Splash Damage$SREF$ !! Firerate !! Aim Time$AREF$ !! Range !! Explosion Range !! DPS$DREF$ !! Cost Efficiency
 |-
-| 0 || {{Money|$TP$}} || 10 || 1.95 || 1 || 12 || 4.5 || $DPS$ || {{Money|$CE$}}
+| 0 || {{Money|$TP$}} || 10 || 1.95 || 0.8 || 12 || 4.5 || $DPS$ || {{Money|$CE$}}
 |-
-| 1 || {{Money|$TP$}} || 10 || 1.8 || 1 || 13.5 || 4.5 || $DPS$ || {{Money|$CE$}}
+| 1 || {{Money|$TP$}} || 10 || 1.8 || 0.8 || 13.5 || 4.5 || $DPS$ || {{Money|$CE$}}
 |-
-| 2 || {{Money|$TP$}} || 18 || 1.8 || 1 || 13.5 || 5 || $DPS$ || {{Money|$CE$}}
+| 2 || {{Money|$TP$}} || 18 || 1.8 || 0.8 || 13.5 || 5 || $DPS$ || {{Money|$CE$}}
 |-
 | 3 || {{Money|$TP$}} || 25 || 1.1 || 0 || 15 || 5.5 || $DPS$ || {{Money|$CE$}}
 |-

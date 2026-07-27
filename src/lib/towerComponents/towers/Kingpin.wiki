@@ -84,7 +84,7 @@ $RC$ = $FNC-RECURSION$
 {| class="wikitable stats-table"
 ! colspan="6" |[[Money Runner]] Stats
 |-
-! Level !! Health !! Cash on Death !! Spawn Time !! DPS !! Ram DPS
+! Level !! Health !! Cash on Death !! Spawn Time !! Income per Second !! Ram DPS
 |-
 | 0–2 || 40 || {{Money|200}} || 40 || {{Money|$IPS$}} || $RDPS$
 |-
@@ -124,7 +124,6 @@ $RC$ = $FNC-RECURSION$
 <!-- @se-ignore -->
 |-|Levels =
 <div class="overflow-box">
-''*Note: Levels are completely inaccurate, as they reuse the same math formula as for Juggernaut's levels''
 {| class="wikitable stats-table"
 ! colspan="12" |Levels
 |-

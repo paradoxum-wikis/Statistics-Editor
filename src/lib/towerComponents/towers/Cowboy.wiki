@@ -27,7 +27,7 @@ $IEREF$ = <ref name=ie>Money generated per 1 damage is calculated as (Income + C
 |-
 | 2 || {{Money|$TP$}} || 5 || 0.9 || 1.25 || 6 || {{Money|50}} || 15 || $DPS$ || {{Money|$CE$}} || {{Money|$IPS$}} || {{Money|$IE$}}
 |-
-| 3 || {{Money|$TP$}} || 10 || 0.6 || 1 || 6 || {{Money|45}} || 17.5 || $DPS$ || {{Money|$CE$}} || {{Money|$IPS$}} || {{Money|$IE$}}
+| 3 || {{Money|$TP$}} || 10 || 0.6 || 1 || 6 || {{Money|50}} || 17.5 || $DPS$ || {{Money|$CE$}} || {{Money|$IPS$}} || {{Money|$IE$}}
 |-
 | 4 || {{Money|$TP$}} || 10 || 0.35 || 1 || 12 || {{Money|125}} || 20 || $DPS$ || {{Money|$CE$}} || {{Money|$IPS$}} || {{Money|$IE$}}
 |-

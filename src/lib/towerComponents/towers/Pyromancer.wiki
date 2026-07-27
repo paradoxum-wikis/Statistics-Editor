@@ -6,7 +6,7 @@ $MDPS$ = DPS * Max Hits
 $TED$ = Burn Damage * (Burn Time / Tick)
 $CE$ = Total Price / DPS
 $TP$ = $FNC-TOTALPRICE$
-$FNC-COST$ = 900; 325; 1000; 2000; 3750; 7500
+$FNC-COST$ = 900; 325; 1000; 2000; 3777; 11111
 $FNC-PVP-COST$ = 850; 350; 950; 1500; 3800; 9000
 $FSE-DETECTION$ = 2; 0;
 $FSE-UPGRADE$ = Improved Handling; Fire Fighting; Fire Hazard; Napalm Thrower; Pyromaniac
@@ -29,9 +29,9 @@ $DREF$ = <ref>DPS assumes the flames only hit one enemy.<br/>Total DPS is calcul
 |-
 | 3 || {{Money|$TP$}} || 3 || 5 || 0.175 || 12.5 || 5% || 6 || 1 || 7 || 1.5 || $TED$ || $DPS$<ref>$NDPS$ Normal DPS + $BDPS$ Burn DPS</ref> || $MDPS$ || {{Money|$CE$}}
 |-
-| 4 || {{Money|$TP$}} || 4 || 10 || 0.175 || 12.5 || 10% || 10 || 1 || 7 || 1.75 || $TED$ || $DPS$<ref>$NDPS$ Normal DPS + $BDPS$ Burn DPS</ref> || $MDPS$ || {{Money|$CE$}}
+| 4 || {{Money|$TP$}} || 5 || 10 || 0.175 || 12.5 || 10% || 10 || 1 || 7 || 1.75 || $TED$ || $DPS$<ref>$NDPS$ Normal DPS + $BDPS$ Burn DPS</ref> || $MDPS$ || {{Money|$CE$}}
 |-
-| 5 || {{Money|$TP$}} || 6 || 25 || 0.175 || 14 || 10% || 10 || 1 || 10 || 2.5 || $TED$ || $DPS$<ref>$NDPS$ Normal DPS + $BDPS$ Burn DPS</ref> || $MDPS$ || {{Money|$CE$}}
+| 5 || {{Money|$TP$}} || 9 || 25 || 0.175 || 14 || 10% || 10 || 1 || 10 || 2.5 || $TED$ || $DPS$<ref>$NDPS$ Normal DPS + $BDPS$ Burn DPS</ref> || $MDPS$ || {{Money|$CE$}}
 |}
 </div>
 |-|PVP =

@@ -2,13 +2,15 @@
 $DPS$ = Damage / Firerate
 $CE$ = Total Price / DPS
 $TP$ = $FNC-TOTALPRICE$
-$EXP$ = {{#expr:floor(50 * 1.09^(Level - 1))}}
+$TE$ = $FNC-TOTAL-EXP$
+$EXP$ = {{#expr:floor(50 * 1.09^(Level - 1) * (Level > 0))}}
 $FNC-COST$ = 125; 50; 375; 1350; 2200
 $FNC-PVP-COST$ = 300; 100; 650; 1800; 3250
 $FSE-DETECTION$ = 2; ;
 $FSE-UPGRADE$ = Faster Reloading; Precise Aiming; Stronger Equipment; Akimbo Handguns
 $FSE-UPGRADEICON$ = 3278746120; 3278749117; 3278741672; 3279537687
 $FSE-CATEGORY$ = Starter
+$R$ = $FNC-RECURSION$
 </var>
 <div class="mobile-tabber"><tabber>
 |-|Regular =
@@ -44,52 +46,54 @@ $FSE-CATEGORY$ = Starter
 |}
 </div>
 <!-- @se-ignore -->
-|-|Level =
+|-|Levels =
 <div class="overflow-box">
 {| class="wikitable stats-table"
+! colspan="12" |Levels
+|-
 ! Level !! Exp !! Total Exp
 |-
-| 0 || {{Exp|0}} || {{Exp|0}} 
+| 0 || {{Exp|0}} || {{Exp|$TE$}}$R$
 |-
-| 1 || {{Exp|$EXP$}} || {{Exp|50}} 
+| 1 || {{Exp|$EXP$}}$R$ || $R$
 |-
-| 2 || {{Exp|$EXP$}} || {{Exp|105}}
+| 2 || $R$ || $R$
 |-
-| 3 || {{Exp|$EXP$}} || {{Exp|164}}
+| 3 || $R$ || $R$
 |-
-| 4 || {{Exp|$EXP$}} || {{Exp|228}}
+| 4 || $R$ || $R$
 |-
-| 5 || {{Exp|$EXP$}} || {{Exp|298}}
+| 5 || $R$ || $R$
 |-
-| 6 || {{Exp|$EXP$}} || {{Exp|374}}
+| 6 || $R$ || $R$
 |-
-| 7 || {{Exp|$EXP$}} || {{Exp|457}}
+| 7 || $R$ || $R$
 |-
-| 8 || {{Exp|$EXP$}} || {{Exp|550}}
+| 8 || $R$ || $R$
 |-
-| 9 || {{Exp|$EXP$}} || {{Exp|653}}
+| 9 || $R$ || $R$
 |-
-| 10 || {{Exp|$EXP$}} || {{Exp|766}}
+| 10 || $R$ || $R$
 |-
-| 11 || {{Exp|$EXP$}} || {{Exp|889}}
+| 11 || $R$ || $R$
 |-
-| 12 || {{Exp|$EXP$}} || {{Exp|1,022}}
+| 12 || $R$ || $R$
 |-
-| 13 || {{Exp|$EXP$}} || {{Exp|1,165}}
+| 13 || $R$ || $R$
 |-
-| 14 || {{Exp|$EXP$}} || {{Exp|1,318}}
+| 14 || $R$ || $R$
 |-
-| 15 || {{Exp|$EXP$}} || {{Exp|1,485}}
+| 15 || $R$ || $R$
 |-
-| 16 || {{Exp|$EXP$}} || {{Exp|1,667}}
+| 16 || $R$ || $R$
 |-
-| 17 || {{Exp|$EXP$}} || {{Exp|1,865}}
+| 17 || $R$ || $R$
 |-
-| 18 || {{Exp|$EXP$}} || {{Exp|2,081}}
+| 18 || $R$ || $R$
 |-
-| 19 || {{Exp|$EXP$}} || {{Exp|2,316}} 
+| 19 || $R$ || $R$
 |-
-| 20 || {{Exp|$EXP$}} || {{Exp|2,573}} 
+| 20 || $R$ || $R$
 |}
 </div>
 <!-- @/se-ignore -->

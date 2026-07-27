@@ -6,10 +6,11 @@ $FDMG$ = {{#expr:Damage * 2 round 0}}
 $ADMG$ = {{#expr:ceil(Damage * 0.3)}}
 $DPS2$ = $DPS$ + $AFDPS$
 $FDPS2$ = $FDPS$ + $AFDPS$
-$MDPS$ = $DPS$ * Max Hits
-$MDPS2$ = $FDPS2$ * Max Hits
+$MDPS$ = ($DPS$) * Max Hits
+$MDPS2$ = ($FDPS2$) * Max Hits
 $FNC-COST$ = 950; 400; 1650; 3200; 8250; 16000
 $CE$ = Total Price / DPS
+$MCE$ = Total Price / Max DPS
 $FREF$ = <ref>Frozen damage is dealt when hitting enemies that are already frozen or chilled. Frozen damage is double the regular damage.</ref>
 $DREF$ = <ref>DPS assumes only one enemy is hit and is not frozen.</ref>
 $FDREF$ = <ref>Once ''Ice Breaker'' is unlocked, DPS assumes that the enemy is frozen at all times.</ref>
@@ -20,18 +21,18 @@ $FSE-CATEGORY$ = Exclusive
 </var>
 <div class="overflow-box">
 {| class="wikitable stats-table"
-! Level !! Total Price !! Damage !! Frozen Damage$FREF$ !! Aftershock Damage !! Swingrate !! Aftershock Delay !! Range !! Max Hits !! Slowdown per Hit !! Max Slowdown !! Slowdown Time !! Freeze Time !! DPS$DREF$ !! Frozen DPS !! Max DPS$FDREF$ !! Cost Efficiency
+! Level !! Total Price !! Damage !! Frozen Damage$FREF$ !! Aftershock Damage !! Swingrate !! Aftershock Delay !! Range !! Max Hits !! Slowdown per Hit !! Max Slowdown !! Slowdown Time !! Freeze Time !! DPS$DREF$ !! Frozen DPS !! Max DPS$FDREF$ !! Cost Efficiency !! Max Cost Efficiency
 |-
-| 0 || {{Money|$FNC-TOTALPRICE$}} || 10 || N/A || N/A || 1.2 || N/A || 6.5 || 4 || 10% || 30% || 4 || N/A || $DPS$ || N/A || $MDPS$ || {{Money|$CE$}}
+| 0 || {{Money|$FNC-TOTALPRICE$}} || 10 || N/A || N/A || 1.2 || N/A || 6.5 || 4 || 10% || 30% || 4 || N/A || $DPS$ || N/A || $MDPS$ || {{Money|$CE$}} || {{Money|$MCE$}}
 |-
-| 1 || {{Money|$FNC-TOTALPRICE$}} || 14 || N/A || N/A || 1.2 || N/A || 6.5 || 4 || 15% || 30% || 4 || N/A || $DPS$ || N/A || $MDPS$ || {{Money|$CE$}}
+| 1 || {{Money|$FNC-TOTALPRICE$}} || 14 || N/A || N/A || 1.2 || N/A || 6.5 || 4 || 15% || 30% || 4 || N/A || $DPS$ || N/A || $MDPS$ || {{Money|$CE$}} || {{Money|$MCE$}}
 |-
-| 2 || {{Money|$FNC-TOTALPRICE$}} || 28 || N/A || N/A || 1.2 || N/A || 7 || 5 || 15% || 30% || 4 || N/A || $DPS$ || N/A || $MDPS$ || {{Money|$CE$}}
+| 2 || {{Money|$FNC-TOTALPRICE$}} || 28 || N/A || N/A || 1.2 || N/A || 7 || 5 || 15% || 30% || 4 || N/A || $DPS$ || N/A || $MDPS$ || {{Money|$CE$}} || {{Money|$MCE$}}
 |-
-| 3 || {{Money|$FNC-TOTALPRICE$}} || 50 || N/A || N/A || 1.2 || N/A || 7 || 5 || 17.5% || 35% || 4 || 0.75 || $DPS$ || N/A || $MDPS$ || {{Money|$CE$}}
+| 3 || {{Money|$FNC-TOTALPRICE$}} || 50 || N/A || N/A || 1.2 || N/A || 7 || 5 || 17.5% || 35% || 4 || 0.75 || $DPS$ || N/A || $MDPS$ || {{Money|$CE$}} || {{Money|$MCE$}}
 |-
-| 4 || {{Money|$FNC-TOTALPRICE$}} || 100 || $FDMG$ || N/A || 1.2 || N/A || 7.5 || 5 || 17.5% || 35% || 5 || 0.75 || $DPS$ || $FDPS$ || $MDPS2$ || {{Money|$CE$}}
+| 4 || {{Money|$FNC-TOTALPRICE$}} || 100 || $FDMG$ || N/A || 1.2 || N/A || 7.5 || 5 || 17.5% || 35% || 5 || 0.75 || $DPS$ || $FDPS$ || $MDPS2$ || {{Money|$CE$}} || {{Money|$MCE$}}
 |-
-| 5 || {{Money|$FNC-TOTALPRICE$}} || 150 || $FDMG$ || $ADMG$ || 1.2 || 0.4 || 7.5 || 8 || 35% || 35% || 5 || 1 || $DPS2$<ref>$DPS$ Normal DPS + $AFDPS$ Aftershock DPS</ref> || $FDPS2$<ref>$FDPS$ Normal DPS + $AFDPS$ Aftershock DPS</ref> || $MDPS2$ || {{Money|$CE$}}
+| 5 || {{Money|$FNC-TOTALPRICE$}} || 150 || $FDMG$ || $ADMG$ || 1.2 || 0.4 || 7.5 || 8 || 35% || 35% || 5 || 1 || $DPS2$<ref>$DPS$ Normal DPS + $AFDPS$ Aftershock DPS</ref> || $FDPS2$<ref>$FDPS$ Normal DPS + $AFDPS$ Aftershock DPS</ref> || $MDPS2$ || {{Money|$CE$}} || {{Money|$MCE$}}
 |}
 </div>

@@ -25,6 +25,6 @@ $DREF$ = <ref>DPS assumes the ice flames only hit one enemy.<br>At Level 2+, Ice
 |-
 | 3 || {{Money|$TP$}} || 3 || 5 || 0.2 || 1 || 4 || 12.5% || 25% || 5 || 7% || N/A || 50 || 2 || 1.75 || 4 || $TED$ || 13.5 || $CDPS$<ref>$DPS$ Normal DPS + $IDPS$ Chill DPS</ref> || {{Money|$CE$}}
 |-
-| 4 || {{Money|$TP$}} || 6 || 10 || 0.2 || 1 || 6 || 10% || 25% || 5 || 10% || 0.75 || 50 || 1.25 || 2.25 || 4 || $TED$ || 15 || $CDPS$<ref>$DPS$ Normal DPS + $IDPS$ Chill DPS</ref> || {{Money|$CE$}}
+| 4 || {{Money|$TP$}} || 6 || 10 || 0.2 || 1 || 6 || 12.5% || 25% || 5 || 10% || 0.75 || 70 || 1.25 || 2.25 || 4 || $TED$ || 15 || $CDPS$<ref>$DPS$ Normal DPS + $IDPS$ Chill DPS</ref> || {{Money|$CE$}}
 |}
 </div>
