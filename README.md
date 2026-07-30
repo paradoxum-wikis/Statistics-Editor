@@ -1,6 +1,8 @@
 # Statistics Editor
 
-This repo contains the rewrite of the [TDS Statistics Editor](https://github.com/paradoxum-wikis/TDS-Stats-Editor).
+This repo contains the statistics editor for Tower Defense Simulator, allowing one to modify a tower's statistics to any desired value.
+
+The tool is mainly aimed at editors who want to update tower statistics and port them over to the wiki, however, other users can also use it to share their tower concepts and or rebalances using the tool's shareable link or workshop.
 
 As this tool uses the same format for its data as the [Tower Defense Simulator Wiki](https://tds.fandom.com/), you may already be familiar with it if you have edited the statistics table before on the wiki. If not, you can check [Help:Neowtext](https://tds.fandom.com/wiki/Help:Neowtext).
 
