@@ -340,6 +340,36 @@ export function getEditableCellRawValue(
   return config.rows[rowIdx]?.[header];
 }
 
+/**
+ * Expanded formula text for a read-only cell hover tip.
+ * Null if not a formula.
+ */
+export function formulaSourceTip(
+  formula: string | number | undefined,
+  tokens: Record<string, string>,
+): string | null {
+  if (typeof formula !== "string") return null;
+  let s = stripRefs(formula).trim();
+  if (!s) return null;
+  if (!/\$[^$]+\$/.test(s) && !/{{#expr:/i.test(s)) return null;
+
+  for (let i = 0; i < 5; i++) {
+    const next = s.replace(/\$[A-Z0-9_-]+\$/gi, (tok) => {
+      const def = tokens[tok];
+      if (typeof def !== "string") return tok;
+      // drop pure-ref aliases
+      // keep unknown tokens as-is
+      if (/<ref\b/i.test(def) && !stripRefs(def).trim()) return "";
+      const body = stripRefs(def).trim();
+      return body || tok;
+    });
+    if (next === s) break;
+    s = next;
+  }
+  s = s.trim();
+  return s || null;
+}
+
 export function cellDisplaySource(
   value: unknown,
   formula: string | number | undefined,

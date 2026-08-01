@@ -9,6 +9,7 @@
     type RefTokenRegistry,
   } from "$lib/towerTable";
   import CellRefs from "./CellRefs.svelte";
+  import Tip from "../smol/Tip.svelte";
 
   let {
     value,
@@ -17,6 +18,7 @@
     disabled,
     isMoney,
     readOnlyValue,
+    formulaSource = null,
     tokens = {},
     deltaInfo,
     getRefNum,
@@ -30,6 +32,7 @@
     disabled: boolean;
     isMoney: boolean;
     readOnlyValue: boolean;
+    formulaSource?: string | null;
     tokens?: Record<string, string>;
     deltaInfo: DeltaInfo;
     getRefNum: (content: string, name?: string | null) => number;
@@ -48,6 +51,7 @@
         : String(rawValue),
   );
 
+  const showFormulaTip = $derived(!editable && !!formulaSource);
   const focusOnMount: Attachment<HTMLElement> = (node) => node.focus();
 </script>
 
@@ -131,7 +135,25 @@
   {/if}
 {/snippet}
 
-{#if editable || isMoney}
+{#if showFormulaTip}
+  <Tip
+    content={formulaSource!}
+    class="max-w-80! font-mono text-xs!"
+    sideOffset={4}
+  >
+    {#snippet children({ props })}
+      {#if isMoney}
+        <div class="cell-flex formula-tip" {...props}>
+          {@render body()}
+        </div>
+      {:else}
+        <span class="formula-tip" {...props}>
+          {@render body()}
+        </span>
+      {/if}
+    {/snippet}
+  </Tip>
+{:else if editable || isMoney}
   <div class="cell-flex">
     {@render body()}
   </div>
@@ -179,6 +201,10 @@
 
   .cell-multiline {
     white-space: pre-line;
+  }
+
+  .formula-tip {
+    cursor: help;
   }
 
   .delta-text {

@@ -5,6 +5,7 @@
   import {
     cellDisplaySource,
     displayCellValue,
+    formulaSourceTip,
     getDeltaForCell,
     getEditableCellRawValue,
     isCellEditable,
@@ -120,6 +121,9 @@
                 rowIdx,
                 header,
               )}
+              {@const formulaSource = editable
+                ? null
+                : formulaSourceTip(rawValue, fTokens)}
               {@const deltaInfo = showDiff
                 ? getDeltaForCell(
                     baseline,
@@ -134,7 +138,9 @@
               <td
                 class="table-data {deltaInfo.cellClass} {editable
                   ? 'editable-cell'
-                  : 'readonly-cell'} {settingsStore.hideCellWrapper
+                  : 'readonly-cell'} {formulaSource
+                  ? 'has-formula-source'
+                  : ''} {settingsStore.hideCellWrapper
                   ? 'compact-cell'
                   : 'spacious-cell'}"
               >
@@ -150,6 +156,7 @@
                   {disabled}
                   {isMoney}
                   readOnlyValue={!editable}
+                  {formulaSource}
                   tokens={fTokens}
                   {deltaInfo}
                   {getRefNum}
