@@ -176,6 +176,13 @@ export function formatNumber(n: number): string {
 }
 
 /**
+ * Round formula results to 2dp before row store / chaining.
+ */
+export function wikiRound(n: number): number {
+  return Number(n.toFixed(2));
+}
+
+/**
  * Formats a calculated number with separators + 2 decimal places.
  */
 export function formatReadOnly(v: unknown): string {

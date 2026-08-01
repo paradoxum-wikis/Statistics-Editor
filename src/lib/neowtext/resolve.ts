@@ -1,8 +1,8 @@
 import { evaluateFormula } from "$lib/neowtext/evaluator";
 import {
-  parseNumeric,
   stripRefs,
   formatReadOnly,
+  wikiRound,
   getRofBugVer,
   applyRofBug,
   normalizeColumnKey,
@@ -576,7 +576,7 @@ export function resolveToken(
 
     const result = evaluateFormula(val, context);
     // fragment var expansion
-    if (!Number.isNaN(result)) return result;
+    if (!Number.isNaN(result)) return wikiRound(result);
     return val;
   }
 
