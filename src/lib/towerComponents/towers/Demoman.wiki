@@ -11,7 +11,6 @@ $FSE-PVP-UPGRADE$ = Further Throwing; Steil Grenade; Chinalake; Collateral Damag
 $FSE-UPGRADEICON$ = 5523227714; 5523227714; 5523228733; 5523229364
 $FSE-PVP-UPGRADEICON$ = ; 5523227714; 5523228733; 5523229364
 $FSE-CATEGORY$ = Starter
-$SREF$ = <ref name=splash>Damage dealt in the inner explosion sphere. Splash damage is decreased linearly from the edge of the inner explosion sphere to the edge of the outer explosion sphere, if the enemy is in the outer explosion sphere.</ref>
 $AREF$ = <ref name=aim>Aim Time happens before the '''Demoman''' throws a grenade. This does not affect its firerate.</ref>
 $DREF$ = <ref name=dps>DPS does not consider projectile travel time.</ref>
 DPS assumes that only one enemy is hit and it receives full splash damage.</ref>
@@ -20,7 +19,7 @@ DPS assumes that only one enemy is hit and it receives full splash damage.</ref>
 |-|Regular =
 <div class="overflow-box">
 {| class="wikitable stats-table"
-! Level !! Total Price !! Splash Damage$SREF$ !! Firerate !! Aim Time$AREF$ !! Range !! Explosion Range !! DPS$DREF$ !! Cost Efficiency
+! Level !! Total Price !! Splash Damage !! Firerate !! Aim Time$AREF$ !! Range !! Explosion Range !! DPS$DREF$ !! Cost Efficiency
 |-
 | 0 || {{Money|$TP$}} || 8 || 2.6 || 1 || 10 || 4.5 || $DPS$ || {{Money|$CE$}}
 |-

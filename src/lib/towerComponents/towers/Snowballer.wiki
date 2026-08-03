@@ -6,7 +6,6 @@ $FNC-COST$ = 300; 50; 320; 3000
 $FSE-DETECTION$ = ; 0; 3
 $FSE-UPGRADE$ = Snow Day; Frigid Temperatures; Snowball Cannon
 $FSE-UPGRADEICON$ = 15686418975; 15686418835; 15686418748
-$FNC-ROFBUG$ = Firerate
 $FSE-CATEGORY$ = Exclusive
 </var>
 <div class="overflow-box">
