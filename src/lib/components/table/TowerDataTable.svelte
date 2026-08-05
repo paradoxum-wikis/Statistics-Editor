@@ -49,6 +49,8 @@
     ) => void;
   } = $props();
 
+  let hoveredCol = $state<number | null>(null);
+
   const fTokens = $derived(
     (config.skinData?.formulaTokens ?? config.formulaTokens ?? {}) as Record<
       string,
@@ -91,6 +93,9 @@
             class={header === "Level"
               ? "table-header-sticky px-2"
               : "table-header whitespace-nowrap"}
+            class:hovered-col={hoveredCol === hIdx}
+            onmouseenter={() => (hoveredCol = hIdx)}
+            onmouseleave={() => (hoveredCol = null)}
           >
             <CellRefs
               value={config.rawHeaders?.[hIdx] || header}
@@ -110,7 +115,12 @@
         <tr class="table-row">
           {#each config.headers as header, hIdx (`${hIdx}:${header}`)}
             {#if header === "Level"}
-              <td class="table-cell-sticky">
+              <td
+                class="table-cell-sticky"
+                class:hovered-col={hoveredCol === hIdx}
+                onmouseenter={() => (hoveredCol = hIdx)}
+                onmouseleave={() => (hoveredCol = null)}
+              >
                 {row[header] ?? rowIdx}
               </td>
             {:else}
@@ -143,6 +153,9 @@
                   : ''} {settingsStore.hideCellWrapper
                   ? 'compact-cell'
                   : 'spacious-cell'}"
+                class:hovered-col={hoveredCol === hIdx}
+                onmouseenter={() => (hoveredCol = hIdx)}
+                onmouseleave={() => (hoveredCol = null)}
               >
                 <TowerTableCell
                   value={displayCellValue(
@@ -322,5 +335,9 @@
         oklch(0.58 0.14 25 / 0.22)
       ) !important;
     }
+  }
+
+  .hovered-col {
+    background: var(--accent);
   }
 </style>
