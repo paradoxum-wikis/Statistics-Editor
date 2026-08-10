@@ -3,7 +3,7 @@ $DPS$ = (Damage * Burst Count)  / (Cooldown + (Firerate * Burst Count))
 $DPS2$ = Damage / Firerate
 $CE$ = Total Price / DPS
 $TP$ = $FNC-TOTALPRICE$
-$FNC-COST$ = 450; 150; 800; 3750; 12000
+$FNC-COST$ = 450; 150; 800; 3400; 11350
 $FSE-DETECTION$ = 2; ; 0
 $FSE-UPGRADE$ = Trigger Finger; Field Training; Gilded Gear; Maximum Potential
 $FSE-UPGRADEICON$ = 5523192002; 5523193619; 5523195646; 5523196519
@@ -17,12 +17,12 @@ $DREF$ = <ref name=dps>Calculated as (Damage × Burst Count) ÷ (Cooldown + (Fir
 |-
 | 0 || {{Money|$TP$}} || 1 || 4 || 0.15 || 0.45 || 17 || $DPS$ || {{Money|$CE$}}
 |-
-| 1 || {{Money|$TP$}} || 1 || 4 || 0.125 || 0.35 || 17 || $DPS$ || {{Money|$CE$}}
+| 1 || {{Money|$TP$}} || 1 || 4 || 0.12 || 0.35 || 17 || $DPS$ || {{Money|$CE$}}
 |-
-| 2 || {{Money|$TP$}} || 2 || 5 || 0.125 || 0.35 || 20 || $DPS$ || {{Money|$CE$}}
+| 2 || {{Money|$TP$}} || 2 || 5 || 0.12 || 0.35 || 20 || $DPS$ || {{Money|$CE$}}
 |-
-| 3 || {{Money|$TP$}} || 4 || N/A || 0.125 || 0 || 20 || $DPS2$ || {{Money|$CE$}}
+| 3 || {{Money|$TP$}} || 4 || N/A || 0.12 || 0 || 20 || $DPS2$ || {{Money|$CE$}}
 |-
-| 4 || {{Money|$TP$}} || 12 || N/A || 0.125 || 0 || 22 || $DPS2$ || {{Money|$CE$}}
+| 4 || {{Money|$TP$}} || 12 || N/A || 0.12 || 0 || 22 || $DPS2$ || {{Money|$CE$}}
 |}
 </div>

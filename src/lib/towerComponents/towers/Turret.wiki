@@ -27,7 +27,7 @@ $FSE-CATEGORY$ = Advanced
 |-
 | 4 || {{Money|$TP$}} || 57 || 0.16 || 24 || $DPS$ || {{Money|$CE$}}
 |-
-| 5 || {{Money|$TP$}} || 62 || 0.12 || 27 || $DPS$ || {{Money|$CE$}}
+| 5 || {{Money|$TP$}} || 68 || 0.12 || 27 || $DPS$ || {{Money|$CE$}}
 |}
 </div>
 |-|PVP =

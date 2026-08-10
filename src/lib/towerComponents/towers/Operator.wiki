@@ -27,11 +27,11 @@ $DREF$ = <ref name=dps>Calculated as (Damage × Burst Count) ÷ (Cooldown + (Fir
 |-
 | 3 || {{Money|$TP$}} || 4 || 9 || 0.1 || 1 || 15.5 || 10% || 4 || $DPS$ || {{Money|$CE$}}
 |-
-| 4 || {{Money|$TP$}} || 6 || 9 || 0.1 || 1 || 15.5 || 10% || 4.75 || $DPS$ || {{Money|$CE$}}
+| 4 || {{Money|$TP$}} || 6 || 9 || 0.1 || 1 || 15.5 || 10% || 5.5 || $DPS$ || {{Money|$CE$}}
 |-
 | 5 || {{Money|$TP$}} || 6 || N/A || 0.16 || 0 || 16 || 10% || 5.5 || $DPS2$ || {{Money|$CE$}}
 |-
-| 6 || {{Money|$TP$}} || 10 || N/A || 0.16 || 0 || 17 || 10% || 4.75 || $DPS2$ || {{Money|$CE$}}
+| 6 || {{Money|$TP$}} || 10 || N/A || 0.16 || 0 || 17 || 10% || 5.5 || $DPS2$ || {{Money|$CE$}}
 |}
 </div>
 <!-- @se-ignore -->

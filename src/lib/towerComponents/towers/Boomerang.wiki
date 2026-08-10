@@ -1,6 +1,6 @@
 <var>
-$DPS$ = Damage * Boomerang Count / Firerate
-$MDPS$ = Damage * Boomerang Count / Firerate * Max Hits
+$DPS$ = Damage * Boomerang Count / (Firerate + Throw Delay)
+$MDPS$ = Damage * Boomerang Count / (Firerate + Throw Delay) * Max Hits
 $CE$ = Total Price / DPS
 $MCE$ = Total Price / Max DPS
 $TP$ = $FNC-TOTALPRICE$
