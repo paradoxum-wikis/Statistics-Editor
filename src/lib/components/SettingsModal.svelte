@@ -170,6 +170,7 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 10px;
+    padding-bottom: 1.25rem;
 
     @media (max-width: 767px) {
       grid-template-columns: 1fr;
@@ -189,10 +190,6 @@
 
     &.disabled {
       opacity: 0.5;
-    }
-
-    &:last-child {
-      margin-bottom: 1.25rem;
     }
 
     .setting-icon {
