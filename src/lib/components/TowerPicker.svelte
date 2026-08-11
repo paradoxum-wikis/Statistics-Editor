@@ -260,7 +260,7 @@
     overflow: hidden;
     border-radius: var(--radius);
     border: 1px solid var(--border);
-    background: var(--card);
+    background: var(--popover);
     color: var(--foreground);
 
     &[data-state="open"] {
