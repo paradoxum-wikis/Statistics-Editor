@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { cubicOut } from "svelte/easing";
-  import { fly } from "svelte/transition";
   import { Tabs, Popover } from "bits-ui";
   import Separator from "./smol/Separator.svelte";
   import Btn from "./smol/Btn.svelte";
@@ -26,19 +24,17 @@
   import { hasSeDiff, mkCellKey } from "$lib/neowtext/directives";
   import {
     applyRefSuffixEdit,
-    getRofBugVer,
     stripRefs,
     toDisplayNumber,
   } from "$lib/utils/format";
   import TowerDataTable from "./table/TowerDataTable.svelte";
   import {
-    buildActiveSkinTables,
-    buildCompareRowsCache,
-    buildDisplayRowsCache,
     buildSkinRefState,
+    ensureSkinRows,
     getCompareValueForKey as getCompareValueFromCache,
     refEntryKey,
     tableCacheKey,
+    type SkinRowsSession,
     type TableConfig,
   } from "$lib/towerTable";
   import NotesSection from "./NotesSection.svelte";
@@ -55,49 +51,34 @@
 
   const availableSkins = $derived(tower?.skinNames ?? []);
   const selectedSkinName = $derived(towerStore.selectedSkinName);
-  let skinDirection = $state(1);
-
-  const rofInfo = $derived.by(() => {
-    settingsStore.rofBug;
-    const info = getRofBugVer(tower?.getSkin(selectedSkinName)?.formulaTokens);
-    return {
-      type: info.type,
-      cols: new Set(info.cols),
-      enabled: settingsStore.rofBug,
-    };
-  });
-
-  const activeSkinData = $derived.by(() => {
-    towerStore.refreshTrigger;
-    return buildActiveSkinTables(tower, selectedSkinName);
-  });
-
   const modifier = $derived({ entries: modifierStore.entries });
 
-  const compareRowsCache = $derived.by(() => {
-    towerStore.refreshTrigger;
-    modifierStore.entries;
-    settingsStore.rofBug;
-    return buildCompareRowsCache(tower, rofInfo, modifier);
-  });
+  // Session outlives derived re-runs so skin tabs reuse rows; `id` resets it.
+  const skinRowsSession: SkinRowsSession = {
+    id: "",
+    display: new Map(),
+    compare: new Map(),
+    tables: new Map(),
+  };
 
-  const displayRowsCache = $derived.by(() => {
-    towerStore.refreshTrigger;
-    modifierStore.entries;
-    settingsStore.rofBug;
-    return buildDisplayRowsCache(
-      activeSkinData,
+  const skinRows = $derived.by(() =>
+    ensureSkinRows(
+      skinRowsSession,
+      `${tower?.name}|${towerStore.refreshTrigger}|${settingsStore.rofBug}|${JSON.stringify(modifierStore.entries)}`,
+      tower,
       selectedSkinName,
-      rofInfo,
+      settingsStore.rofBug,
       modifier,
-    );
-  });
+    ),
+  );
 
-  const skinRefs = $derived.by(() => {
-    towerStore.refreshTrigger;
-    modifierStore.entries;
-    return buildSkinRefState(activeSkinData, displayRowsCache, modifier);
-  });
+  const activeSkinData = $derived(skinRows.active);
+  const displayRowsCache = $derived(skinRows.display);
+  const compareRowsCache = $derived(skinRows.compare);
+
+  const skinRefs = $derived.by(() =>
+    buildSkinRefState(activeSkinData, displayRowsCache, modifier),
+  );
 
   const getSkinRefNum = $derived.by(() => {
     const map = skinRefs.refNumberMap;
@@ -440,9 +421,6 @@
       value={towerStore.selectedSkinName}
       onValueChange={(v) => {
         if (!v || !tower) return;
-        const was = availableSkins.indexOf(towerStore.selectedSkinName);
-        const is = availableSkins.indexOf(v);
-        skinDirection = is >= was ? 1 : -1;
         towerStore.selectedSkinName = v;
         analytics.track("skin_change", {
           tower_name: tower.name,
@@ -466,41 +444,31 @@
       {/if}
 
       <Tabs.Content value={selectedSkinName}>
-        {#key selectedSkinName}
-          <div
-            in:fly={{
-              x: skinDirection * 56,
-              duration: 190,
-              easing: cubicOut,
-            }}
-          >
-            {#if activeSkinData}
-              {#each activeSkinData.orderedTables as table, orderedIdx (tableCacheKey(table.skinName, table.tableIdx))}
-                <TowerDataTable
-                  config={table}
-                  displayRows={displayRowsCache.get(
-                    tableCacheKey(table.skinName, table.tableIdx),
-                  ) ?? []}
-                  compareRows={compareRowsCache.get(
-                    tableCacheKey(table.skinName, table.tableIdx),
-                  ) ?? []}
-                  baseline={towerStore.baseline}
-                  globalModifier={modifier}
-                  {showDiff}
-                  {disabled}
-                  isFirst={orderedIdx === 0}
-                  refTokenRegistry={skinRefs.registry}
-                  getRefNum={getSkinRefNum}
-                  commit={commitEdit}
-                />
-              {/each}
-            {:else}
-              <div class="text-center py-4 text-muted-foreground">
-                No skin data available.
-              </div>
-            {/if}
+        {#if activeSkinData}
+          {#each activeSkinData.orderedTables as table, orderedIdx (tableCacheKey(table.skinName, table.tableIdx))}
+            <TowerDataTable
+              config={table}
+              displayRows={displayRowsCache.get(
+                tableCacheKey(table.skinName, table.tableIdx),
+              ) ?? []}
+              compareRows={compareRowsCache.get(
+                tableCacheKey(table.skinName, table.tableIdx),
+              ) ?? []}
+              baseline={towerStore.baseline}
+              globalModifier={modifier}
+              {showDiff}
+              {disabled}
+              isFirst={orderedIdx === 0}
+              refTokenRegistry={skinRefs.registry}
+              getRefNum={getSkinRefNum}
+              commit={commitEdit}
+            />
+          {/each}
+        {:else}
+          <div class="text-center py-4 text-muted-foreground">
+            No skin data available.
           </div>
-        {/key}
+        {/if}
       </Tabs.Content>
     </Tabs.Root>
 

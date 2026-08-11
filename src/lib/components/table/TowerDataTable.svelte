@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { fly } from "svelte/transition";
-  import { cubicOut } from "svelte/easing";
   import type { GlobalModifier } from "$lib/utils/globalModifier";
   import {
     cellDisplaySource,
@@ -68,7 +66,6 @@
   class="table-container {!isFirst
     ? 'extra-table-container'
     : ''} {settingsStore.minTableWidth ? 'min-content' : ''}"
-  in:fly={{ y: 8, duration: 160, easing: cubicOut }}
 >
   <table class="table {settingsStore.minTableWidth ? 'min-content' : ''}">
     <thead class="table-head">

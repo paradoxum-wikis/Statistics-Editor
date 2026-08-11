@@ -2,6 +2,7 @@
   import { onMount } from "svelte";
   import { fade } from "svelte/transition";
   import { page } from "$app/state";
+  import { MediaQuery } from "svelte/reactivity";
   import { Tooltip } from "bits-ui";
   import { analytics } from "$lib/services/analytics";
   import { bootstrap } from "$lib/bootstrap";
@@ -14,6 +15,7 @@
 
   let { children } = $props();
   let isClient = $state(false);
+  const desktop = new MediaQuery("min-width: 768px");
 
   const siteName = "TDS Statistics Editor";
   const siteUrl = "https://se.tds.wiki/";
@@ -126,12 +128,15 @@
 <Tooltip.Provider delayDuration={200} skipDelayDuration={300}>
   {@render children()}
   {#if !isStandalone}
-    <div class="hidden md:flex h-screen flex-col" in:fade={{ duration: 140 }}>
-      <DesktopLayout {isClient} />
-    </div>
-    <div class="md:hidden" in:fade={{ duration: 140 }}>
-      <MobileLayout {isClient} />
-    </div>
+    {#if desktop.current}
+      <div class="flex h-screen flex-col" in:fade={{ duration: 140 }}>
+        <DesktopLayout {isClient} />
+      </div>
+    {:else}
+      <div in:fade={{ duration: 140 }}>
+        <MobileLayout {isClient} />
+      </div>
+    {/if}
   {/if}
 </Tooltip.Provider>
 <Toaster />

@@ -8,6 +8,7 @@ import {
 import {
   applyRofBug,
   formatNumber,
+  getRofBugVer,
   stripRefOnlyVarSuffix,
   stripRefs,
   toDisplayNumber,
@@ -310,6 +311,75 @@ export function buildDisplayRowsCache(
     }
   }
   return cache;
+}
+
+// for mutable sessions
+export type SkinRowsSession = {
+  id: string;
+  display: Map<string, TableRow[]>;
+  compare: Map<string, TableRow[]>;
+  tables: Map<string, ActiveSkinTables>;
+};
+
+export function ensureSkinRows(
+  session: SkinRowsSession,
+  id: string,
+  tower: Tower | null,
+  skinName: string,
+  rofEnabled: boolean,
+  globalModifier: GlobalModifier,
+): {
+  active: ActiveSkinTables | null;
+  display: Map<string, TableRow[]>;
+  compare: Map<string, TableRow[]>;
+} {
+  if (session.id !== id) {
+    session.id = id;
+    session.display = new Map();
+    session.compare = new Map();
+    session.tables = new Map();
+  }
+  if (!tower || !skinName) {
+    return { active: null, display: session.display, compare: session.compare };
+  }
+
+  let active = session.tables.get(skinName);
+  if (!active) {
+    const built = buildActiveSkinTables(tower, skinName);
+    if (!built) {
+      return {
+        active: null,
+        display: session.display,
+        compare: session.compare,
+      };
+    }
+    session.tables.set(skinName, built);
+    active = built;
+  }
+
+  const rof = getRofBugVer(tower.getSkin(skinName)?.formulaTokens);
+  const rofInfo: RofInfo = {
+    type: rof.type,
+    cols: new Set(rof.cols),
+    enabled: rofEnabled,
+  };
+  for (const config of active.orderedTables) {
+    if (!config.rows.length) continue;
+    const key = tableCacheKey(skinName, config.tableIdx);
+    if (!session.display.has(key)) {
+      session.display.set(
+        key,
+        buildDisplayRows(config, rofInfo, globalModifier),
+      );
+    }
+    if (!session.compare.has(key)) {
+      session.compare.set(
+        key,
+        buildDisplayRows(config, rofInfo, globalModifier, false, false),
+      );
+    }
+  }
+  return { active, display: session.display, compare: session.compare };
 }
 
 function getCellFormulaToken(
