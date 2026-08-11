@@ -49,7 +49,7 @@ const SETTING_DEFS: Record<BooleanSettingKey, BooleanSettingDef> = {
     icon: Eraser,
     label: "Clear Cell on Edit",
     description:
-      "Clears the input box when you click on a cell instead of keeping whatever was already there.",
+      "Clears the cell's input box on click instead of keeping the old text.",
   },
   restoreRefOnClearEdit: {
     storageKey: "tdse_coe_ref",
@@ -87,8 +87,7 @@ const SETTING_DEFS: Record<BooleanSettingKey, BooleanSettingDef> = {
     tab: "appearance",
     icon: Columns2,
     label: "Always Show Tabs",
-    description:
-      "Keeps the variation tab bar visible even when a tower only has one variation.",
+    description: "Keeps variation tabs visible even with a single variation.",
   },
   minTableWidth: {
     storageKey: "tdse_mctw",
@@ -97,8 +96,7 @@ const SETTING_DEFS: Record<BooleanSettingKey, BooleanSettingDef> = {
     tab: "appearance",
     icon: Scaling,
     label: "Compact Table Width",
-    description:
-      "Prevents the table from stretching to the full width, keeping it only as wide as necessary.",
+    description: "Prevents the table from stretching to all available space.",
   },
   hideCellWrapper: {
     storageKey: "tdse_hcw",
@@ -117,7 +115,7 @@ const SETTING_DEFS: Record<BooleanSettingKey, BooleanSettingDef> = {
     icon: Rows3,
     label: "Compact Paths",
     description:
-      "Hides the path letter labels above split-path upgrade tabs for a tighter sidebar.",
+      "Hides the path labels above split-path upgrade tabs for a tighter sidebar.",
   },
   hideWikiBanner: {
     storageKey: "tdse_hwb",
