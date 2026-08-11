@@ -222,7 +222,7 @@
     <div class="mb-4 flex flex-wrap items-center gap-2">
       <div class="relative w-full max-w-xs">
         <TextInput
-          class="input-short pl-7"
+          class="short pl-7"
           placeholder="Search title, tower, or author..."
           bind:value={q}
         />
@@ -372,7 +372,7 @@
     ? `"${unpublishTarget.title}" leaves the Workshop, but the share link will still keep working.`
     : ""}
   confirmLabel="Unpublish"
-  confirmClass="btn btn-destructive-fill text-white"
+  confirmClass="btn destructive-fill text-white"
   onConfirm={confirmUnpublish}
   onCancel={() => (unpublishTarget = null)}
 />

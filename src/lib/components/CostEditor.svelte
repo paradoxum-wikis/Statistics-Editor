@@ -118,7 +118,7 @@
           </span>
           <input
             type="number"
-            class="input input-compact min-w-0"
+            class="input compact min-w-0"
             value={row.cost}
             min="0"
             step="1"

@@ -24,18 +24,17 @@
 
 {#snippet settingRow(setting: BooleanSetting, parentActive = true)}
   {@const enabled = settingsStore.getBoolean(setting.key)}
-  <div class="setting" class:setting--disabled={!parentActive}>
-    <div class="setting__icon">
+  <div class="setting" class:disabled={!parentActive}>
+    <div class="setting-icon">
       <setting.icon size={22} strokeWidth={2.5} />
     </div>
-    <div class="setting__text">
-      <div class="setting__title">{setting.label}</div>
-      <div class="setting__desc">{setting.description}</div>
+    <div class="setting-text">
+      <div class="setting-title">{setting.label}</div>
+      <div class="setting-desc">{setting.description}</div>
     </div>
     <button
       id={setting.id}
       class="toggle"
-      class:on={enabled}
       role="switch"
       aria-checked={enabled}
       aria-label={setting.label}
@@ -80,7 +79,7 @@
     class="sm:max-w-240! md:gap-0! md:p-5! max-md:pb-0"
   >
     {#snippet header()}
-      <div class="set__head">
+      <div class="set-head">
         <div class="tabs-list" use:tabPill={() => tab}>
           <Tabs.List class="contents" aria-label="Settings categories">
             {#each SETTING_TABS as item (item.value)}
@@ -109,10 +108,8 @@
 
     <Tabs.Content value={tab}>
       {#key tab}
-        <div
-          in:fly={{ x: tabDirection * 48, duration: 180, easing: cubicOut }}
-        >
-          <div class="set__grid">
+        <div in:fly={{ x: tabDirection * 48, duration: 180, easing: cubicOut }}>
+          <div class="set-grid">
             {#each settingGroupsForTab(tab) as group (group.parent.key)}
               {@render settingRow(group.parent)}
               {#each group.children as child (child.key)}
@@ -130,28 +127,49 @@
 </Tabs.Root>
 
 <style>
-  .set__head {
+  .set-head {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     width: 100%;
     align-items: center;
     margin-bottom: 1rem;
+
+    .tabs-list {
+      grid-column: 2;
+      justify-self: center;
+    }
+
+    .close {
+      grid-column: 3;
+      justify-self: end;
+    }
+
+    @media (max-width: 767px) {
+      display: flex;
+      align-items: stretch;
+
+      .tabs-list {
+        width: 100%;
+        grid-column: auto;
+        justify-self: auto;
+      }
+
+      :global(.tabs-trigger) {
+        flex: 1 1 0%;
+        min-width: 0;
+        padding-inline: 0.5rem;
+      }
+    }
   }
 
-  .set__head .tabs-list {
-    grid-column: 2;
-    justify-self: center;
-  }
-
-  .set__head .close {
-    grid-column: 3;
-    justify-self: end;
-  }
-
-  .set__grid {
+  .set-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 10px;
+
+    @media (max-width: 767px) {
+      grid-template-columns: 1fr;
+    }
   }
 
   .setting {
@@ -164,36 +182,45 @@
     border-radius: var(--radius);
     background: var(--muted);
     transition: opacity 0.15s;
-  }
 
-  .setting--disabled {
-    opacity: 0.5;
-  }
+    &.disabled {
+      opacity: 0.5;
+    }
 
-  .setting__icon {
-    display: grid;
-    place-items: center;
-    width: 36px;
-    height: 36px;
-    color: var(--primary);
-  }
+    .setting-icon {
+      display: grid;
+      place-items: center;
+      width: 36px;
+      height: 36px;
+      color: var(--primary);
+    }
 
-  .setting__title {
-    font-size: 15px;
-    font-weight: 700;
-    -webkit-text-stroke: 0;
-  }
+    .setting-title {
+      font-size: 15px;
+      font-weight: 700;
+      -webkit-text-stroke: 0;
 
-  :global(.dark) .setting__title {
-    -webkit-text-stroke: var(--text-stroke-width)
-      var(--text-stroke-color);
-    paint-order: stroke fill;
-  }
+      :global(.dark) & {
+        -webkit-text-stroke: var(--text-stroke-width) var(--text-stroke-color);
+        paint-order: stroke fill;
+      }
+    }
 
-  .setting__desc {
-    margin-top: 1px;
-    font-size: 12px;
-    color: var(--muted-foreground);
+    .setting-desc {
+      margin-top: 1px;
+      font-size: 12px;
+      color: var(--muted-foreground);
+    }
+
+    @media (max-width: 767px) {
+      grid-template-columns: 32px 1fr auto;
+      gap: 8px;
+      padding-inline: 10px;
+
+      .setting-icon {
+        width: 28px;
+      }
+    }
   }
 
   .toggle {
@@ -201,13 +228,19 @@
     --btn-deep: var(--destructive-dark);
     --btn-rim: oklch(from var(--btn) min(0.95, calc(l + 0.12)) c h);
     display: inline-flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 2px;
+    min-width: 84px;
     border: 2px solid var(--btn-rim);
     border-radius: var(--radius);
     background: linear-gradient(180deg, var(--btn) 0%, var(--btn-deep) 100%);
     box-shadow: none;
+    padding: 8px 14px;
     color: white;
+    font-size: 11px;
+    font-weight: 700;
     cursor: pointer;
     transition:
       filter 0.08s,
@@ -227,17 +260,8 @@
       outline: 2px solid var(--primary);
       outline-offset: 2px;
     }
-  }
 
-  .toggle {
-    flex-direction: column;
-    gap: 2px;
-    min-width: 84px;
-    padding: 8px 14px;
-    font-size: 11px;
-    font-weight: 700;
-
-    &.on {
+    &[aria-checked="true"] {
       --btn: var(--green);
       --btn-deep: var(--green-dark);
     }
@@ -245,41 +269,8 @@
     &:disabled {
       cursor: not-allowed;
     }
-  }
 
-  @media (max-width: 767px) {
-    .set__head {
-      display: flex;
-      align-items: stretch;
-    }
-
-    .set__head .tabs-list {
-      width: 100%;
-      grid-column: auto;
-      justify-self: auto;
-    }
-
-    .set__head :global(.tabs-trigger) {
-      flex: 1 1 0%;
-      min-width: 0;
-      padding-inline: 0.5rem;
-    }
-
-    .set__grid {
-      grid-template-columns: 1fr;
-    }
-
-    .setting {
-      grid-template-columns: 32px 1fr auto;
-      gap: 8px;
-      padding-inline: 10px;
-    }
-
-    .setting__icon {
-      width: 28px;
-    }
-
-    .toggle {
+    @media (max-width: 767px) {
       min-width: 68px;
       padding-inline: 8px;
     }

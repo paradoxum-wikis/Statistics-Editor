@@ -575,7 +575,7 @@
   title="Discard unsaved changes?"
   body={discardBody}
   confirmLabel="Discard and continue"
-  confirmClass="btn btn-destructive-fill text-white"
+  confirmClass="btn destructive-fill text-white"
   onConfirm={confirmDiscard}
   onCancel={cancelDiscard}
 />
@@ -591,7 +591,7 @@
   title="Are you absolutely sure?"
   body={deleteProfileBody}
   confirmLabel="Delete"
-  confirmClass="btn btn-destructive-fill text-white"
+  confirmClass="btn destructive-fill text-white"
   onConfirm={confirmDeleteProfile}
   onCancel={() => (profileToDelete = null)}
 />

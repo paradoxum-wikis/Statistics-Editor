@@ -9,8 +9,8 @@
     body,
     cancelLabel = "Cancel",
     confirmLabel,
-    cancelClass = "btn btn-outline mt-2 sm:mt-0",
-    confirmClass = "btn btn-primary",
+    cancelClass = "btn outline mt-2 sm:mt-0",
+    confirmClass = "btn primary",
     onConfirm,
     onCancel,
   }: {

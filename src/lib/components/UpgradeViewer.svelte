@@ -132,7 +132,7 @@
   <Tabs.List class="contents">
     {#if upgradeGroups.length > 1}
       <div
-        class="tabs-list tabs-list-stretch mb-1.5 overflow-x-auto"
+        class="tabs-list stretch mb-1.5 overflow-x-auto"
         use:tabPill={() => selectedUpgrade}
       >
         {#each upgradeGroups[0].indices as index (index)}
@@ -152,7 +152,7 @@
               </span>
             {/if}
             <div
-              class="tabs-list tabs-list-stretch overflow-x-auto"
+              class="tabs-list stretch overflow-x-auto"
               use:tabPill={() => selectedUpgrade}
             >
               {#each group.indices as index (index)}
@@ -166,7 +166,7 @@
       </div>
     {:else}
       <div
-        class="tabs-list tabs-list-stretch mb-4 overflow-x-auto"
+        class="tabs-list stretch mb-4 overflow-x-auto"
         use:tabPill={() => selectedUpgrade}
       >
         {#each Array(numUpgrades) as _, index (index)}

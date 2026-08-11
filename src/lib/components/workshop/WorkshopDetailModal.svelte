@@ -396,7 +396,7 @@
                       ? "Remove upvote"
                       : "Upvote"
                     : "Sign in to upvote"}
-                  class="btn btn-outline inline-flex items-center gap-1.5 {item.voted
+                  class="btn outline inline-flex items-center gap-1.5 {item.voted
                     ? 'border-sky-500/50! text-sky-600! dark:text-sky-400!'
                     : ''}"
                   onPressedChange={() => void onVote()}
@@ -408,7 +408,7 @@
             </Tip>
             <Tip content="View this build’s stats in the editor">
               {#snippet children({ props })}
-                <a {...props} class="btn btn-secondary" href={openHref}>
+                <a {...props} class="btn secondary" href={openHref}>
                   View tower in Editor
                 </a>
               {/snippet}
@@ -543,7 +543,7 @@
   title="Delete this comment?"
   description={deleteTarget ? "This can't be undone." : ""}
   confirmLabel="Delete"
-  confirmClass="btn btn-destructive-fill text-white"
+  confirmClass="btn destructive-fill text-white"
   onConfirm={confirmDeleteComment}
   onCancel={() => (deleteTarget = null)}
 />

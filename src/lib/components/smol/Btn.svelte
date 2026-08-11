@@ -21,11 +21,11 @@
   } = $props();
 
   const variantClass: Record<BtnVariant, string> = {
-    primary: "btn-primary",
-    secondary: "btn-secondary",
-    outline: "btn-outline",
-    destructive: "btn-destructive",
-    "destructive-fill": "btn-destructive-fill",
+    primary: "primary",
+    secondary: "secondary",
+    outline: "outline",
+    destructive: "destructive",
+    "destructive-fill": "destructive-fill",
   };
 
   const btnClass = $derived(`btn ${variantClass[variant]} ${className}`);

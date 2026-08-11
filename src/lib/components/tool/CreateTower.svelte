@@ -81,7 +81,7 @@
         {/if}
         <button
           type="submit"
-          class="btn btn-primary w-full"
+          class="btn primary w-full"
           disabled={!newTowerName.trim()}
         >
           Create

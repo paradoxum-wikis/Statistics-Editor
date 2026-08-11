@@ -198,7 +198,7 @@
           <div class="flex gap-2">
             <TextInput
               id="workshop-share-input"
-              class="input-short"
+              class="short"
               placeholder="https://tds.wiki/s/..."
               bind:value={shareInput}
               onkeydown={(e: KeyboardEvent) => {
@@ -230,7 +230,7 @@
         </div>
         <TextInput
           id="workshop-title-input"
-          class="input-short"
+          class="short"
           placeholder="Accel rework but actually balanced"
           maxlength="80"
           bind:value={title}
@@ -262,7 +262,7 @@
         </label>
         <TextInput
           id="workshop-image-input"
-          class="input-short"
+          class="short"
           placeholder="File:Place.png · Roblox Asset ID · https://..."
           maxlength="512"
           bind:value={image}

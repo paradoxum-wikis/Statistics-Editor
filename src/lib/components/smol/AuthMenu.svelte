@@ -102,7 +102,7 @@
     title="Sign out?"
     body={logoutBody}
     confirmLabel="Let me out!"
-    confirmClass="btn btn-destructive-fill text-white"
+    confirmClass="btn destructive-fill text-white"
     onConfirm={confirmLogout}
   />
 {:else}
@@ -149,7 +149,7 @@
           editor, save (Alt+Shift+S), then confirm here.
         </p>
         <a
-          class="btn btn-primary inline-flex w-full justify-center"
+          class="btn primary inline-flex w-full justify-center"
           href={authStore.challenge.edit_url}
           target="_blank"
           rel="noopener noreferrer"
@@ -174,14 +174,14 @@
         {#if !authStore.challenge}
           <button
             type="button"
-            class="btn btn-outline"
+            class="btn outline"
             onclick={() => (loginOpen = false)}
           >
             Cancel
           </button>
           <button
             type="button"
-            class="btn btn-primary"
+            class="btn primary"
             disabled={authStore.busy || !username.trim()}
             onclick={onStart}
           >
@@ -190,7 +190,7 @@
         {:else}
           <button
             type="button"
-            class="btn btn-outline"
+            class="btn outline"
             disabled={authStore.busy}
             onclick={() => authStore.clearChallenge()}
           >
@@ -198,7 +198,7 @@
           </button>
           <button
             type="button"
-            class="btn btn-primary"
+            class="btn primary"
             disabled={authStore.busy}
             onclick={onComplete}
           >

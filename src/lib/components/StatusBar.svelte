@@ -148,7 +148,6 @@
                 {...props}
                 type="button"
                 class="status-bar-indicator"
-                class:on={enabled}
                 aria-label={setting.label}
                 aria-pressed={enabled}
                 disabled={!parentOk}

@@ -193,7 +193,7 @@
       {:else}
         <div class="mb-4 flex flex-wrap items-center gap-2">
           <TextInput
-            class="input-short max-w-xs"
+            class="short max-w-xs"
             placeholder="Search title, tower, author, ids..."
             bind:value={q}
           />
@@ -377,7 +377,7 @@
       ? `"${deleteTarget.title}" is removed permanently. The share id can be published again.`
       : ""}
     confirmLabel="Delete forever"
-    confirmClass="btn btn-destructive-fill text-white"
+    confirmClass="btn destructive-fill text-white"
     onConfirm={confirmHardDelete}
     onCancel={() => (deleteTarget = null)}
   />

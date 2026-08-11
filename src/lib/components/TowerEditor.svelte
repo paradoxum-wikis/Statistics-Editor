@@ -452,7 +452,7 @@
     >
       {#if availableSkins.length > 1 || settingsStore.alwaysShowSkinTabs}
         <div
-          class="tabs-list tabs-list-stretch mb-4 overflow-x-auto"
+          class="tabs-list stretch mb-4 overflow-x-auto"
           use:tabPill={() => selectedSkinName}
         >
           <Tabs.List class="contents">
@@ -511,7 +511,7 @@
           {#snippet children({ props })}
             <span class="inline-flex" {...props}>
               <Popover.Trigger
-                class="btn btn-secondary"
+                class="btn secondary"
                 disabled={!canShareUrl}
               >
                 <span class="max-md:hidden">Share URL</span>
@@ -545,11 +545,11 @@
             {:else if shareError}
               <p class="text-sm text-destructive">{shareError}</p>
               <div class="flex justify-end">
-                <Popover.Close class="btn btn-outline">Close</Popover.Close>
+                <Popover.Close class="btn outline">Close</Popover.Close>
               </div>
             {:else if shareLink}
               <input
-                class="input input-short w-full font-mono text-xs"
+                class="input short w-full font-mono text-xs"
                 readonly
                 value={shareLink}
                 onclick={(e) => (e.currentTarget as HTMLInputElement).select()}
@@ -583,7 +583,7 @@
           <Tip content="Fetch latest Neowtext from the TDS Wiki">
             {#snippet children({ props })}
               <Popover.Trigger
-                class="btn btn-secondary"
+                class="btn secondary"
                 disabled={isFetching}
                 {...props}
               >
@@ -606,8 +606,8 @@
               </p>
             </div>
             <div class="flex justify-end mt-4 gap-2">
-              <Popover.Close class="btn btn-outline">Cancel</Popover.Close>
-              <Popover.Close class="btn btn-primary" onclick={handleFetchWiki}>
+              <Popover.Close class="btn outline">Cancel</Popover.Close>
+              <Popover.Close class="btn primary" onclick={handleFetchWiki}>
                 Confirm
               </Popover.Close>
             </div>
@@ -652,7 +652,7 @@
         {/if}
       </Btn>
       <Popover.Root>
-        <Popover.Trigger class="btn btn-destructive text-white">
+        <Popover.Trigger class="btn destructive text-white">
           <span class="max-md:hidden"
             >{towerStore.isCustomSelected()
               ? "Delete Tower"
@@ -684,9 +684,9 @@
             </p>
           </div>
           <div class="mt-4 flex justify-end gap-2">
-            <Popover.Close class="btn btn-outline">Cancel</Popover.Close>
+            <Popover.Close class="btn outline">Cancel</Popover.Close>
             <Popover.Close
-              class="btn btn-destructive-fill text-white"
+              class="btn destructive-fill text-white"
               onclick={() => void handleResetOrDelete()}
             >
               Confirm
@@ -699,7 +699,7 @@
           <Tip content="Write these stats to your current profile">
             {#snippet children({ props })}
               <Popover.Trigger
-                class="btn btn-primary tower-editor-actions-primary"
+                class="btn primary tower-editor-actions-primary"
                 disabled={!towerStore.isDirty}
                 {...props}
               >
@@ -718,8 +718,8 @@
               </p>
             </div>
             <div class="flex justify-end mt-4 gap-2">
-              <Popover.Close class="btn btn-outline">Cancel</Popover.Close>
-              <Popover.Close class="btn btn-primary" onclick={handleSave}>
+              <Popover.Close class="btn outline">Cancel</Popover.Close>
+              <Popover.Close class="btn primary" onclick={handleSave}>
                 Confirm
               </Popover.Close>
             </div>

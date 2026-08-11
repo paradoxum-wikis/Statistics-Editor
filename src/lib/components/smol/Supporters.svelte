@@ -43,7 +43,7 @@
         href={data.profile.link}
         target="_blank"
         rel="noopener noreferrer"
-        class="btn btn-primary mt-2 w-full"
+        class="btn primary mt-2 w-full"
       >
         Support Us!
       </a>
@@ -117,18 +117,16 @@
     background-clip: text;
     color: transparent;
     animation: tier-ii-shift 2.7s linear infinite;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+      background-position: 0 center;
+    }
   }
 
   @keyframes tier-ii-shift {
     to {
       background-position: 200% center;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .tier-ii {
-      animation: none;
-      background-position: 0 center;
     }
   }
 </style>

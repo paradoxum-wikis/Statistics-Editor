@@ -72,7 +72,7 @@
               </span>
               <input
                 type="text"
-                class="input input-compact placeholder:text-muted-foreground/40"
+                class="input compact placeholder:text-muted-foreground/40"
                 placeholder="-"
                 value={row.title}
                 onchange={(e) => updateTitle(row.index, e.currentTarget.value)}
@@ -84,7 +84,7 @@
               </span>
               <input
                 type="text"
-                class="input input-compact placeholder:text-muted-foreground/40"
+                class="input compact placeholder:text-muted-foreground/40"
                 placeholder="-"
                 value={row.image}
                 onchange={(e) => updateImage(row.index, e.currentTarget.value)}

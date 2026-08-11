@@ -46,7 +46,7 @@
     </p>
   {/if}
 
-  <button type="button" class="btn btn-primary" onclick={onHome}>
+  <button type="button" class="btn primary" onclick={onHome}>
     Back to Home
   </button>
 </div>

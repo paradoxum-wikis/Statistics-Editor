@@ -291,7 +291,7 @@
         <Tip content="Fetch latest Neowtext from the TDS Wiki">
           {#snippet children({ props })}
             <Popover.Trigger
-              class="btn btn-secondary"
+              class="btn secondary"
               disabled={isFetching || saving}
               {...props}
             >
@@ -309,8 +309,8 @@
             </p>
           </div>
           <div class="flex justify-end mt-4 gap-2">
-            <Popover.Close class="btn btn-outline">Cancel</Popover.Close>
-            <Popover.Close class="btn btn-primary" onclick={handleFetchWiki}>
+            <Popover.Close class="btn outline">Cancel</Popover.Close>
+            <Popover.Close class="btn primary" onclick={handleFetchWiki}>
               Confirm
             </Popover.Close>
           </div>
@@ -328,7 +328,7 @@
     </Btn>
 
     <Popover.Root>
-      <Popover.Trigger class="btn btn-destructive text-white">
+      <Popover.Trigger class="btn destructive text-white">
         {towerStore.isCustomSelected() ? "Delete Tower" : "Reset Tower"}
       </Popover.Trigger>
       <Popover.Content class="popover-content" sideOffset={6}>
@@ -351,9 +351,9 @@
           </p>
         </div>
         <div class="mt-4 flex justify-end gap-2">
-          <Popover.Close class="btn btn-outline">Cancel</Popover.Close>
+          <Popover.Close class="btn outline">Cancel</Popover.Close>
           <Popover.Close
-            class="btn btn-destructive-fill text-white"
+            class="btn destructive-fill text-white"
             onclick={() => void handleResetOrDelete()}
           >
             Confirm
@@ -370,7 +370,7 @@
       >
         {#snippet children({ props })}
           <Popover.Trigger
-            class="btn btn-primary"
+            class="btn primary"
             disabled={!canSave ||
               !towerStore.isDirty ||
               saving ||
@@ -391,8 +391,8 @@
           </p>
         </div>
         <div class="flex justify-end mt-4 gap-2">
-          <Popover.Close class="btn btn-outline">Cancel</Popover.Close>
-          <Popover.Close class="btn btn-primary" onclick={saveOverride}>
+          <Popover.Close class="btn outline">Cancel</Popover.Close>
+          <Popover.Close class="btn primary" onclick={saveOverride}>
             Confirm
           </Popover.Close>
         </div>
