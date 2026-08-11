@@ -138,7 +138,7 @@
                 {setting.description}
               </p>
               {#if !parentOk && parent}
-                <p class="mt-1 text-xs text-muted-foreground">
+                <p class="mt-1 text-xs text-amber-600 dark:text-amber-400">
                   Requires {parent.label}
                 </p>
               {/if}
