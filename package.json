@@ -37,6 +37,7 @@
   },
   "dependencies": {
     "@bhsd/codemirror-wikitext": "^0.10.0",
+    "@fontsource-variable/montserrat": "^5.3.0",
     "@lucide/svelte": "^1.24.0",
     "codemirror": "^6.0.2",
     "layerchart": "^2.0.2",
