@@ -6,10 +6,7 @@
   import GlobalModifier from "./tool/GlobalModifier.svelte";
   import StatsChart from "./tool/StatsChart.svelte";
   import CreateTower from "./tool/CreateTower.svelte";
-  import {
-    settingsStore,
-    BOOLEAN_SETTINGS,
-  } from "$lib/stores/settings.svelte";
+  import { settingsStore, BOOLEAN_SETTINGS } from "$lib/stores/settings.svelte";
   import { towerStore } from "$lib/stores/tower.svelte";
   import {
     House,
@@ -148,8 +145,7 @@
                 aria-label={setting.label}
                 aria-pressed={enabled}
                 disabled={!parentOk}
-                onclick={() =>
-                  settingsStore.setBoolean(setting.key, !enabled)}
+                onclick={() => settingsStore.setBoolean(setting.key, !enabled)}
               >
                 <setting.icon size={14} />
               </button>
@@ -182,22 +178,22 @@
           <p class="mb-1.5 px-2 text-xs text-muted-foreground">
             In the case you REALLY need to toggle.
           </p>
-          <div class="grid max-h-64 gap-0.5 overflow-y-auto">
+          <div class="pin-list">
             {#each BOOLEAN_SETTINGS as setting (setting.key)}
               {@const pinned = settingsStore.isPinned(setting.key)}
               <button
                 type="button"
-                class="dropdown-item w-full justify-start!"
-                class:text-primary={pinned}
+                class="pin-item"
+                aria-pressed={pinned}
                 onclick={() => settingsStore.togglePin(setting.key)}
               >
-                <setting.icon class="me-2 h-4 w-4 shrink-0" />
-                <span class="min-w-0 flex-1 truncate text-start"
-                  >{setting.label}</span
-                >
-                {#if pinned}
-                  <Pin class="ms-2 h-3.5 w-3.5 shrink-0 fill-current" />
-                {/if}
+                <setting.icon size={16} />
+                <span class="mx-1">{setting.label}</span>
+                <span aria-hidden="true">
+                  {#if pinned}
+                    <Pin size={14} />
+                  {/if}
+                </span>
               </button>
             {/each}
           </div>

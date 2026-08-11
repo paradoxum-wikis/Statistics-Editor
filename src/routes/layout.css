@@ -3,7 +3,6 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Soft blue neutrals (hue 250) so light mode matches dark's cool cast. */
   --background: oklch(0.98 0.006 250);
   --foreground: oklch(0.18 0.02 250);
   --card: oklch(0.995 0.003 250);
@@ -608,6 +607,98 @@ h4,
     button {
       opacity: 1;
     }
+  }
+}
+
+.pin-list {
+  display: flex;
+  max-height: 16rem;
+  flex-direction: column;
+  gap: 2px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.pin-item {
+  display: grid;
+  grid-template-columns: 1rem minmax(0, 1fr) 1rem;
+  align-items: center;
+  gap: 0.5rem;
+  border: none;
+  border-radius: var(--radius);
+  background: transparent;
+  padding: 0.375rem 0.75rem;
+  color: var(--foreground);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: start;
+  cursor: pointer;
+  outline: none;
+
+  &[aria-pressed="true"] {
+    color: var(--primary);
+  }
+
+  &:hover,
+  &:focus-visible {
+    background: var(--secondary);
+    color: var(--primary);
+  }
+
+  &[aria-pressed="true"]:hover,
+  &[aria-pressed="true"]:focus-visible {
+    background: color-mix(in oklch, var(--destructive-dark) 15%, transparent);
+    color: var(--destructive);
+  }
+
+  > :first-child {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  > span:first-of-type {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  > :last-child {
+    display: grid;
+    width: 1rem;
+    height: 1rem;
+    place-items: center;
+    overflow: hidden;
+
+    > * {
+      width: 0.875rem;
+      height: 0.875rem;
+      transform-origin: 50% 100%;
+      fill: currentColor;
+      animation: pin-plant 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+
+      @media (prefers-reduced-motion: reduce) {
+        animation: none;
+      }
+    }
+  }
+}
+
+@keyframes pin-plant {
+  0% {
+    opacity: 0;
+    transform: translateY(3px) rotate(-22deg) scale(0.6);
+  }
+  42% {
+    opacity: 1;
+    transform: translateY(-2px) rotate(12deg) scale(1.08);
+  }
+  72% {
+    transform: translateY(1px) rotate(-8deg) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
   }
 }
 
