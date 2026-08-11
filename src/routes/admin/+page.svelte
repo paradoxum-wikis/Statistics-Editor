@@ -2,7 +2,8 @@
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { fade } from "svelte/transition";
-  import { ArrowLeft, Trash2 } from "@lucide/svelte";
+  import { Select } from "bits-ui";
+  import { ArrowLeft, Check, ChevronDown, Trash2 } from "@lucide/svelte";
   import { authStore } from "$lib/stores/auth.svelte";
   import AuthMenu from "$lib/components/smol/AuthMenu.svelte";
   import Alert from "$lib/components/smol/Alert.svelte";
@@ -27,6 +28,12 @@
   import { settingsStore } from "$lib/stores/settings.svelte";
   import { toast } from "$lib/toast";
 
+  const STATUS_OPTIONS = [
+    { value: "all", label: "All" },
+    { value: "published", label: "Published" },
+    { value: "hidden", label: "Hidden" },
+  ] as const;
+
   let items = $state<AdminListing[]>([]);
   let total = $state(0);
   let page = $state(1);
@@ -37,6 +44,9 @@
   let q = $state("");
   let debouncedQ = $state("");
   let status = $state<"all" | "published" | "hidden">("all");
+  const statusLabel = $derived(
+    STATUS_OPTIONS.find((o) => o.value === status)?.label ?? "All",
+  );
 
   let deleteTarget = $state<AdminListing | null>(null);
   let deleteOpen = $state(false);
@@ -137,11 +147,6 @@
 </script>
 
 <svelte:head>
-  <title>
-    {authStore.ready && !allowed
-      ? "403 Forbidden | TDS Statistics Editor"
-      : "Admin | TDS Statistics Editor"}
-  </title>
   <meta name="robots" content="noindex" />
 </svelte:head>
 
@@ -192,21 +197,49 @@
             placeholder="Search title, tower, author, ids..."
             bind:value={q}
           />
-          <select
-            class="input input-short w-auto"
-            bind:value={status}
-            onchange={() => (page = 1)}
-            aria-label="Status filter"
+          <Select.Root
+            type="single"
+            items={[...STATUS_OPTIONS]}
+            value={status}
+            onValueChange={(val) => {
+              if (!val || val === status) return;
+              status = val as typeof status;
+              page = 1;
+            }}
           >
-            <option value="all">All</option>
-            <option value="published">Published</option>
-            <option value="hidden">Hidden</option>
-          </select>
+            <Select.Trigger
+              class="select-trigger w-auto gap-1.5"
+              aria-label="Status filter"
+            >
+              <span class="truncate">{statusLabel}</span>
+              <ChevronDown class="size-3.5 shrink-0 opacity-50" />
+            </Select.Trigger>
+            <Select.Portal>
+              <Select.Content class="select-content min-w-36" sideOffset={6}>
+                <Select.Viewport class="p-1">
+                  {#each STATUS_OPTIONS as option (option.value)}
+                    <Select.Item
+                      class="select-item"
+                      value={option.value}
+                      label={option.label}
+                    >
+                      {#snippet children({ selected })}
+                        {option.label}
+                        {#if selected}
+                          <Check class="ms-auto size-3.5 shrink-0" />
+                        {/if}
+                      {/snippet}
+                    </Select.Item>
+                  {/each}
+                </Select.Viewport>
+              </Select.Content>
+            </Select.Portal>
+          </Select.Root>
           <span class="text-sm text-muted-foreground">{total} listings</span>
         </div>
 
         <div
-          class="overflow-x-auto rounded-[var(--radius)_0] border border-border"
+          class="overflow-x-auto rounded-(--radius) border border-border"
         >
           <table class="w-full min-w-160 text-left text-sm">
             <thead class="border-b bg-muted/50 text-xs text-muted-foreground">
@@ -287,14 +320,12 @@
                   <td class="px-3 py-2">
                     <div class="flex flex-wrap gap-1">
                       <Btn
-                        size="sm"
                         variant="outline"
                         onclick={() => togglePublished(item)}
                       >
                         {item.published ? "Hide" : "Show"}
                       </Btn>
                       <Btn
-                        size="sm"
                         variant="outline"
                         class="text-destructive"
                         onclick={() => askHardDelete(item)}
@@ -322,7 +353,6 @@
           <div class="mt-4 flex items-center justify-center gap-3">
             <Btn
               variant="outline"
-              size="sm"
               disabled={page <= 1}
               onclick={() => (page -= 1)}>Previous</Btn
             >
@@ -331,7 +361,6 @@
             </span>
             <Btn
               variant="outline"
-              size="sm"
               disabled={page >= totalPages}
               onclick={() => (page += 1)}>Next</Btn
             >

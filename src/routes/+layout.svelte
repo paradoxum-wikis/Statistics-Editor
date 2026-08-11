@@ -10,6 +10,7 @@
   import MobileLayout from "$lib/components/MobileLayout.svelte";
   import Toaster from "$lib/components/smol/Toaster.svelte";
   import "./layout.css";
+  import "@fontsource-variable/montserrat/wght.css";
 
   let { children } = $props();
   let isClient = $state(false);
@@ -24,34 +25,41 @@
 
   const towerName = $derived(towerStore.selectedName || page.params.name || "");
   const isWorkshop = $derived(page.url.pathname.startsWith("/workshop"));
-  const isStandalone = $derived(
-    isWorkshop || page.url.pathname.startsWith("/admin"),
-  );
+  const isAdmin = $derived(page.url.pathname.startsWith("/admin"));
+  const isStandalone = $derived(isWorkshop || isAdmin);
   const notFound = $derived(page.status >= 400 || towerStore.missingTower);
+  // Keep title here only — page-level <title> can stick after client nav.
   const pageTitle = $derived(
+
     notFound
       ? `404 Not Found | ${siteName}`
-      : towerName
-        ? `${towerName} | ${siteName}`
+      : isAdmin
+        ? `Admin | ${siteName}`
         : isWorkshop
           ? `Workshop | ${siteName}`
-          : siteName,
+          : towerName
+            ? `${towerName} | ${siteName}`
+            : siteName,
   );
   const description = $derived(
     notFound
       ? "Sorry, the page you're looking for doesn't exist."
-      : towerName
-        ? `Edit ${towerName} stats in the TDS Statistics Editor for the Roblox game Tower Defense Simulator!`
+      : isAdmin
+        ? "Workshop admin for the TDS Statistics Editor."
         : isWorkshop
           ? "Make, browse and share community tower stats in the TDS Statistics Editor Workshop!"
-          : defaultDescription,
+          : towerName
+            ? `Edit ${towerName} stats in the TDS Statistics Editor for the Roblox game Tower Defense Simulator!`
+            : defaultDescription,
   );
   const pageUrl = $derived(
-    towerName
-      ? `${siteUrl}tower/${encodeURIComponent(towerName)}`
+    isAdmin
+      ? `${siteUrl}admin`
       : isWorkshop
         ? `${siteUrl}workshop`
-        : siteUrl,
+        : towerName
+          ? `${siteUrl}tower/${encodeURIComponent(towerName)}`
+          : siteUrl,
   );
 
   onMount(async () => {
@@ -85,23 +93,22 @@
   <meta name="twitter:image" content={ogImage} />
   <meta name="twitter:image:alt" content={ogImageAlt} />
 
-  <meta name="theme-color" content="#33577a" />
+  <meta
+    name="theme-color"
+    content="#33577a"
+    media="(prefers-color-scheme: light)"
+  />
+  <meta
+    name="theme-color"
+    content="#0c1220"
+    media="(prefers-color-scheme: dark)"
+  />
   <meta name="apple-mobile-web-app-title" content="TDS:SE" />
 
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="icon" href="/favicon.ico" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link
-    rel="preconnect"
-    href="https://fonts.gstatic.com"
-    crossorigin="anonymous"
-  />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
-    rel="stylesheet"
-  />
   <link
     rel="stylesheet"
     href="https://bin.t7ru.link/fol/unisans/index.css"
