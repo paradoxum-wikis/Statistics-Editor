@@ -83,6 +83,7 @@
   let chartOpen = $state(false);
 
   const isNotFound = $derived(page.status >= 400 || towerStore.missingTower);
+  const mainFill = $derived(!towerStore.selectedData);
 
   const mainKey = $derived(
     !isClient
@@ -287,10 +288,10 @@
   </header>
 
   <!-- Main Content -->
-  <main class="min-h-0 flex-1 overflow-x-auto overflow-y-auto p-4 mb-14">
+  <main class="mb-14 min-h-0 flex-1 overflow-x-auto overflow-y-auto">
     {#key mainKey}
       <div
-        class="h-full min-h-0"
+        class={mainFill ? "h-full min-h-0 p-4" : "box-border min-h-full p-4"}
         in:fly={{ y: 12, duration: 160, easing: cubicOut }}
       >
         {#if isNotFound}

@@ -12,10 +12,10 @@
 </script>
 
 {#if notes.length > 0}
-  <CollaspibleMain title="Notes" itemValue="notes" class="pb-4">
+  <CollaspibleMain title="Notes" itemValue="notes">
     <ol class="list-none mt-3">
       {#each notes as note (noteKey(note))}
-        <li class="flex gap-1 text-sm not-first:mt-2 last:mb-2">
+        <li class="flex gap-1 text-sm not-first:mt-2">
           <span class="text-[0.75em] text-muted-foreground">
             [{note.num}]
           </span>
