@@ -24,7 +24,7 @@
 {#if variant === "menu"}
   <button
     class="dropdown-item w-full justify-start! {active
-      ? 'text-amber-600 dark:text-amber-400'
+      ? 'text-amber-600! dark:text-amber-400!'
       : ''}"
     onclick={() => onOpen?.()}
   >
@@ -38,7 +38,7 @@
         <IconBtn
           {...props}
           class="status-bar-btn {active
-            ? 'text-amber-600 dark:text-amber-400'
+            ? 'text-amber-600! dark:text-amber-400!'
             : ''}"
           title="Global Modifier"
         >
