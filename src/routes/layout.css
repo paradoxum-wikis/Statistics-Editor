@@ -763,11 +763,9 @@ h4,
 .dialog-title {
   font-size: 1.125rem;
   font-weight: 700;
-  line-height: 1;
+  line-height: 1.2;
   letter-spacing: 0.02em;
   color: var(--foreground);
-  -webkit-text-stroke: var(--text-stroke-width) var(--text-stroke-color);
-  paint-order: stroke fill;
 }
 
 .dialog-description {

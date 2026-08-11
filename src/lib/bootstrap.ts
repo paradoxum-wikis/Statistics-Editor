@@ -1,4 +1,5 @@
 import { authStore } from "$lib/stores/auth.svelte";
+import { announcementsStore } from "$lib/stores/announcements.svelte";
 import { profileStore } from "$lib/stores/profile.svelte";
 import { settingsStore } from "$lib/stores/settings.svelte";
 import { towerStore } from "$lib/stores/tower.svelte";
@@ -13,6 +14,7 @@ export function bootstrap(): Promise<void> {
       towerStore.init(profileStore.current),
       authStore.init(),
     ]);
+    void announcementsStore.init().catch(() => {});
   })();
   return ready;
 }

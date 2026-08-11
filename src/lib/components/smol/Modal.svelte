@@ -34,6 +34,24 @@
   }
 </script>
 
+{#snippet closeBtn()}
+  <button
+    type="button"
+    class="close"
+    aria-label="Close"
+    onclick={() => setOpen(false)}
+  >
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
+      <path
+        d="M6 6l12 12M18 6L6 18"
+        stroke="currentColor"
+        stroke-width="4"
+        stroke-linecap="round"
+      />
+    </svg>
+  </button>
+{/snippet}
+
 {#if desktop.current}
   <Dialog.Root {open} onOpenChange={setOpen}>
     {#if trigger}
@@ -56,13 +74,18 @@
           {/if}
           {@render header()}
         {:else if title}
-          <div class="flex flex-col space-y-1.5 pe-8 text-center sm:text-start">
-            <Dialog.Title class="dialog-title">{title}</Dialog.Title>
-            {#if description}
-              <Dialog.Description class="dialog-description">
-                {description}
-              </Dialog.Description>
-            {/if}
+          <div class="flex items-start justify-between gap-3">
+            <div
+              class="flex min-w-0 flex-1 flex-col space-y-1.5 text-center sm:text-start"
+            >
+              <Dialog.Title class="dialog-title">{title}</Dialog.Title>
+              {#if description}
+                <Dialog.Description class="dialog-description">
+                  {description}
+                </Dialog.Description>
+              {/if}
+            </div>
+            {@render closeBtn()}
           </div>
         {/if}
 
@@ -108,13 +131,18 @@
             {/if}
             {@render header()}
           {:else if title}
-            <div class="flex flex-col space-y-1.5 text-center">
-              <Drawer.Title class="dialog-title">{title}</Drawer.Title>
-              {#if description}
-                <Drawer.Description class="dialog-description">
-                  {description}
-                </Drawer.Description>
-              {/if}
+            <div class="flex items-start justify-between gap-3">
+              <div
+                class="flex min-w-0 flex-1 flex-col space-y-1.5 text-center sm:text-start"
+              >
+                <Drawer.Title class="dialog-title">{title}</Drawer.Title>
+                {#if description}
+                  <Drawer.Description class="dialog-description">
+                    {description}
+                  </Drawer.Description>
+                {/if}
+              </div>
+              {@render closeBtn()}
             </div>
           {/if}
 

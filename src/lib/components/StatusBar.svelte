@@ -7,6 +7,7 @@
   import StatsChart from "./tool/StatsChart.svelte";
   import CreateTower from "./tool/CreateTower.svelte";
   import { settingsStore, BOOLEAN_SETTINGS } from "$lib/stores/settings.svelte";
+  import { announcementsStore } from "$lib/stores/announcements.svelte";
   import { towerStore } from "$lib/stores/tower.svelte";
   import {
     House,
@@ -16,6 +17,7 @@
     SunMoon,
     Check,
     Pin,
+    Megaphone,
   } from "@lucide/svelte";
 
   let {
@@ -40,6 +42,14 @@
   <div class="flex items-center gap-0.5">
     <IconBtn class="status-bar-btn" onclick={() => onHome?.()} title="Home">
       <House size={16} />
+    </IconBtn>
+
+    <IconBtn
+      class="status-bar-btn"
+      onclick={() => announcementsStore.openList()}
+      title="Announcements"
+    >
+      <Megaphone size={16} />
     </IconBtn>
 
     <Popover.Root bind:open={themeOpen}>

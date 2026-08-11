@@ -15,6 +15,7 @@
   import NotFoundView from "./NotFoundView.svelte";
   import TowerPicker from "./TowerPicker.svelte";
   import SettingsModal from "./SettingsModal.svelte";
+  import { announcementsStore } from "$lib/stores/announcements.svelte";
   import GlobalModifier from "./tool/GlobalModifier.svelte";
   import GlobalModifierModal from "./tool/GlobalModifierModal.svelte";
   import StatsChart from "./tool/StatsChart.svelte";
@@ -49,6 +50,7 @@
     Moon,
     SunMoon,
     Store,
+    Megaphone,
   } from "@lucide/svelte";
 
   let { isClient }: { isClient: boolean } = $props();
@@ -525,6 +527,17 @@
           >
             <Settings class="me-2 h-4 w-4" />
             <span>Settings</span>
+          </button>
+
+          <button
+            class="dropdown-item w-full justify-start!"
+            onclick={() => {
+              toolsOpen = false;
+              announcementsStore.openList();
+            }}
+          >
+            <Megaphone class="me-2 h-4 w-4" />
+            <span>Announcements</span>
           </button>
 
           <GlobalModifier

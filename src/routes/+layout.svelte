@@ -10,6 +10,7 @@
   import DesktopLayout from "$lib/components/DesktopLayout.svelte";
   import MobileLayout from "$lib/components/MobileLayout.svelte";
   import Toaster from "$lib/components/smol/Toaster.svelte";
+  import AnnouncementsModal from "$lib/components/AnnouncementsModal.svelte";
   import "./layout.css";
   import "@fontsource-variable/montserrat/wght.css";
 
@@ -139,4 +140,5 @@
     {/if}
   {/if}
 </Tooltip.Provider>
+<AnnouncementsModal />
 <Toaster />
