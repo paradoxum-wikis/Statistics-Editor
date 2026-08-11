@@ -37,7 +37,7 @@
     transition: background-color 0.15s;
 
     &:focus-visible {
-      outline: 2px solid var(--ring);
+      outline: 2px solid var(--primary);
       outline-offset: 2px;
     }
 
@@ -51,7 +51,7 @@
     }
 
     &[data-state="unchecked"] {
-      background: var(--muted);
+      background: var(--secondary);
     }
   }
 
@@ -67,9 +67,7 @@
     width: 1.25rem;
     border-radius: 9999px;
     background: white;
-    box-shadow:
-      0 10px 15px -3px oklch(0 0 0 / 0.1),
-      0 4px 6px -4px oklch(0 0 0 / 0.1);
+    box-shadow: 0 1px 3px oklch(0% 0 0 / 0.35);
     transition: transform 0.15s;
   }
 

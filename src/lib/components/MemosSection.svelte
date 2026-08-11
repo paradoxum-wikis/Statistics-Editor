@@ -58,8 +58,7 @@
             e.preventDefault();
             cancelEdit();
           }
-        }}
-      ></textarea>
+        }}></textarea>
     {:else}
       <div
         class="memo-view mt-3"
@@ -91,20 +90,20 @@
     position: relative;
     min-height: 7rem;
     cursor: text;
-    border-radius: calc(var(--radius) - 0.25rem) 0;
+    border-radius: var(--radius);
     border: 1px solid var(--border);
     padding: 0.25rem 0.75rem;
     font-size: 0.875rem;
     line-height: 1.4;
     transition:
-      border-color 0.2s,
-      background-color 0.2s;
+      border-color 0.25s,
+      background-color 0.25s;
   }
 
   .memo-view:hover,
   .memo-view:focus-visible {
-    border-color: var(--border);
-    background: color-mix(in oklch, var(--accent) 65%, transparent);
+    border-color: var(--border-strong);
+    background: color-mix(in oklch, var(--secondary) 65%, transparent);
     outline: none;
   }
 
@@ -125,9 +124,9 @@
   }
 
   .memo-input {
-    border-radius: calc(var(--radius) - 0.25rem) 0;
-    border: 1px solid var(--input);
-    background: var(--background);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--muted);
     padding: 0.5rem 0.75rem;
     font-size: 0.875rem;
     line-height: 1.4;
@@ -136,7 +135,7 @@
   }
 
   .memo-input:focus-visible {
-    border-color: var(--ring);
-    box-shadow: 0 0 0 2px color-mix(in oklch, var(--ring) 25%, transparent);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px color-mix(in oklch, var(--primary) 25%, transparent);
   }
 </style>

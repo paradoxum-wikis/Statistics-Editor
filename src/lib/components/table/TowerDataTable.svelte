@@ -190,6 +190,7 @@
   .table-container {
     overflow-x: auto;
     border: 1px solid var(--border);
+    border-radius: var(--radius);
     background: var(--card);
 
     &.min-content {
@@ -243,20 +244,25 @@
       border-bottom: 1px solid var(--border);
 
       &:nth-child(even) {
-        background: var(--secondary);
+        background: var(--muted);
 
         .table-cell-sticky {
-          background: var(--secondary);
+          background: linear-gradient(var(--muted), var(--muted)) var(--card);
         }
+      }
+
+      &:last-child {
+        border-bottom: none;
       }
     }
   }
 
   tr.table-row:hover {
-    background: var(--accent);
+    background: var(--secondary);
 
     .table-cell-sticky {
-      background: var(--accent);
+      background: linear-gradient(var(--secondary), var(--secondary))
+        var(--card);
     }
   }
 
@@ -270,7 +276,7 @@
   .table-header-sticky {
     position: sticky;
     left: 0;
-    background: var(--muted);
+    background: linear-gradient(var(--muted), var(--muted)) var(--card);
     z-index: 7;
     text-align: center;
     font-weight: 600;
@@ -338,6 +344,6 @@
   }
 
   .hovered-col {
-    background: var(--accent);
+    background: linear-gradient(var(--secondary), var(--secondary)) var(--card);
   }
 </style>

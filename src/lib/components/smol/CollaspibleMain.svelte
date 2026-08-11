@@ -23,12 +23,14 @@
   <Accordion.Item value={itemValue}>
     <Accordion.Header class="m-0">
       <Accordion.Trigger
-        class="group flex w-full items-center justify-between gap-3 border-b border-border py-2"
+        class="group flex w-full items-center justify-between gap-3 border border-border bg-surface-2 rounded-md px-3 py-2"
       >
-        <span class="font-semibold leading-1">{title}</span>
-        <ChevronDown
-          class="size-4 text-muted-foreground transition-transform duration-150 group-data-[state=open]:rotate-180"
-        />
+        <span class="font-semibold leading-1 text-foreground">{title}</span>
+        <span
+          class="flex size-5 items-center justify-center rounded-sm bg-surface text-muted-foreground transition-transform duration-150 group-data-[state=open]:rotate-180"
+        >
+          <ChevronDown class="size-4" />
+        </span>
       </Accordion.Trigger>
     </Accordion.Header>
     <Accordion.Content forceMount>

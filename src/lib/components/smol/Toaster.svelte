@@ -14,18 +14,11 @@
     warning: TriangleAlert,
   };
 
-  const colorClass: Record<ToastColor, string> = {
-    info: "border-chart-5",
-    success: "border-chart-2",
-    error: "border-chart-1",
-    warning: "border-chart-4",
-  };
-
-  const iconClass: Record<ToastColor, string> = {
-    info: "text-chart-5",
-    success: "text-chart-2",
-    error: "text-chart-1",
-    warning: "text-chart-4",
+  const colorVar: Record<ToastColor, string> = {
+    info: "var(--primary)",
+    success: "var(--green)",
+    error: "var(--destructive)",
+    warning: "var(--yellow)",
   };
 </script>
 
@@ -36,17 +29,14 @@
   {#each toastStore.items as item (item.id)}
     {@const Icon = iconByColor[item.color]}
     <div
-      class="group pointer-events-auto relative flex items-center gap-2 rounded-[var(--radius)_0] border bg-secondary px-2 py-1.5 text-sm text-foreground shadow-md {colorClass[
-        item.color
-      ]}"
+      class="toast group pointer-events-auto relative flex items-center gap-2 rounded-md border border-border bg-popover px-2 py-2 text-sm text-foreground shadow-md"
+      style:--toast-color={colorVar[item.color]}
       role={item.color === "error" ? "alert" : "status"}
       in:fly={{ x: 16, duration: 180 }}
       out:fly={{ x: 16, duration: 140 }}
     >
       <span
-        class="flex size-6 shrink-0 items-center justify-center rounded-[calc(var(--radius)-0.5rem)_0] {iconClass[
-          item.color
-        ]}"
+        class="toast-icon flex size-6 shrink-0 items-center justify-center"
         aria-hidden="true"
       >
         <Icon class="size-4" />
@@ -63,3 +53,13 @@
     </div>
   {/each}
 </div>
+
+<style>
+  .toast {
+    border-left: 3px solid var(--toast-color);
+  }
+
+  .toast-icon {
+    color: var(--toast-color);
+  }
+</style>

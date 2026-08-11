@@ -11,6 +11,7 @@
     class: className,
     onOpenChange,
     trigger,
+    header,
     children,
     footer,
   }: {
@@ -20,6 +21,7 @@
     class?: string;
     onOpenChange?: (open: boolean) => void;
     trigger?: Snippet<[{ props: Record<string, unknown> }]>;
+    header?: Snippet;
     children?: Snippet;
     footer?: Snippet;
   } = $props();
@@ -45,7 +47,15 @@
     <Dialog.Portal>
       <Dialog.Overlay class="dialog-overlay"></Dialog.Overlay>
       <Dialog.Content class={["dialog-content", className]}>
-        {#if title}
+        {#if header}
+          {#if title}<Dialog.Title class="sr-only">{title}</Dialog.Title>{/if}
+          {#if description}
+            <Dialog.Description class="sr-only"
+              >{description}</Dialog.Description
+            >
+          {/if}
+          {@render header()}
+        {:else if title}
           <div class="flex flex-col space-y-1.5 pe-8 text-center sm:text-start">
             <Dialog.Title class="dialog-title">{title}</Dialog.Title>
             {#if description}
@@ -78,7 +88,7 @@
       <Drawer.Overlay class="dialog-overlay"></Drawer.Overlay>
       <Drawer.Content
         class={[
-          "fixed inset-x-0 bottom-0 z-47 flex h-auto max-h-[92dvh] flex-col rounded-t-(--radius) border border-b-0 border-border bg-background px-5 pb-6 outline-none",
+          "fixed inset-x-0 bottom-0 z-47 flex h-auto max-h-[92dvh] flex-col rounded-t-lg border border-b-0 border-border bg-transparent px-5 pb-6 outline-none",
           className,
         ]}
       >
@@ -89,7 +99,15 @@
         <div
           class="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto touch-pan-y"
         >
-          {#if title}
+          {#if header}
+            {#if title}<Drawer.Title class="sr-only">{title}</Drawer.Title>{/if}
+            {#if description}
+              <Drawer.Description class="sr-only"
+                >{description}</Drawer.Description
+              >
+            {/if}
+            {@render header()}
+          {:else if title}
             <div class="flex flex-col space-y-1.5 text-center">
               <Drawer.Title class="dialog-title">{title}</Drawer.Title>
               {#if description}
@@ -113,6 +131,7 @@
 
 <style>
   :global([data-vaul-drawer]) {
+    background: var(--popover);
     touch-action: none;
     will-change: transform;
 
@@ -135,6 +154,10 @@
       bottom: 0;
       width: 200%;
     }
+
+    :global([data-vaul-handle]) {
+      background: var(--foreground);
+    }
   }
 
   :global([data-vaul-handle-hitarea]) {
@@ -145,5 +168,11 @@
     height: max(100%, 2.75rem);
     translate: -50% -50%;
     touch-action: inherit;
+  }
+
+  /* The mobile bottom drawer already exposes a swipe-down handle/hint,
+     so a dedicated X close button is redundant there. */
+  :global([data-vaul-drawer-direction="bottom"] .close) {
+    display: none;
   }
 </style>

@@ -100,20 +100,25 @@
   {#if costRows.length > 0}
     <div class="grid gap-1.5">
       {#each costRows as row (row.level)}
-        <SubtleRow class="flex items-center px-1.5 py-1">
-          <Tip content={row.level === 0 ? "Base" : `Slot ${row.level}`}>
-            {#snippet children({ props })}
-              <span
-                class="text-[0.7rem] text-muted-foreground min-w-13 max-w-20 shrink-0 overflow-hidden text-ellipsis whitespace-nowrap"
-                {...props}
-              >
-                {row.level === 0 ? row.label : `Upg. ${row.label}`}
-              </span>
-            {/snippet}
-          </Tip>
+        <SubtleRow class="flex min-w-0 items-center px-1.5 py-1">
+          <span
+            class="w-16 shrink-0 overflow-hidden text-ellipsis whitespace-nowrap"
+            title={row.level === 0 ? "Base" : `Slot ${row.level}`}
+          >
+            <Tip content={row.level === 0 ? "Base" : `Slot ${row.level}`}>
+              {#snippet children({ props })}
+                <span
+                  class="inline-block max-w-full text-[0.7rem] text-muted-foreground"
+                  {...props}
+                >
+                  {row.level === 0 ? row.label : `Upg. ${row.label}`}
+                </span>
+              {/snippet}
+            </Tip>
+          </span>
           <input
             type="number"
-            class="input input-compact"
+            class="input input-compact min-w-0"
             value={row.cost}
             min="0"
             step="1"

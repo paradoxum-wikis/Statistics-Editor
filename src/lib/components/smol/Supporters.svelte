@@ -23,7 +23,7 @@
 >
   {#if data?.profile}
     <div
-      class="shrink-0 rounded-[calc(var(--radius)-0.25rem)_0] border border-border bg-card p-2.5 text-center"
+      class="shrink-0 rounded-(--radius) border border-border bg-card p-2.5 text-center"
     >
       <a
         href={data.profile.link}
@@ -43,7 +43,7 @@
         href={data.profile.link}
         target="_blank"
         rel="noopener noreferrer"
-        class="btn btn-primary btn-sm mt-2 w-full"
+        class="btn btn-primary mt-2 w-full"
       >
         Support Us!
       </a>
@@ -51,7 +51,7 @@
   {/if}
 
   <aside
-    class="flex min-h-0 flex-1 flex-col rounded-[calc(var(--radius)-0.25rem)_0] border border-border bg-card"
+    class="flex min-h-0 flex-1 flex-col rounded-(--radius) border border-border bg-card"
   >
     <div class="border-b border-border px-3 py-2">
       <h3 class="text-sm font-semibold unisans">Supporters</h3>
@@ -71,7 +71,7 @@
               href={supporter.link}
               target="_blank"
               rel="noopener noreferrer"
-              class="flex gap-2.5 rounded-[calc(var(--radius)-0.5rem)_0] px-1.5 py-2 transition-colors hover:bg-accent hover:text-accent-foreground"
+              class="flex gap-2.5 rounded-(--radius) px-1.5 py-2 transition-colors hover:bg-surface-2 hover:text-foreground"
             >
               <img
                 src={supporter.avatar}

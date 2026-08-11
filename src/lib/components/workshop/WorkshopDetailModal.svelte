@@ -223,9 +223,9 @@
   class="flex! max-h-[92dvh] max-w-6xl! flex-col gap-0 overflow-hidden p-0! md:h-[min(92dvh,56rem)]"
 >
   <div
-    class="flex shrink-0 items-start gap-3 border-b justify-center text-center px-4 pb-3 md:px-5 md:py-4 md:justify-start md:text-start"
+    class="relative flex shrink-0 items-start justify-center gap-3 px-4 pt-4 text-center sm:justify-start sm:text-start md:px-5 md:pt-5"
   >
-    <div class="min-w-0">
+    <div class="min-w-0 grow pr-6 sm:w-auto">
       <Dialog.Title class="truncate text-xl font-semibold">
         {listing?.title ?? (loading ? "Loading..." : "Listing")}
       </Dialog.Title>
@@ -238,6 +238,20 @@
         >
       {/if}
     </div>
+    <button
+      class="close shrink-0"
+      aria-label="Close listing"
+      onclick={() => (open = false)}
+    >
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
+        <path
+          d="M6 6l12 12M18 6L6 18"
+          stroke="currentColor"
+          stroke-width="4"
+          stroke-linecap="round"
+        />
+      </svg>
+    </button>
   </div>
 
   {#if loading}
@@ -254,7 +268,7 @@
       >
         <AspectRatio.Root
           ratio={16 / 9}
-          class="overflow-hidden rounded-[var(--radius)_0] border bg-muted {featured
+          class="overflow-hidden rounded-md border bg-muted {featured
             ? 'border-amber-500/40'
             : 'border-border'}"
         >
@@ -382,7 +396,7 @@
                       ? "Remove upvote"
                       : "Upvote"
                     : "Sign in to upvote"}
-                  class="btn btn-sm btn-outline inline-flex items-center gap-1.5 {item.voted
+                  class="btn btn-outline inline-flex items-center gap-1.5 {item.voted
                     ? 'border-sky-500/50! text-sky-600! dark:text-sky-400!'
                     : ''}"
                   onPressedChange={() => void onVote()}
@@ -394,7 +408,7 @@
             </Tip>
             <Tip content="View this build’s stats in the editor">
               {#snippet children({ props })}
-                <a {...props} class="btn btn-secondary btn-sm" href={openHref}>
+                <a {...props} class="btn btn-secondary" href={openHref}>
                   View tower in Editor
                 </a>
               {/snippet}
@@ -507,7 +521,6 @@
               disabled={commentBusy}></textarea>
             <div class="flex justify-end">
               <Btn
-                size="sm"
                 disabled={commentBusy || !commentBody.trim()}
                 onclick={onComment}
               >

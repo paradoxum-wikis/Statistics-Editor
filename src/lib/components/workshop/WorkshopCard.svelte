@@ -76,7 +76,7 @@
 </script>
 
 <article
-  class="relative flex overflow-hidden rounded-[var(--radius)_0] border bg-card transition-colors duration-250 {compact
+  class="relative flex overflow-hidden rounded-(--radius) border bg-card transition-colors duration-250 {compact
     ? 'flex-row gap-0'
     : 'flex-col gap-2'} {featured
     ? 'border-amber-500/50 bg-amber-500/4 hover:bg-amber-500/8'

@@ -36,24 +36,22 @@
 
 <style>
   :global(.tip) {
-    z-index: 57;
+    z-index: 67;
     max-width: 14rem;
-    border-radius: calc(var(--radius) - 0.25rem) 0;
+    border-radius: var(--radius);
     border: 1px solid var(--border);
     background: var(--popover);
     color: var(--popover-foreground);
-    padding: 0.375rem 0.625rem;
-    font-size: 0.875rem;
-    box-shadow:
-      0 4px 6px -1px oklch(0 0 0 / 0.1),
-      0 2px 4px -2px oklch(0 0 0 / 0.1);
+    padding: 6px 10px;
+    font-size: 13px;
+    font-weight: 500;
 
     &[data-state="delayed-open"] {
-      animation: overlay-in 150ms ease;
+      animation: overlay-in 0.15s;
     }
 
     &[data-state="closed"] {
-      animation: overlay-out 100ms ease;
+      animation: overlay-out 0.1s;
     }
   }
 </style>

@@ -54,7 +54,6 @@
         onkeydown={handleColumnKeydown}
       />
       <Btn
-        size="sm"
         variant={canAddColumn ? "primary" : "secondary"}
         onclick={addModifierColumn}
         disabled={!canAddColumn}
@@ -70,7 +69,7 @@
     >
       {#each modifierStore.entries as entry, index (entry.column)}
         <div
-          class="rounded-[calc(var(--radius)-0.625rem)_0] border border-border bg-secondary/40 p-1.5"
+          class="rounded-(--radius) border border-border bg-surface-2/40 p-1.5"
         >
           <div class="mb-1 flex items-center justify-between gap-1">
             <span class="min-w-0 truncate text-xs font-medium"
@@ -85,7 +84,7 @@
                 aria-label="Enable {entry.column} modifier"
               />
               <IconBtn
-                class="rounded-[calc(var(--radius)-0.875rem)_0]! p-0.5! text-muted-foreground hover:bg-muted hover:text-foreground"
+                class="rounded-(--radius)! p-0.5! text-muted-foreground hover:bg-muted hover:text-foreground"
                 title="Remove"
                 aria-label="Remove"
                 onclick={() => modifierStore.removeEntry(index)}

@@ -59,15 +59,13 @@
   {#if upgradeRows.length > 0}
     <div class="grid gap-2">
       {#each upgradeRows as row (row.index)}
-        <div
-          class="border border-border rounded-[calc(var(--radius)-0.25rem)_0] overflow-hidden"
-        >
+        <div class="border border-border rounded-sm overflow-hidden">
           <div
-            class="text-[0.68rem] font-semibold text-muted-foreground px-3.5 py-0.5 border-b border-border bg-secondary/30"
+            class="text-[0.68rem] font-semibold text-muted-foreground px-3.5 py-0.5 border-b border-border bg-surface-2/60"
           >
             Upgrade {row.index + 1}
           </div>
-          <div class="flex flex-col gap-1 p-1.5 bg-secondary/10">
+          <div class="flex flex-col gap-1 p-1.5 bg-surface">
             <div class="flex items-center gap-1.5">
               <span class="text-[0.65rem] text-muted-foreground w-10 shrink-0">
                 Title

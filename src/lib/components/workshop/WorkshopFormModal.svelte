@@ -175,7 +175,7 @@
         <div class="space-y-1">
           <span class="text-sm font-medium">Share Link</span>
           <div
-            class="flex items-center justify-between gap-2 rounded-[var(--radius)_0] border border-border bg-muted/50 px-3 py-2 text-sm"
+            class="flex items-center justify-between gap-2 rounded-(--radius) border border-border bg-surface-2/50 px-3 py-2 text-sm"
           >
             <span class="truncate font-medium">{verified.tower_name}</span>
             <span class="shrink-0 font-mono text-xs text-muted-foreground">
@@ -210,7 +210,6 @@
             />
             <Btn
               variant="outline"
-              size="sm"
               disabled={!shareDirty || checking}
               onclick={checkShare}
             >

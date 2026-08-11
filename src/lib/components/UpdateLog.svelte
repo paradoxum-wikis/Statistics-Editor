@@ -199,14 +199,14 @@
         <ul class="min-w-0 space-y-2">
           {#each group.entries as entry (entry.sha)}
             <li
-              class="min-w-0 rounded-[calc(var(--radius)-0.5rem)_0] border border-border/60 p-2 bg-muted"
+              class="min-w-0 rounded-sm border border-border p-2.5 bg-surface"
             >
               <div class="mb-1 flex min-w-0 items-start justify-between gap-2">
                 {#if entry.badgeType}
                   <Tip content={badgeTip(entry)}>
                     {#snippet children({ props })}
                       <span
-                        class="min-w-0 truncate rounded px-1.5 py-0.5 text-[0.65rem] font-medium leading-tight {entry.color}"
+                        class="min-w-0 truncate rounded-full px-2 py-0.5 text-[0.65rem] font-medium leading-tight {entry.color}"
                         {...props}
                       >
                         {entry.badgeType}{#if entry.breaking}!{/if}{#if entry.badgeScope}

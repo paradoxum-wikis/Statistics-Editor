@@ -6,18 +6,14 @@
   type BtnVariant =
     "primary" | "secondary" | "outline" | "destructive" | "destructive-fill";
 
-  type BtnSize = "default" | "sm";
-
   let {
     variant = "primary",
-    size = "default",
     class: className = "",
     children: label,
     title,
     ...restProps
   }: {
     variant?: BtnVariant;
-    size?: BtnSize;
     class?: string;
     children: Snippet;
     title?: string;
@@ -32,9 +28,7 @@
     "destructive-fill": "btn-destructive-fill",
   };
 
-  const btnClass = $derived(
-    `btn ${variantClass[variant]} ${size === "sm" ? "btn-sm" : ""} ${className}`,
-  );
+  const btnClass = $derived(`btn ${variantClass[variant]} ${className}`);
 </script>
 
 {#if title}
