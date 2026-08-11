@@ -360,7 +360,7 @@
   </div>
 
   {#if loadingTower}
-    <p class="text-[11px] text-muted-foreground">Loading {loadingTower}…</p>
+    <p class="text-[11px] text-muted-foreground">Loading {loadingTower}...</p>
   {/if}
 
   {#if model.hasPoints && yDomain && hasAutoY}

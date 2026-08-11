@@ -223,7 +223,7 @@
   class="flex! max-h-[92dvh] max-w-6xl! flex-col gap-0 overflow-hidden p-0! md:h-[min(92dvh,56rem)]"
 >
   <div
-    class="relative flex shrink-0 items-start justify-center gap-3 px-4 pt-4 text-center sm:justify-start sm:text-start md:px-5 md:pt-5"
+    class="relative flex shrink-0 items-start justify-center gap-3 px-4 text-center sm:justify-start sm:text-start md:px-5 md:pt-5"
   >
     <div class="min-w-0 grow pr-6 sm:w-auto">
       <Dialog.Title class="truncate text-xl font-semibold">

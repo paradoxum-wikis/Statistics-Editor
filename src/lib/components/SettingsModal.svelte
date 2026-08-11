@@ -134,6 +134,10 @@
     align-items: center;
     margin-bottom: 1rem;
 
+    @media (max-width: 767px) {
+      margin-bottom: 0;
+    }
+
     .tabs-list {
       grid-column: 2;
       justify-self: center;
@@ -185,6 +189,10 @@
 
     &.disabled {
       opacity: 0.5;
+    }
+
+    &:last-child {
+      margin-bottom: 1.25rem;
     }
 
     .setting-icon {
