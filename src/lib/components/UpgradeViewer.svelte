@@ -1,18 +1,20 @@
 <script lang="ts">
-  import { Tabs } from "bits-ui";
-  import { fade } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
+  import { fly } from "svelte/transition";
+  import { Tabs } from "bits-ui";
   import type { Picture } from "@sveltejs/enhanced-img";
   import { stripRefs } from "$lib/utils/format";
   import { renderCellHtml } from "$lib/neowtext/render";
   import { towerStore } from "$lib/stores/tower.svelte";
   import { imageLoader } from "$lib/services/imageLoader";
   import { settingsStore } from "$lib/stores/settings.svelte";
+  import { tabPill } from "$lib/utils/tabPill.svelte";
 
   let {
     upgradeNames = {},
     upgradeSummaries = {},
     upgradeLevels = [],
+    upgradeGroups = [],
     selectedUpgrade = $bindable("0"),
     numUpgrades,
   }: {
@@ -27,6 +29,7 @@
       }>;
     };
     upgradeLevels?: string[];
+    upgradeGroups?: { branch: string; indices: number[] }[];
     selectedUpgrade: string;
     numUpgrades: number;
   } = $props();
@@ -59,6 +62,17 @@
   let selectedImageUrl = $state<string | null>(null);
   let selectedImageLoading = $state(false);
   let selectedImageFailed = $state(false);
+  let upgradeDirection = $state(1);
+
+  // Under a path header, strip the redundant letter (5A → 5 under A).
+  function pathTabLabel(index: number, branch?: string): string {
+    const raw = upgradeLevels[index] ?? String(index + 1);
+    if (!branch || settingsStore.compactPathTabs) return raw;
+    const match = raw.match(/^(\d+)([A-Za-z]+)$/);
+    if (!match) return raw;
+    if (match[2].toUpperCase() === branch.toUpperCase()) return match[1];
+    return raw;
+  }
 
   $effect(() => {
     imageLoader.setDebugMode(settingsStore.debugMode);
@@ -108,22 +122,68 @@
   });
 </script>
 
-<Tabs.Root bind:value={selectedUpgrade}>
-  <Tabs.List class="mb-4 flex space-x-1 overflow-x-auto">
-    {#each Array(numUpgrades) as _, index (index)}
-      <Tabs.Trigger
-        value={index.toString()}
-        class="w-full rounded-[var(--radius)_0] bg-muted px-2 py-1 text-xs transition-[background-color,color] duration-250 data-[state=active]:cursor-default data-[state=active]:bg-primary data-[state=active]:text-white"
+<Tabs.Root
+  value={selectedUpgrade}
+  onValueChange={(value) => {
+    upgradeDirection = Number(value) >= Number(selectedUpgrade) ? 1 : -1;
+    selectedUpgrade = value;
+  }}
+>
+  <Tabs.List class="contents">
+    {#if upgradeGroups.length > 1}
+      <div
+        class="tabs-list tabs-list-stretch mb-1.5 overflow-x-auto"
+        use:tabPill={() => selectedUpgrade}
       >
-        {upgradeLevels[index] ?? index + 1}
-      </Tabs.Trigger>
-    {/each}
+        {#each upgradeGroups[0].indices as index (index)}
+          <Tabs.Trigger value={index.toString()} class="tabs-trigger">
+            {pathTabLabel(index)}
+          </Tabs.Trigger>
+        {/each}
+      </div>
+      <div class="mb-4 flex gap-1.5">
+        {#each upgradeGroups.slice(1) as group (group.branch)}
+          <div class="flex min-w-0 flex-1 flex-col gap-1">
+            {#if !settingsStore.compactPathTabs}
+              <span
+                class="mx-auto text-[0.6rem] font-bold tracking-wider text-muted-foreground"
+              >
+                {group.branch}
+              </span>
+            {/if}
+            <div
+              class="tabs-list tabs-list-stretch overflow-x-auto"
+              use:tabPill={() => selectedUpgrade}
+            >
+              {#each group.indices as index (index)}
+                <Tabs.Trigger value={index.toString()} class="tabs-trigger">
+                  {pathTabLabel(index, group.branch)}
+                </Tabs.Trigger>
+              {/each}
+            </div>
+          </div>
+        {/each}
+      </div>
+    {:else}
+      <div
+        class="tabs-list tabs-list-stretch mb-4 overflow-x-auto"
+        use:tabPill={() => selectedUpgrade}
+      >
+        {#each Array(numUpgrades) as _, index (index)}
+          <Tabs.Trigger value={index.toString()} class="tabs-trigger">
+            {pathTabLabel(index)}
+          </Tabs.Trigger>
+        {/each}
+      </div>
+    {/if}
   </Tabs.List>
 
   {#each Array(numUpgrades) as _, index (index)}
     <Tabs.Content value={index.toString()}>
       {#if selectedUpgrade === index.toString()}
-        <div in:fade={{ duration: 250, easing: cubicOut }}>
+        <div
+          in:fly={{ x: upgradeDirection * 48, duration: 180, easing: cubicOut }}
+        >
           {#if selectedImageLoading}
             <div class="upgrade-image-container">Loading...</div>
           {:else if selectedImageUrl}
@@ -145,7 +205,7 @@
           {/if}
 
           {#if upgradeSummaries[index]?.length}
-            <div class="upgrade-summary-box">
+            <div class="upgrade-summary-box mt-2 mb-1">
               <div class="upgrade-summary-list">
                 {#each upgradeSummaries[index] as line, i (i)}
                   <div class="upgrade-summary-line">
@@ -188,10 +248,9 @@
 
 <style>
   .upgrade-summary-box {
-    margin-top: 0.75rem;
     border: 1px solid var(--border);
-    border-radius: var(--radius) 0;
-    background: var(--secondary);
+    border-radius: var(--radius);
+    background: var(--muted);
     padding: 0.5rem 0.625rem;
     font-size: 0.85em;
   }
@@ -233,8 +292,8 @@
   .upgrade-image-container {
     width: 100%;
     aspect-ratio: 1;
-    background: var(--muted);
-    border-radius: 0.25rem;
+    background: var(--secondary);
+    border-radius: var(--radius);
     display: flex;
     align-items: center;
     justify-content: center;

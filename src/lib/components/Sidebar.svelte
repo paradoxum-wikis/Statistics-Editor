@@ -9,6 +9,7 @@
   import { towerStore } from "$lib/stores/tower.svelte";
   import { settingsStore } from "$lib/stores/settings.svelte";
   import { applyRofBug, toNumericValue, getRofBugVer } from "$lib/utils/format";
+  import { schemaIndexToLevel } from "$lib/neowtext/functions/schema";
 
   import type { Picture } from "@sveltejs/enhanced-img";
   import DamageIcon from "$lib/assets/Damage.png?enhanced";
@@ -60,6 +61,24 @@
     );
   });
 
+  // split paths: group flat upgrade indices by schema branch (trunk first)
+  let upgradeGroups = $derived.by(() => {
+    towerStore.refreshTrigger;
+    if (!currentSkin?.upgrades) return [];
+    const schema = currentSkin.getSchema();
+    const groups: { branch: string; indices: number[] }[] = [];
+    for (let i = 0; i < currentSkin.upgrades.length; i++) {
+      const { branch } = schemaIndexToLevel(schema, i + 1);
+      let group = groups.find((g) => g.branch === branch);
+      if (!group) {
+        group = { branch, indices: [] };
+        groups.push(group);
+      }
+      group.indices.push(i);
+    }
+    return groups;
+  });
+
   let upgradeSummaries = $derived.by(() => {
     towerStore.refreshTrigger;
     if (!currentSkin) return {};
@@ -99,7 +118,6 @@
     const result: { [key: number]: SummaryLine[] } = {};
     if (!skin?.levels?.levels) return result;
 
-    const attributes: string[] = skin.levels.attributes ?? [];
     const excludedSummaryStats = new Set(["Level", "Cost"]);
 
     const parseLevelLabel = (
@@ -174,7 +192,16 @@
 
       const lines: SummaryLine[] = [];
 
-      for (const stat of attributes) {
+      // Only diff the upgrade's OWN stats. `skin.levels.attributes` is the global
+      // union across all branch tables, and `levels.getCell` carries values forward
+      // down the flat array, so using that would leak one branch's stats (e.g. Fortify
+      // Radius) into an unrelated branch's summary. The upgrade's own attribute set
+      // only contains the columns of its own branch/table.
+      const ownAttributes = Object.keys(
+        skin.upgrades?.[upgradeIndex]?.attributes ?? {},
+      );
+
+      for (const stat of ownAttributes) {
         if (["Hidden", "Flying", "Lead"].includes(stat)) continue;
         if (excludedSummaryStats.has(stat)) continue;
         if (allReadOnly.has(stat)) continue;
@@ -252,6 +279,7 @@
           {upgradeNames}
           {upgradeSummaries}
           {upgradeLevels}
+          {upgradeGroups}
           bind:selectedUpgrade
           {numUpgrades}
         />

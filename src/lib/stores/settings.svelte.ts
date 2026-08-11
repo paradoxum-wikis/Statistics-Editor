@@ -10,6 +10,7 @@ import {
   Skull,
   SquareDashedBottom,
   Superscript,
+  Rows3,
 } from "@lucide/svelte";
 import { analytics } from "$lib/services/analytics";
 
@@ -94,6 +95,16 @@ const SETTING_DEFS = {
     icon: SquareDashedBottom,
     label: "Compact Cell",
     description: "Uses tighter table cells, making tables leaner in general.",
+  },
+  compactPathTabs: {
+    storageKey: "tdse_compact_paths",
+    default: false,
+    id: "compact-path-tabs",
+    tab: "appearance",
+    icon: Rows3,
+    label: "Compact Paths",
+    description:
+      "Hides the path letter labels above split-path upgrade tabs for a tighter sidebar.",
   },
   hideWikiBanner: {
     storageKey: "tdse_hwb",
@@ -188,6 +199,7 @@ class SettingsStore {
   seeValueDifference = $state<boolean>(SETTING_DEFS.seeValueDifference.default);
   alwaysShowSkinTabs = $state<boolean>(SETTING_DEFS.alwaysShowSkinTabs.default);
   hideCellWrapper = $state<boolean>(SETTING_DEFS.hideCellWrapper.default);
+  compactPathTabs = $state<boolean>(SETTING_DEFS.compactPathTabs.default);
   hideWikiBanner = $state<boolean>(SETTING_DEFS.hideWikiBanner.default);
   minTableWidth = $state<boolean>(SETTING_DEFS.minTableWidth.default);
   clearOnEdit = $state<boolean>(SETTING_DEFS.clearOnEdit.default);
@@ -220,6 +232,9 @@ class SettingsStore {
         break;
       case "hideCellWrapper":
         this.hideCellWrapper = value;
+        break;
+      case "compactPathTabs":
+        this.compactPathTabs = value;
         break;
       case "hideWikiBanner":
         this.hideWikiBanner = value;
@@ -270,6 +285,8 @@ class SettingsStore {
         return this.minTableWidth;
       case "hideCellWrapper":
         return this.hideCellWrapper;
+      case "compactPathTabs":
+        return this.compactPathTabs;
       case "hideWikiBanner":
         return this.hideWikiBanner;
       case "debugMode":
