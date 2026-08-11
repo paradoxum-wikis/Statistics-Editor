@@ -515,14 +515,36 @@ h4,
 }
 
 .status-bar-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: none;
+  border-radius: var(--radius);
   background: transparent;
   padding: 0.25rem;
   color: var(--muted-foreground);
-  cursor: help;
+  cursor: pointer;
+  transition:
+    color 0.1s,
+    background 0.1s;
 
-  &:hover {
+  &:hover:not(:disabled) {
+    background: var(--secondary);
     color: var(--foreground);
+  }
+
+  &.on {
+    color: var(--primary);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 1px;
   }
 }
 

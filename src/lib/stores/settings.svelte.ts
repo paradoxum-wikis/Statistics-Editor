@@ -167,6 +167,9 @@ const THEME_SETTING: SettingString<"light" | "dark" | "system"> = {
   default: "system",
 };
 
+const PINS_STORAGE_KEY = "tdse_pinned_settings";
+const SETTING_KEY_SET = new Set<string>(Object.keys(SETTING_DEFS));
+
 function readBoolean(storageKey: string, defaultValue: boolean): boolean {
   if (typeof localStorage === "undefined") return defaultValue;
   const raw = localStorage.getItem(storageKey);
@@ -194,6 +197,23 @@ function writeStringSetting<T extends string>(
   localStorage.setItem(def.key, value);
 }
 
+function readPinnedKeys(): BooleanSettingKey[] {
+  if (typeof localStorage === "undefined") return [];
+  const raw = localStorage.getItem(PINS_STORAGE_KEY);
+  if (!raw) return [];
+  const parsed: unknown = JSON.parse(raw);
+  if (!Array.isArray(parsed)) return [];
+  return parsed.filter(
+    (key): key is BooleanSettingKey =>
+      typeof key === "string" && SETTING_KEY_SET.has(key),
+  );
+}
+
+function writePinnedKeys(keys: BooleanSettingKey[]): void {
+  if (typeof localStorage === "undefined") return;
+  localStorage.setItem(PINS_STORAGE_KEY, JSON.stringify(keys));
+}
+
 class SettingsStore {
   debugMode = $state<boolean>(SETTING_DEFS.debugMode.default);
   seeValueDifference = $state<boolean>(SETTING_DEFS.seeValueDifference.default);
@@ -209,6 +229,7 @@ class SettingsStore {
   rofBug = $state<boolean>(SETTING_DEFS.rofBug.default);
   analyticsConsent = $state<boolean>(SETTING_DEFS.analyticsConsent.default);
   theme = $state(THEME_SETTING.default);
+  pinnedKeys = $state<BooleanSettingKey[]>([]);
 
   private assignBoolean(key: BooleanSettingKey, value: boolean) {
     switch (key) {
@@ -254,6 +275,29 @@ class SettingsStore {
       this.assignBoolean(key, readBoolean(def.storageKey, def.default));
     }
     this.theme = readStringSetting(THEME_SETTING);
+    this.pinnedKeys = readPinnedKeys();
+  }
+
+  isPinned(key: BooleanSettingKey): boolean {
+    return this.pinnedKeys.includes(key);
+  }
+
+  togglePin(key: BooleanSettingKey): void {
+    this.pinnedKeys = this.isPinned(key)
+      ? this.pinnedKeys.filter((k) => k !== key)
+      : [...this.pinnedKeys, key];
+    writePinnedKeys(this.pinnedKeys);
+    analytics.track("setting_pin", {
+      setting_name: key,
+      pinned: String(this.isPinned(key)),
+    });
+  }
+
+  get pinnedSettings(): BooleanSetting[] {
+    const byKey = new Map(BOOLEAN_SETTINGS.map((s) => [s.key, s]));
+    return this.pinnedKeys
+      .map((key) => byKey.get(key))
+      .filter((s): s is BooleanSetting => s != null);
   }
 
   init() {

@@ -6,9 +6,21 @@
   import GlobalModifier from "./tool/GlobalModifier.svelte";
   import StatsChart from "./tool/StatsChart.svelte";
   import CreateTower from "./tool/CreateTower.svelte";
-  import { settingsStore, BOOLEAN_SETTINGS } from "$lib/stores/settings.svelte";
+  import {
+    settingsStore,
+    BOOLEAN_SETTINGS,
+    type BooleanSettingKey,
+  } from "$lib/stores/settings.svelte";
   import { towerStore } from "$lib/stores/tower.svelte";
-  import { House, Settings, Sun, Moon, SunMoon, Check } from "@lucide/svelte";
+  import {
+    House,
+    Settings,
+    Sun,
+    Moon,
+    SunMoon,
+    Check,
+    Pin,
+  } from "@lucide/svelte";
 
   let {
     settingsOpen = $bindable(false),
@@ -21,10 +33,9 @@
   } = $props();
 
   let themeOpen = $state(false);
+  let pinsOpen = $state(false);
 
-  const activeSettings = $derived(
-    BOOLEAN_SETTINGS.filter((setting) => settingsStore.getBoolean(setting.key)),
-  );
+  const pinnedSettings = $derived(settingsStore.pinnedSettings);
 </script>
 
 <div
@@ -117,10 +128,14 @@
     <CreateTower onCreated={onTowerCreated} />
   </div>
 
-  <div class="ms-auto flex min-w-0 items-center gap-2 px-2">
-    {#if activeSettings.length > 0}
-      <div class="flex items-center gap-1">
-        {#each activeSettings as setting (setting.key)}
+  <div class="ms-auto flex min-w-0 items-center gap-1 px-1">
+    {#if pinnedSettings.length > 0}
+      <div class="flex items-center gap-0.5">
+        {#each pinnedSettings as setting (setting.key)}
+          {@const enabled = settingsStore.getBoolean(setting.key)}
+          {@const parentOk =
+            !setting.dependsOn ||
+            settingsStore.getBoolean(setting.dependsOn as BooleanSettingKey)}
           <Tip>
             {#snippet content()}
               <p class="text-sm font-medium">{setting.label}</p>
@@ -129,26 +144,82 @@
               </p>
             {/snippet}
             {#snippet children({ props })}
-              <IconBtn {...props} class="status-bar-indicator">
+              <button
+                {...props}
+                type="button"
+                class="status-bar-indicator"
+                class:on={enabled}
+                aria-label={setting.label}
+                aria-pressed={enabled}
+                disabled={!parentOk}
+                onclick={() =>
+                  settingsStore.setBoolean(setting.key, !enabled)}
+              >
                 <setting.icon size={14} />
-              </IconBtn>
+              </button>
             {/snippet}
           </Tip>
         {/each}
       </div>
     {/if}
 
+    <Popover.Root bind:open={pinsOpen}>
+      <Popover.Trigger>
+        {#snippet child({ props })}
+          <IconBtn
+            {...props}
+            class="status-bar-btn"
+            title="Pin settings to status bar"
+          >
+            <Pin size={14} />
+          </IconBtn>
+        {/snippet}
+      </Popover.Trigger>
+      <Popover.Portal>
+        <Popover.Content
+          class="dropdown-content w-auto! min-w-56 max-w-72"
+          side="top"
+          align="end"
+          sideOffset={6}
+        >
+          <h4 class="mb-1 px-2 pt-1 text-sm font-medium">Pinner</h4>
+          <p class="mb-1.5 px-2 text-xs text-muted-foreground">
+            In the case you REALLY need to toggle.
+          </p>
+          <div class="grid max-h-64 gap-0.5 overflow-y-auto">
+            {#each BOOLEAN_SETTINGS as setting (setting.key)}
+              {@const pinned = settingsStore.isPinned(setting.key)}
+              <button
+                type="button"
+                class="dropdown-item w-full justify-start!"
+                class:text-primary={pinned}
+                onclick={() => settingsStore.togglePin(setting.key)}
+              >
+                <setting.icon class="me-2 h-4 w-4 shrink-0" />
+                <span class="min-w-0 flex-1 truncate text-start"
+                  >{setting.label}</span
+                >
+                {#if pinned}
+                  <Pin class="ms-2 h-3.5 w-3.5 shrink-0 fill-current" />
+                {/if}
+              </button>
+            {/each}
+          </div>
+        </Popover.Content>
+      </Popover.Portal>
+    </Popover.Root>
+
     {#if towerStore.sharePreviewId}
       <Veperator />
       <span
-        class="shrink-0 text-xs text-sky-600 dark:text-sky-400 font-semibold"
+        class="shrink-0 px-1 text-xs font-semibold text-sky-600 dark:text-sky-400"
       >
         Sandboxed
       </span>
     {:else if towerStore.isDirty}
       <Veperator />
       <span
-        class="shrink-0 text-xs text-amber-600 dark:text-amber-400 font-semibold"
+        class="shrink-0 px-1 text-xs font-semibold text-amber-600 dark:text-amber-400"
       >
         Unsaved
       </span>
