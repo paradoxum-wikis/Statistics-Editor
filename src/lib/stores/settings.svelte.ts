@@ -348,9 +348,12 @@ class SettingsStore {
     } else {
       writeBoolean(def.storageKey, value);
     }
-    if (key === "clearOnEdit" && !value) {
-      this.assignBoolean("restoreRefOnClearEdit", false);
-      writeBoolean(SETTING_DEFS.restoreRefOnClearEdit.storageKey, false);
+    if (!value) {
+      for (const child of BOOLEAN_SETTINGS) {
+        if (child.dependsOn !== key || !this.getBoolean(child.key)) continue;
+        this.assignBoolean(child.key, false);
+        writeBoolean(SETTING_DEFS[child.key].storageKey, false);
+      }
     }
     if (key !== "analyticsConsent") {
       analytics.track("setting_change", {
@@ -358,6 +361,11 @@ class SettingsStore {
         setting_value: String(value),
       });
     }
+  }
+
+  parentActive(setting: BooleanSetting): boolean {
+    if (!setting.dependsOn) return true;
+    return this.getBoolean(setting.dependsOn as BooleanSettingKey);
   }
 
   setTheme(value: "light" | "dark" | "system") {

@@ -9,7 +9,6 @@
   import {
     settingsStore,
     BOOLEAN_SETTINGS,
-    type BooleanSettingKey,
   } from "$lib/stores/settings.svelte";
   import { towerStore } from "$lib/stores/tower.svelte";
   import {
@@ -133,9 +132,7 @@
       <div class="flex items-center gap-0.5">
         {#each pinnedSettings as setting (setting.key)}
           {@const enabled = settingsStore.getBoolean(setting.key)}
-          {@const parentOk =
-            !setting.dependsOn ||
-            settingsStore.getBoolean(setting.dependsOn as BooleanSettingKey)}
+          {@const parentOk = settingsStore.parentActive(setting)}
           <Tip>
             {#snippet content()}
               <p class="text-sm font-medium">{setting.label}</p>
