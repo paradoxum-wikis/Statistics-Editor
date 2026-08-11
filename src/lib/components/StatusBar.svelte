@@ -129,13 +129,19 @@
       <div class="flex items-center gap-0.5">
         {#each pinnedSettings as setting (setting.key)}
           {@const enabled = settingsStore.getBoolean(setting.key)}
-          {@const parentOk = settingsStore.parentActive(setting)}
+          {@const parent = settingsStore.parentOf(setting)}
+          {@const parentOk = !parent || settingsStore.getBoolean(parent.key)}
           <Tip>
             {#snippet content()}
               <p class="text-sm font-medium">{setting.label}</p>
               <p class="text-xs text-muted-foreground">
                 {setting.description}
               </p>
+              {#if !parentOk && parent}
+                <p class="mt-1 text-xs text-muted-foreground">
+                  Requires {parent.label}
+                </p>
+              {/if}
             {/snippet}
             {#snippet children({ props })}
               <button
@@ -143,7 +149,7 @@
                 type="button"
                 class="status-bar-indicator"
                 aria-label={setting.label}
-                aria-pressed={enabled}
+                aria-pressed={enabled && parentOk}
                 disabled={!parentOk}
                 onclick={() => settingsStore.setBoolean(setting.key, !enabled)}
               >

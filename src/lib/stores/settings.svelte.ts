@@ -16,6 +16,19 @@ import { analytics } from "$lib/services/analytics";
 
 export type SettingTab = "editor" | "appearance" | "advanced";
 
+export type BooleanSettingKey =
+  | "clearOnEdit"
+  | "restoreRefOnClearEdit"
+  | "rofBug"
+  | "seeValueDifference"
+  | "alwaysShowSkinTabs"
+  | "minTableWidth"
+  | "hideCellWrapper"
+  | "compactPathTabs"
+  | "hideWikiBanner"
+  | "debugMode"
+  | "analyticsConsent";
+
 type BooleanSettingDef = {
   storageKey: string;
   default: boolean;
@@ -24,10 +37,10 @@ type BooleanSettingDef = {
   icon: Component;
   label: string;
   description: string;
-  dependsOn?: string;
+  dependsOn?: BooleanSettingKey;
 };
 
-const SETTING_DEFS = {
+const SETTING_DEFS: Record<BooleanSettingKey, BooleanSettingDef> = {
   clearOnEdit: {
     storageKey: "tdse_coe",
     default: true,
@@ -134,9 +147,8 @@ const SETTING_DEFS = {
     label: "Analytics",
     description: "Help us improve by sharing anonymous usage data.",
   },
-} as const satisfies Record<string, BooleanSettingDef>;
+};
 
-export type BooleanSettingKey = keyof typeof SETTING_DEFS;
 export type BooleanSetting = BooleanSettingDef & { key: BooleanSettingKey };
 
 export const BOOLEAN_SETTINGS: BooleanSetting[] = (
@@ -341,13 +353,18 @@ class SettingsStore {
   }
 
   setBoolean(key: BooleanSettingKey, value: boolean): void {
-    this.assignBoolean(key, value);
     const def = SETTING_DEFS[key];
+    if (value && def.dependsOn && !this.getBoolean(def.dependsOn)) {
+      return;
+    }
+
+    this.assignBoolean(key, value);
     if (key === "analyticsConsent") {
       analytics.setConsent(value);
     } else {
       writeBoolean(def.storageKey, value);
     }
+
     if (!value) {
       for (const child of BOOLEAN_SETTINGS) {
         if (child.dependsOn !== key || !this.getBoolean(child.key)) continue;
@@ -355,6 +372,7 @@ class SettingsStore {
         writeBoolean(SETTING_DEFS[child.key].storageKey, false);
       }
     }
+
     if (key !== "analyticsConsent") {
       analytics.track("setting_change", {
         setting_name: key,
@@ -363,9 +381,9 @@ class SettingsStore {
     }
   }
 
-  parentActive(setting: BooleanSetting): boolean {
-    if (!setting.dependsOn) return true;
-    return this.getBoolean(setting.dependsOn as BooleanSettingKey);
+  parentOf(setting: BooleanSetting): BooleanSetting | undefined {
+    if (!setting.dependsOn) return undefined;
+    return BOOLEAN_SETTINGS.find((s) => s.key === setting.dependsOn);
   }
 
   setTheme(value: "light" | "dark" | "system") {
