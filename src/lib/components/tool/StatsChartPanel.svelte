@@ -284,7 +284,7 @@
             <Select.Portal>
               <Select.Content
                 class="select-content max-h-55 min-w-32"
-                sideOffset={5}
+                sideOffset={6}
               >
                 <Select.Viewport class="p-1">
                   {#each xItems as option (option.value)}
@@ -309,7 +309,7 @@
         {#if canAddPath}
           <button
             type="button"
-            class="inline-flex h-7 items-center gap-1 rounded-[var(--radius)_0] border border-border px-2 text-xs text-muted-foreground hover:bg-muted hover:text-foreground"
+            class="inline-flex h-7 items-center gap-1 rounded-sm border border-border px-2 text-xs text-muted-foreground hover:bg-muted hover:text-foreground"
             onclick={addPathSeries}
           >
             <Plus class="size-3.5" />
@@ -333,7 +333,7 @@
             <Select.Portal>
               <Select.Content
                 class="select-content max-h-55 min-w-40"
-                sideOffset={5}
+                sideOffset={6}
               >
                 <Select.Viewport class="p-1">
                   {#each towerItems as option (option.value)}
@@ -365,7 +365,7 @@
 
   {#if model.hasPoints && yDomain && hasAutoY}
     <div
-      class="lc-root-container h-56 w-full overflow-hidden rounded-[var(--radius)_0] border border-border bg-card/40 p-1"
+      class="lc-root-container h-56 w-full overflow-hidden rounded-md border border-border bg-card/40 p-1"
     >
       <LineChart
         data={model.data}
@@ -395,7 +395,7 @@
               <Spline
                 seriesKey={s.key}
                 strokeWidth={2}
-                stroke={s.color ?? "var(--color-chart-1)"}
+                stroke={s.color ?? "var(--chart-1)"}
               />
             {/each}
           </ChartClipPath>
@@ -434,12 +434,12 @@
     {/key}
   {:else if !series.length}
     <div
-      class="flex h-56 flex-col items-center justify-center gap-3 rounded-[var(--radius)_0] border border-dashed border-border"
+      class="flex h-56 flex-col items-center justify-center gap-3 rounded-md border border-dashed border-border"
     >
       {#if canAddCurrent}
         <button
           type="button"
-          class="inline-flex h-8 items-center gap-1.5 rounded-[var(--radius)_0] border border-border bg-secondary px-3 text-xs font-medium text-foreground hover:bg-muted"
+          class="inline-flex h-8 items-center gap-1.5 rounded-sm border border-border bg-surface-2 px-3 text-xs font-medium text-foreground hover:bg-muted"
           onclick={addCurrentTower}
         >
           Add Current Tower
@@ -457,7 +457,7 @@
     <div class="space-y-2">
       {#each model.rows as row (row.def.id)}
         <div
-          class="flex flex-wrap items-center gap-1.5 rounded-[var(--radius)_0] border border-border/80 bg-card/30 px-2 py-1.5"
+          class="flex flex-wrap items-center gap-1.5 rounded-sm border border-border/80 bg-card/30 px-2 py-1.5"
         >
           <span class="flex shrink-0 items-center gap-0.5">
             {#each row.colors as c, ci (ci)}
@@ -491,7 +491,7 @@
               <Select.Portal>
                 <Select.Content
                   class="select-content max-h-55 min-w-32"
-                  sideOffset={5}
+                  sideOffset={6}
                 >
                   <Select.Viewport class="p-1">
                     {#each row.scopeItems as option (option.value)}
@@ -530,7 +530,7 @@
             <Select.Portal>
               <Select.Content
                 class="select-content max-h-55 min-w-36"
-                sideOffset={5}
+                sideOffset={6}
               >
                 <Select.Viewport class="p-1">
                   {#each row.metricItems as option (option.value)}
@@ -556,7 +556,7 @@
 
           <button
             type="button"
-            class="ms-auto inline-flex size-7 items-center justify-center rounded-[var(--radius)_0] text-muted-foreground hover:bg-muted hover:text-foreground"
+            class="ms-auto inline-flex size-7 items-center justify-center rounded-sm text-muted-foreground hover:bg-muted hover:text-foreground"
             title="Remove series"
             onclick={() => {
               const next = series.filter((s) => s.id !== row.def.id);

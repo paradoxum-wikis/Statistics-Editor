@@ -163,7 +163,7 @@
       <ChevronDown class="w-3 h-3 opacity-50 ms-1" />
     </Select.Trigger>
     <Select.Portal>
-      <Select.Content class="select-content min-w-27 max-h-55" sideOffset={5}>
+      <Select.Content class="select-content min-w-27 max-h-55" sideOffset={6}>
         <Select.Viewport class="p-1">
           {#each options as option (option.value)}
             <Select.Item
@@ -199,7 +199,7 @@
         {#if multiPath}
           <SubtleRow class="overflow-hidden">
             <div
-              class="flex items-center gap-1 px-3.5 py-1 border-b border-border bg-secondary/30"
+              class="flex items-center gap-1 px-3.5 py-1 border-b border-border bg-surface-2/60"
             >
               <enhanced:img
                 src={detection.icon}

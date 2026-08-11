@@ -10,7 +10,7 @@
     onCreated,
     side = "top",
     align = "start",
-    sideOffset = variant === "menu" ? 8 : 6,
+    sideOffset = 6,
   }: {
     variant?: "icon" | "menu";
     onCreated?: (name: string) => void | Promise<void>;

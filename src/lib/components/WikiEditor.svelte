@@ -35,7 +35,7 @@
       maxHeight: "30rem",
       outline: "none",
       border: "1px solid var(--border)",
-      borderRadius: "var(--radius) 0 0 0",
+      borderRadius: "var(--radius)",
       backgroundColor: "var(--background)",
     },
     ".cm-scroller": {
@@ -64,12 +64,14 @@
         "color-mix(in oklch, var(--muted) 25%, var(--background))",
       color: "var(--foreground)",
       fontSize: ".7rem",
+      borderRadius: "0 0 var(--radius) var(--radius)",
     },
     ".cm-panels": {
       zIndex: "37",
     },
-    ".cm-panels-bottom, .cm-status-message": {
-      borderColor: "var(--accent)",
+    ".cm-panels-bottom": {
+      borderTop: "none",
+      backgroundColor: "transparent",
     },
     ".cm-activeLineGutter": {
       backgroundColor: "color-mix(in oklch, var(--muted) 50%, transparent)",
@@ -207,7 +209,8 @@
 
   async function handleResetOrDelete() {
     if (towerStore.isCustomSelected()) {
-      if (await towerStore.confirmDeleteTower()) toast.success("Tower deleted.");
+      if (await towerStore.confirmDeleteTower())
+        toast.success("Tower deleted.");
     } else if (await towerStore.reset()) {
       toast.success("Tower reset.");
     }
@@ -288,7 +291,7 @@
         <Tip content="Fetch latest Neowtext from the TDS Wiki">
           {#snippet children({ props })}
             <Popover.Trigger
-              class="btn btn-secondary btn-sm"
+              class="btn btn-secondary"
               disabled={isFetching || saving}
               {...props}
             >
@@ -296,7 +299,7 @@
             </Popover.Trigger>
           {/snippet}
         </Tip>
-        <Popover.Content class="popover-content">
+        <Popover.Content class="popover-content" sideOffset={6}>
           <div class="space-y-2">
             <h4 class="font-medium leading-none">Confirm Fetch</h4>
             <p class="text-sm text-muted-foreground">
@@ -317,7 +320,6 @@
 
     <Btn
       variant="secondary"
-      size="sm"
       onclick={() => void discardChanges()}
       disabled={!towerStore.isDirty || saving}
       title="Discard unsaved changes"
@@ -326,10 +328,10 @@
     </Btn>
 
     <Popover.Root>
-      <Popover.Trigger class="btn btn-destructive btn-sm text-white">
+      <Popover.Trigger class="btn btn-destructive text-white">
         {towerStore.isCustomSelected() ? "Delete Tower" : "Reset Tower"}
       </Popover.Trigger>
-      <Popover.Content class="popover-content">
+      <Popover.Content class="popover-content" sideOffset={6}>
         <div class="space-y-2">
           <h4 class="font-medium leading-none">
             {towerStore.isCustomSelected() ? "Confirm Delete" : "Confirm Reset"}
@@ -368,7 +370,7 @@
       >
         {#snippet children({ props })}
           <Popover.Trigger
-            class="btn btn-primary btn-sm"
+            class="btn btn-primary"
             disabled={!canSave ||
               !towerStore.isDirty ||
               saving ||
@@ -379,7 +381,7 @@
           </Popover.Trigger>
         {/snippet}
       </Tip>
-      <Popover.Content class="popover-content">
+      <Popover.Content class="popover-content" sideOffset={6}>
         <div class="space-y-2">
           <h4 class="font-medium leading-none">Confirm Override</h4>
           <p class="text-sm text-muted-foreground">
@@ -399,9 +401,7 @@
   </div>
 
   {#if errorMessage}
-    <div
-      class="rounded-[var(--radius)_0] border border-red-500/30 bg-red-500/10 p-3"
-    >
+    <div class="rounded-md border border-red-500/30 bg-red-500/10 p-3">
       <div class="text-sm font-medium text-red-600">Error</div>
       <div class="text-xs text-red-600/90 wrap-break-word mt-1">
         {errorMessage}

@@ -56,6 +56,7 @@
   type EditorMode = "cells" | "wiki";
 
   let editorMode = $state<EditorMode>("cells");
+  let editorModeDirection = $state(1);
   let sidebarOpen = $state(false);
   let settingsOpen = $state(false);
   let wikiEditorModule = $state<Awaited<
@@ -251,7 +252,7 @@
 
   <!-- Header -->
   <header
-    class="sticky top-0 z-17 flex flex-col items-center gap-2 border-b bg-card/20 px-4 py-1"
+    class="sticky top-0 z-17 flex flex-col items-center gap-2 border-b bg-card px-4 py-1"
   >
     <h1 class="text-sm font-bold text-foreground tracking-wide">
       {towerStore.selectedName || "TDS Statistics Editor"}
@@ -275,6 +276,8 @@
         <ModeToggle
           bind:mode={editorMode}
           disableCells={towerStore.selectedData?.isMalformed ?? false}
+          onModeChange={(next) =>
+            (editorModeDirection = next === "wiki" ? 1 : -1)}
         />
         <AuthMenu />
       </div>
@@ -296,7 +299,13 @@
           <LoadingCard message="Engineer is setting up the editor for you..." />
         {:else if towerStore.selectedData}
           {#key editorMode}
-            <div in:fly={{ y: 8, duration: 160, easing: cubicOut }}>
+            <div
+              in:fly={{
+                x: editorModeDirection * 80,
+                duration: 180,
+                easing: cubicOut,
+              }}
+            >
               {#if editorMode === "cells" && !towerStore.selectedData.isMalformed}
                 <TowerEditor tower={towerStore.selectedData} />
               {:else if wikiEditorModule}
@@ -347,7 +356,12 @@
           </DropdownMenu.Trigger>
         {/snippet}
       </Tip>
-      <DropdownMenu.Content align="center" side="top" class="dropdown-content">
+      <DropdownMenu.Content
+        align="center"
+        side="top"
+        sideOffset={6}
+        class="dropdown-content"
+      >
         <DropdownMenu.Group>
           <DropdownMenu.GroupHeading class="px-2 py-1.5 text-sm font-semibold">
             <h4 class="text-sm font-medium">Profiles</h4>
@@ -371,7 +385,7 @@
             </DropdownMenu.Item>
           {/each}
         </DropdownMenu.Group>
-        <DropdownMenu.Separator class="-mx-1 my-1 h-px bg-muted" />
+        <DropdownMenu.Separator class="-mx-1 my-1 h-px bg-border" />
 
         <Modal
           bind:open={createProfileOpen}
@@ -421,7 +435,7 @@
 
         {#if profileStore.current !== "Default"}
           <DropdownMenu.Item
-            class="dropdown-item text-destructive focus:text-destructive hover:bg-red-100"
+            class="dropdown-item text-destructive hover:bg-destructive/10"
             onclick={(e) => openDeleteProfileDialog(profileStore.current, e)}
           >
             <span>Delete Current</span>
@@ -443,7 +457,7 @@
         class="popover-content w-auto! min-w-52"
         side="top"
         align="end"
-        sideOffset={8}
+        sideOffset={6}
       >
         <h4 class="font-medium text-sm mb-2">Tools</h4>
         <div class="grid gap-0.5">
@@ -467,7 +481,7 @@
               class="popover-content w-auto! min-w-40"
               side="left"
               align="start"
-              sideOffset={8}
+              sideOffset={6}
             >
               <h4 class="font-medium text-sm mb-1">Theme</h4>
               <div class="grid gap-0.5">

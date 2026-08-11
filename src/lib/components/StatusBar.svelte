@@ -140,12 +140,16 @@
 
     {#if towerStore.sharePreviewId}
       <Veperator />
-      <span class="shrink-0 text-xs text-sky-600 dark:text-sky-400">
+      <span
+        class="shrink-0 text-xs text-sky-600 dark:text-sky-400 font-semibold"
+      >
         Sandboxed
       </span>
     {:else if towerStore.isDirty}
       <Veperator />
-      <span class="shrink-0 text-xs text-amber-600 dark:text-amber-400">
+      <span
+        class="shrink-0 text-xs text-amber-600 dark:text-amber-400 font-semibold"
+      >
         Unsaved
       </span>
     {/if}

@@ -91,7 +91,7 @@
     {@const body = part.content.trim()}
     {@const tip = resolveContent?.(body) ?? body}
     {@const n = getRefNum(tip, part.name)}
-    <Tip class="max-w-72!" sideOffset={4}>
+    <Tip class="max-w-72!" sideOffset={6}>
       {#snippet content()}
         <RenderedHtml html={renderCellHtml(tip, true)} />
       {/snippet}

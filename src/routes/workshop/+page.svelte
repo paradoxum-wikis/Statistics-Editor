@@ -66,11 +66,11 @@
   async function loadSpotlight() {
     const res = await listWorkshop({ spotlight: true });
     spotlight = res.items;
-    void fetchFandomAvatars(
-      res.items.map((i) => i.author.fandom_userid),
-    ).catch((e) => {
-      if (settingsStore.debugMode) console.error("[workshop] avatars", e);
-    });
+    void fetchFandomAvatars(res.items.map((i) => i.author.fandom_userid)).catch(
+      (e) => {
+        if (settingsStore.debugMode) console.error("[workshop] avatars", e);
+      },
+    );
   }
 
   async function load() {
@@ -272,7 +272,7 @@
             <ChevronDown class="size-3.5 shrink-0 opacity-50" />
           </Select.Trigger>
           <Select.Portal>
-            <Select.Content class="select-content min-w-36" sideOffset={5}>
+            <Select.Content class="select-content min-w-36" sideOffset={6}>
               <Select.Viewport class="p-1">
                 {#each SORT_OPTIONS as option (option.value)}
                   <Select.Item
@@ -331,7 +331,6 @@
           <div class="mt-4 flex items-center justify-center gap-3">
             <Btn
               variant="outline"
-              size="sm"
               disabled={page <= 1}
               onclick={() => (page -= 1)}>Previous</Btn
             >
@@ -340,7 +339,6 @@
             </span>
             <Btn
               variant="outline"
-              size="sm"
               disabled={page >= totalPages}
               onclick={() => (page += 1)}>Next</Btn
             >

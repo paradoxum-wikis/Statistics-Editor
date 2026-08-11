@@ -1,149 +1,287 @@
 <script lang="ts">
+  import { cubicOut } from "svelte/easing";
+  import { fly } from "svelte/transition";
   import { Tabs } from "bits-ui";
   import Modal from "$lib/components/smol/Modal.svelte";
-  import Switch from "$lib/components/smol/Switch.svelte";
   import {
     settingsStore,
     settingGroupsForTab,
     type BooleanSetting,
     type SettingTab,
   } from "$lib/stores/settings.svelte";
+  import { tabPill } from "$lib/utils/tabPill.svelte";
 
-  const SETTING_TABS: SettingTab[] = ["editor", "appearance", "advanced"];
+  const SETTING_TABS: { value: SettingTab; label: string }[] = [
+    { value: "editor", label: "Editor" },
+    { value: "appearance", label: "Appearance" },
+    { value: "advanced", label: "Advanced" },
+  ];
 
   let { open = $bindable(false) } = $props();
+  let tab = $state<SettingTab>("editor");
+  let tabDirection = $state(1);
 </script>
 
-{#snippet settingRow(
-  setting: BooleanSetting,
-  child = false,
-  parentActive?: boolean,
-)}
-  <div
-    class="relative z-7 flex items-center justify-between gap-2 rounded-[var(--radius)_0] border border-border bg-card p-4"
-    class:setting-row-collapsed={child && parentActive === false}
-    class:setting-row-revealed={child && parentActive === true}
-  >
-    <div class="flex items-center gap-3">
-      <div
-        class="flex shrink-0 items-center justify-center rounded-full border border-border bg-background {child
-          ? 'h-7 w-7'
-          : 'h-9 w-9'}"
-      >
-        <setting.icon class="text-foreground {child ? 'h-4 w-4' : 'h-5 w-5'}" />
-      </div>
-      <div class="space-y-1">
-        <label
-          for={setting.id}
-          class="font-medium leading-none {child ? 'text-xs' : 'text-sm'}"
-        >
-          {setting.label}
-        </label>
-        <p class="text-muted-foreground {child ? 'text-[0.65rem]' : 'text-xs'}">
-          {setting.description}
-        </p>
-      </div>
+{#snippet settingRow(setting: BooleanSetting, parentActive = true)}
+  {@const enabled = settingsStore.getBoolean(setting.key)}
+  <div class="setting" class:setting--disabled={!parentActive}>
+    <div class="setting__icon">
+      <setting.icon size={22} strokeWidth={2.5} />
     </div>
-    <Switch
+    <div class="setting__text">
+      <div class="setting__title">{setting.label}</div>
+      <div class="setting__desc">{setting.description}</div>
+    </div>
+    <button
       id={setting.id}
-      checked={settingsStore.getBoolean(setting.key)}
-      disabled={child && parentActive === false}
-      onCheckedChange={(v: boolean) => settingsStore.setBoolean(setting.key, v)}
-    />
+      class="toggle"
+      class:on={enabled}
+      role="switch"
+      aria-checked={enabled}
+      aria-label={setting.label}
+      disabled={!parentActive}
+      onclick={() => settingsStore.setBoolean(setting.key, !enabled)}
+    >
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none">
+        {#if enabled}
+          <path
+            d="M4 12l6 6L20 6"
+            stroke="currentColor"
+            stroke-width="4"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        {:else}
+          <path
+            d="M6 6l12 12M18 6L6 18"
+            stroke="currentColor"
+            stroke-width="4"
+            stroke-linecap="round"
+          />
+        {/if}
+      </svg>
+      <span>{enabled ? "Enabled" : "Disabled"}</span>
+    </button>
   </div>
 {/snippet}
 
-<Modal
-  bind:open
-  title="Settings"
-  description="Please change them to your heart's content."
-  class="sm:max-w-2xl max-md:pb-0"
+<Tabs.Root
+  value={tab}
+  onValueChange={(value) => {
+    const was = SETTING_TABS.findIndex((item) => item.value === tab);
+    const is = SETTING_TABS.findIndex((item) => item.value === value);
+    tabDirection = is >= was ? 1 : -1;
+    tab = value as SettingTab;
+  }}
 >
-  <Tabs.Root value="editor">
-    <Tabs.List
-      class="mb-4 flex w-full rounded-[var(--radius)_0] border border-border bg-muted p-1"
-    >
-      <Tabs.Trigger
-        value="editor"
-        class="flex-1 rounded-[calc(var(--radius)-0.25rem)_0] px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
-        >Editor</Tabs.Trigger
-      >
-      <Tabs.Trigger
-        value="appearance"
-        class="flex-1 rounded-[calc(var(--radius)-0.25rem)_0] px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
-        >Appearance</Tabs.Trigger
-      >
-      <Tabs.Trigger
-        value="advanced"
-        class="flex-1 rounded-[calc(var(--radius)-0.25rem)_0] px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
-        >Advanced</Tabs.Trigger
-      >
-    </Tabs.List>
-
-    {#each SETTING_TABS as tab (tab)}
-      <Tabs.Content value={tab}>
-        <div class="grid gap-4 py-2">
-          {#each settingGroupsForTab(tab) as group (group.parent.key)}
-            <div class="relative flex flex-col">
-              {@render settingRow(group.parent)}
-
-              {#each group.children as child (child.key)}
-                {@const parentEnabled = settingsStore.getBoolean(
-                  group.parent.key,
-                )}
-                <div
-                  class="setting-child-wrap"
-                  class:setting-child-wrap-revealed={parentEnabled}
-                >
-                  {@render settingRow(child, true, parentEnabled)}
-                </div>
-              {/each}
-            </div>
-          {/each}
+  <Modal
+    bind:open
+    title="Settings"
+    class="sm:max-w-240! md:gap-0! md:p-5! max-md:pb-0"
+  >
+    {#snippet header()}
+      <div class="set__head">
+        <div class="tabs-list" use:tabPill={() => tab}>
+          <Tabs.List class="contents" aria-label="Settings categories">
+            {#each SETTING_TABS as item (item.value)}
+              <Tabs.Trigger value={item.value} class="tabs-trigger">
+                {item.label}
+              </Tabs.Trigger>
+            {/each}
+          </Tabs.List>
         </div>
-      </Tabs.Content>
-    {/each}
-  </Tabs.Root>
-</Modal>
+        <button
+          class="close"
+          aria-label="Close settings"
+          onclick={() => (open = false)}
+        >
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
+            <path
+              d="M6 6l12 12M18 6L6 18"
+              stroke="currentColor"
+              stroke-width="4"
+              stroke-linecap="round"
+            />
+          </svg>
+        </button>
+      </div>
+    {/snippet}
+
+    <Tabs.Content value={tab}>
+      {#key tab}
+        <div
+          in:fly={{ x: tabDirection * 48, duration: 180, easing: cubicOut }}
+        >
+          <div class="set__grid">
+            {#each settingGroupsForTab(tab) as group (group.parent.key)}
+              {@render settingRow(group.parent)}
+              {#each group.children as child (child.key)}
+                {@render settingRow(
+                  child,
+                  settingsStore.getBoolean(group.parent.key),
+                )}
+              {/each}
+            {/each}
+          </div>
+        </div>
+      {/key}
+    </Tabs.Content>
+  </Modal>
+</Tabs.Root>
 
 <style>
-  .setting-child-wrap {
-    position: relative;
-    margin-top: -2.75rem;
-    margin-bottom: -0.45rem;
-    overflow: hidden;
-    pointer-events: none;
-    opacity: 0.72;
-    transition:
-      margin-top 0.27s,
-      margin-bottom 0.27s,
-      opacity 0.27s;
+  .set__head {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    width: 100%;
+    align-items: center;
+    margin-bottom: 1rem;
   }
 
-  .setting-child-wrap-revealed {
-    margin-top: 0.35rem;
-    margin-bottom: 0;
-    pointer-events: auto;
-    opacity: 1;
+  .set__head .tabs-list {
+    grid-column: 2;
+    justify-self: center;
   }
 
-  .setting-row-collapsed {
-    padding: 0.45rem 0.85rem 0.45rem 1.15rem;
-    background: color-mix(in oklch, var(--secondary) 6%, transparent);
-    transform: translateY(-0.35rem) scale(0.95);
-    transition:
-      transform 0.27s,
-      padding 0.27s,
-      background 0.27s;
+  .set__head .close {
+    grid-column: 3;
+    justify-self: end;
   }
 
-  .setting-row-revealed {
-    padding: 0.5rem 1rem 0.5rem 1.25rem;
-    background: color-mix(in oklch, var(--secondary) 10%, transparent);
-    transform: translateY(0) scale(1);
+  .set__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .setting {
+    display: grid;
+    grid-template-columns: 40px 1fr auto;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--muted);
+    transition: opacity 0.15s;
+  }
+
+  .setting--disabled {
+    opacity: 0.5;
+  }
+
+  .setting__icon {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    color: var(--primary);
+  }
+
+  .setting__title {
+    font-size: 15px;
+    font-weight: 700;
+    -webkit-text-stroke: 0;
+  }
+
+  :global(.dark) .setting__title {
+    -webkit-text-stroke: var(--text-stroke-width)
+      var(--text-stroke-color);
+    paint-order: stroke fill;
+  }
+
+  .setting__desc {
+    margin-top: 1px;
+    font-size: 12px;
+    color: var(--muted-foreground);
+  }
+
+  .toggle {
+    --btn: var(--destructive);
+    --btn-deep: var(--destructive-dark);
+    --btn-rim: oklch(from var(--btn) min(0.95, calc(l + 0.12)) c h);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--btn-rim);
+    border-radius: var(--radius);
+    background: linear-gradient(180deg, var(--btn) 0%, var(--btn-deep) 100%);
+    box-shadow: none;
+    color: white;
+    cursor: pointer;
     transition:
-      transform 0.27s,
-      padding 0.27s,
-      background 0.27s;
+      filter 0.08s,
+      transform 0.05s,
+      box-shadow 0.05s;
+
+    &:hover:not(:disabled) {
+      filter: brightness(1.06);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(1px);
+      box-shadow: none;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+    }
+  }
+
+  .toggle {
+    flex-direction: column;
+    gap: 2px;
+    min-width: 84px;
+    padding: 8px 14px;
+    font-size: 11px;
+    font-weight: 700;
+
+    &.on {
+      --btn: var(--green);
+      --btn-deep: var(--green-dark);
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .set__head {
+      display: flex;
+      align-items: stretch;
+    }
+
+    .set__head .tabs-list {
+      width: 100%;
+      grid-column: auto;
+      justify-self: auto;
+    }
+
+    .set__head :global(.tabs-trigger) {
+      flex: 1 1 0%;
+      min-width: 0;
+      padding-inline: 0.5rem;
+    }
+
+    .set__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .setting {
+      grid-template-columns: 32px 1fr auto;
+      gap: 8px;
+      padding-inline: 10px;
+    }
+
+    .setting__icon {
+      width: 28px;
+    }
+
+    .toggle {
+      min-width: 68px;
+      padding-inline: 8px;
+    }
   }
 </style>

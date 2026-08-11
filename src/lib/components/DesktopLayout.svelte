@@ -37,6 +37,7 @@
 
   let settingsOpen = $state(false);
   let editorMode = $state<EditorMode>("cells");
+  let editorModeDirection = $state(1);
   let wikiEditorModule = $state<Awaited<
     typeof import("./WikiEditor.svelte")
   > | null>(null);
@@ -220,12 +221,16 @@
           {#if isClient}
             <DropdownMenu.Root>
               <DropdownMenu.Trigger
-                class="inline-flex shrink-0 items-center gap-2 rounded-[var(--radius)_0] border border-border px-3 py-2 text-sm font-medium transition-colors duration-250 hover:bg-muted"
+                class="inline-flex shrink-0 items-center gap-2 rounded-md border border-border bg-surface px-3 py-2 text-sm font-medium transition-colors hover:bg-surface-2"
               >
                 <span>{profileStore.current}</span>
                 <span class="text-xs text-muted-foreground">(Profile)</span>
               </DropdownMenu.Trigger>
-              <DropdownMenu.Content align="start" class="dropdown-content">
+              <DropdownMenu.Content
+                align="start"
+                sideOffset={6}
+                class="dropdown-content"
+              >
                 <DropdownMenu.Group>
                   <DropdownMenu.GroupHeading
                     class="px-2 py-1.5 text-sm font-semibold"
@@ -253,7 +258,7 @@
                     </DropdownMenu.Item>
                   {/each}
                 </DropdownMenu.Group>
-                <DropdownMenu.Separator class="-mx-1 my-1 h-px bg-muted" />
+                <DropdownMenu.Separator class="-mx-1 my-1 h-px bg-border" />
 
                 <Modal
                   bind:open={createProfileOpen}
@@ -303,7 +308,7 @@
 
                 {#if profileStore.current !== "Default"}
                   <DropdownMenu.Item
-                    class="dropdown-item text-destructive focus:text-destructive hover:bg-red-100"
+                    class="dropdown-item text-destructive hover:bg-destructive/10"
                     onclick={(e) =>
                       openDeleteProfileDialog(profileStore.current, e)}
                   >
@@ -327,6 +332,8 @@
             <ModeToggle
               bind:mode={editorMode}
               disableCells={towerStore.selectedData?.isMalformed ?? false}
+              onModeChange={(next) =>
+                (editorModeDirection = next === "wiki" ? 1 : -1)}
             />
             <AuthMenu />
             <TowerPicker
@@ -357,7 +364,13 @@
               />
             {:else if towerStore.selectedData}
               {#key editorMode}
-                <div in:fly={{ y: 8, duration: 160, easing: cubicOut }}>
+                <div
+                  in:fly={{
+                    x: editorModeDirection * 80,
+                    duration: 180,
+                    easing: cubicOut,
+                  }}
+                >
                   {#if editorMode === "cells" && !towerStore.selectedData.isMalformed}
                     <TowerEditor tower={towerStore.selectedData} />
                   {:else if wikiEditorModule}

@@ -96,7 +96,7 @@
     </div>
 
     <Combobox.Portal>
-      <Combobox.Content class="combobox-content">
+      <Combobox.Content class="combobox-content" sideOffset={6}>
         <Combobox.Viewport class="max-h-75 overflow-y-auto p-2">
           {#each filteredItems as item (item.value)}
             <Combobox.Item
@@ -130,11 +130,10 @@
       type="search"
       placeholder="Enter a tower name!"
       bind:value={query}
-      class="bg-card! border-border! rounded-[var(--radius)_0_0]!"
     />
 
     <div
-      class="rounded-[0_0_var(--radius)] min-h-0 max-h-[min(60vh,36rem)] flex-1 overflow-y-auto border border-border bg-card md:max-h-none"
+      class="min-h-0 max-h-[min(60vh,36rem)] flex-1 overflow-y-auto rounded-md border border-border bg-card md:max-h-none"
     >
       {#if !query && recent.length > 0}
         <section class="p-2">
@@ -142,7 +141,7 @@
           <ul class="picker-grid">
             {#each recent as name (name)}
               <li
-                class="group relative min-w-0 rounded-[calc(var(--radius)-0.25rem)_0] hover:bg-accent hover:text-accent-foreground"
+                class="group relative min-w-0 rounded-sm hover:bg-primary/15 hover:text-foreground"
                 out:slide={{ duration: 177, easing: cubicOut, axis: "x" }}
               >
                 <button
@@ -173,7 +172,7 @@
             {#each group.towers as name (name)}
               <li class="min-w-0">
                 <button
-                  class="combobox-item min-w-0 truncate hover:bg-accent hover:text-accent-foreground"
+                  class="combobox-item min-w-0 truncate hover:bg-primary/15"
                   onclick={() => pick(name)}
                 >
                   {name}
@@ -227,20 +226,22 @@
   :global(.combobox-input) {
     height: 2.5rem;
     width: 15.625rem;
-    border-radius: var(--radius) 0;
-    border: 1px solid var(--input);
-    background: var(--background);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--muted);
+    color: var(--foreground);
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
+    font-weight: 500;
     outline: none;
+    transition: border-color 0.15s;
 
     &::placeholder {
-      color: var(--muted-foreground);
+      color: var(--text-faint);
     }
 
     &:focus-visible {
-      outline: 2px solid var(--ring);
-      outline-offset: 2px;
+      border-color: var(--border-strong);
     }
 
     &:disabled {
@@ -249,24 +250,25 @@
     }
   }
 
+  :global(.dark) :global(.combobox-input) {
+    background: oklch(0% 0 0 / 0.5);
+  }
+
   :global(.combobox-content) {
-    z-index: 47;
+    z-index: 57;
     min-width: 15.625rem;
     overflow: hidden;
-    border-radius: var(--radius) 0;
+    border-radius: var(--radius);
     border: 1px solid var(--border);
-    background: var(--popover);
-    color: var(--popover-foreground);
-    box-shadow:
-      0 4px 6px -1px oklch(0 0 0 / 0.1),
-      0 2px 4px -2px oklch(0 0 0 / 0.1);
+    background: var(--card);
+    color: var(--foreground);
 
     &[data-state="open"] {
-      animation: overlay-in 150ms ease;
+      animation: overlay-in 0.15s;
     }
 
     &[data-state="closed"] {
-      animation: overlay-out 100ms ease;
+      animation: overlay-out 0.15s;
     }
   }
 
@@ -277,7 +279,7 @@
     cursor: pointer;
     user-select: none;
     align-items: center;
-    border-radius: calc(var(--radius) - 0.25rem) 0;
+    border-radius: var(--radius);
     padding: 0.375rem 2rem 0.375rem 1rem;
     font-size: 0.875rem;
     outline: none;
@@ -288,8 +290,8 @@
     }
 
     &[data-highlighted] {
-      background: var(--accent);
-      color: var(--accent-foreground);
+      background: color-mix(in oklch, var(--primary) 22%, transparent);
+      color: var(--foreground);
     }
   }
 </style>

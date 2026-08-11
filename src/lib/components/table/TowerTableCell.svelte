@@ -139,7 +139,7 @@
   <Tip
     content={formulaSource!}
     class="max-w-80! font-mono text-xs!"
-    sideOffset={4}
+    sideOffset={6}
   >
     {#snippet children({ props })}
       {#if isMoney}

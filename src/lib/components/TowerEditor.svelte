@@ -1,9 +1,12 @@
 <script lang="ts">
+  import { cubicOut } from "svelte/easing";
+  import { fly } from "svelte/transition";
   import { Tabs, Popover } from "bits-ui";
   import Separator from "./smol/Separator.svelte";
   import Btn from "./smol/Btn.svelte";
   import Switch from "./smol/Switch.svelte";
   import Tip from "./smol/Tip.svelte";
+  import { tabPill } from "$lib/utils/tabPill.svelte";
   import type Tower from "$lib/towerComponents/tower";
   import type SkinData from "$lib/towerComponents/skinData";
   import { settingsStore } from "$lib/stores/settings.svelte";
@@ -52,6 +55,7 @@
 
   const availableSkins = $derived(tower?.skinNames ?? []);
   const selectedSkinName = $derived(towerStore.selectedSkinName);
+  let skinDirection = $state(1);
 
   const rofInfo = $derived.by(() => {
     settingsStore.rofBug;
@@ -73,6 +77,7 @@
   const compareRowsCache = $derived.by(() => {
     towerStore.refreshTrigger;
     modifierStore.entries;
+    settingsStore.rofBug;
     return buildCompareRowsCache(tower, rofInfo, modifier);
   });
 
@@ -410,7 +415,7 @@
   {#if tower}
     {#if towerStore.sharePreviewId}
       <div
-        class="flex flex-wrap items-center justify-between gap-2 rounded-[var(--radius)_0] border border-sky-500/30 bg-sky-500/10 px-3 py-2"
+        class="flex flex-wrap items-center justify-between gap-2 rounded-md border border-sky-500/30 bg-sky-500/10 px-3 py-2"
       >
         <p class="text-sm text-sky-950 dark:text-sky-100">
           {#if towerStore.shareOwner}
@@ -425,7 +430,6 @@
         </p>
         <Btn
           variant="outline"
-          size="sm"
           onclick={() => void towerStore.exitSharePreview()}
         >
           Back to My Stats
@@ -436,6 +440,9 @@
       value={towerStore.selectedSkinName}
       onValueChange={(v) => {
         if (!v || !tower) return;
+        const was = availableSkins.indexOf(towerStore.selectedSkinName);
+        const is = availableSkins.indexOf(v);
+        skinDirection = is >= was ? 1 : -1;
         towerStore.selectedSkinName = v;
         analytics.track("skin_change", {
           tower_name: tower.name,
@@ -444,45 +451,56 @@
       }}
     >
       {#if availableSkins.length > 1 || settingsStore.alwaysShowSkinTabs}
-        <Tabs.List
-          class="mb-4 flex gap-2 rounded-[var(--radius)_0] bg-muted p-1 px-2"
+        <div
+          class="tabs-list tabs-list-stretch mb-4 overflow-x-auto"
+          use:tabPill={() => selectedSkinName}
         >
-          {#each availableSkins as skinName (skinName)}
-            <Tabs.Trigger
-              value={skinName}
-              class="rounded-[calc(var(--radius)-0.25rem)_0] border border-input bg-card px-4 py-1 text-sm font-medium text-foreground transition-colors duration-250 hover:bg-accent data-[state=active]:bg-primary data-[state=active]:text-white"
-              >{skinName}</Tabs.Trigger
-            >
-          {/each}
-        </Tabs.List>
+          <Tabs.List class="contents">
+            {#each availableSkins as skinName (skinName)}
+              <Tabs.Trigger value={skinName} class="tabs-trigger"
+                >{skinName}</Tabs.Trigger
+              >
+            {/each}
+          </Tabs.List>
+        </div>
       {/if}
 
       <Tabs.Content value={selectedSkinName}>
-        {#if activeSkinData}
-          {#each activeSkinData.orderedTables as table, orderedIdx (tableCacheKey(table.skinName, table.tableIdx))}
-            <TowerDataTable
-              config={table}
-              displayRows={displayRowsCache.get(
-                tableCacheKey(table.skinName, table.tableIdx),
-              ) ?? []}
-              compareRows={compareRowsCache.get(
-                tableCacheKey(table.skinName, table.tableIdx),
-              ) ?? []}
-              baseline={towerStore.baseline}
-              globalModifier={modifier}
-              {showDiff}
-              {disabled}
-              isFirst={orderedIdx === 0}
-              refTokenRegistry={skinRefs.registry}
-              getRefNum={getSkinRefNum}
-              commit={commitEdit}
-            />
-          {/each}
-        {:else}
-          <div class="text-center py-4 text-muted-foreground">
-            No skin data available.
+        {#key selectedSkinName}
+          <div
+            in:fly={{
+              x: skinDirection * 56,
+              duration: 190,
+              easing: cubicOut,
+            }}
+          >
+            {#if activeSkinData}
+              {#each activeSkinData.orderedTables as table, orderedIdx (tableCacheKey(table.skinName, table.tableIdx))}
+                <TowerDataTable
+                  config={table}
+                  displayRows={displayRowsCache.get(
+                    tableCacheKey(table.skinName, table.tableIdx),
+                  ) ?? []}
+                  compareRows={compareRowsCache.get(
+                    tableCacheKey(table.skinName, table.tableIdx),
+                  ) ?? []}
+                  baseline={towerStore.baseline}
+                  globalModifier={modifier}
+                  {showDiff}
+                  {disabled}
+                  isFirst={orderedIdx === 0}
+                  refTokenRegistry={skinRefs.registry}
+                  getRefNum={getSkinRefNum}
+                  commit={commitEdit}
+                />
+              {/each}
+            {:else}
+              <div class="text-center py-4 text-muted-foreground">
+                No skin data available.
+              </div>
+            {/if}
           </div>
-        {/if}
+        {/key}
       </Tabs.Content>
     </Tabs.Root>
 
@@ -502,7 +520,7 @@
             </span>
           {/snippet}
         </Tip>
-        <Popover.Content class="popover-content w-80">
+        <Popover.Content class="popover-content w-80" sideOffset={6}>
           <div class="space-y-3">
             <p class="text-sm text-muted-foreground">
               Share this lovely tower with a short link! Anyone who opens it can
@@ -527,9 +545,7 @@
             {:else if shareError}
               <p class="text-sm text-destructive">{shareError}</p>
               <div class="flex justify-end">
-                <Popover.Close class="btn btn-outline btn-sm"
-                  >Close</Popover.Close
-                >
+                <Popover.Close class="btn btn-outline">Close</Popover.Close>
               </div>
             {:else if shareLink}
               <input
@@ -540,7 +556,7 @@
               />
               <div class="flex justify-end gap-2">
                 {#if authStore.user}
-                  <Btn size="sm" variant="secondary" onclick={openPublish}>
+                  <Btn variant="secondary" onclick={openPublish}>
                     Publish to Workshop
                   </Btn>
                 {:else}
@@ -549,14 +565,14 @@
                   >
                     {#snippet children({ props })}
                       <span class="inline-flex" {...props}>
-                        <Btn size="sm" variant="secondary" disabled>
+                        <Btn variant="secondary" disabled>
                           Publish to Workshop
                         </Btn>
                       </span>
                     {/snippet}
                   </Tip>
                 {/if}
-                <Btn size="sm" onclick={copyShareLink}>Copy</Btn>
+                <Btn onclick={copyShareLink}>Copy</Btn>
               </div>
             {/if}
           </div>
@@ -580,7 +596,7 @@
               </Popover.Trigger>
             {/snippet}
           </Tip>
-          <Popover.Content class="popover-content">
+          <Popover.Content class="popover-content" sideOffset={6}>
             <div class="space-y-2">
               <h4 class="font-medium leading-none">Confirm Fetch</h4>
               <p class="text-sm text-muted-foreground">
@@ -646,7 +662,7 @@
             >{towerStore.isCustomSelected() ? "Delete" : "Reset"}</span
           >
         </Popover.Trigger>
-        <Popover.Content class="popover-content">
+        <Popover.Content class="popover-content" sideOffset={6}>
           <div class="space-y-2">
             <h4 class="font-medium leading-none">
               {towerStore.isCustomSelected()
@@ -692,7 +708,7 @@
               </Popover.Trigger>
             {/snippet}
           </Tip>
-          <Popover.Content class="popover-content">
+          <Popover.Content class="popover-content" sideOffset={6}>
             <div class="space-y-2">
               <h4 class="font-medium leading-none">Apply to Profile?</h4>
               <p class="text-sm text-muted-foreground">
