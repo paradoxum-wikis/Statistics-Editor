@@ -99,6 +99,11 @@ function buildVariablesMap(tower: Tower): Record<string, string> {
 
   preserveTokens(baseSkin);
 
+  const tokens = baseSkin?.formulaTokens ?? {};
+  const meta = getFncValue(tokens, "META") ?? getFncValue(tokens, "CATEGORY");
+  if (meta !== undefined) variables["$FSE-META$"] = meta;
+  delete variables["$FSE-CATEGORY$"];
+
   const schema = parseSchema(
     getFncValue(baseSkin?.formulaTokens ?? {}, "SCHEMA"),
   );
@@ -196,6 +201,8 @@ function patchVariableBlock(
   for (const [, key] of oldBlock.matchAll(/^\s*([^=\s]+)\s*=/gm)) {
     if (key in variables) {
       orderedVars[key] = variables[key];
+    } else if (key === "$FSE-CATEGORY$" && "$FSE-META$" in variables) {
+      orderedVars["$FSE-META$"] = variables["$FSE-META$"];
     } else if (key.startsWith("$FNC-")) {
       const fse = "$FSE-" + key.slice(5);
       if (fse in variables) orderedVars[fse] = variables[fse];

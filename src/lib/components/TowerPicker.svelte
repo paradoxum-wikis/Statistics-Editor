@@ -4,7 +4,7 @@
   import { slide } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
   import {
-    buildCategoryMap,
+    buildMetaMap,
     groupedTowerNames,
   } from "$lib/towerComponents/towers";
   import { towerStore } from "$lib/stores/tower.svelte";
@@ -40,16 +40,16 @@
         ),
   );
 
-  const categoryMap = $derived.by(() => {
+  const metaMap = $derived.by(() => {
     void towerStore.refreshTrigger;
-    return buildCategoryMap(profileStore.current, {
+    return buildMetaMap(profileStore.current, {
       towerName: towerStore.selectedName,
       wikitext: towerStore.effectiveWikitext,
     });
   });
 
   const groups = $derived(
-    groupedTowerNames(towerStore.names, query, categoryMap),
+    groupedTowerNames(towerStore.names, query, metaMap),
   );
 
   const recent = $derived(
@@ -147,7 +147,8 @@
               >
                 <TowerCard
                   {name}
-                  tier={categoryMap.get(name)}
+                  tier={metaMap.get(name)?.category}
+                  image={metaMap.get(name)?.image}
                   onclick={() => pick(name)}
                 />
                 <button
@@ -173,6 +174,7 @@
                 <TowerCard
                   {name}
                   tier={group.label}
+                  image={metaMap.get(name)?.image}
                   onclick={() => pick(name)}
                 />
               </li>

@@ -5,7 +5,7 @@
  * Exceptions are DETECTION/UPGRADE/UPGRADEICON for compatibility reasons,
  * FNC- versions are accepted on read but migrated to FSE- on save.
  */
-const FSE_BASES = ["DETECTION", "UPGRADE", "UPGRADEICON", "CATEGORY"];
+const FSE_BASES = ["DETECTION", "UPGRADE", "UPGRADEICON", "CATEGORY", "META"];
 const COMPATIBILITY_FSE = ["DETECTION", "UPGRADE", "UPGRADEICON"];
 
 function isFseSuffix(suffix: string): boolean {

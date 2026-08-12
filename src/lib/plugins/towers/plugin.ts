@@ -1,5 +1,6 @@
 import type { Plugin, ViteDevServer } from "vite";
-import { parseTowerCategory } from "./parse";
+import { parseTowerMeta, type TowerMeta } from "./parse";
+
 const TOWERS_DIR = `${process.cwd()}/src/lib/towerComponents/towers`;
 const VIRTUAL_ID = "virtual:towers";
 const RESOLVED_ID = "\0" + VIRTUAL_ID;
@@ -8,22 +9,23 @@ async function scanTowers() {
   const glob = new Bun.Glob("*.wiki");
   const wikiFiles = Array.from(glob.scanSync({ cwd: TOWERS_DIR }));
   const towerNames: string[] = [];
-  const categoryEntries: [string, string][] = [];
+  const metaEntries: [string, TowerMeta][] = [];
 
   for (const file of wikiFiles) {
     const towerName = file.slice(0, -5);
     towerNames.push(towerName);
     const content = await Bun.file(`${TOWERS_DIR}/${file}`).text();
-    const category = parseTowerCategory(content);
-    if (category) categoryEntries.push([towerName, category]);  }
+    const meta = parseTowerMeta(content);
+    if (meta) metaEntries.push([towerName, meta]);
+  }
 
   towerNames.sort((a, b) => a.localeCompare(b));
-  return { towerNames, categoryEntries };
+  return { towerNames, metaEntries };
 }
 
 function serializeModule(data: Awaited<ReturnType<typeof scanTowers>>) {
   return `export const towerNames = ${JSON.stringify(data.towerNames)};
-export const categoryEntries = ${JSON.stringify(data.categoryEntries)};`;
+export const metaEntries = ${JSON.stringify(data.metaEntries)};`;
 }
 
 export function towersPlugin(): Plugin {

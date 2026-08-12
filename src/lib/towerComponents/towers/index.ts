@@ -1,9 +1,11 @@
 import { listWikiOverrides } from "$lib/neowtext/wikiSource";
-import { parseTowerCategory } from "$lib/plugins/towers/parse";
-import { categoryEntries, towerNames } from "virtual:towers";
+import { parseTowerMeta, type TowerMeta } from "$lib/plugins/towers/parse";
+import { metaEntries, towerNames } from "virtual:towers";
 
-// $FSE-CATEGORY$
+// $FSE-META$
 export { towerNames };
+export type { TowerMeta };
+
 export const towerCategoryOrder = [
   "Starter",
   "Intermediate",
@@ -15,24 +17,31 @@ export const towerCategoryOrder = [
   "Unavailable",
 ] as const;
 
-const baseCategoryMap = new Map<string, string>(categoryEntries);
+const baseMetaMap = new Map<string, TowerMeta>(metaEntries);
 
-function categoryFromWikitext(wikitext: string): string {
-  return parseTowerCategory(wikitext) ?? "Custom";
+function resolveName(map: Map<string, TowerMeta>, tower: string): string {
+  if (map.has(tower)) return tower;
+  const lower = tower.toLowerCase();
+  for (const name of map.keys()) {
+    if (name.toLowerCase() === lower) return name;
+  }
+  return tower;
 }
 
-export function buildCategoryMap(
+export function buildMetaMap(
   profileName: string,
   live?: { towerName: string; wikitext: string },
-): Map<string, string> {
-  const map = new Map(baseCategoryMap);
+): Map<string, TowerMeta> {
+  const map = new Map(baseMetaMap);
 
   for (const [tower, wikitext] of listWikiOverrides(profileName)) {
-    map.set(tower, categoryFromWikitext(wikitext));
+    const meta = parseTowerMeta(wikitext);
+    if (meta) map.set(resolveName(map, tower), meta);
   }
 
   if (live?.towerName && live.wikitext.trim()) {
-    map.set(live.towerName, categoryFromWikitext(live.wikitext));
+    const meta = parseTowerMeta(live.wikitext);
+    if (meta) map.set(resolveName(map, live.towerName), meta);
   }
 
   return map;
@@ -41,7 +50,7 @@ export function buildCategoryMap(
 export function groupedTowerNames(
   names: readonly string[],
   query: string,
-  categoryByTower: ReadonlyMap<string, string>,
+  metaByTower: ReadonlyMap<string, TowerMeta>,
 ): { label: string; towers: string[] }[] {
   const q = query.trim().toLowerCase();
   const filtered = q
@@ -50,7 +59,7 @@ export function groupedTowerNames(
 
   const buckets = new Map<string, string[]>();
   for (const name of filtered) {
-    const label = categoryByTower.get(name) ?? "Custom";
+    const label = metaByTower.get(name)?.category ?? "Custom";
     const bucket = buckets.get(label) ?? [];
     bucket.push(name);
     buckets.set(label, bucket);

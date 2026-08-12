@@ -1,10 +1,11 @@
 <script lang="ts">
   import type { HTMLButtonAttributes } from "svelte/elements";
   import placeholder from "$lib/assets/Placeholder.png";
+  import { imageLoader } from "$lib/services/imageLoader";
 
   let {
     name,
-    image = placeholder,
+    image,
     tier,
     selected,
     class: className,
@@ -17,6 +18,26 @@
     selected?: boolean;
     class?: string;
   } & HTMLButtonAttributes = $props();
+
+  let src = $state(placeholder);
+
+  $effect(() => {
+    const ref = image?.trim();
+    src = placeholder;
+    if (!ref) return;
+    const cached = imageLoader.getCachedUrl(name, -1, ref);
+    if (cached) {
+      src = cached;
+      return;
+    }
+    let cancelled = false;
+    imageLoader.loadImage(name, -1, ref).then((url) => {
+      if (!cancelled && url) src = url;
+    });
+    return () => {
+      cancelled = true;
+    };
+  });
 </script>
 
 <button
@@ -26,7 +47,7 @@
   {onclick}
   {...rest}
 >
-  <img src={image} alt="" loading="lazy" />
+  <img {src} alt="" loading="lazy" />
   <span>{name}</span>
 </button>
 
