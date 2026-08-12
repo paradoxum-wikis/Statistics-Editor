@@ -8,7 +8,7 @@ $FSE-DETECTION$ = 3; ; 0
 $FSE-UPGRADE$ = Quickscope; Survivalist's Kit; Sharp Shooter; Hunter In The Night
 $FSE-PVP-UPGRADE$ = Faster Hands; Experienced; Better Gear; Deadliest Hunter
 $FSE-UPGRADEICON$ = 3839040358; 3839041547; 3839042767; 3839043838
-$FSE-CATEGORY$ = Intermediate
+$FSE-META$ = Intermediate; File:NewHunterIcon.png
 </var>
 <div class="mobile-tabber"><tabber>
 |-|Regular =

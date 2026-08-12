@@ -11,7 +11,7 @@ $FNC-COST$ = 6750; 1500; 5000; 20000; 50000; 125000;
 $FSE-DETECTION$ = 4; 0; 5
 $FSE-UPGRADE$ = Improved Handling; Stark Missile; Epic Armor Plating; Ultra Charged Body Armor; To The Void and Back
 $FSE-UPGRADEICON$ = 4989372339; 4989372568; 3584258139; 4989373124; 4989373460
-$FSE-CATEGORY$ = Exclusive
+$FSE-META$ = Exclusive; File:DefaultWarMachineRework0.png
 $SREF$ = <ref>Number is the damage dealt in the inner explosion sphere. Splash damage is decreased linearly from the edge of the inner explosion sphere to the edge of the outer explosion sphere, if the enemy is in the outer explosion sphere.</ref>
 $DREF$ = <ref>Total DPS is calculated as Normal DPS + Missile DPS.<br/>Missile DPS assumes only one enemy is hit with all missiles and it receives full splash damage.</ref>
 </var>

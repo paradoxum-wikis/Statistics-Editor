@@ -10,7 +10,7 @@ $FNC-COST$ = 2000; 1856; 8888; 18450; 44001
 $FSE-DETECTION$ = ; 0; 0
 $FSE-UPGRADE$ = Kite in the Wind; Self-Sustaining Battery; Auric Quantum Cooling Cell; Kimat's Bite
 $FSE-UPGRADEICON$ = 91355001385794; 75051178841119; 106313416363708; 109247042334349
-$FSE-CATEGORY$ = Advanced
+$FSE-META$ = Advanced; File:TeslaIcon.png
 $DREF$ = <ref>For Level 2+, the '''Smite Damage''' is also included, assuming it only hits the targeted enemy and deals full damage to it.<br>Calculated as (Smite Meter × Damage + Smite Damage) ÷ (Firerate × Smite Meter).</ref>
 $MREF$ = <ref>Accounts for every enemy being hit.<br>Calculated as (Damage × Max Hits * [Smite Meter ÷ Max Hits] + Smite Damage) ÷ (Firerate × [Smite Meter ÷ Max Hits]) for Level 2+, where in both cases of Smite Meter ÷ Max Hits, the result of that (such as 3 divided by 8 resulting in 0.375) has to be rounded up (in the previous example, that turns 0.375 to 1).</ref>
 </var>

@@ -8,7 +8,7 @@ $FNC-COST$ = 550; 400; 750; 2500; 7000
 $FSE-DETECTION$ = ; 3; 0
 $FSE-UPGRADE$ = Steel Fang; Firmer Grip; Twin Strike; Lord Of The Rangs
 $FSE-UPGRADEICON$ = 86490015907171; 115637133853496; 82968142141425; 129523706643871
-$FSE-CATEGORY$ = Starter
+$FSE-META$ = Starter; File:DefaultBoomerang0.png
 </var>
 <div class="overflow-box">
 {| class="wikitable stats-table"

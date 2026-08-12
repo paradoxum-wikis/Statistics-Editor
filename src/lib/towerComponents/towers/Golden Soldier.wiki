@@ -7,7 +7,7 @@ $FNC-COST$ = 450; 150; 800; 3400; 11350
 $FSE-DETECTION$ = 2; ; 0
 $FSE-UPGRADE$ = Trigger Finger; Field Training; Gilded Gear; Maximum Potential
 $FSE-UPGRADEICON$ = 5523192002; 5523193619; 5523195646; 5523196519
-$FSE-CATEGORY$ = Golden Perks
+$FSE-META$ = Golden Perks; File:KR Golden Soldier Icon.png
 $FREF$ = <ref name=firerate>Firerate only applies to the burst and is not the time between bursts.</ref>
 $DREF$ = <ref name=dps>Calculated as (Damage × Burst Count) ÷ (Cooldown + (Firerate × Burst Count)).</ref>
 </var>

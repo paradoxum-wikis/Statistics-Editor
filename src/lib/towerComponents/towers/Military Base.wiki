@@ -11,7 +11,7 @@ $FNC-PVP-COST$ = 400; 200; 400; 1750; 7500; 25000
 $FSE-DETECTION$ = 3; 0;
 $FSE-UPGRADE$ = Mechanics; Barbed Wire; Mounted Gunner; Tank; Railgun Tank
 $FSE-UPGRADEICON$ = 3877874591; 3877875003; 3877873543; 3444568329; 3444568580
-$FSE-CATEGORY$ = Intermediate
+$FSE-META$ = Intermediate; File:DefaultMilitaryBaseIconM29.png
 $SREF$ = <ref name=splash>Damage dealt in the inner explosion sphere. Splash damage is decreased linearly if the enemy is in the outer explosion sphere.</ref>
 $RREF$ = <ref name=ram>DPS dealt with its collisions. It is calculated as Health ÷ Spawnrate.</ref>
 </var>

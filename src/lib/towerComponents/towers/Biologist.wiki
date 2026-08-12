@@ -16,7 +16,7 @@ $IREF$ = <ref name="ivydps">DPS is multiplied by the '''Biologist's''' unit queu
 $TREF$ = <ref>Total Elapsed Damage is calculated as Poison Damage × (Poison Time ÷ Poison Tick).</ref>
 $FSE-UPGRADE$ = Bio Chemistry; Scientific Breakthrough; Flower Power; Botanical Berserker!
 $FSE-UPGRADEICON$ = 95317340543936; 91087216328467; 101480107243808; 121014188542772
-$FSE-CATEGORY$ = Exclusive
+$FSE-META$ = Exclusive; File:BiologistIcon.png
 $FSE-DETECTION$ = 2; 1; 3
 </var>
 <div class="overflow-box">

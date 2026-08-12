@@ -8,7 +8,7 @@ $FNC-PVP-COST$ = 200; 125; 500; 800; 1500; 3000
 $FSE-DETECTION$ = 1; ;
 $FSE-UPGRADE$ = Paintball Gear; Shoulder Pads; Double Barrel Gun; Competitive Gear
 $FSE-UPGRADEICON$ = 3280081327; 3319083300; 3280082028; 3319084508; 3319085582
-$FSE-CATEGORY$ = Starter
+$FSE-META$ = Starter; File:NewPaintballerIcon.png
 $MREF$ = <ref name=maxdps>Calculated as DPS × Max Hits.</ref>
 $CREF$ = <ref name=ce>Calculated with normal DPS.</ref>
 </var>

@@ -9,7 +9,7 @@ $TP$ = $FNC-TOTALPRICE$
 $FSE-UPGRADE$ = Warrior Armor; Dangersense; Extra Protection; Illumina; Darkheart Swordsman
 $FSE-UPGRADEICON$ = 3356186535; 141745478; 4118882122; 16620737; 16868189
 $FSE-DETECTION$ = 2; ;
-$FSE-CATEGORY$ = Unavailable
+$FSE-META$ = Unavailable; File:DefaultCombatantIcon.png
 $DREF$ = <ref>DPS assumes that only one enemy is hit per swing.<br />Ability is not taken into account.</ref>
 $MDREF$ = <ref>DPS assumes that the maximum number of enemies are hit per swing.<br/>Ability is not taken into account.</ref>
 </var>

@@ -13,7 +13,7 @@ $FNC-COST$ = 3600; 1400; 4000; 6000; 7250; 16500; 38500; 14000; 32500; 64000
 $FSE-DETECTION$ = ; 3; ; ; 3; 4; ; 3; 6;
 $FSE-UPGRADE$ = Hat Trick; Mafia Expansion; High Roller; LV. 10 Bounty Hunter; LV. 50 Flashy Business; LV. 999 BOSS; Underworld Backup; B.P. Operations; Golden Syndicate
 $FSE-UPGRADEICON$ = 115111916696325; 128115489998324; 72861050225989; 114668237754966; 132421103594393; 104949216258591; 95999047723463; 105993154736785; 119447258450364
-$FSE-CATEGORY$ = Evolved
+$FSE-META$ = Evolved; File:DefaultKingpin0.png
 $RC$ = $FNC-RECURSION$
 </var>
 <div class="mobile-tabber"><tabber>
@@ -32,7 +32,6 @@ $RC$ = $FNC-RECURSION$
 |-
 | 3 || {{Money|$TP$}} || 12 || 0.14 || 20 || 2 || $DPS$ || {{Money|$CE$}}
 |}
-</div>
 
 <div class="overflow-box">
 {| class="wikitable stats-table"

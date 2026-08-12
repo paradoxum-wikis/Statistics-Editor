@@ -17,7 +17,7 @@ $FNC-COST$ = 1500; 2000; 6500; 12000; 22000
 $FSE-DETECTION$ = ; 0;
 $FSE-UPGRADE$ = Pyrotechnics; Bigger Boom; Light the Sky; The Finale
 $FSE-UPGRADEICON$ = 113918271734207; 102159060729309; 76789690706169; 83889465749773
-$FSE-CATEGORY$ = Exclusive
+$FSE-META$ = Exclusive; File:FireworkTechnicianIcon.png
 $TREF$ = <ref>Total Elapsed Damage is calculated as Burn Damage × (Burn Time ÷ Burn Tick).</ref>
 $FREF$ = <ref>Does not account for towers with a penalty applied to them which divides the chance and assumes each enemy only hits an enemy once. Both of these factors will affect the chances, either making it more likely or less likely to fire them.</ref>
 </var>

@@ -6,7 +6,7 @@ $FNC-COST$ = 67; 320; 2222; 1000000
 $FSE-DETECTION$ = 0; 0; 0
 $FSE-UPGRADE$ = Lord Exo Slayer; QA Leaker; Spectin destroyer
 $FSE-UPGRADEICON$ = 139027030887404; 136854065383009; 16911190427
-$FSE-CATEGORY$ = Golden Perks
+$FSE-META$ = Golden Perks; File:GoldenSnowballer.png
 </var>
 <div class="overflow-box">
 {| class="wikitable stats-table"

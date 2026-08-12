@@ -9,7 +9,7 @@ $FSE-UPGRADE$ = Radio Comms; Field Ops; Guerrilla Tactics; Stealth Mercenary
 $FSE-PVP-UPGRADE$ = Radio Comms; Bigger Rifle; Upskill; Stealth Mercenary
 $FSE-UPGRADEICON$ = 5523212631; 5523215135; 5523216332; 5523217773
 $FNC-ROFBUG$ = Firerate
-$FSE-CATEGORY$ = Intermediate
+$FSE-META$ = Intermediate; File:EasterMilitant_Icon.png
 </var>
 <div class="mobile-tabber"><tabber>
 |-|Regular =

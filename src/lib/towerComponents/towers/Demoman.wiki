@@ -10,10 +10,9 @@ $FSE-UPGRADE$ = Faster Throwing; Ullapool Caber; Loch-n-Load; Expert's Ordnance
 $FSE-PVP-UPGRADE$ = Further Throwing; Steil Grenade; Chinalake; Collateral Damage
 $FSE-UPGRADEICON$ = 5523227714; 5523227714; 5523228733; 5523229364
 $FSE-PVP-UPGRADEICON$ = ; 5523227714; 5523228733; 5523229364
-$FSE-CATEGORY$ = Starter
+$FSE-META$ = Starter; File:DefaultDemomanIcon2.png
 $AREF$ = <ref name=aim>Aim Time happens before the '''Demoman''' throws a grenade. This does not affect its firerate.</ref>
 $DREF$ = <ref name=dps>DPS does not consider projectile travel time.</ref>
-DPS assumes that only one enemy is hit and it receives full splash damage.</ref>
 </var>
 <div class="mobile-tabber"><tabber>
 |-|Regular =
@@ -35,7 +34,7 @@ DPS assumes that only one enemy is hit and it receives full splash damage.</ref>
 |-|PVP =
 <div class="overflow-box">
 {| class="wikitable stats-table"
-! Level !! Total Price !! Splash Damage$SREF$ !! Firerate !! Aim Time$AREF$ !! Range !! Explosion Range !! DPS$DREF$ !! Cost Efficiency
+! Level !! Total Price !! Splash Damage !! Firerate !! Aim Time$AREF$ !! Range !! Explosion Range !! DPS$DREF$ !! Cost Efficiency
 |-
 | 0 || {{Money|$TP$}} || 6 || 1.75 || 1 || 9 || 4.5 || $DPS$ || {{Money|$CE$}}
 |-

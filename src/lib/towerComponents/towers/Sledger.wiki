@@ -17,7 +17,7 @@ $FDREF$ = <ref>Once ''Ice Breaker'' is unlocked, DPS assumes that the enemy is f
 $FSE-UPGRADE$ = Heavier Swings; Better Sledge; Freezing Point; Ice Breaker; Arctic Aftershocks
 $FSE-UPGRADEICON$ = File:SledgerLevel1.png; File:SledgerLevel2.png; File:SledgerLevel3.png; File:SledgerLevel4.png; File:SledgerLevel5.png
 $FSE-DETECTION$ = ; 0;
-$FSE-CATEGORY$ = Exclusive
+$FSE-META$ = Exclusive; File:OICESledgerIcon.png
 </var>
 <div class="overflow-box">
 {| class="wikitable stats-table"

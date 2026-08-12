@@ -6,7 +6,7 @@ $FNC-COST$ = 875; 200; 1150; 2650; 7750
 $FSE-DETECTION$ = 2; 0;
 $FSE-UPGRADE$ = Pitch Throwing; Golden Handskade; Loose Cannon; A Thousand Exploding Suns
 $FSE-UPGRADEICON$ = 5523227714; 5523227714; 5523228733; 5523229364
-$FSE-CATEGORY$ = Golden Perks
+$FSE-META$ = Golden Perks; File:GoldenDemoman0.png
 $AREF$ = <ref name=aim>Aim Time happens before the '''Demoman''' throws a grenade. This does not affect its firerate.</ref>
 $DREF$ = <ref name=dps>DPS does not consider projectile travel time.<br/>DPS assumes that only one enemy is hit and it receives full splash damage.</ref>
 </var>

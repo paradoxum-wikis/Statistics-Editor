@@ -11,7 +11,7 @@ $DREF$ = <ref>DPS is calculated as (Damage × 2 + Crit Damage) ÷ Crit Swing ÷ 
 $FSE-UPGRADE$ = Sleight of Hands; Bloodlust; Psycho Knife; Ocean Of Blood
 $FSE-UPGRADEICON$ = 92740435796975; 93224058728799; 102669883500047; 102686099141752
 $FSE-DETECTION$ = 1; 2;
-$FSE-CATEGORY$ = Exclusive
+$FSE-META$ = Exclusive; File:HexscapeSlasherIcon.png
 </var>
 <div class="overflow-box">
 {| class="wikitable stats-table"

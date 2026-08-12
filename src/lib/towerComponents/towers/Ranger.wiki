@@ -10,7 +10,7 @@ $FSE-DETECTION$ = ; 2; 0
 $FSE-PVP-DETECTION$ = ; 0; 0
 $FSE-UPGRADE$ = Faster Reloading; Intelligence Radio; Trained Outlaw; Experimental Weapon of Destruction
 $FSE-UPGRADEICON$ = 3280081327; 3381734408; 3381735232; 3381735846
-$FSE-CATEGORY$ = Advanced
+$FSE-META$ = Advanced; File:Newranger.png
 </var>
 <div class="mobile-tabber"><tabber>
 |-|Regular =

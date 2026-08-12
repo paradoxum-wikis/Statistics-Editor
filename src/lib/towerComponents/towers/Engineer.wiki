@@ -14,7 +14,7 @@ $FSE-UPGRADE$ = Precise Calculations; Makeshift Radar; Auto Converter; Heavy Con
 $FSE-PVP-UPGRADE$ = Precise Calculations; Makeshift Radar; Auto Converter; Improved Blueprints; Heavy Construction; Illegal Gun Parts
 $FSE-UPGRADEICON$ = 4517035597; 149177741; 8998290803; 155526941; 31857714; 7852911857
 $FSE-PVP-UPGRADEICON$ = 4517035597; 149177741; 8998290803; 31857714; 155526941; 7852911857
-$FSE-CATEGORY$ = Hardcore
+$FSE-META$ = Hardcore; File:EngineerIcon.png
 $DREF$ = <ref name="dps">Does not account for time taken to build Sentries.</ref>
 $CDREF$ = <ref name="cdps">Combined DPS is the total DPS of the tower itself and the max number of units at that Level.</ref>
 $CEREF$ = <ref name="ce">Uses combined DPS in the calculation.</ref>

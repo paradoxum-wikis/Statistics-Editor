@@ -6,7 +6,7 @@ $FNC-COST$ = 750; 250; 750; 1900; 4500; 12500
 $FSE-DETECTION$ = 2; ;
 $FSE-UPGRADE$ = Improved Throwing; Double Head Axe; Blood Seeking; Tactical Ops; Head Chopping
 $FSE-UPGRADEICON$ = 129697807; 542098553; 6426220009; 27386833; 143769378
-$FSE-CATEGORY$ = Exclusive
+$FSE-META$ = Exclusive; File:DefaultExecutioner2.png
 $FREF$ = <ref>The firerate assumes that the axe returns on time.</ref>
 $DREF$ = <ref>DPS assumes that only one enemy is hit per throw.<br/>DPS also assumes that the axe returns on time.</ref>
 </var>

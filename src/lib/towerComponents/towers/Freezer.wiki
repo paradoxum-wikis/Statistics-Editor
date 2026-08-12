@@ -12,7 +12,7 @@ $FSE-PVP-DETECTION$ = 2; ;
 $FSE-UPGRADE$ = Expedition Gear; Bundled Up!; Arctic Soldier; Ull's Arrow
 $FSE-PVP-UPGRADE$ = Expedition Gear; Bundled Up!; Arctic Soldier; Frost Bite!
 $FSE-UPGRADEICON$ = 15686418975; 15686418835; 15686418748; 15686418571
-$FSE-CATEGORY$ = Intermediate
+$FSE-META$ = Intermediate; File:ReworkedFreezerIcon.png
 $DREF$ = <ref name=dps>Calculated as (Damage × Burst Count) ÷ (Cooldown + (Firerate × Burst Count)) at Level 3+.</ref>
 </var>
 <div class="mobile-tabber"><tabber>

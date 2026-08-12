@@ -9,7 +9,7 @@ $FSE-PVP-DETECTION$ = 1; 2;
 $FSE-UPGRADE$ = Stronger Ammunition; Radar; Dual Turret; Even Heavier Ammo; XR-200 Turret
 $FSE-PVP-UPGRADE$ = Radar; Stronger Ammunition; Dual Turret; Even Heavier Ammo; XR-200 Turret
 $FSE-UPGRADEICON$ = 149177741; 149177741; 3584258139; 3584280869; 3584258608
-$FSE-CATEGORY$ = Advanced
+$FSE-META$ = Advanced; File:TurretIcon.png
 </var>
 <div class="mobile-tabber"><tabber>
 |-|Regular =

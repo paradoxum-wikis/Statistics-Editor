@@ -8,7 +8,7 @@ $FNC-PVP-COST$ = 4500; 2500; 7500; 15000; 32500; 42000; 100000
 $FSE-DETECTION$ = 3; ; 0
 $FSE-UPGRADE$ = Heavier Bullets; Bigger Magazine; Extra Barrel; Minigun Barrel; Impenetrable Fortress; Destruction-Oriented-Output-Machine
 $FSE-UPGRADEICON$ = 70569444235865; 104227180979769; 71764582498505; 128136625170591; 125372339735512
-$FSE-CATEGORY$ = Advanced
+$FSE-META$ = Advanced; File:GatlingGunIcon.png
 $DREF$ = <ref name=dps>Calculated as (Damage × Ammo) ÷ (Reload Time + (Firerate × Ammo)). Assumes bullets only hit one enemy.</ref>
 $CREF$ = <ref name=ce>Uses normal DPS.</ref>
 </var>

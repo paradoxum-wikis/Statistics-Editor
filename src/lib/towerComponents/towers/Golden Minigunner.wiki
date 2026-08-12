@@ -6,7 +6,7 @@ $FNC-COST$ = 2400; 1000; 4800; 13500; 27500
 $FSE-DETECTION$ = 2; ;
 $FSE-UPGRADE$ = Improved Handling; Thermal Vision; High Tech Armory; 24 Karat Gatling Gun
 $FSE-UPGRADEICON$ = 15184753790; 15184753514; 15184753289; 15184752970
-$FSE-CATEGORY$ = Golden Perks
+$FSE-META$ = Golden Perks; File:Goldenminigunner.png
 $DREF$ = <ref name=dps>DPS does not consider rev-up time.</ref>
 </var>
 <div class="overflow-box">

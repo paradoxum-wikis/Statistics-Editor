@@ -13,7 +13,7 @@ $FSE-PVP-DETECTION$ = ; ;
 $FSE-UPGRADE$ = Explosive Experts; Upgraded Barracks; Improved Training; Riot Control; Air Transport; Enhanced Equipment
 $FSE-PVP-UPGRADE$ = Explosive Experts; Upgraded Barracks; Improved Training; Riot Control; Air Transport; Enhanced Equipment
 $FSE-UPGRADEICON$ = 17196819847; 17196820389; 17196819964; 13019520315; 17196820108; 17196820275
-$FSE-CATEGORY$ = Advanced
+$FSE-META$ = Advanced; File:DefaultMercenaryBaseIcon.png
 $RREF$ = <ref name="rifledps">DPS is calculated as (Damage × Burst Count) ÷ (Cooldown + Aim Time + (Firerate × Burst Count)).</ref>
 </var>
 <div class="mobile-tabber"><tabber>

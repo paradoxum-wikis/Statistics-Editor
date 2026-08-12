@@ -13,7 +13,7 @@ $FSE-DETECTION$ = 1; 0;
 $FSE-PVP-DETECTION$ = 1; 2;
 $FSE-UPGRADE$ = Scam Artist; Brand New Rig; Black Market Tech; Neural-Runner
 $FSE-UPGRADEICON$ = 138135211876727; 75068776606540; 121470510950529; 111948304760969
-$FSE-CATEGORY$ = Advanced
+$FSE-META$ = Advanced; File:SaboteurIcon.png
 $DPREF$ = <ref name=dps>DPS assumes all bullets hit only one enemy.</ref>
 </var>
 <div class="mobile-tabber"><tabber>

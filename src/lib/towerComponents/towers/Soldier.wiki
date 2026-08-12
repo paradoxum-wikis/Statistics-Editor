@@ -9,7 +9,7 @@ $FSE-PVP-DETECTION$ = 2; ; 0
 $FSE-UPGRADE$ = Barracks Training; Better Aiming; Equipment Upgrades; Deadliest Soldier
 $FSE-PVP-UPGRADE$ = Better Vision; Better Aiming; Equipment Upgrades; Deadliest Soldier
 $FSE-UPGRADEICON$ = 5523192002; 5523193619; 5523195646; 5523196519
-$FSE-CATEGORY$ = Starter
+$FSE-META$ = Starter; File:KrampusRevengeSoldierIcon.png
 $FREF$ = <ref name=firerate>Firerate only applies to the burst and is not the time between bursts.</ref>
 $DREF$ = <ref name=dps>Calculated as (Damage × Burst Count) ÷ (Cooldown + (Firerate × Burst Count)).</ref>
 </var>

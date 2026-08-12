@@ -7,7 +7,7 @@ $FNC-PVP-COST$ = 500; 350; 800; 3250; 5000
 $FSE-UPGRADE$ = Faster Reloading; Geared Up; Frontlines Sniping; Spec Ops
 $FSE-UPGRADEICON$ = 3280081327; 3280367022; 3280367963; 3280368786
 $FSE-DETECTION$ = 2; 3; 0
-$FSE-CATEGORY$ = Starter
+$FSE-META$ = Starter; File:DefaultSniperIcon1.png
 </var>
 <div class="mobile-tabber"><tabber>
 |-|Regular =
