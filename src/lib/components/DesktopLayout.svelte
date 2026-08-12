@@ -222,7 +222,7 @@
           {#if isClient}
             <DropdownMenu.Root>
               <DropdownMenu.Trigger
-                class="inline-flex shrink-0 items-center gap-2 rounded-md border border-border bg-surface px-3 py-2 text-sm font-medium transition-colors hover:bg-surface-2"
+                class="inline-flex h-8 shrink-0 items-center gap-2 rounded-md border border-border bg-surface px-3 text-sm font-medium transition-colors hover:bg-surface-2"
               >
                 <span>{profileStore.current}</span>
                 <span class="text-xs text-muted-foreground">(Profile)</span>
@@ -324,6 +324,7 @@
         <div class="flex shrink-0 items-center space-x-2">
           {#if isClient}
             <IconBtn
+              class="h-8 p-1!"
               onclick={() =>
                 goto(resolve("/workshop"), { keepFocus: true, noScroll: true })}
               title="Workshop"
@@ -331,6 +332,7 @@
               <Store size={20} />
             </IconBtn>
             <ModeToggle
+              class="h-8"
               bind:mode={editorMode}
               disableCells={towerStore.selectedData?.isMalformed ?? false}
               onModeChange={(next) =>

@@ -10,7 +10,7 @@
   import avatarPlaceholder from "$lib/assets/Avatar.png";
 
   const avatarBtn =
-    "inline-flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-muted transition-colors hover:bg-muted/80";
+    "inline-flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-muted transition-colors hover:bg-muted/80";
 
   let loginOpen = $state(false);
   let accountOpen = $state(false);

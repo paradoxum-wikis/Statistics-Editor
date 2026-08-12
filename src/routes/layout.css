@@ -454,6 +454,7 @@ h4,
   color: var(--foreground);
   padding: 0.5rem;
   transition: background 0.08s;
+  aspect-ratio: 1 / 1;
 
   &:hover {
     background: var(--secondary);

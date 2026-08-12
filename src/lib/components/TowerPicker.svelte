@@ -90,7 +90,9 @@
         }}
         onclick={() => (open = true)}
       />
-      <Combobox.Trigger class="absolute right-3 top-3">
+      <Combobox.Trigger
+        class="absolute top-1/2 right-3 -translate-y-1/2"
+      >
         <ChevronsUpDown class="h-4 w-4 opacity-50" />
       </Combobox.Trigger>
     </div>
@@ -224,13 +226,13 @@
   }
 
   :global(.combobox-input) {
-    height: 2.5rem;
+    height: 2rem;
     width: 15.625rem;
     border-radius: var(--radius);
     border: 1px solid var(--border);
     background: var(--muted);
     color: var(--foreground);
-    padding: 0.5rem 1rem;
+    padding: 0.25rem 1rem;
     font-size: 0.875rem;
     font-weight: 500;
     outline: none;

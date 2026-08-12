@@ -270,6 +270,7 @@
 
       <div class="flex items-center justify-center gap-2">
         <IconBtn
+          class="h-8 p-1!"
           onclick={() =>
             goto(resolve("/workshop"), { keepFocus: true, noScroll: true })}
           title="Workshop"
@@ -277,6 +278,7 @@
           <Store size={20} />
         </IconBtn>
         <ModeToggle
+          class="h-8"
           bind:mode={editorMode}
           disableCells={towerStore.selectedData?.isMalformed ?? false}
           onModeChange={(next) =>
