@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { HTMLButtonAttributes } from "svelte/elements";
-  import placeholder from "$lib/assets/Placeholder.png";
+  import placeholder from "$lib/assets/PlaceholderTower.png";
   import { imageLoader } from "$lib/services/imageLoader";
 
   let {
