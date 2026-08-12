@@ -76,7 +76,7 @@
             rel="noopener noreferrer"
           >
             <BookOpenText class="me-2 h-4 w-4" />
-            <span>Wiki Profile</span>
+            <span>Wiki profile</span>
           </a>
           <button
             type="button"
