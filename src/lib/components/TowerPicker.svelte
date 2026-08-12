@@ -11,6 +11,7 @@
   import { profileStore } from "$lib/stores/profile.svelte";
   import { analytics } from "$lib/services/analytics";
   import TextInput from "./smol/TextInput.svelte";
+  import TowerCard from "./TowerCard.svelte";
 
   let {
     variant,
@@ -90,9 +91,7 @@
         }}
         onclick={() => (open = true)}
       />
-      <Combobox.Trigger
-        class="absolute top-1/2 right-3 -translate-y-1/2"
-      >
+      <Combobox.Trigger class="absolute top-1/2 right-3 -translate-y-1/2">
         <ChevronsUpDown class="h-4 w-4 opacity-50" />
       </Combobox.Trigger>
     </div>
@@ -127,7 +126,7 @@
     </Combobox.Portal>
   </Combobox.Root>
 {:else}
-  <div class={["home-picker flex min-h-0 flex-1 flex-col gap-3", className]}>
+  <div class={["flex min-h-0 flex-1 flex-col gap-3", className]}>
     <TextInput
       type="search"
       placeholder="Enter a tower name!"
@@ -139,23 +138,21 @@
     >
       {#if !query && recent.length > 0}
         <section class="p-2">
-          <h3 class="picker-section-title">Recent</h3>
-          <ul class="picker-grid">
+          <h3>Recent</h3>
+          <ul class="flex flex-wrap gap-2.5">
             {#each recent as name (name)}
               <li
-                class="group relative min-w-0 rounded-sm hover:bg-primary/15 hover:text-foreground"
+                class="group relative"
                 out:slide={{ duration: 177, easing: cubicOut, axis: "x" }}
               >
-                <button
-                  type="button"
-                  class="block w-full cursor-pointer truncate py-1.5 ps-4 pe-9 text-left text-sm outline-none"
-                  onclick={() => pick(name)}
-                >
+                <TowerCard
                   {name}
-                </button>
+                  tier={categoryMap.get(name)}
+                  onclick={() => pick(name)}
+                />
                 <button
                   type="button"
-                  class="absolute top-1/2 right-2 -translate-y-1/2 cursor-pointer p-0.5 pe-2 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:text-destructive"
+                  class="absolute top-1 right-1 z-17 rounded-sm bg-black/50 p-0.5 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:text-destructive"
                   aria-label="Remove {name} from recents"
                   onclick={() => towerStore.removeRecent(name)}
                 >
@@ -169,16 +166,15 @@
 
       {#each groups as group (group.label)}
         <section class="p-2">
-          <h3 class="picker-section-title">{group.label}</h3>
-          <ul class="picker-grid">
+          <h3>{group.label}</h3>
+          <ul class="flex flex-wrap gap-2.5">
             {#each group.towers as name (name)}
-              <li class="min-w-0">
-                <button
-                  class="combobox-item min-w-0 truncate hover:bg-primary/15"
-                  onclick={() => pick(name)}
-                >
+              <li>
+                <TowerCard
                   {name}
-                </button>
+                  tier={group.label}
+                  onclick={() => pick(name)}
+                />
               </li>
             {/each}
           </ul>
@@ -193,36 +189,13 @@
 {/if}
 
 <style>
-  .picker-section-title {
+  h3 {
     padding: 0.25rem 0.5rem;
     font-size: 0.75rem;
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: var(--muted-foreground);
-  }
-
-  .picker-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.125rem;
-    /* remove when firefox adds support for gap decors */
-    background: linear-gradient(var(--border), var(--border)) 50% / 1px 100%
-      no-repeat;
-
-    @media (min-width: 768px) {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      background:
-        linear-gradient(var(--border), var(--border)) calc(100% / 3) / 1px 100%
-          no-repeat,
-        linear-gradient(var(--border), var(--border)) calc(200% / 3) / 1px 100%
-          no-repeat;
-    }
-
-    @supports (row-rule: 7px solid) {
-      background: none;
-      column-rule: 1px solid var(--border);
-    }
   }
 
   :global(.combobox-input) {
@@ -250,10 +223,10 @@
       cursor: not-allowed;
       opacity: 0.5;
     }
-  }
 
-  :global(.dark) :global(.combobox-input) {
-    background: oklch(0% 0 0 / 0.5);
+    :global(.dark) & {
+      background: oklch(0% 0 0 / 0.5);
+    }
   }
 
   :global(.combobox-content) {
