@@ -58,10 +58,8 @@
     --tower-well: oklch(from var(--tower-tier) 0.54 calc(c * 0.28) h);
     --fog: oklch(1 0 0);
     position: relative;
-    display: flex;
-    flex-direction: column;
     width: 8.325rem;
-    height: 100%;
+    aspect-ratio: 1 / 1.2;
     padding: 0;
     overflow: hidden;
     border: 2px solid var(--tower-tier);
@@ -119,6 +117,11 @@
       box-shadow:
         0 6px 12px color-mix(in oklch, var(--tower-tier) 50%, transparent),
         0 0 12px color-mix(in oklch, var(--tower-tier) 35%, transparent);
+
+      transform: scale(1.05);
+      transition:
+        transform 0.25s cubic-bezier(0.1, 1.55, 0.65, 1),
+        box-shadow 0.25s ease-in;
     }
 
     &.selected {
@@ -153,13 +156,16 @@
   img {
     position: relative;
     z-index: 7;
-    flex: 1;
-    min-height: 0;
+    width: 100%;
+    height: 100%;
     object-fit: contain;
   }
 
   span {
-    position: relative;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
     z-index: 7;
     padding: 0.2rem 0.3rem 0.3rem;
     overflow: hidden;
