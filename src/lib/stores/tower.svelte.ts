@@ -26,7 +26,7 @@ import {
 import { analytics } from "$lib/services/analytics";
 
 const RECENT_KEY = "tdse_recent_towers";
-const RECENT_MAX = 8;
+const RECENT_MAX = 12;
 
 function readRecentTowers(): string[] {
   if (typeof localStorage === "undefined") return [];
