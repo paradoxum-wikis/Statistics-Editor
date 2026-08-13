@@ -1,5 +1,9 @@
 import { settingsStore } from "$lib/stores/settings.svelte";
-import { toNumericValue, stripRefs, normalizeColumnKey } from "$lib/utils/format";
+import {
+  toNumericValue,
+  stripRefs,
+  normalizeColumnKey,
+} from "$lib/utils/format";
 import { transpileExpr } from "mediawiki-expr";
 
 const ARITHMETIC_ALLOWED = /^[\w\s+\-*/%.(),<>=!&|?:;{}[\]"']+$/;
@@ -26,7 +30,11 @@ function getReplacer(
   );
 
   const fn = (expr: string, ctx: Record<string, number>) =>
-    expr.replace(regex, (match) => String(ctx[match] ?? match));
+    expr.replace(regex, (match, offset: number) => {
+      // Table.Col is one ident
+      if (offset > 0 && expr[offset - 1] === ".") return match;
+      return String(ctx[match] ?? match);
+    });
 
   replacerCache.set(cacheKey, fn);
   return fn;

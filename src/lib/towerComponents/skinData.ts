@@ -189,7 +189,7 @@ class SkinData {
     }
 
     const buildCacheFor = (
-      tableName: string,
+      tableName: string | undefined,
       headers: string[],
       rows: Record<string, string | number>[],
     ) => {
@@ -206,10 +206,22 @@ class SkinData {
     };
 
     this.tableCache = {};
-    buildCacheFor(this.tableName, this.headers, this.rawRows);
+    const skins = Object.values(this.tower.skins);
+    const base = skins[0] !== this ? skins[0] : undefined;
+    // untitled later tabs answer to the first tab's title at the same slot
+    buildCacheFor(
+      this.tableName || (base && base.tableName),
+      this.headers,
+      this.rawRows,
+    );
 
-    for (const table of this.extraTables) {
-      buildCacheFor(table.name, table.headers, table.rows);
+    for (let i = 0; i < this.extraTables.length; i++) {
+      const table = this.extraTables[i];
+      buildCacheFor(
+        table.name || (base && base.extraTables[i].name),
+        table.headers,
+        table.rows,
+      );
     }
   }
 

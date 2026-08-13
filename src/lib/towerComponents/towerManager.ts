@@ -289,6 +289,16 @@ export default class TowerManager {
         return cache;
       }
 
+      const inheritTableName = (index: number, name: string) => {
+        if (name) return name;
+        const base = Object.values(towerJson)[0] as {
+          TableName: string;
+          ExtraTables: { name: string }[];
+        };
+        if (!base) return name;
+        return index === 0 ? base.TableName : base.ExtraTables[index - 1].name;
+      };
+
       const buildSkinJson = (
         tableData: TableData,
         isPvp: boolean,
@@ -356,7 +366,16 @@ export default class TowerManager {
           }
         }
         const tableCache = buildTableCache(
-          [tableData, ...extraTables],
+          [
+            {
+              ...tableData,
+              name: inheritTableName(0, tableData.name),
+            },
+            ...extraTables.map((t, i) => ({
+              ...t,
+              name: inheritTableName(i + 1, t.name),
+            })),
+          ],
           indexOverrides,
         );
         const branchMapping: Record<string, string> = {};
@@ -686,6 +705,21 @@ export default class TowerManager {
           }
         }
 
+        const outCache = buildTableCache(
+          [
+            {
+              ...tableData,
+              name: inheritTableName(0, tableData.name),
+              rows,
+            },
+            ...resolvedExtraTables.map((t, i) => ({
+              ...t,
+              name: inheritTableName(i + 1, t.name),
+            })),
+          ],
+          indexOverrides,
+        );
+
         return {
           Defaults: defaults,
           Upgrades: upgrades,
@@ -699,10 +733,7 @@ export default class TowerManager {
           IsPvp: isPvp,
           MoneyColumns: tableData.moneyColumns ?? [],
           ExtraTables: resolvedExtraTables,
-          TableCache: buildTableCache(
-            [{ ...tableData, rows }, ...resolvedExtraTables],
-            indexOverrides,
-          ),
+          TableCache: outCache,
           PrimaryTableIndex: primaryTableIndex,
           VariantPrefix: variantPrefix,
         };
