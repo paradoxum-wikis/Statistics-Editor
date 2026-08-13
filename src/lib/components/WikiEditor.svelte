@@ -36,7 +36,7 @@
       outline: "none",
       border: "1px solid var(--border)",
       borderRadius: "var(--radius)",
-      backgroundColor: "var(--background)",
+      backgroundColor: "var(--card)",
     },
     ".cm-scroller": {
       overflow: "auto",
