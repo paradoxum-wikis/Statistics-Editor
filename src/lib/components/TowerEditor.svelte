@@ -478,10 +478,7 @@
         <Tip content={shareUrlTip}>
           {#snippet children({ props })}
             <span class="inline-flex" {...props}>
-              <Popover.Trigger
-                class="btn secondary"
-                disabled={!canShareUrl}
-              >
+              <Popover.Trigger class="btn secondary" disabled={!canShareUrl}>
                 <span class="max-md:hidden">Share URL</span>
                 <span class="hidden max-md:inline">Share</span>
               </Popover.Trigger>

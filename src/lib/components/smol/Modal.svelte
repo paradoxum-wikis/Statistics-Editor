@@ -75,8 +75,10 @@
           {@render header()}
         {:else if title}
           <div
-              class="flex justify-between gap-3 {description ? 'items-start' : 'items-center'}"
-            >
+            class="flex justify-between gap-3 {description
+              ? 'items-start'
+              : 'items-center'}"
+          >
             <div
               class="flex min-w-0 flex-1 flex-col space-y-1.5 text-center sm:text-start"
             >
@@ -134,7 +136,9 @@
             {@render header()}
           {:else if title}
             <div
-              class="flex justify-between gap-3 {description ? 'items-start' : 'items-center'}"
+              class="flex justify-between gap-3 {description
+                ? 'items-start'
+                : 'items-center'}"
             >
               <div
                 class="flex min-w-0 flex-1 flex-col space-y-1.5 text-center sm:text-start"

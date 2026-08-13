@@ -18,7 +18,11 @@
   {#each toastStore.items as item (item.id)}
     {@const Icon = iconByColor[item.color]}
     <div
-      class={["toast", item.color, item.description || item.action ? "rich" : ""]}
+      class={[
+        "toast",
+        item.color,
+        item.description || item.action ? "rich" : "",
+      ]}
       role={item.color === "error" ? "alert" : "status"}
       in:fly={{ x: 16, duration: 180 }}
       out:fly={{ x: 16, duration: 140 }}

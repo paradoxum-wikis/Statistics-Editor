@@ -36,10 +36,7 @@
   }
 </script>
 
-<div
-  class="tabs-list {className}"
-  use:tabPill={() => ({ mode, disableCells })}
->
+<div class="tabs-list {className}" use:tabPill={() => ({ mode, disableCells })}>
   <button
     class="tabs-trigger {mode === 'cells' && !disableCells ? 'active' : ''}"
     onclick={() => void switchToCells()}
