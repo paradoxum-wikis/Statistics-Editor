@@ -3,10 +3,7 @@
   import { Check, ChevronsUpDown, X } from "@lucide/svelte";
   import { slide } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
-  import {
-    buildMetaMap,
-    groupedTowerNames,
-  } from "$lib/towerComponents/towers";
+  import { buildMetaMap, groupedTowerNames } from "$lib/towerComponents/towers";
   import { towerStore } from "$lib/stores/tower.svelte";
   import { profileStore } from "$lib/stores/profile.svelte";
   import { analytics } from "$lib/services/analytics";
@@ -48,10 +45,7 @@
     });
   });
 
-  const groups = $derived(
-    groupedTowerNames(towerStore.names, query, metaMap),
-  );
-
+  const groups = $derived(groupedTowerNames(towerStore.names, query, metaMap));
   const recent = $derived(
     towerStore.recentNames.filter((name) => towerStore.names.includes(name)),
   );
@@ -167,7 +161,7 @@
 
       {#each groups as group (group.label)}
         <section class="p-2">
-          <h3>{group.label}</h3>
+          <h3 data-tier={group.label}>{group.label}</h3>
           <ul class="flex flex-wrap gap-2.5">
             {#each group.towers as name (name)}
               <li>
@@ -192,12 +186,54 @@
 
 <style>
   h3 {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.75rem;
-    font-weight: 500;
+    padding: 0 0.5rem 0.5rem;
+    font-size: 1.25rem;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: var(--muted-foreground);
+    color: var(--tower-tier);
+    --tower-tier: lightgrey;
+    -webkit-text-stroke: 0.125em
+      color-mix(in oklch, var(--tower-tier), black 50%);
+    paint-order: stroke fill;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    &::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--tower-tier);
+    }
+
+    &[data-tier] {
+      --tower-tier: var(--tower-custom);
+    }
+    &[data-tier="Starter"] {
+      --tower-tier: var(--tower-starter);
+    }
+    &[data-tier="Intermediate"] {
+      --tower-tier: var(--tower-intermediate);
+    }
+    &[data-tier="Advanced"] {
+      --tower-tier: var(--tower-advanced);
+    }
+    &[data-tier="Hardcore"] {
+      --tower-tier: var(--tower-hardcore);
+    }
+    &[data-tier="Evolved"] {
+      --tower-tier: var(--tower-evolved);
+    }
+    &[data-tier="Exclusive"] {
+      --tower-tier: var(--tower-exclusive);
+    }
+    &[data-tier="Golden Perks"] {
+      --tower-tier: var(--tower-golden-perks);
+    }
+    &[data-tier="Unavailable"] {
+      --tower-tier: var(--tower-unavailable);
+    }
   }
 
   :global(.combobox-input) {

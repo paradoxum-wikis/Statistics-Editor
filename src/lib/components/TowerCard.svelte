@@ -53,7 +53,7 @@
 
 <style>
   button {
-    --tower-tier: oklch(0.777 0.077 77);
+    --tower-tier: var(--tower-custom);
     --tower-fill: oklch(from var(--tower-tier) 0.78 calc(c * 0.36) h);
     --tower-well: oklch(from var(--tower-tier) 0.54 calc(c * 0.28) h);
     --fog: oklch(1 0 0);
@@ -89,28 +89,28 @@
     }
 
     &[data-tier="Starter"] {
-      --tower-tier: oklch(0.755 0 0);
+      --tower-tier: var(--tower-starter);
     }
     &[data-tier="Intermediate"] {
-      --tower-tier: oklch(0.885 0.221 148);
+      --tower-tier: var(--tower-intermediate);
     }
     &[data-tier="Advanced"] {
-      --tower-tier: oklch(0.707 0.168 242);
+      --tower-tier: var(--tower-advanced);
     }
     &[data-tier="Hardcore"] {
-      --tower-tier: oklch(0.635 0.241 303);
+      --tower-tier: var(--tower-hardcore);
     }
     &[data-tier="Evolved"] {
-      --tower-tier: oklch(0.778 0.133 197);
+      --tower-tier: var(--tower-evolved);
     }
     &[data-tier="Exclusive"] {
-      --tower-tier: oklch(0.688 0.241 350.5);
+      --tower-tier: var(--tower-exclusive);
     }
     &[data-tier="Golden Perks"] {
-      --tower-tier: oklch(0.932 0.211 104);
+      --tower-tier: var(--tower-golden-perks);
     }
     &[data-tier="Unavailable"] {
-      --tower-tier: oklch(0.628 0.258 30);
+      --tower-tier: var(--tower-unavailable);
     }
 
     &:hover {

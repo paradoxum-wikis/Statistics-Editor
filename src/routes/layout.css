@@ -40,6 +40,15 @@
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.557 0.147 249);
+  --tower-custom: oklch(0.777 0.077 77);
+  --tower-starter: oklch(0.755 0 0);
+  --tower-intermediate: oklch(0.885 0.221 148);
+  --tower-advanced: oklch(0.707 0.168 242);
+  --tower-hardcore: oklch(0.635 0.241 303);
+  --tower-evolved: oklch(0.778 0.133 197);
+  --tower-exclusive: oklch(0.688 0.241 350.5);
+  --tower-golden-perks: oklch(0.932 0.211 104);
+  --tower-unavailable: oklch(0.628 0.258 30);
 }
 
 .dark {
