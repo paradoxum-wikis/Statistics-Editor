@@ -12,7 +12,7 @@
 </script>
 
 <div
-  class="pointer-events-none fixed right-4 bottom-4 z-67 flex w-[min(100vw-2rem,22rem)] flex-col gap-2 max-md:bottom-17"
+  class="pointer-events-none fixed right-4 bottom-4 z-87 flex w-[min(100vw-2rem,22rem)] flex-col gap-2 max-md:bottom-17"
   aria-live="polite"
 >
   {#each toastStore.items as item (item.id)}

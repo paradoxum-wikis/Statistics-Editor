@@ -13,6 +13,7 @@
     confirmClass = "btn primary",
     onConfirm,
     onCancel,
+    stacked = false,
   }: {
     open?: boolean;
     title: string;
@@ -24,6 +25,7 @@
     confirmClass?: string;
     onConfirm?: () => void | Promise<void>;
     onCancel?: () => void;
+    stacked?: boolean;
   } = $props();
 
   let confirming = $state(false);
@@ -46,6 +48,7 @@
   bind:open
   {title}
   description={body ? undefined : description}
+  {stacked}
   onOpenChange={handleOpenChange}
 >
   {#if body}

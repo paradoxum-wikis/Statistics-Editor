@@ -537,6 +537,7 @@
 
 <Alert
   bind:open={deleteOpen}
+  stacked
   title="Delete this comment?"
   description={deleteTarget ? "This can't be undone." : ""}
   confirmLabel="Delete"

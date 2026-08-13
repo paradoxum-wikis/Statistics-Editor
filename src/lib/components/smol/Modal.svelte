@@ -14,11 +14,13 @@
     header,
     children,
     footer,
+    stacked = false,
   }: {
     open?: boolean;
     title?: string;
     description?: string;
     class?: string;
+    stacked?: boolean;
     onOpenChange?: (open: boolean) => void;
     trigger?: Snippet<[{ props: Record<string, unknown> }]>;
     header?: Snippet;
@@ -63,8 +65,9 @@
     {/if}
 
     <Dialog.Portal>
-      <Dialog.Overlay class="dialog-overlay"></Dialog.Overlay>
-      <Dialog.Content class={["dialog-content", className]}>
+      <Dialog.Overlay class={["dialog-overlay", stacked && "stacked"]}
+      ></Dialog.Overlay>
+      <Dialog.Content class={["dialog-content", stacked && "stacked", className]}>
         {#if header}
           {#if title}<Dialog.Title class="sr-only">{title}</Dialog.Title>{/if}
           {#if description}
@@ -112,10 +115,12 @@
     {/if}
 
     <Drawer.Portal>
-      <Drawer.Overlay class="dialog-overlay"></Drawer.Overlay>
+      <Drawer.Overlay class={["dialog-overlay", stacked && "stacked"]}
+      ></Drawer.Overlay>
       <Drawer.Content
         class={[
           "fixed inset-x-0 bottom-0 z-47 flex h-auto max-h-[92dvh] flex-col rounded-t-lg border border-b-0 border-border bg-transparent px-5 pb-6 outline-none",
+          stacked && "z-77",
           className,
         ]}
       >
