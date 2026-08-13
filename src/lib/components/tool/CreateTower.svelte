@@ -4,6 +4,7 @@
   import IconBtn from "../smol/IconBtn.svelte";
   import TextInput from "../smol/TextInput.svelte";
   import { towerStore } from "$lib/stores/tower.svelte";
+  import { toast } from "$lib/toast";
 
   let {
     variant = "icon",
@@ -37,6 +38,7 @@
     }
     reset();
     open = false;
+    toast.success("Tower created!");
     await onCreated?.(created);
   }
 </script>

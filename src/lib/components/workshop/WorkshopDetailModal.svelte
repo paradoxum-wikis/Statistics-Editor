@@ -153,7 +153,7 @@
   async function onVote() {
     if (!listing || voteBusy) return;
     if (!authStore.user) {
-      toast.error("Sign in with Fandom to upvote.");
+      toast.warning("Sign in with Fandom to upvote.");
       return;
     }
     voteBusy = true;
@@ -171,10 +171,6 @@
 
   async function onComment() {
     if (!listing || commentBusy) return;
-    if (!authStore.user) {
-      toast.error("Sign in with Fandom to comment.");
-      return;
-    }
     const body = commentBody.trim();
     if (!body) return;
     commentBusy = true;
@@ -208,6 +204,7 @@
     try {
       await deleteWorkshopComment(listing.id, deleteTarget.id);
       comments = comments.filter((x) => x.id !== deleteTarget!.id);
+      toast.success("Comment deleted.");
     } catch (e) {
       if (settingsStore.debugMode)
         console.error("[workshop] delete comment", e);

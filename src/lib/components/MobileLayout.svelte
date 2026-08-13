@@ -8,6 +8,7 @@
   import { towerStore } from "$lib/stores/tower.svelte";
   import { profileStore } from "$lib/stores/profile.svelte";
   import { settingsStore } from "$lib/stores/settings.svelte";
+  import { toast } from "$lib/toast";
 
   import Sidebar from "./Sidebar.svelte";
   import TowerEditor from "./TowerEditor.svelte";
@@ -160,6 +161,7 @@
       await towerStore.switchProfile(name);
       newProfileName = "";
       createProfileOpen = false;
+      toast.success("Profile created!");
     }
   }
 
@@ -226,8 +228,10 @@
   async function confirmDeleteProfile() {
     if (profileToDelete) {
       const deletedCurrent = profileToDelete === profileStore.current;
-      if (profileStore.delete(profileToDelete) && deletedCurrent) {
-        await towerStore.switchProfile(profileStore.current);
+      if (profileStore.delete(profileToDelete)) {
+        if (deletedCurrent)
+          await towerStore.switchProfile(profileStore.current);
+        toast.success("Profile deleted.");
       }
       profileToDelete = null;
     }

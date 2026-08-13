@@ -352,7 +352,7 @@
           tower_name: tower.name,
           success: true,
         });
-        toast.success("Fetched latest from the Wiki.");
+        toast.success("Fetched latest from the Wiki!");
       } else {
         analytics.track("wiki_fetch", {
           tower_name: tower.name,
@@ -366,7 +366,7 @@
         tower_name: tower.name,
         success: false,
       });
-      toast.error("Error fetching from Wiki.");
+      toast.error("Error fetching from the Wiki.");
     } finally {
       isFetching = false;
     }

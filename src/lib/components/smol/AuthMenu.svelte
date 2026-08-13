@@ -8,6 +8,7 @@
   import TextInput from "./TextInput.svelte";
   import Separator from "./Separator.svelte";
   import avatarPlaceholder from "$lib/assets/Avatar.png";
+  import { toast } from "$lib/toast";
 
   const avatarBtn =
     "inline-flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-muted transition-colors hover:bg-muted/80";
@@ -30,10 +31,11 @@
 
   async function onComplete() {
     await authStore.complete();
-    if (!authStore.error) {
-      loginOpen = false;
-      username = "";
-    }
+    if (authStore.error) return;
+    loginOpen = false;
+    username = "";
+    const name = authStore.user?.fandom_username;
+    toast.success(name ? `Signed in as ${name}.` : "Signed in.");
   }
 
   function requestLogout() {
@@ -44,6 +46,11 @@
   async function confirmLogout() {
     logoutOpen = false;
     await authStore.logout();
+    if (authStore.error) {
+      toast.error(authStore.error);
+      return;
+    }
+    toast.success("Signed out.");
   }
 </script>
 
