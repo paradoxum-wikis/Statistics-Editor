@@ -41,7 +41,7 @@
     fix: "A problem was corrected.",
     performance: "Speed or efficiency was improved.",
     refactor: "Internal structure was reworked without changing behavior.",
-    style: "Appearance or layout was adjusted.",
+    style: "Appearance of the site was adjusted.",
     documentation: "Written documentation was updated.",
     chore: "General maintenance work was done.",
     "continuous integration": "Scheduled automation was updated.",
