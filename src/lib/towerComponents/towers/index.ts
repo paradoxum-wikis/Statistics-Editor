@@ -34,14 +34,20 @@ export function buildMetaMap(
 ): Map<string, TowerMeta> {
   const map = new Map(baseMetaMap);
 
-  for (const [tower, wikitext] of listWikiOverrides(profileName)) {
+  const apply = (tower: string, wikitext: string) => {
     const meta = parseTowerMeta(wikitext);
-    if (meta) map.set(resolveName(map, tower), meta);
+    if (!meta) return;
+    const name = resolveName(map, tower);
+    const prev = map.get(name);
+    map.set(name, { category: meta.category, image: meta.image ?? prev?.image });
+  };
+
+  for (const [tower, wikitext] of listWikiOverrides(profileName)) {
+    apply(tower, wikitext);
   }
 
   if (live?.towerName && live.wikitext.trim()) {
-    const meta = parseTowerMeta(live.wikitext);
-    if (meta) map.set(resolveName(map, live.towerName), meta);
+    apply(live.towerName, live.wikitext);
   }
 
   return map;
