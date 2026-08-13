@@ -234,3 +234,57 @@
     {/if}
   </div>
 </div>
+
+<style>
+  :global(.status-bar-btn) {
+    border-radius: var(--radius);
+    background: var(--muted);
+    padding: 0.25rem;
+    color: var(--muted-foreground);
+
+    &:hover,
+    &[data-state="open"] {
+      background: var(--secondary);
+      color: var(--foreground);
+    }
+  }
+
+  .status-bar-indicator {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: var(--radius);
+    background: transparent;
+    padding: 0.25rem;
+    color: var(--muted-foreground);
+    cursor: pointer;
+    transition:
+      color 0.1s,
+      background 0.1s;
+
+    &:hover:not(:disabled) {
+      background: var(--secondary);
+      color: var(--foreground);
+    }
+
+    &[aria-pressed="true"] {
+      color: var(--primary);
+
+      &:hover,
+      &[data-state="open"] {
+        color: var(--primary);
+      }
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 1px;
+    }
+  }
+</style>
