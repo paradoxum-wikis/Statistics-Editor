@@ -77,7 +77,7 @@
         var(--tower-fill) 20%,
         var(--tower-tier) 100%
       );
-    color: oklch(100% 0 0);
+    color: oklch(1 0 0);
     transition:
       transform 0.08s,
       box-shadow 0.1s;

@@ -378,7 +378,7 @@ h4,
   &.active,
   &[data-state="active"] {
     background: transparent;
-    color: oklch(100% 0 0);
+    color: oklch(1 0 0);
     -webkit-text-stroke: var(--text-stroke-width) var(--text-stroke-color);
     paint-order: stroke fill;
   }
@@ -397,7 +397,7 @@ h4,
   font-size: 0.8125rem;
   font-weight: 700;
   letter-spacing: 0.01em;
-  color: oklch(100% 0 0);
+  color: oklch(1 0 0);
   -webkit-text-stroke: var(--text-stroke-width) var(--text-stroke-color);
   paint-order: stroke fill;
   background: linear-gradient(180deg, var(--btn) 0%, var(--btn-deep) 100%);
@@ -485,7 +485,7 @@ h4,
   border-radius: var(--radius);
   background: linear-gradient(180deg, var(--btn) 0%, var(--btn-deep) 100%);
   box-shadow: none;
-  color: white;
+  color: oklch(1 0 0)
   cursor: pointer;
   transition:
     filter 0.08s,

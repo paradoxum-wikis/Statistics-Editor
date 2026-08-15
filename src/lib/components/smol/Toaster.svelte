@@ -69,7 +69,7 @@
     border-radius: var(--radius);
     background: linear-gradient(180deg, var(--btn) 0%, var(--btn-deep) 100%);
     padding: 0.375rem 0.875rem;
-    color: oklch(100% 0 0);
+    color: oklch(1 0 0);
     font-size: 0.8125rem;
     font-weight: 700;
     letter-spacing: 0.01em;
@@ -102,7 +102,7 @@
       font-size: 0.75rem;
       font-weight: 500;
       line-height: 1.35;
-      color: oklch(100% 0 0 / 0.82);
+      color: oklch(1 0 0 / 0.82);
     }
 
     .action {

@@ -534,7 +534,7 @@
         left: 0;
         overflow: hidden;
         padding-inline: 0.1rem;
-        color: white;
+        color: oklch(1 0 0)
         font-size: 0.74rem;
         font-weight: 800;
         line-height: 1.2;
@@ -572,7 +572,7 @@
 
       &:hover .filter-icon,
       &.active .filter-icon {
-        color: white;
+        color: oklch(1 0 0)
 
         &::before {
           border-color: var(--filter-color);
