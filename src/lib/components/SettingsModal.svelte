@@ -243,7 +243,7 @@
     background: linear-gradient(180deg, var(--btn) 0%, var(--btn-deep) 100%);
     box-shadow: none;
     padding: 8px 14px;
-    color: oklch(1 0 0)
+    color: oklch(1 0 0);
     font-size: 11px;
     font-weight: 700;
     cursor: pointer;

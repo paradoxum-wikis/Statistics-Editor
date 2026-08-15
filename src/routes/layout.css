@@ -485,7 +485,7 @@ h4,
   border-radius: var(--radius);
   background: linear-gradient(180deg, var(--btn) 0%, var(--btn-deep) 100%);
   box-shadow: none;
-  color: oklch(1 0 0)
+  color: oklch(1 0 0);
   cursor: pointer;
   transition:
     filter 0.08s,
