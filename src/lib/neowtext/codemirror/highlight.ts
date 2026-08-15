@@ -7,15 +7,13 @@ import {
   type ViewUpdate,
 } from "@codemirror/view";
 import type { Extension, Text } from "@codemirror/state";
-import { isKnownFn, parseRef, type DollarRef } from "./tokens";
+import { DIR_RE, isKnownFn, parseRef, type DollarRef } from "./tokens";
 
 function ignoredAt(doc: Text, pos: number): boolean {
-  const from = Math.max(0, pos - 16000);
-  const slice = doc.sliceString(from, pos);
+  const slice = doc.sliceString(0, pos);
   const cOpen = slice.lastIndexOf("<!--");
   if (cOpen >= 0 && slice.indexOf("-->", cOpen + 4) < 0) return true;
-  const lower = slice.toLowerCase();
-  const nOpen = lower.lastIndexOf("<nowiki");
+  const nOpen = slice.toLowerCase().lastIndexOf("<nowiki");
   return nOpen >= 0 && !/<\/nowiki>/i.test(slice.slice(nOpen));
 }
 
@@ -33,7 +31,7 @@ function classFor(ref: DollarRef): string {
 
 const mark = (cls: string) => Decoration.mark({ class: cls });
 
-const decorator = new MatchDecorator({
+const dollarDecorator = new MatchDecorator({
   regexp: /\$([^$\n]*)\$/g,
   decorate(add, from, to, match, view) {
     if (ignoredAt(view.state.doc, from)) return;
@@ -45,17 +43,29 @@ const decorator = new MatchDecorator({
   },
 });
 
-export const neowtextHighlight: Extension = ViewPlugin.fromClass(
-  class {
-    decorations: DecorationSet;
+const dirDecorator = new MatchDecorator({
+  regexp: new RegExp(DIR_RE.source, "gi"),
+  decoration: Decoration.mark({ class: "nt-dir" }),
+});
 
-    constructor(view: EditorView) {
-      this.decorations = decorator.createDeco(view);
-    }
+function decoPlugin(decorator: MatchDecorator): Extension {
+  return ViewPlugin.fromClass(
+    class {
+      decorations: DecorationSet;
 
-    update(update: ViewUpdate) {
-      this.decorations = decorator.updateDeco(update, this.decorations);
-    }
-  },
-  { decorations: (v) => v.decorations },
-);
+      constructor(view: EditorView) {
+        this.decorations = decorator.createDeco(view);
+      }
+
+      update(update: ViewUpdate) {
+        this.decorations = decorator.updateDeco(update, this.decorations);
+      }
+    },
+    { decorations: (v) => v.decorations },
+  );
+}
+
+export const neowtextHighlight: Extension = [
+  decoPlugin(dollarDecorator),
+  decoPlugin(dirDecorator),
+];

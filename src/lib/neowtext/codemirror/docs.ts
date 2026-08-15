@@ -3,6 +3,7 @@ import {
   FNC_NAMES,
   FSE_NAMES,
   type DollarRef,
+  type SeDirective,
 } from "./tokens";
 
 const HELP_PAGE = "https://tds.fandom.com/wiki/Help:Neowtext";
@@ -58,13 +59,15 @@ export function helpHash(ref: DollarRef): string {
     return "FNC";
   }
   if (ref.kind === "fse") {
-    return FSE_NAMES.has(ref.name!.toUpperCase()) ? ref.name!.toUpperCase() : "FSE";
+    return FSE_NAMES.has(ref.name!.toUpperCase())
+      ? ref.name!.toUpperCase()
+      : "FSE";
   }
   return "Variables";
 }
 
-export function helpUrl(ref: DollarRef): string {
-  return `${HELP_PAGE}#${helpHash(ref)}`;
+export function helpLink(hash: string): string {
+  return `${HELP_PAGE}#${hash}`;
 }
 
 export function describeRef(ref: DollarRef): string {
@@ -72,22 +75,24 @@ export function describeRef(ref: DollarRef): string {
   if (ref.pinError) return ref.pinError;
   if ((ref.kind === "fnc" || ref.kind === "fse") && ref.name) {
     const upper = ref.name.toUpperCase();
-    if (ref.kind === "fnc" && upper.startsWith("TOTAL-") && upper !== "TOTALPRICE") {
+    if (
+      ref.kind === "fnc" &&
+      upper.startsWith("TOTAL-") &&
+      upper !== "TOTALPRICE"
+    ) {
       return TOTAL;
     }
     if (ref.kind === "fnc" && upper.startsWith("ROFBUG")) return FNC.ROFBUG;
+    const deprecated = deprecatedFn(ref);
     const text =
       ref.kind === "fse"
         ? FSE[upper]
-        : (FNC[upper] ?? (deprecatedFn(ref) ? FSE[upper] : undefined));
+        : (FNC[upper] ?? (deprecated ? FSE[upper] : undefined));
     if (!text) return `Unknown ${ref.prefix}.`;
-    const extra = [
-      ref.pvp ? "PVP-scoped; inherits the non-PVP value if unset." : "",
-      deprecatedFn(ref) ?? "",
-    ]
-      .filter(Boolean)
-      .join("\n");
-    return extra ? `${text}\n${extra}` : text;
+    let out = text;
+    if (ref.pvp) out += "\nPVP-scoped; inherits the non-PVP value if unset.";
+    if (deprecated) out += `\n${deprecated}`;
+    return out;
   }
   if (ref.kind === "var" && ref.base.includes(".")) return DOT;
   return VAR;
@@ -108,4 +113,27 @@ export function kindLabel(ref: DollarRef): string {
     );
   if (ref.kind === "var" && ref.base.includes(".")) return "Dot notation" + pin;
   return "Variable";
+}
+
+const IGNORE = `Skips a region so the Statistics Editor does not parse it. The wiki still renders whatever is inside.
+• @se-ignore: opening
+• @/se-ignore: closing
+• @se-ignore/: self-closing, this one line`;
+
+const DIR: Record<"se-diff" | "se-memo", string> = {
+  "se-diff":
+    "Stores a JSON snapshot of changed cells so the editor can show a difference against a saved baseline.",
+  "se-memo":
+    "Stores the editor memo as JSON in the source. Adjacent @se-memo comments are concatenated if the payload is large.",
+};
+
+export function describeDirective(dir: SeDirective): string {
+  if (dir.name === "se-diff" || dir.name === "se-memo") return DIR[dir.name];
+  return IGNORE;
+}
+
+export function directiveHelpHash(dir: SeDirective): string {
+  if (dir.name === "se-diff") return "diff";
+  if (dir.name === "se-memo") return "memo";
+  return "ignore";
 }

@@ -3,67 +3,68 @@ import type { Extension } from "@codemirror/state";
 import {
   deprecatedFn,
   isKnownFn,
+  scanDirectives,
   scanDollarRefs,
   scanUnclosedDollars,
   scanVarTags,
 } from "./tokens";
 
+function diag(
+  from: number,
+  to: number,
+  message: string,
+  severity: Diagnostic["severity"] = "error",
+): Diagnostic {
+  return { from, to, severity, source: "neowtext", message };
+}
+
 export function lintNeowtext(text: string): Diagnostic[] {
   const diagnostics: Diagnostic[] = [];
 
   for (const { from, to } of scanUnclosedDollars(text)) {
-    diagnostics.push({
-      from,
-      to,
-      severity: "error",
-      source: "neowtext",
-      message: "Unclosed $...$.",
-    });
+    diagnostics.push(diag(from, to, "Unclosed $...$."));
   }
 
   for (const ref of scanDollarRefs(text)) {
     if (ref.empty) {
-      diagnostics.push({
-        from: ref.from,
-        to: ref.to,
-        severity: "error",
-        source: "neowtext",
-        message: "Empty $...$.",
-      });
+      diagnostics.push(diag(ref.from, ref.to, "Empty $...$."));
       continue;
     }
     if (ref.pinError) {
-      diagnostics.push({
-        from: ref.from,
-        to: ref.to,
-        severity: "error",
-        source: "neowtext",
-        message: ref.pinError,
-      });
+      diagnostics.push(diag(ref.from, ref.to, ref.pinError));
     }
     if (
       (ref.kind === "fnc" || ref.kind === "fse") &&
       !isKnownFn(ref.prefix!, ref.name!)
     ) {
-      diagnostics.push({
-        from: ref.from,
-        to: ref.to,
-        severity: "error",
-        source: "neowtext",
-        message: `Unknown ${ref.prefix} "${ref.name}".`,
-      });
+      diagnostics.push(
+        diag(ref.from, ref.to, `Unknown ${ref.prefix} "${ref.name}".`),
+      );
     } else {
       const deprecated = deprecatedFn(ref);
       if (deprecated) {
-        diagnostics.push({
-          from: ref.from,
-          to: ref.to,
-          severity: "warning",
-          source: "neowtext",
-          message: deprecated,
-        });
+        diagnostics.push(diag(ref.from, ref.to, deprecated, "warning"));
       }
     }
+  }
+
+  let ignoreOpen = -1;
+  for (const dir of scanDirectives(text)) {
+    if (dir.name === "se-ignore") ignoreOpen = dir.from;
+    else if (dir.name === "/se-ignore") {
+      if (ignoreOpen < 0) {
+        diagnostics.push(
+          diag(dir.from, dir.to, "Unexpected @/se-ignore with no open @se-ignore."),
+        );
+      } else {
+        ignoreOpen = -1;
+      }
+    }
+  }
+  if (ignoreOpen >= 0) {
+    diagnostics.push(
+      diag(ignoreOpen, ignoreOpen + "@se-ignore".length, "Unclosed @se-ignore."),
+    );
   }
 
   const tags = scanVarTags(text);
@@ -74,25 +75,15 @@ export function lintNeowtext(text: string): Diagnostic[] {
       depth++;
       lastOpen = tag.from;
     } else if (depth === 0) {
-      diagnostics.push({
-        from: tag.from,
-        to: tag.to,
-        severity: "error",
-        source: "neowtext",
-        message: "Unexpected </var> with no open <var>.",
-      });
+      diagnostics.push(
+        diag(tag.from, tag.to, "Unexpected </var> with no open <var>."),
+      );
     } else {
       depth--;
     }
   }
   if (depth > 0 && lastOpen >= 0) {
-    diagnostics.push({
-      from: lastOpen,
-      to: lastOpen + 5,
-      severity: "error",
-      source: "neowtext",
-      message: "Unclosed <var> block.",
-    });
+    diagnostics.push(diag(lastOpen, lastOpen + 5, "Unclosed <var> block."));
   }
 
   return diagnostics;

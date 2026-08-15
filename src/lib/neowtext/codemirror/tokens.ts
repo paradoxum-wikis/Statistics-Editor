@@ -208,6 +208,49 @@ export function varBinding(text: string, inner: string): string | undefined {
   return found;
 }
 
+export type SeName =
+  | "se-ignore"
+  | "/se-ignore"
+  | "se-ignore/"
+  | "se-diff"
+  | "se-memo";
+
+export interface SeDirective {
+  from: number;
+  to: number;
+  name: SeName;
+  raw: string;
+}
+
+export const DIR_RE =
+  /@\/se-ignore\b|@se-ignore\/|@se-ignore\b|@se-diff\b|@se-memo\b/gi;
+
+function seName(raw: string): SeName {
+  return raw.slice(1).toLowerCase() as SeName;
+}
+
+export function scanDirectives(text: string): SeDirective[] {
+  const out: SeDirective[] = [];
+  const re = new RegExp(DIR_RE.source, "gi");
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(text))) {
+    out.push({
+      from: m.index,
+      to: m.index + m[0].length,
+      name: seName(m[0]),
+      raw: m[0],
+    });
+  }
+  return out;
+}
+
+export function directiveAt(text: string, pos: number): SeDirective | null {
+  for (const d of scanDirectives(text)) {
+    if (pos >= d.from && pos <= d.to) return d;
+  }
+  return null;
+}
+
 export function scanVarTags(
   text: string,
 ): { from: number; to: number; open: boolean }[] {
