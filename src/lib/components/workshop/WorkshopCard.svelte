@@ -75,39 +75,22 @@
   });
 </script>
 
-<article
-  class="relative flex overflow-hidden rounded-(--radius) border bg-card transition-colors duration-250 {compact
-    ? 'flex-row gap-0'
-    : 'flex-col gap-2'} {featured
-    ? 'border-amber-500/50 bg-amber-500/4 hover:bg-amber-500/8'
-    : 'border-border hover:bg-muted/40'}"
->
+<article class={["workshop-card", { compact }, { featured }]}>
   <button
     type="button"
-    class="absolute inset-0 z-0 cursor-pointer outline-none"
+    class="card-link"
     aria-label={`Open ${listing.title}`}
     onclick={() => onOpen?.(listing)}
   ></button>
 
-  <div
-    class="pointer-events-none relative shrink-0 bg-muted {compact
-      ? 'w-[38%] min-h-24 self-stretch sm:w-[34%]'
-      : 'aspect-video w-full'}"
-  >
+  <div class="media">
     {#if imageUrl}
-      <img
-        src={imageUrl}
-        alt=""
-        class="h-full w-full object-cover {compact ? 'absolute inset-0' : ''}"
-        loading="lazy"
-      />
+      <img src={imageUrl} alt="" loading="lazy" />
     {:else}
-      <enhanced:img
-        src="$lib/assets/PlaceholderWide.png"
-        alt=""
-        class="h-full w-full object-cover {compact ? 'absolute inset-0' : ''}"
-      />
+      <enhanced:img src="$lib/assets/PlaceholderWide.png" alt="" />
     {/if}
+    <div class="media-shade"></div>
+
     {#if !compact && listing.tags.length}
       <div
         class="absolute top-2 right-2 flex max-w-[calc(100%-1rem)] flex-wrap justify-end gap-1"
@@ -116,7 +99,7 @@
           <span
             class="rounded-full border px-2 py-0.5 text-xs capitalize backdrop-blur-xs {tag ===
             WORKSHOP_TAG_FEATURED
-              ? 'border-amber-500/50 bg-amber-100/70 font-medium text-amber-900 dark:bg-amber-950/70 dark:text-amber-100'
+              ? 'border-(--tower-exclusive)/50 bg-(--tower-exclusive)/70 font-medium text-white'
               : 'border-border bg-card/70 text-muted-foreground'}">{tag}</span
           >
         {/each}
@@ -124,26 +107,15 @@
     {/if}
   </div>
 
-  <div
-    class="pointer-events-none flex min-w-0 flex-1 flex-col {compact
-      ? 'justify-center gap-1 p-2.5 sm:p-3'
-      : 'gap-2 p-4 pt-1'}"
-  >
-    <div class="flex items-start justify-between gap-2">
-      <div class="min-w-0">
-        <h3 class="truncate font-semibold {compact ? 'text-sm' : ''}">
-          {listing.title}
-        </h3>
-        <p
-          class="truncate text-muted-foreground {compact
-            ? 'text-xs'
-            : 'text-sm'}"
-        >
-          {listing.tower_name}
-        </p>
+  <div class="body">
+    <div class="title-row">
+      <div>
+        <h3>{listing.title}</h3>
+        <p class="tower-name">{listing.tower_name}</p>
       </div>
+
       {#if listing.mine && (onEdit || onUnpublish)}
-        <div class="pointer-events-auto relative z-7 flex shrink-0 gap-0.5">
+        <div class="actions">
           {#if onEdit}
             <IconBtn
               class="p-1.5"
@@ -175,13 +147,7 @@
     </div>
 
     {#if listing.description}
-      <p
-        class="text-muted-foreground {compact
-          ? 'line-clamp-1 text-xs'
-          : 'line-clamp-3 text-sm'}"
-      >
-        {listing.description}
-      </p>
+      <p class="description">{listing.description}</p>
     {/if}
 
     {#if compact && listing.tags.length}
@@ -190,68 +156,48 @@
           <span
             class="rounded-full border px-1.5 py-0.5 text-[0.65rem] capitalize {tag ===
             WORKSHOP_TAG_FEATURED
-              ? 'border-amber-500/50 bg-amber-100/70 font-medium text-amber-900 dark:bg-amber-950/70 dark:text-amber-100'
+              ? 'border-(--tower-exclusive)/50 bg-(--tower-exclusive)/70 font-medium text-white'
               : 'border-border bg-muted/70 text-muted-foreground'}">{tag}</span
           >
         {/each}
       </div>
     {/if}
 
-    <div
-      class="mt-auto flex items-center justify-between gap-2 text-xs text-muted-foreground {compact
-        ? 'pt-0.5'
-        : 'pt-1'}"
-    >
-      <span class="flex min-w-0 items-center gap-1.5">
-        <Avatar.Root
-          class="size-4 shrink-0 overflow-hidden rounded-full border border-border bg-muted"
-        >
-          <Avatar.Image
-            src={avatarSrc ?? avatarPlaceholder}
-            alt=""
-            class="size-full object-cover"
-          />
-          <Avatar.Fallback
-            class="flex size-full items-center justify-center text-[8px] font-medium text-muted-foreground"
-          >
+    <div class="meta">
+      <span class="author">
+        <Avatar.Root>
+          <Avatar.Image src={avatarSrc ?? avatarPlaceholder} alt="" />
+          <Avatar.Fallback>
             {listing.author.fandom_username.slice(0, 2).toUpperCase()}
           </Avatar.Fallback>
         </Avatar.Root>
-        <span class="truncate">{listing.author.fandom_username}</span>
+        <span>{listing.author.fandom_username}</span>
       </span>
-      <span
-        class="pointer-events-auto relative z-7 flex shrink-0 items-center gap-1.5 leading-none"
-      >
+
+      <span class="stats">
         <Tip content={listing.voted ? "You upvoted this" : "Upvotes"}>
           {#snippet children({ props })}
-            <span
-              {...props}
-              class="inline-flex items-center gap-1 {listing.voted
-                ? 'text-sky-600 dark:text-sky-400'
-                : ''}"
-            >
-              <ThumbsUp size={12} class="shrink-0" />
+            <span {...props} class:voted={listing.voted}>
+              <ThumbsUp size={12} />
               {listing.votes.toLocaleString()}
             </span>
           {/snippet}
         </Tip>
-        <span class="leading-none" aria-hidden="true">·</span>
         <Tip content="Views">
           {#snippet children({ props })}
-            <span {...props} class="inline-flex items-center gap-1">
-              <Eye size={12} class="shrink-0" />
+            <span {...props}>
+              <Eye size={12} />
               {listing.views.toLocaleString()}
             </span>
           {/snippet}
         </Tip>
         {#if !compact}
-          <span class="leading-none" aria-hidden="true">·</span>
           <Tip
             content={`Updated ${new Date(listing.updated_at).toLocaleString()}`}
           >
             {#snippet children({ props })}
-              <span {...props} class="inline-flex items-center gap-1">
-                <CalendarClock size={12} class="shrink-0" />
+              <span {...props} class="updated">
+                <CalendarClock size={12} />
                 {timeAgo(listing.updated_at)}
               </span>
             {/snippet}
@@ -261,3 +207,263 @@
     </div>
   </div>
 </article>
+
+<style>
+  .workshop-card {
+    position: relative;
+    display: flex;
+    min-height: 100%;
+    flex-direction: column;
+    overflow: hidden;
+    border: 2px solid var(--border-strong);
+    border-radius: calc(var(--radius) * 1.6);
+    background: var(--card);
+    box-shadow: 0 0.5rem 1.5rem oklch(0 0 0 / 0.08);
+    transition: border-color 0.16s ease;
+
+    &.featured {
+      border-color: var(--tower-exclusive);
+
+      .body {
+        background: color-mix(
+          in oklch,
+          var(--tower-exclusive) 10%,
+          transparent
+        );
+      }
+    }
+
+    &:hover,
+    &:focus-within {
+      border-color: var(--primary);
+    }
+
+    &.featured:hover,
+    &.featured:focus-within {
+      border-color: var(--tower-exclusive);
+    }
+
+    &:focus-within {
+      outline: 2px solid color-mix(in oklch, var(--ring) 65%, transparent);
+      outline-offset: 2px;
+    }
+
+    &.compact {
+      min-height: 9.5rem;
+      flex-direction: row;
+
+      .media {
+        width: 43%;
+        min-width: 8rem;
+        aspect-ratio: auto;
+      }
+
+      .body {
+        justify-content: center;
+        padding: 0.8rem;
+      }
+
+      .description {
+        line-clamp: 2;
+        -webkit-line-clamp: 2;
+      }
+
+      @media (max-width: 520px) {
+        min-height: 8.5rem;
+
+        .media {
+          min-width: 6.5rem;
+        }
+
+        .description,
+        .author {
+          display: none;
+        }
+      }
+    }
+  }
+
+  .card-link {
+    position: absolute;
+    z-index: 0;
+    inset: 0;
+    cursor: pointer;
+    border: 0;
+    background: transparent;
+    outline: none;
+  }
+
+  .media,
+  .body {
+    position: relative;
+    pointer-events: none;
+  }
+
+  .media {
+    overflow: hidden;
+    background: var(--muted);
+    aspect-ratio: 16 / 9;
+
+    img,
+    :global(picture),
+    :global(picture img) {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: scale 0.35s ease;
+    }
+
+    .workshop-card:hover & img,
+    .workshop-card:hover & :global(picture img) {
+      scale: 1.025;
+    }
+  }
+
+  .media-shade {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      oklch(0 0 0 / 0.08),
+      transparent 48%,
+      oklch(0 0 0 / 0.32)
+    );
+  }
+
+  .body {
+    display: flex;
+    min-width: 0;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.55rem;
+    padding: 0.9rem 1rem 1rem;
+  }
+
+  .title-row {
+    display: flex;
+    min-width: 0;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem;
+
+    > div:first-child {
+      min-width: 0;
+    }
+
+    h3 {
+      overflow: hidden;
+      color: var(--foreground);
+      font-family: var(--font);
+      font-size: 0.92rem;
+      font-weight: 800;
+      line-height: 1.25;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  .tower-name {
+    margin-top: 0.15rem;
+    overflow: hidden;
+    color: var(--muted-foreground);
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .actions {
+    position: relative;
+    z-index: 7;
+    display: flex;
+    flex-shrink: 0;
+    gap: 0.15rem;
+    pointer-events: auto;
+  }
+
+  .description {
+    display: -webkit-box;
+    overflow: hidden;
+    color: var(--muted-foreground);
+    font-size: 0.75rem;
+    line-height: 1.45;
+    -webkit-box-orient: vertical;
+    line-clamp: 2;
+    -webkit-line-clamp: 2;
+  }
+
+  .meta {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.65rem;
+    margin-top: auto;
+    padding-top: 0.25rem;
+    color: var(--muted-foreground);
+    font-size: 0.66rem;
+  }
+
+  .author {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 0.4rem;
+
+    > span:last-child {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    :global([data-avatar-root]) {
+      width: 1.15rem;
+      height: 1.15rem;
+      flex-shrink: 0;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      background: var(--muted);
+    }
+
+    :global([data-avatar-image]) {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    :global([data-avatar-fallback]) {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.5rem;
+      font-weight: 700;
+    }
+  }
+
+  .stats {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 0.55rem;
+
+    > span {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.2rem;
+
+      &.voted {
+        color: var(--primary);
+      }
+    }
+  }
+
+  @media (max-width: 410px) {
+    .updated {
+      display: none !important;
+    }
+  }
+</style>

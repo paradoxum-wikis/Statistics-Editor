@@ -266,7 +266,7 @@
         <AspectRatio.Root
           ratio={16 / 9}
           class="overflow-hidden rounded-md border bg-muted {featured
-            ? 'border-amber-500/40'
+            ? 'border-(--tower-exclusive)/40'
             : 'border-border'}"
         >
           {#if imageUrl}
@@ -292,7 +292,7 @@
               <span
                 class="rounded-full border px-2 py-0.5 text-xs capitalize {tag ===
                 WORKSHOP_TAG_FEATURED
-                  ? 'border-amber-500/50 bg-amber-500/15 font-medium text-amber-800 dark:text-amber-200'
+                  ? 'border-(--tower-exclusive)/50 bg-(--tower-exclusive)/15 font-medium text-(--tower-exclusive)'
                   : 'border-border text-muted-foreground'}">{tag}</span
               >
             {/each}

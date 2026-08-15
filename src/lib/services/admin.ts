@@ -50,7 +50,13 @@ export async function listAdminWorkshop(
 
 export function patchAdminListing(
   id: string,
-  body: { published?: boolean; tags?: WorkshopListingTag[] },
+  body: {
+    published?: boolean;
+    tags?: WorkshopListingTag[];
+    title?: string;
+    description?: string;
+    image?: string;
+  },
 ) {
   return api<void>(`/aapi/admin/workshop/${encodeURIComponent(id)}`, {
     method: "PATCH",
