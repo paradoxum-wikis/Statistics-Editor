@@ -9,6 +9,7 @@ const neowtextTheme = EditorView.theme({
     fontWeight: "600",
   },
   ".nt-var": { color: "oklch(0.52 0.17 250)" },
+  ".nt-dot": { color: "oklch(0.50 0.07 250)" },
   ".nt-fnc": { color: "oklch(0.50 0.16 148)" },
   ".nt-fse": { color: "oklch(0.55 0.19 330)" },
   ".nt-dir, .nt-dir *": { color: "oklch(0.55 0.22 55)" },

@@ -111,7 +111,7 @@ export function kindLabel(ref: DollarRef): string {
         ? "Function Statistics Editor · PVP"
         : "Function Statistics Editor") + pin
     );
-  if (ref.kind === "var" && ref.base.includes(".")) return "Dot notation" + pin;
+  if (ref.kind === "var" && ref.base.includes(".")) return "Dot Notation" + pin;
   return "Variable";
 }
 

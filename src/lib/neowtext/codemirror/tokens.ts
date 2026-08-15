@@ -124,17 +124,50 @@ export function deprecatedFn(ref: DollarRef): string | undefined {
   }
 }
 
-export function refAt(text: string, pos: number): DollarRef | null {
+export const DOT_RE = /([a-zA-Z_][a-zA-Z0-9_ ]*)\.([a-zA-Z_][a-zA-Z0-9_ ]*)/g;
+
+// File: notation matches the engine Table.Col regex
+export function imageCol(col: string): boolean {
+  return /^(png|jpe?g|gif|webp|svg)$/i.test(col.trim());
+}
+
+function hitAt<T extends { from: number; to: number }>(
+  text: string,
+  pos: number,
+  scan: (line: string) => T[],
+): T | null {
   const start = text.lastIndexOf("\n", pos - 1) + 1;
   const nl = text.indexOf("\n", pos);
   const line = text.slice(start, nl < 0 ? text.length : nl);
   const local = pos - start;
-  for (const ref of scanDollarRefs(line)) {
-    if (local >= ref.from && local <= ref.to) {
-      return { ...ref, from: ref.from + start, to: ref.to + start };
+  for (const hit of scan(line)) {
+    if (local >= hit.from && local <= hit.to) {
+      return { ...hit, from: hit.from + start, to: hit.to + start };
     }
   }
   return null;
+}
+
+export function scanDots(text: string): DollarRef[] {
+  const masked = maskIgnored(text).replace(/\$[^$\n]*\$/g, spaces);
+  const out: DollarRef[] = [];
+  const re = new RegExp(DOT_RE.source, "g");
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(masked))) {
+    if (imageCol(m[2])) continue;
+    out.push(
+      parseRef(m.index, m.index + m[0].length, `${m[1].trim()}.${m[2].trim()}`),
+    );
+  }
+  return out;
+}
+
+export function dotAt(text: string, pos: number): DollarRef | null {
+  return hitAt(text, pos, scanDots);
+}
+
+export function refAt(text: string, pos: number): DollarRef | null {
+  return hitAt(text, pos, scanDollarRefs);
 }
 
 export function scanDollarRefs(text: string): DollarRef[] {
@@ -209,11 +242,7 @@ export function varBinding(text: string, inner: string): string | undefined {
 }
 
 export type SeName =
-  | "se-ignore"
-  | "/se-ignore"
-  | "se-ignore/"
-  | "se-diff"
-  | "se-memo";
+  "se-ignore" | "/se-ignore" | "se-ignore/" | "se-diff" | "se-memo";
 
 export interface SeDirective {
   from: number;
@@ -245,10 +274,7 @@ export function scanDirectives(text: string): SeDirective[] {
 }
 
 export function directiveAt(text: string, pos: number): SeDirective | null {
-  for (const d of scanDirectives(text)) {
-    if (pos >= d.from && pos <= d.to) return d;
-  }
-  return null;
+  return hitAt(text, pos, scanDirectives);
 }
 
 export function scanVarTags(

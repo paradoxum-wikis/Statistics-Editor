@@ -8,7 +8,7 @@ import {
   helpLink,
   kindLabel,
 } from "./docs";
-import { directiveAt, isVarDeclaration, refAt, varBinding } from "./tokens";
+import { directiveAt, dotAt, isVarDeclaration, refAt, varBinding } from "./tokens";
 
 function tooltip(
   from: number,
@@ -56,7 +56,7 @@ export const neowtextHover: Extension = hoverTooltip((view, pos) => {
       directiveHelpHash(dir),
     );
   }
-  const ref = refAt(doc, pos);
+  const ref = refAt(doc, pos) ?? dotAt(doc, pos);
   if (!ref) return null;
   const held =
     ref.kind === "var" && !isVarDeclaration(doc, ref)
@@ -65,7 +65,7 @@ export const neowtextHover: Extension = hoverTooltip((view, pos) => {
   return tooltip(
     ref.from,
     ref.to,
-    `$${ref.inner}$`,
+    doc[ref.from] === "$" ? `$${ref.inner}$` : ref.base,
     kindLabel(ref),
     held !== undefined ? held : describeRef(ref),
     helpHash(ref),
