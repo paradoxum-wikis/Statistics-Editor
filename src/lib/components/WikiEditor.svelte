@@ -14,6 +14,7 @@
   import { mediawiki } from "@bhsd/codemirror-wikitext";
   import parserConfig from "wikiparser-node/config/default.json" with { type: "json" };
   import type { ConfigData } from "wikiparser-node";
+  import { neowtextSupport } from "$lib/neowtext/codemirror";
   import { towerStore } from "$lib/stores/tower.svelte";
   import { profileStore } from "$lib/stores/profile.svelte";
   import { settingsStore } from "$lib/stores/settings.svelte";
@@ -32,7 +33,7 @@
       backgroundColor: "transparent",
     },
     "&.cm-editor": {
-      maxHeight: "30rem",
+      maxHeight: "min(48rem, calc(100dvh - 12rem))",
       outline: "none",
       border: "1px solid var(--border)",
       borderRadius: "var(--radius)",
@@ -153,6 +154,7 @@
           lineNumbers(),
           lintGutter(),
           mediawiki(parserConfig as unknown as ConfigData),
+          neowtextSupport,
           syntaxHighlighting(defaultHighlightStyle),
           EditorView.lineWrapping,
           editorTheme,
@@ -413,9 +415,7 @@
     <div class="wiki-cm-host w-full" bind:this={editorContainer}></div>
 
     <p class="text-xs text-muted-foreground">
-      Notes:
-      <br />
-      • The source editor uses Neowtext, which includes features such as variables
+      The source editor uses Neowtext, which includes features such as variables
       and is likely to be unfamiliar to most people. Refer to the
       <a
         href="https://tds.fandom.com/wiki/Help:Neowtext"
@@ -424,12 +424,6 @@
         class="text-blue-500 underline">help page</a
       >
       to learn more about it.
-      <br />
-      • This editor does not validate Neowtext or wikitext yet. A malformed table
-      may result in missing/incorrect stats.
-      <br />
-      • The source editor itself is highly experimental. Expect bugs and rough edges,
-      and please report any issues you encounter!
     </p>
   </div>
 {/if}
