@@ -11,6 +11,7 @@
   import Card from "$lib/components/smol/Card.svelte";
   import IconBtn from "$lib/components/smol/IconBtn.svelte";
   import LoadingCard from "$lib/components/smol/LoadingCard.svelte";
+  import Modal from "$lib/components/smol/Modal.svelte";
   import NotFoundView from "$lib/components/NotFoundView.svelte";
   import TextInput from "$lib/components/smol/TextInput.svelte";
   import {
@@ -50,6 +51,13 @@
 
   let deleteTarget = $state<AdminListing | null>(null);
   let deleteOpen = $state(false);
+
+  let editTarget = $state<AdminListing | null>(null);
+  let editOpen = $state(false);
+  let editTitle = $state("");
+  let editDesc = $state("");
+  let editImage = $state("");
+  let editBusy = $state(false);
 
   const allowed = $derived(isAdminUser(authStore.user));
   const totalPages = $derived(Math.max(1, Math.ceil(total / pageSize)));
@@ -138,6 +146,34 @@
       toast.error(e instanceof Error ? e.message : "Delete failed.");
     } finally {
       deleteTarget = null;
+    }
+  }
+
+  function openEdit(item: AdminListing) {
+    editTarget = item;
+    editTitle = item.title;
+    editDesc = item.description;
+    editImage = item.image ?? "";
+    editOpen = true;
+  }
+
+  async function saveEdit() {
+    if (!editTarget || editBusy) return;
+    editBusy = true;
+    try {
+      await patchAdminListing(editTarget.id, {
+        title: editTitle.trim(),
+        description: editDesc.trim(),
+        image: editImage.trim(),
+      });
+      toast.success("Metadata updated.");
+      editOpen = false;
+      await load();
+    } catch (e) {
+      if (settingsStore.debugMode) console.error("[admin] edit", e);
+      toast.error(e instanceof Error ? e.message : "Update failed.");
+    } finally {
+      editBusy = false;
     }
   }
 
@@ -319,6 +355,9 @@
                   </td>
                   <td class="px-3 py-2">
                     <div class="flex flex-wrap gap-1">
+                      <Btn variant="outline" onclick={() => openEdit(item)}>
+                        Edit
+                      </Btn>
                       <Btn
                         variant="outline"
                         onclick={() => togglePublished(item)}
@@ -381,4 +420,73 @@
     onConfirm={confirmHardDelete}
     onCancel={() => (deleteTarget = null)}
   />
+
+  <Modal
+    bind:open={editOpen}
+    title="Edit listing"
+    description="Update this listing's metadata."
+  >
+    {#if editTarget}
+      <div class="space-y-3">
+        <div class="space-y-1">
+          <div class="flex items-baseline justify-between">
+            <label class="text-sm font-medium" for="admin-edit-title">Title</label>
+            <span class="text-xs text-muted-foreground"
+              >{editTitle.trim().length}/80</span
+            >
+          </div>
+          <TextInput
+            id="admin-edit-title"
+            class="short"
+            maxlength="80"
+            bind:value={editTitle}
+          />
+        </div>
+
+        <div class="space-y-1">
+          <div class="flex items-baseline justify-between">
+            <label class="text-sm font-medium" for="admin-edit-desc"
+              >Description</label
+            >
+            <span class="text-xs text-muted-foreground"
+              >{editDesc.trim().length}/500</span
+            >
+          </div>
+          <textarea
+            id="admin-edit-desc"
+            class="input h-auto min-h-20 resize-none py-2"
+            maxlength="500"
+            rows="3"
+            bind:value={editDesc}></textarea>
+        </div>
+
+        <div class="space-y-1">
+          <label class="text-sm font-medium" for="admin-edit-image">
+            Image
+            <span class="font-normal text-muted-foreground">(optional)</span>
+          </label>
+          <TextInput
+            id="admin-edit-image"
+            class="short"
+            maxlength="512"
+            placeholder="File:Place.png · Roblox Asset ID · https://..."
+            bind:value={editImage}
+          />
+        </div>
+      </div>
+    {/if}
+
+    {#snippet footer()}
+      <div class="flex justify-end gap-2">
+        <Btn variant="outline" onclick={() => (editOpen = false)}>Cancel</Btn>
+        <Btn
+          variant="primary"
+          disabled={editBusy || !editTitle.trim()}
+          onclick={saveEdit}
+        >
+          {editBusy ? "Saving..." : "Save"}
+        </Btn>
+      </div>
+    {/snippet}
+  </Modal>
 {/if}
