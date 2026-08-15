@@ -26,7 +26,7 @@ const neowtextTheme = EditorView.theme({
     },
     "& small": {
       display: "block",
-      color: "var(--muted-foreground)",
+      color: "oklch(0.50 0.02 250 / 0.75)",
       fontSize: ".65rem",
       margin: ".1rem 0 .25rem",
     },
@@ -35,7 +35,7 @@ const neowtextTheme = EditorView.theme({
       whiteSpace: "pre-wrap",
     },
     "& code": { display: "block" },
-    "& a": { color: "var(--link)" },
+    "& a": { color: "oklch(0.52 0.14 250)" },
   },
 });
 
