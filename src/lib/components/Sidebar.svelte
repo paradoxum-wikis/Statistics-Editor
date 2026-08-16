@@ -1,306 +1,306 @@
 <script lang="ts">
-  import UpgradeViewer from "./UpgradeViewer.svelte";
-  import UpgradeEditor from "./UpgradeEditor.svelte";
-  import DetectionEditor from "./DetectionEditor.svelte";
-  import CostEditor from "./CostEditor.svelte";
-  import UpdateLog from "./UpdateLog.svelte";
-  import WikiBanner from "./smol/WikiBanner.svelte";
-  import Separator from "./smol/Separator.svelte";
-  import { towerStore } from "$lib/stores/tower.svelte";
-  import { settingsStore } from "$lib/stores/settings.svelte";
-  import { applyRofBug, toNumericValue, getRofBugVer } from "$lib/utils/format";
-  import { schemaIndexToLevel } from "$lib/neowtext/functions/schema";
+	import UpgradeViewer from "./UpgradeViewer.svelte";
+	import UpgradeEditor from "./UpgradeEditor.svelte";
+	import DetectionEditor from "./DetectionEditor.svelte";
+	import CostEditor from "./CostEditor.svelte";
+	import UpdateLog from "./UpdateLog.svelte";
+	import WikiBanner from "./smol/WikiBanner.svelte";
+	import Separator from "./smol/Separator.svelte";
+	import { towerStore } from "$lib/stores/tower.svelte";
+	import { settingsStore } from "$lib/stores/settings.svelte";
+	import { applyRofBug, toNumericValue, getRofBugVer } from "$lib/utils/format";
+	import { schemaIndexToLevel } from "$lib/neowtext/functions/schema";
 
-  import type { Picture } from "@sveltejs/enhanced-img";
-  import DamageIcon from "$lib/assets/Damage.png?enhanced";
-  import CooldownIcon from "$lib/assets/Cooldown.png?enhanced";
-  import IncomeIcon from "$lib/assets/Income.png?enhanced";
-  import RangeIcon from "$lib/assets/Range.png?enhanced";
-  import HiddenIcon from "$lib/assets/HiddenDetection.png?enhanced";
-  import FlyingIcon from "$lib/assets/FlyingDetection.png?enhanced";
-  import LeadIcon from "$lib/assets/LeadDetection.png?enhanced";
+	import type { Picture } from "@sveltejs/enhanced-img";
+	import DamageIcon from "$lib/assets/Damage.png?enhanced";
+	import CooldownIcon from "$lib/assets/Cooldown.png?enhanced";
+	import IncomeIcon from "$lib/assets/Income.png?enhanced";
+	import RangeIcon from "$lib/assets/Range.png?enhanced";
+	import HiddenIcon from "$lib/assets/HiddenDetection.png?enhanced";
+	import FlyingIcon from "$lib/assets/FlyingDetection.png?enhanced";
+	import LeadIcon from "$lib/assets/LeadDetection.png?enhanced";
 
-  type SummaryLine = {
-    kind: "change" | "grant";
-    stat: string;
-    from?: string | number | null;
-    to?: string | number | null;
-    icon?: Picture;
-  };
+	type SummaryLine = {
+		kind: "change" | "grant";
+		stat: string;
+		from?: string | number | null;
+		to?: string | number | null;
+		icon?: Picture;
+	};
 
-  let { class: className }: { class?: string } = $props();
+	let { class: className }: { class?: string } = $props();
 
-  let selectedUpgrade = $state("0");
+	let selectedUpgrade = $state("0");
 
-  let currentSkin = $derived.by(() => {
-    towerStore.refreshTrigger;
-    return towerStore.selectedData?.getSkin(towerStore.selectedSkinName);
-  });
+	let currentSkin = $derived.by(() => {
+		towerStore.refreshTrigger;
+		return towerStore.selectedData?.getSkin(towerStore.selectedSkinName);
+	});
 
-  let numUpgrades = $derived(currentSkin?.upgrades?.length ?? 0);
+	let numUpgrades = $derived(currentSkin?.upgrades?.length ?? 0);
 
-  let upgradeNames = $derived.by(() => {
-    towerStore.refreshTrigger;
-    if (!currentSkin?.upgrades) return {};
-    const names: { [key: number]: string } = {};
-    currentSkin.upgrades.forEach((upgrade: any, index: number) => {
-      if (upgrade.upgradeData?.Title) {
-        names[index] = upgrade.upgradeData.Title;
-      }
-    });
-    return names;
-  });
+	let upgradeNames = $derived.by(() => {
+		towerStore.refreshTrigger;
+		if (!currentSkin?.upgrades) return {};
+		const names: { [key: number]: string } = {};
+		currentSkin.upgrades.forEach((upgrade: any, index: number) => {
+			if (upgrade.upgradeData?.Title) {
+				names[index] = upgrade.upgradeData.Title;
+			}
+		});
+		return names;
+	});
 
-  let upgradeLevels = $derived.by(() => {
-    towerStore.refreshTrigger;
-    if (!currentSkin?.upgrades) return [];
-    return currentSkin.upgrades.map((upgrade: any, index: number) =>
-      upgrade.upgradeData?.Level != null
-        ? String(upgrade.upgradeData.Level)
-        : String(index + 1),
-    );
-  });
+	let upgradeLevels = $derived.by(() => {
+		towerStore.refreshTrigger;
+		if (!currentSkin?.upgrades) return [];
+		return currentSkin.upgrades.map((upgrade: any, index: number) =>
+			upgrade.upgradeData?.Level != null
+				? String(upgrade.upgradeData.Level)
+				: String(index + 1),
+		);
+	});
 
-  // split paths: group flat upgrade indices by schema branch (trunk first)
-  let upgradeGroups = $derived.by(() => {
-    towerStore.refreshTrigger;
-    if (!currentSkin?.upgrades) return [];
-    const schema = currentSkin.getSchema();
-    const groups: { branch: string; indices: number[] }[] = [];
-    for (let i = 0; i < currentSkin.upgrades.length; i++) {
-      const { branch } = schemaIndexToLevel(schema, i + 1);
-      let group = groups.find((g) => g.branch === branch);
-      if (!group) {
-        group = { branch, indices: [] };
-        groups.push(group);
-      }
-      group.indices.push(i);
-    }
-    return groups;
-  });
+	// split paths: group flat upgrade indices by schema branch (trunk first)
+	let upgradeGroups = $derived.by(() => {
+		towerStore.refreshTrigger;
+		if (!currentSkin?.upgrades) return [];
+		const schema = currentSkin.getSchema();
+		const groups: { branch: string; indices: number[] }[] = [];
+		for (let i = 0; i < currentSkin.upgrades.length; i++) {
+			const { branch } = schemaIndexToLevel(schema, i + 1);
+			let group = groups.find((g) => g.branch === branch);
+			if (!group) {
+				group = { branch, indices: [] };
+				groups.push(group);
+			}
+			group.indices.push(i);
+		}
+		return groups;
+	});
 
-  let upgradeSummaries = $derived.by(() => {
-    towerStore.refreshTrigger;
-    if (!currentSkin) return {};
-    return buildUpgradeSummariesForeskin(currentSkin);
-  });
+	let upgradeSummaries = $derived.by(() => {
+		towerStore.refreshTrigger;
+		if (!currentSkin) return {};
+		return buildUpgradeSummariesForeskin(currentSkin);
+	});
 
-  let towerKey = $derived(towerStore.selectedData?.name ?? "none");
+	let towerKey = $derived(towerStore.selectedData?.name ?? "none");
 
-  const STATS_BY_ICON: Array<[icon: Picture, stats: string[]]> = [
-    [DamageIcon, ["Damage"]],
-    [CooldownIcon, ["Cooldown", "Tick", "Firerate"]],
-    [IncomeIcon, ["Income"]],
-    [RangeIcon, ["Range"]],
-    [HiddenIcon, ["Hidden"]],
-    [FlyingIcon, ["Flying"]],
-    [LeadIcon, ["Lead"]],
-  ];
+	const STATS_BY_ICON: Array<[icon: Picture, stats: string[]]> = [
+		[DamageIcon, ["Damage"]],
+		[CooldownIcon, ["Cooldown", "Tick", "Firerate"]],
+		[IncomeIcon, ["Income"]],
+		[RangeIcon, ["Range"]],
+		[HiddenIcon, ["Hidden"]],
+		[FlyingIcon, ["Flying"]],
+		[LeadIcon, ["Lead"]],
+	];
 
-  const ICON_BY_STAT: Record<string, Picture> = Object.fromEntries(
-    STATS_BY_ICON.flatMap(([icon, stats]) => stats.map((s) => [s, icon])),
-  );
+	const ICON_BY_STAT: Record<string, Picture> = Object.fromEntries(
+		STATS_BY_ICON.flatMap(([icon, stats]) => stats.map((s) => [s, icon])),
+	);
 
-  function normalizeForCompare(v: unknown): string {
-    if (v === undefined || v === null) return "";
-    if (typeof v === "number") {
-      if (!Number.isFinite(v)) return String(v);
-      return String(Number(v.toFixed(8)));
-    }
-    if (typeof v === "boolean") return v ? "true" : "false";
-    if (typeof v === "string") return v.trim();
-    return JSON.stringify(v);
-  }
+	function normalizeForCompare(v: unknown): string {
+		if (v === undefined || v === null) return "";
+		if (typeof v === "number") {
+			if (!Number.isFinite(v)) return String(v);
+			return String(Number(v.toFixed(8)));
+		}
+		if (typeof v === "boolean") return v ? "true" : "false";
+		if (typeof v === "string") return v.trim();
+		return JSON.stringify(v);
+	}
 
-  function buildUpgradeSummariesForeskin(skin: any): {
-    [key: number]: SummaryLine[];
-  } {
-    const result: { [key: number]: SummaryLine[] } = {};
-    if (!skin?.levels?.levels) return result;
+	function buildUpgradeSummariesForeskin(skin: any): {
+		[key: number]: SummaryLine[];
+	} {
+		const result: { [key: number]: SummaryLine[] } = {};
+		if (!skin?.levels?.levels) return result;
 
-    const excludedSummaryStats = new Set(["Level", "Cost"]);
+		const excludedSummaryStats = new Set(["Level", "Cost"]);
 
-    const parseLevelLabel = (
-      value: unknown,
-    ): { numeric: number | null; suffix: string } => {
-      const raw = String(value ?? "").trim();
-      const match = raw.match(/^(\d+)([A-Za-z]*)$/);
-      if (!match) return { numeric: null, suffix: "" };
-      return {
-        numeric: Number.parseInt(match[1], 10),
-        suffix: (match[2] ?? "").toUpperCase(),
-      };
-    };
+		const parseLevelLabel = (
+			value: unknown,
+		): { numeric: number | null; suffix: string } => {
+			const raw = String(value ?? "").trim();
+			const match = raw.match(/^(\d+)([A-Za-z]*)$/);
+			if (!match) return { numeric: null, suffix: "" };
+			return {
+				numeric: Number.parseInt(match[1], 10),
+				suffix: (match[2] ?? "").toUpperCase(),
+			};
+		};
 
-    const upgradeLevelLabels: string[] = (skin.upgrades ?? []).map(
-      (upgrade: any, index: number) =>
-        String(upgrade?.upgradeData?.Level ?? index + 1),
-    );
+		const upgradeLevelLabels: string[] = (skin.upgrades ?? []).map(
+			(upgrade: any, index: number) =>
+				String(upgrade?.upgradeData?.Level ?? index + 1),
+		);
 
-    function resolveFromLevel(upgradeIndex: number): number {
-      const current = parseLevelLabel(upgradeLevelLabels[upgradeIndex]);
-      if (current.numeric == null) {
-        return upgradeIndex > 0 ? upgradeIndex : 0;
-      }
+		function resolveFromLevel(upgradeIndex: number): number {
+			const current = parseLevelLabel(upgradeLevelLabels[upgradeIndex]);
+			if (current.numeric == null) {
+				return upgradeIndex > 0 ? upgradeIndex : 0;
+			}
 
-      let parentUpgradeIndex = -1;
+			let parentUpgradeIndex = -1;
 
-      for (let i = upgradeIndex - 1; i >= 0; i--) {
-        const prev = parseLevelLabel(upgradeLevelLabels[i]);
-        if (prev.numeric == null || prev.numeric >= current.numeric) continue;
-        if ((prev.suffix || "") === current.suffix) {
-          parentUpgradeIndex = i;
-          break;
-        }
-      }
+			for (let i = upgradeIndex - 1; i >= 0; i--) {
+				const prev = parseLevelLabel(upgradeLevelLabels[i]);
+				if (prev.numeric == null || prev.numeric >= current.numeric) continue;
+				if ((prev.suffix || "") === current.suffix) {
+					parentUpgradeIndex = i;
+					break;
+				}
+			}
 
-      if (parentUpgradeIndex === -1 && current.suffix) {
-        for (let i = upgradeIndex - 1; i >= 0; i--) {
-          const prev = parseLevelLabel(upgradeLevelLabels[i]);
-          if (prev.numeric == null || prev.numeric >= current.numeric) continue;
-          if (!prev.suffix) {
-            parentUpgradeIndex = i;
-            break;
-          }
-        }
-      }
+			if (parentUpgradeIndex === -1 && current.suffix) {
+				for (let i = upgradeIndex - 1; i >= 0; i--) {
+					const prev = parseLevelLabel(upgradeLevelLabels[i]);
+					if (prev.numeric == null || prev.numeric >= current.numeric) continue;
+					if (!prev.suffix) {
+						parentUpgradeIndex = i;
+						break;
+					}
+				}
+			}
 
-      if (parentUpgradeIndex === -1 && upgradeIndex > 0) {
-        parentUpgradeIndex = upgradeIndex - 1;
-      }
+			if (parentUpgradeIndex === -1 && upgradeIndex > 0) {
+				parentUpgradeIndex = upgradeIndex - 1;
+			}
 
-      return parentUpgradeIndex === -1 ? 0 : parentUpgradeIndex + 1;
-    }
+			return parentUpgradeIndex === -1 ? 0 : parentUpgradeIndex + 1;
+		}
 
-    const rofInfo = getRofBugVer(skin?.formulaTokens);
-    const rofCols = new Set(rofInfo.cols);
+		const rofInfo = getRofBugVer(skin?.formulaTokens);
+		const rofCols = new Set(rofInfo.cols);
 
-    const extraReadOnly =
-      skin.extraTables?.flatMap((t: any) => t.readOnlyColumns || []) ?? [];
-    const allReadOnly = new Set([
-      ...(skin.readOnlyAttributes || []),
-      ...extraReadOnly,
-    ]);
+		const extraReadOnly =
+			skin.extraTables?.flatMap((t: any) => t.readOnlyColumns || []) ?? [];
+		const allReadOnly = new Set([
+			...(skin.readOnlyAttributes || []),
+			...extraReadOnly,
+		]);
 
-    for (
-      let upgradeIndex = 0;
-      upgradeIndex < skin.upgrades.length;
-      upgradeIndex++
-    ) {
-      const toLevel = upgradeIndex + 1;
-      const fromLevel = resolveFromLevel(upgradeIndex);
+		for (
+			let upgradeIndex = 0;
+			upgradeIndex < skin.upgrades.length;
+			upgradeIndex++
+		) {
+			const toLevel = upgradeIndex + 1;
+			const fromLevel = resolveFromLevel(upgradeIndex);
 
-      const lines: SummaryLine[] = [];
+			const lines: SummaryLine[] = [];
 
-      // Only diff the upgrade's OWN stats. `skin.levels.attributes` is the global
-      // union across all branch tables, and `levels.getCell` carries values forward
-      // down the flat array, so using that would leak one branch's stats (e.g. Fortify
-      // Radius) into an unrelated branch's summary. The upgrade's own attribute set
-      // only contains the columns of its own branch/table.
-      const ownAttributes = Object.keys(
-        skin.upgrades?.[upgradeIndex]?.attributes ?? {},
-      );
+			// Only diff the upgrade's OWN stats. `skin.levels.attributes` is the global
+			// union across all branch tables, and `levels.getCell` carries values forward
+			// down the flat array, so using that would leak one branch's stats (e.g. Fortify
+			// Radius) into an unrelated branch's summary. The upgrade's own attribute set
+			// only contains the columns of its own branch/table.
+			const ownAttributes = Object.keys(
+				skin.upgrades?.[upgradeIndex]?.attributes ?? {},
+			);
 
-      for (const stat of ownAttributes) {
-        if (["Hidden", "Flying", "Lead"].includes(stat)) continue;
-        if (excludedSummaryStats.has(stat)) continue;
-        if (allReadOnly.has(stat)) continue;
+			for (const stat of ownAttributes) {
+				if (["Hidden", "Flying", "Lead"].includes(stat)) continue;
+				if (excludedSummaryStats.has(stat)) continue;
+				if (allReadOnly.has(stat)) continue;
 
-        const fromVal = skin.levels.getCell(fromLevel, stat);
-        const toVal = skin.levels.getCell(toLevel, stat);
+				const fromVal = skin.levels.getCell(fromLevel, stat);
+				const toVal = skin.levels.getCell(toLevel, stat);
 
-        let cmpFrom: unknown = fromVal;
-        let cmpTo: unknown = toVal;
-        let displayFrom: unknown = fromVal;
-        let displayTo: unknown = toVal;
+				let cmpFrom: unknown = fromVal;
+				let cmpTo: unknown = toVal;
+				let displayFrom: unknown = fromVal;
+				let displayTo: unknown = toVal;
 
-        if (settingsStore.rofBug && rofCols.has(stat)) {
-          const fnum = toNumericValue(fromVal);
-          const tnum = toNumericValue(toVal);
-          if (fnum !== null) {
-            const adj = applyRofBug(fnum, rofInfo.type);
-            cmpFrom = adj;
-            displayFrom = adj;
-          }
+				if (settingsStore.rofBug && rofCols.has(stat)) {
+					const fnum = toNumericValue(fromVal);
+					const tnum = toNumericValue(toVal);
+					if (fnum !== null) {
+						const adj = applyRofBug(fnum, rofInfo.type);
+						cmpFrom = adj;
+						displayFrom = adj;
+					}
 
-          if (tnum !== null) {
-            const adj = applyRofBug(tnum, rofInfo.type);
-            cmpTo = adj;
-            displayTo = adj;
-          }
-        }
+					if (tnum !== null) {
+						const adj = applyRofBug(tnum, rofInfo.type);
+						cmpTo = adj;
+						displayTo = adj;
+					}
+				}
 
-        const fromNorm = normalizeForCompare(cmpFrom);
-        const toNorm = normalizeForCompare(cmpTo);
+				const fromNorm = normalizeForCompare(cmpFrom);
+				const toNorm = normalizeForCompare(cmpTo);
 
-        if (fromNorm === toNorm) continue;
-        if (!toNorm && !fromNorm) continue;
+				if (fromNorm === toNorm) continue;
+				if (!toNorm && !fromNorm) continue;
 
-        lines.push({
-          kind: "change",
-          stat,
-          from: displayFrom as string | number | null,
-          to: displayTo as string | number | null,
-          icon: ICON_BY_STAT[stat],
-        });
-      }
+				lines.push({
+					kind: "change",
+					stat,
+					from: displayFrom as string | number | null,
+					to: displayTo as string | number | null,
+					icon: ICON_BY_STAT[stat],
+				});
+			}
 
-      for (const detection of ["Hidden", "Flying", "Lead"]) {
-        const fromDet = !!skin.levels.getCell(fromLevel, detection);
-        const toDet = !!skin.levels.getCell(toLevel, detection);
-        if (!fromDet && toDet) {
-          lines.push({
-            kind: "grant",
-            stat: detection,
-            icon: ICON_BY_STAT[detection],
-          });
-        }
-      }
+			for (const detection of ["Hidden", "Flying", "Lead"]) {
+				const fromDet = !!skin.levels.getCell(fromLevel, detection);
+				const toDet = !!skin.levels.getCell(toLevel, detection);
+				if (!fromDet && toDet) {
+					lines.push({
+						kind: "grant",
+						stat: detection,
+						icon: ICON_BY_STAT[detection],
+					});
+				}
+			}
 
-      result[upgradeIndex] = lines;
-    }
+			result[upgradeIndex] = lines;
+		}
 
-    return result;
-  }
+		return result;
+	}
 </script>
 
 <aside
-  class={["flex h-full flex-col border-r border-border bg-card", className]}
+	class={["flex h-full flex-col border-r border-border bg-card", className]}
 >
-  <div class="flex flex-1 flex-col overflow-y-auto p-3.5">
-    {#if !settingsStore.hideWikiBanner}
-      <WikiBanner />
-      <Separator class="mb-4" />
-    {/if}
+	<div class="flex flex-1 flex-col overflow-y-auto p-3.5">
+		{#if !settingsStore.hideWikiBanner}
+			<WikiBanner />
+			<Separator class="mb-4" />
+		{/if}
 
-    {#if towerStore.selectedData}
-      {#key towerKey}
-        <UpgradeViewer
-          {upgradeNames}
-          {upgradeSummaries}
-          {upgradeLevels}
-          {upgradeGroups}
-          bind:selectedUpgrade
-          {numUpgrades}
-        />
-      {/key}
+		{#if towerStore.selectedData}
+			{#key towerKey}
+				<UpgradeViewer
+					{upgradeNames}
+					{upgradeSummaries}
+					{upgradeLevels}
+					{upgradeGroups}
+					bind:selectedUpgrade
+					{numUpgrades}
+				/>
+			{/key}
 
-      <UpgradeEditor />
-      <DetectionEditor />
-      <CostEditor />
-    {:else}
-      <div class="mb-3 flex items-baseline justify-between gap-2">
-        <h3 class="text-sm font-semibold">Recent Updates</h3>
-        <a
-          href="https://github.com/paradoxum-wikis/Statistics-Editor/commits/main/"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="text-xs text-link hover:underline"
-        >
-          View all
-        </a>
-      </div>
-      <UpdateLog />
-    {/if}
-  </div>
+			<UpgradeEditor />
+			<DetectionEditor />
+			<CostEditor />
+		{:else}
+			<div class="mb-3 flex items-baseline justify-between gap-2">
+				<h3 class="text-sm font-semibold">Recent Updates</h3>
+				<a
+					href="https://github.com/paradoxum-wikis/Statistics-Editor/commits/main/"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="text-xs text-link hover:underline"
+				>
+					View all
+				</a>
+			</div>
+			<UpdateLog />
+		{/if}
+	</div>
 </aside>

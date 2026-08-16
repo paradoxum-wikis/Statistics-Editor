@@ -1,492 +1,492 @@
 <script lang="ts">
-  import { goto } from "$app/navigation";
-  import { resolve } from "$app/paths";
-  import { fade } from "svelte/transition";
-  import { Select } from "bits-ui";
-  import { ArrowLeft, Check, ChevronDown, Trash2 } from "@lucide/svelte";
-  import { authStore } from "$lib/stores/auth.svelte";
-  import AuthMenu from "$lib/components/smol/AuthMenu.svelte";
-  import Alert from "$lib/components/smol/Alert.svelte";
-  import Btn from "$lib/components/smol/Btn.svelte";
-  import Card from "$lib/components/smol/Card.svelte";
-  import IconBtn from "$lib/components/smol/IconBtn.svelte";
-  import LoadingCard from "$lib/components/smol/LoadingCard.svelte";
-  import Modal from "$lib/components/smol/Modal.svelte";
-  import NotFoundView from "$lib/components/NotFoundView.svelte";
-  import TextInput from "$lib/components/smol/TextInput.svelte";
-  import {
-    hardDeleteAdminListing,
-    isAdminUser,
-    listAdminWorkshop,
-    patchAdminListing,
-    type AdminListing,
-  } from "$lib/services/admin";
-  import {
-    WORKSHOP_TAG_FEATURED,
-    WORKSHOP_TAGS,
-    type WorkshopListingTag,
-  } from "$lib/services/workshop";
-  import { settingsStore } from "$lib/stores/settings.svelte";
-  import { toast } from "$lib/toast";
+	import { goto } from "$app/navigation";
+	import { resolve } from "$app/paths";
+	import { fade } from "svelte/transition";
+	import { Select } from "bits-ui";
+	import { ArrowLeft, Check, ChevronDown, Trash2 } from "@lucide/svelte";
+	import { authStore } from "$lib/stores/auth.svelte";
+	import AuthMenu from "$lib/components/smol/AuthMenu.svelte";
+	import Alert from "$lib/components/smol/Alert.svelte";
+	import Btn from "$lib/components/smol/Btn.svelte";
+	import Card from "$lib/components/smol/Card.svelte";
+	import IconBtn from "$lib/components/smol/IconBtn.svelte";
+	import LoadingCard from "$lib/components/smol/LoadingCard.svelte";
+	import Modal from "$lib/components/smol/Modal.svelte";
+	import NotFoundView from "$lib/components/NotFoundView.svelte";
+	import TextInput from "$lib/components/smol/TextInput.svelte";
+	import {
+		hardDeleteAdminListing,
+		isAdminUser,
+		listAdminWorkshop,
+		patchAdminListing,
+		type AdminListing,
+	} from "$lib/services/admin";
+	import {
+		WORKSHOP_TAG_FEATURED,
+		WORKSHOP_TAGS,
+		type WorkshopListingTag,
+	} from "$lib/services/workshop";
+	import { settingsStore } from "$lib/stores/settings.svelte";
+	import { toast } from "$lib/toast";
 
-  const STATUS_OPTIONS = [
-    { value: "all", label: "All" },
-    { value: "published", label: "Published" },
-    { value: "hidden", label: "Hidden" },
-  ] as const;
+	const STATUS_OPTIONS = [
+		{ value: "all", label: "All" },
+		{ value: "published", label: "Published" },
+		{ value: "hidden", label: "Hidden" },
+	] as const;
 
-  let items = $state<AdminListing[]>([]);
-  let total = $state(0);
-  let page = $state(1);
-  let pageSize = $state(24);
-  let loading = $state(true);
-  let error = $state<string | null>(null);
+	let items = $state<AdminListing[]>([]);
+	let total = $state(0);
+	let page = $state(1);
+	let pageSize = $state(24);
+	let loading = $state(true);
+	let error = $state<string | null>(null);
 
-  let q = $state("");
-  let debouncedQ = $state("");
-  let status = $state<"all" | "published" | "hidden">("all");
-  const statusLabel = $derived(
-    STATUS_OPTIONS.find((o) => o.value === status)?.label ?? "All",
-  );
+	let q = $state("");
+	let debouncedQ = $state("");
+	let status = $state<"all" | "published" | "hidden">("all");
+	const statusLabel = $derived(
+		STATUS_OPTIONS.find((o) => o.value === status)?.label ?? "All",
+	);
 
-  let deleteTarget = $state<AdminListing | null>(null);
-  let deleteOpen = $state(false);
+	let deleteTarget = $state<AdminListing | null>(null);
+	let deleteOpen = $state(false);
 
-  let editTarget = $state<AdminListing | null>(null);
-  let editOpen = $state(false);
-  let editTitle = $state("");
-  let editDesc = $state("");
-  let editImage = $state("");
-  let editBusy = $state(false);
+	let editTarget = $state<AdminListing | null>(null);
+	let editOpen = $state(false);
+	let editTitle = $state("");
+	let editDesc = $state("");
+	let editImage = $state("");
+	let editBusy = $state(false);
 
-  const allowed = $derived(isAdminUser(authStore.user));
-  const totalPages = $derived(Math.max(1, Math.ceil(total / pageSize)));
-  let fetchSeq = 0;
+	const allowed = $derived(isAdminUser(authStore.user));
+	const totalPages = $derived(Math.max(1, Math.ceil(total / pageSize)));
+	let fetchSeq = 0;
 
-  async function load() {
-    if (!allowed) {
-      loading = false;
-      return;
-    }
-    const seq = ++fetchSeq;
-    loading = true;
-    error = null;
-    try {
-      const res = await listAdminWorkshop({
-        q: debouncedQ,
-        status,
-        page,
-      });
-      if (seq !== fetchSeq) return;
-      items = res.items;
-      total = res.total;
-      pageSize = res.page_size;
-    } catch (e) {
-      if (seq !== fetchSeq) return;
-      if (settingsStore.debugMode) console.error("[admin] list", e);
-      error = e instanceof Error ? e.message : "Failed to load admin list.";
-    } finally {
-      if (seq === fetchSeq) loading = false;
-    }
-  }
+	async function load() {
+		if (!allowed) {
+			loading = false;
+			return;
+		}
+		const seq = ++fetchSeq;
+		loading = true;
+		error = null;
+		try {
+			const res = await listAdminWorkshop({
+				q: debouncedQ,
+				status,
+				page,
+			});
+			if (seq !== fetchSeq) return;
+			items = res.items;
+			total = res.total;
+			pageSize = res.page_size;
+		} catch (e) {
+			if (seq !== fetchSeq) return;
+			if (settingsStore.debugMode) console.error("[admin] list", e);
+			error = e instanceof Error ? e.message : "Failed to load admin list.";
+		} finally {
+			if (seq === fetchSeq) loading = false;
+		}
+	}
 
-  $effect(() => {
-    const value = q;
-    const t = setTimeout(() => {
-      debouncedQ = value;
-      page = 1;
-    }, 250);
-    return () => clearTimeout(t);
-  });
+	$effect(() => {
+		const value = q;
+		const t = setTimeout(() => {
+			debouncedQ = value;
+			page = 1;
+		}, 250);
+		return () => clearTimeout(t);
+	});
 
-  $effect(() => {
-    authStore.ready;
-    authStore.user;
-    debouncedQ;
-    status;
-    page;
-    void load();
-  });
+	$effect(() => {
+		authStore.ready;
+		authStore.user;
+		debouncedQ;
+		status;
+		page;
+		void load();
+	});
 
-  async function togglePublished(item: AdminListing) {
-    try {
-      await patchAdminListing(item.id, { published: !item.published });
-      toast.success(item.published ? "Hidden." : "Published.");
-      await load();
-    } catch (e) {
-      if (settingsStore.debugMode) console.error("[admin] published", e);
-      toast.error(e instanceof Error ? e.message : "Update failed.");
-    }
-  }
+	async function togglePublished(item: AdminListing) {
+		try {
+			await patchAdminListing(item.id, { published: !item.published });
+			toast.success(item.published ? "Hidden." : "Published.");
+			await load();
+		} catch (e) {
+			if (settingsStore.debugMode) console.error("[admin] published", e);
+			toast.error(e instanceof Error ? e.message : "Update failed.");
+		}
+	}
 
-  async function setTags(item: AdminListing, tags: WorkshopListingTag[]) {
-    try {
-      await patchAdminListing(item.id, { tags });
-      toast.success("Tags updated.");
-      await load();
-    } catch (e) {
-      if (settingsStore.debugMode) console.error("[admin] tags", e);
-      toast.error(e instanceof Error ? e.message : "Update failed.");
-    }
-  }
+	async function setTags(item: AdminListing, tags: WorkshopListingTag[]) {
+		try {
+			await patchAdminListing(item.id, { tags });
+			toast.success("Tags updated.");
+			await load();
+		} catch (e) {
+			if (settingsStore.debugMode) console.error("[admin] tags", e);
+			toast.error(e instanceof Error ? e.message : "Update failed.");
+		}
+	}
 
-  function askHardDelete(item: AdminListing) {
-    deleteTarget = item;
-    deleteOpen = true;
-  }
+	function askHardDelete(item: AdminListing) {
+		deleteTarget = item;
+		deleteOpen = true;
+	}
 
-  async function confirmHardDelete() {
-    if (!deleteTarget) return;
-    try {
-      await hardDeleteAdminListing(deleteTarget.id);
-      toast.success("Listing deleted (share freed).");
-      await load();
-    } catch (e) {
-      if (settingsStore.debugMode) console.error("[admin] delete", e);
-      toast.error(e instanceof Error ? e.message : "Delete failed.");
-    } finally {
-      deleteTarget = null;
-    }
-  }
+	async function confirmHardDelete() {
+		if (!deleteTarget) return;
+		try {
+			await hardDeleteAdminListing(deleteTarget.id);
+			toast.success("Listing deleted (share freed).");
+			await load();
+		} catch (e) {
+			if (settingsStore.debugMode) console.error("[admin] delete", e);
+			toast.error(e instanceof Error ? e.message : "Delete failed.");
+		} finally {
+			deleteTarget = null;
+		}
+	}
 
-  function openEdit(item: AdminListing) {
-    editTarget = item;
-    editTitle = item.title;
-    editDesc = item.description;
-    editImage = item.image ?? "";
-    editOpen = true;
-  }
+	function openEdit(item: AdminListing) {
+		editTarget = item;
+		editTitle = item.title;
+		editDesc = item.description;
+		editImage = item.image ?? "";
+		editOpen = true;
+	}
 
-  async function saveEdit() {
-    if (!editTarget || editBusy) return;
-    editBusy = true;
-    try {
-      await patchAdminListing(editTarget.id, {
-        title: editTitle.trim(),
-        description: editDesc.trim(),
-        image: editImage.trim(),
-      });
-      toast.success("Metadata updated.");
-      editOpen = false;
-      await load();
-    } catch (e) {
-      if (settingsStore.debugMode) console.error("[admin] edit", e);
-      toast.error(e instanceof Error ? e.message : "Update failed.");
-    } finally {
-      editBusy = false;
-    }
-  }
+	async function saveEdit() {
+		if (!editTarget || editBusy) return;
+		editBusy = true;
+		try {
+			await patchAdminListing(editTarget.id, {
+				title: editTitle.trim(),
+				description: editDesc.trim(),
+				image: editImage.trim(),
+			});
+			toast.success("Metadata updated.");
+			editOpen = false;
+			await load();
+		} catch (e) {
+			if (settingsStore.debugMode) console.error("[admin] edit", e);
+			toast.error(e instanceof Error ? e.message : "Update failed.");
+		} finally {
+			editBusy = false;
+		}
+	}
 
-  async function goHome() {
-    await goto(resolve("/"), { keepFocus: true, noScroll: true });
-  }
+	async function goHome() {
+		await goto(resolve("/"), { keepFocus: true, noScroll: true });
+	}
 </script>
 
 <svelte:head>
-  <meta name="robots" content="noindex" />
+	<meta name="robots" content="noindex" />
 </svelte:head>
 
 {#if !authStore.ready}
-  <div
-    class="flex h-screen items-center justify-center bg-background p-5"
-    in:fade={{ duration: 140 }}
-  >
-    <LoadingCard message="Loading..." />
-  </div>
+	<div
+		class="flex h-screen items-center justify-center bg-background p-5"
+		in:fade={{ duration: 140 }}
+	>
+		<LoadingCard message="Loading..." />
+	</div>
 {:else if !allowed}
-  <div class="flex h-screen flex-col bg-background" in:fade={{ duration: 140 }}>
-    <main class="min-h-0 flex-1 overflow-y-auto p-5">
-      <NotFoundView onHome={goHome} code={403} />
-    </main>
-  </div>
+	<div class="flex h-screen flex-col bg-background" in:fade={{ duration: 140 }}>
+		<main class="min-h-0 flex-1 overflow-y-auto p-5">
+			<NotFoundView onHome={goHome} code={403} />
+		</main>
+	</div>
 {:else}
-  <div class="flex h-screen flex-col bg-background" in:fade={{ duration: 140 }}>
-    <header
-      class="sticky top-0 z-7 flex items-center justify-between gap-3 border-b bg-card p-2 px-3"
-    >
-      <div class="flex min-w-0 items-center gap-3">
-        <IconBtn
-          onclick={() => goto(resolve("/workshop"))}
-          title="Back to Workshop"
-        >
-          <ArrowLeft size={18} />
-        </IconBtn>
-        <h1 class="unisans truncate text-3xl font-black text-foreground">
-          Admin
-        </h1>
-      </div>
-      <AuthMenu />
-    </header>
+	<div class="flex h-screen flex-col bg-background" in:fade={{ duration: 140 }}>
+		<header
+			class="sticky top-0 z-7 flex items-center justify-between gap-3 border-b bg-card p-2 px-3"
+		>
+			<div class="flex min-w-0 items-center gap-3">
+				<IconBtn
+					onclick={() => goto(resolve("/workshop"))}
+					title="Back to Workshop"
+				>
+					<ArrowLeft size={18} />
+				</IconBtn>
+				<h1 class="unisans truncate text-3xl font-black text-foreground">
+					Admin
+				</h1>
+			</div>
+			<AuthMenu />
+		</header>
 
-    <main class="min-h-0 flex-1 overflow-y-auto p-5">
-      {#if loading && items.length === 0}
-        <LoadingCard message="Loading..." />
-      {:else if error}
-        <Card class="p-8 text-center">
-          <p class="text-destructive">{error}</p>
-          <Btn class="mt-3" variant="outline" onclick={load}>Retry</Btn>
-        </Card>
-      {:else}
-        <div class="mb-4 flex flex-wrap items-center gap-2">
-          <TextInput
-            class="short max-w-xs text-sm!"
-            placeholder="Search title, tower, author, ids..."
-            bind:value={q}
-          />
-          <Select.Root
-            type="single"
-            items={[...STATUS_OPTIONS]}
-            value={status}
-            onValueChange={(val) => {
-              if (!val || val === status) return;
-              status = val as typeof status;
-              page = 1;
-            }}
-          >
-            <Select.Trigger
-              class="select-trigger w-auto gap-1.5"
-              aria-label="Status filter"
-            >
-              <span class="truncate">{statusLabel}</span>
-              <ChevronDown class="size-3.5 shrink-0 opacity-50" />
-            </Select.Trigger>
-            <Select.Portal>
-              <Select.Content class="select-content min-w-36" sideOffset={6}>
-                <Select.Viewport class="p-1">
-                  {#each STATUS_OPTIONS as option (option.value)}
-                    <Select.Item
-                      class="select-item"
-                      value={option.value}
-                      label={option.label}
-                    >
-                      {#snippet children({ selected })}
-                        {option.label}
-                        {#if selected}
-                          <Check class="ms-auto size-3.5 shrink-0" />
-                        {/if}
-                      {/snippet}
-                    </Select.Item>
-                  {/each}
-                </Select.Viewport>
-              </Select.Content>
-            </Select.Portal>
-          </Select.Root>
-          <span class="text-sm text-muted-foreground">{total} listings</span>
-        </div>
+		<main class="min-h-0 flex-1 overflow-y-auto p-5">
+			{#if loading && items.length === 0}
+				<LoadingCard message="Loading..." />
+			{:else if error}
+				<Card class="p-8 text-center">
+					<p class="text-destructive">{error}</p>
+					<Btn class="mt-3" variant="outline" onclick={load}>Retry</Btn>
+				</Card>
+			{:else}
+				<div class="mb-4 flex flex-wrap items-center gap-2">
+					<TextInput
+						class="short max-w-xs text-sm!"
+						placeholder="Search title, tower, author, ids..."
+						bind:value={q}
+					/>
+					<Select.Root
+						type="single"
+						items={[...STATUS_OPTIONS]}
+						value={status}
+						onValueChange={(val) => {
+							if (!val || val === status) return;
+							status = val as typeof status;
+							page = 1;
+						}}
+					>
+						<Select.Trigger
+							class="select-trigger w-auto gap-1.5"
+							aria-label="Status filter"
+						>
+							<span class="truncate">{statusLabel}</span>
+							<ChevronDown class="size-3.5 shrink-0 opacity-50" />
+						</Select.Trigger>
+						<Select.Portal>
+							<Select.Content class="select-content min-w-36" sideOffset={6}>
+								<Select.Viewport class="p-1">
+									{#each STATUS_OPTIONS as option (option.value)}
+										<Select.Item
+											class="select-item"
+											value={option.value}
+											label={option.label}
+										>
+											{#snippet children({ selected })}
+												{option.label}
+												{#if selected}
+													<Check class="ms-auto size-3.5 shrink-0" />
+												{/if}
+											{/snippet}
+										</Select.Item>
+									{/each}
+								</Select.Viewport>
+							</Select.Content>
+						</Select.Portal>
+					</Select.Root>
+					<span class="text-sm text-muted-foreground">{total} listings</span>
+				</div>
 
-        <div
-          class="overflow-x-auto rounded-(--radius) border border-border"
-        >
-          <table class="w-full min-w-160 text-left text-sm">
-            <thead class="border-b bg-muted/50 text-xs text-muted-foreground">
-              <tr>
-                <th class="px-3 py-2 font-medium">Title</th>
-                <th class="px-3 py-2 font-medium">Tower</th>
-                <th class="px-3 py-2 font-medium">Author</th>
-                <th class="px-3 py-2 font-medium">Views</th>
-                <th class="px-3 py-2 font-medium">Tags</th>
-                <th class="px-3 py-2 font-medium">Status</th>
-                <th class="px-3 py-2 font-medium">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {#each items as item (item.id)}
-                {@const cat = WORKSHOP_TAGS.find((t) => item.tags.includes(t))}
-                {@const featured = item.tags.includes(WORKSHOP_TAG_FEATURED)}
-                <tr class="border-b border-border last:border-0">
-                  <td class="max-w-48 truncate px-3 py-2 font-medium">
-                    {item.title}
-                    <div class="font-mono text-xs text-muted-foreground">
-                      {item.id} · {item.share_id}
-                    </div>
-                  </td>
-                  <td class="max-w-32 truncate px-3 py-2">{item.tower_name}</td>
-                  <td class="max-w-32 truncate px-3 py-2">
-                    {item.author.fandom_username}
-                  </td>
-                  <td class="px-3 py-2 tabular-nums"
-                    >{item.views.toLocaleString()}</td
-                  >
-                  <td class="px-3 py-2">
-                    <div class="flex flex-wrap gap-1">
-                      {#each WORKSHOP_TAGS as t (t)}
-                        <button
-                          type="button"
-                          class="rounded-full border px-2 py-0.5 text-xs capitalize transition-colors {cat ===
-                          t
-                            ? 'border-primary bg-primary text-primary-foreground'
-                            : 'border-border text-muted-foreground hover:bg-muted'}"
-                          aria-pressed={cat === t}
-                          onclick={() =>
-                            setTags(
-                              item,
-                              featured ? [t, WORKSHOP_TAG_FEATURED] : [t],
-                            )}
-                        >
-                          {t}
-                        </button>
-                      {/each}
-                      <button
-                        type="button"
-                        class="rounded-full border px-2 py-0.5 text-xs transition-colors {featured
-                          ? 'border-amber-500/50 bg-amber-500/15 font-medium text-amber-800 dark:text-amber-200'
-                          : 'border-border text-muted-foreground hover:bg-muted'}"
-                        aria-pressed={featured}
-                        disabled={!cat}
-                        onclick={() =>
-                          cat &&
-                          setTags(
-                            item,
-                            featured ? [cat] : [cat, WORKSHOP_TAG_FEATURED],
-                          )}
-                      >
-                        featured
-                      </button>
-                    </div>
-                  </td>
-                  <td class="px-3 py-2">
-                    <span
-                      class="rounded-full border px-2 py-0.5 text-xs {item.published
-                        ? 'border-border text-foreground'
-                        : 'border-destructive/40 text-destructive'}"
-                    >
-                      {item.published ? "live" : "hidden"}
-                    </span>
-                  </td>
-                  <td class="px-3 py-2">
-                    <div class="flex flex-wrap gap-1">
-                      <Btn variant="outline" onclick={() => openEdit(item)}>
-                        Edit
-                      </Btn>
-                      <Btn
-                        variant="outline"
-                        onclick={() => togglePublished(item)}
-                      >
-                        {item.published ? "Hide" : "Show"}
-                      </Btn>
-                      <Btn
-                        variant="outline"
-                        class="text-destructive"
-                        onclick={() => askHardDelete(item)}
-                      >
-                        <Trash2 size={14} />
-                        Delete
-                      </Btn>
-                    </div>
-                  </td>
-                </tr>
-              {:else}
-                <tr>
-                  <td
-                    colspan="7"
-                    class="px-3 py-8 text-center text-muted-foreground"
-                    >Nothing here.</td
-                  >
-                </tr>
-              {/each}
-            </tbody>
-          </table>
-        </div>
+				<div class="overflow-x-auto rounded-(--radius) border border-border">
+					<table class="w-full min-w-160 text-left text-sm">
+						<thead class="border-b bg-muted/50 text-xs text-muted-foreground">
+							<tr>
+								<th class="px-3 py-2 font-medium">Title</th>
+								<th class="px-3 py-2 font-medium">Tower</th>
+								<th class="px-3 py-2 font-medium">Author</th>
+								<th class="px-3 py-2 font-medium">Views</th>
+								<th class="px-3 py-2 font-medium">Tags</th>
+								<th class="px-3 py-2 font-medium">Status</th>
+								<th class="px-3 py-2 font-medium">Actions</th>
+							</tr>
+						</thead>
+						<tbody>
+							{#each items as item (item.id)}
+								{@const cat = WORKSHOP_TAGS.find((t) => item.tags.includes(t))}
+								{@const featured = item.tags.includes(WORKSHOP_TAG_FEATURED)}
+								<tr class="border-b border-border last:border-0">
+									<td class="max-w-48 truncate px-3 py-2 font-medium">
+										{item.title}
+										<div class="font-mono text-xs text-muted-foreground">
+											{item.id} · {item.share_id}
+										</div>
+									</td>
+									<td class="max-w-32 truncate px-3 py-2">{item.tower_name}</td>
+									<td class="max-w-32 truncate px-3 py-2">
+										{item.author.fandom_username}
+									</td>
+									<td class="px-3 py-2 tabular-nums"
+										>{item.views.toLocaleString()}</td
+									>
+									<td class="px-3 py-2">
+										<div class="flex flex-wrap gap-1">
+											{#each WORKSHOP_TAGS as t (t)}
+												<button
+													type="button"
+													class="rounded-full border px-2 py-0.5 text-xs capitalize transition-colors {cat ===
+													t
+														? 'border-primary bg-primary text-primary-foreground'
+														: 'border-border text-muted-foreground hover:bg-muted'}"
+													aria-pressed={cat === t}
+													onclick={() =>
+														setTags(
+															item,
+															featured ? [t, WORKSHOP_TAG_FEATURED] : [t],
+														)}
+												>
+													{t}
+												</button>
+											{/each}
+											<button
+												type="button"
+												class="rounded-full border px-2 py-0.5 text-xs transition-colors {featured
+													? 'border-amber-500/50 bg-amber-500/15 font-medium text-amber-800 dark:text-amber-200'
+													: 'border-border text-muted-foreground hover:bg-muted'}"
+												aria-pressed={featured}
+												disabled={!cat}
+												onclick={() =>
+													cat &&
+													setTags(
+														item,
+														featured ? [cat] : [cat, WORKSHOP_TAG_FEATURED],
+													)}
+											>
+												featured
+											</button>
+										</div>
+									</td>
+									<td class="px-3 py-2">
+										<span
+											class="rounded-full border px-2 py-0.5 text-xs {item.published
+												? 'border-border text-foreground'
+												: 'border-destructive/40 text-destructive'}"
+										>
+											{item.published ? "live" : "hidden"}
+										</span>
+									</td>
+									<td class="px-3 py-2">
+										<div class="flex flex-wrap gap-1">
+											<Btn variant="outline" onclick={() => openEdit(item)}>
+												Edit
+											</Btn>
+											<Btn
+												variant="outline"
+												onclick={() => togglePublished(item)}
+											>
+												{item.published ? "Hide" : "Show"}
+											</Btn>
+											<Btn
+												variant="outline"
+												class="text-destructive"
+												onclick={() => askHardDelete(item)}
+											>
+												<Trash2 size={14} />
+												Delete
+											</Btn>
+										</div>
+									</td>
+								</tr>
+							{:else}
+								<tr>
+									<td
+										colspan="7"
+										class="px-3 py-8 text-center text-muted-foreground"
+										>Nothing here.</td
+									>
+								</tr>
+							{/each}
+						</tbody>
+					</table>
+				</div>
 
-        {#if totalPages > 1}
-          <div class="mt-4 flex items-center justify-center gap-3">
-            <Btn
-              variant="outline"
-              disabled={page <= 1}
-              onclick={() => (page -= 1)}>Previous</Btn
-            >
-            <span class="text-sm text-muted-foreground">
-              Page {page} of {totalPages}
-            </span>
-            <Btn
-              variant="outline"
-              disabled={page >= totalPages}
-              onclick={() => (page += 1)}>Next</Btn
-            >
-          </div>
-        {/if}
-      {/if}
-    </main>
-  </div>
+				{#if totalPages > 1}
+					<div class="mt-4 flex items-center justify-center gap-3">
+						<Btn
+							variant="outline"
+							disabled={page <= 1}
+							onclick={() => (page -= 1)}>Previous</Btn
+						>
+						<span class="text-sm text-muted-foreground">
+							Page {page} of {totalPages}
+						</span>
+						<Btn
+							variant="outline"
+							disabled={page >= totalPages}
+							onclick={() => (page += 1)}>Next</Btn
+						>
+					</div>
+				{/if}
+			{/if}
+		</main>
+	</div>
 
-  <Alert
-    bind:open={deleteOpen}
-    title="Hard-delete this listing?"
-    description={deleteTarget
-      ? `"${deleteTarget.title}" is removed permanently. The share id can be published again.`
-      : ""}
-    confirmLabel="Delete forever"
-    confirmClass="btn destructive-fill text-white"
-    onConfirm={confirmHardDelete}
-    onCancel={() => (deleteTarget = null)}
-  />
+	<Alert
+		bind:open={deleteOpen}
+		title="Hard-delete this listing?"
+		description={deleteTarget
+			? `"${deleteTarget.title}" is removed permanently. The share id can be published again.`
+			: ""}
+		confirmLabel="Delete forever"
+		confirmClass="btn destructive-fill text-white"
+		onConfirm={confirmHardDelete}
+		onCancel={() => (deleteTarget = null)}
+	/>
 
-  <Modal
-    bind:open={editOpen}
-    title="Edit listing"
-    description="Update this listing's metadata."
-  >
-    {#if editTarget}
-      <div class="space-y-3">
-        <div class="space-y-1">
-          <div class="flex items-baseline justify-between">
-            <label class="text-sm font-medium" for="admin-edit-title">Title</label>
-            <span class="text-xs text-muted-foreground"
-              >{editTitle.trim().length}/80</span
-            >
-          </div>
-          <TextInput
-            id="admin-edit-title"
-            class="short"
-            maxlength="80"
-            bind:value={editTitle}
-          />
-        </div>
+	<Modal
+		bind:open={editOpen}
+		title="Edit listing"
+		description="Update this listing's metadata."
+	>
+		{#if editTarget}
+			<div class="space-y-3">
+				<div class="space-y-1">
+					<div class="flex items-baseline justify-between">
+						<label class="text-sm font-medium" for="admin-edit-title"
+							>Title</label
+						>
+						<span class="text-xs text-muted-foreground"
+							>{editTitle.trim().length}/80</span
+						>
+					</div>
+					<TextInput
+						id="admin-edit-title"
+						class="short"
+						maxlength="80"
+						bind:value={editTitle}
+					/>
+				</div>
 
-        <div class="space-y-1">
-          <div class="flex items-baseline justify-between">
-            <label class="text-sm font-medium" for="admin-edit-desc"
-              >Description</label
-            >
-            <span class="text-xs text-muted-foreground"
-              >{editDesc.trim().length}/500</span
-            >
-          </div>
-          <textarea
-            id="admin-edit-desc"
-            class="input h-auto min-h-20 resize-none py-2"
-            maxlength="500"
-            rows="3"
-            bind:value={editDesc}></textarea>
-        </div>
+				<div class="space-y-1">
+					<div class="flex items-baseline justify-between">
+						<label class="text-sm font-medium" for="admin-edit-desc"
+							>Description</label
+						>
+						<span class="text-xs text-muted-foreground"
+							>{editDesc.trim().length}/500</span
+						>
+					</div>
+					<textarea
+						id="admin-edit-desc"
+						class="input h-auto min-h-20 resize-none py-2"
+						maxlength="500"
+						rows="3"
+						bind:value={editDesc}></textarea>
+				</div>
 
-        <div class="space-y-1">
-          <label class="text-sm font-medium" for="admin-edit-image">
-            Image
-            <span class="font-normal text-muted-foreground">(optional)</span>
-          </label>
-          <TextInput
-            id="admin-edit-image"
-            class="short"
-            maxlength="512"
-            placeholder="File:Place.png · Roblox Asset ID · https://..."
-            bind:value={editImage}
-          />
-        </div>
-      </div>
-    {/if}
+				<div class="space-y-1">
+					<label class="text-sm font-medium" for="admin-edit-image">
+						Image
+						<span class="font-normal text-muted-foreground">(optional)</span>
+					</label>
+					<TextInput
+						id="admin-edit-image"
+						class="short"
+						maxlength="512"
+						placeholder="File:Place.png · Roblox Asset ID · https://..."
+						bind:value={editImage}
+					/>
+				</div>
+			</div>
+		{/if}
 
-    {#snippet footer()}
-      <div class="flex justify-end gap-2">
-        <Btn variant="outline" onclick={() => (editOpen = false)}>Cancel</Btn>
-        <Btn
-          variant="primary"
-          disabled={editBusy || !editTitle.trim()}
-          onclick={saveEdit}
-        >
-          {editBusy ? "Saving..." : "Save"}
-        </Btn>
-      </div>
-    {/snippet}
-  </Modal>
+		{#snippet footer()}
+			<div class="flex justify-end gap-2">
+				<Btn variant="outline" onclick={() => (editOpen = false)}>Cancel</Btn>
+				<Btn
+					variant="primary"
+					disabled={editBusy || !editTitle.trim()}
+					onclick={saveEdit}
+				>
+					{editBusy ? "Saving..." : "Save"}
+				</Btn>
+			</div>
+		{/snippet}
+	</Modal>
 {/if}

@@ -1,62 +1,62 @@
 import { columnKeysEqual, toNumericValue } from "$lib/utils/format";
 
 export type GlobalModifierEntry = {
-  column: string;
-  delta: number;
-  percent: number;
-  enabled: boolean;
+	column: string;
+	delta: number;
+	percent: number;
+	enabled: boolean;
 };
 
 export type GlobalModifier = {
-  entries: GlobalModifierEntry[];
+	entries: GlobalModifierEntry[];
 };
 
 export function isGlobalModifierActive(modifier: GlobalModifier): boolean {
-  return modifier.entries.some(
-    (entry) => entry.enabled && (entry.delta !== 0 || entry.percent !== 0),
-  );
+	return modifier.entries.some(
+		(entry) => entry.enabled && (entry.delta !== 0 || entry.percent !== 0),
+	);
 }
 
 export function applyGlobalModifierDisplay(
-  modifier: GlobalModifier,
-  header: string,
-  value: string | number | null | undefined,
+	modifier: GlobalModifier,
+	header: string,
+	value: string | number | null | undefined,
 ): string | number | null | undefined {
-  if (modifier.entries.length === 0) return value;
+	if (modifier.entries.length === 0) return value;
 
-  let result = toNumericValue(value);
-  if (result === null) return value;
+	let result = toNumericValue(value);
+	if (result === null) return value;
 
-  let changed = false;
+	let changed = false;
 
-  for (const entry of modifier.entries) {
-    if (!entry.enabled || !entry.column.trim()) continue;
-    if (entry.delta === 0 && entry.percent === 0) continue;
-    if (!columnKeysEqual(entry.column, header)) continue;
+	for (const entry of modifier.entries) {
+		if (!entry.enabled || !entry.column.trim()) continue;
+		if (entry.delta === 0 && entry.percent === 0) continue;
+		if (!columnKeysEqual(entry.column, header)) continue;
 
-    if (entry.percent !== 0) {
-      result *= 1 + entry.percent / 100;
-      changed = true;
-    }
-    if (entry.delta !== 0) {
-      result += entry.delta;
-      changed = true;
-    }
-  }
+		if (entry.percent !== 0) {
+			result *= 1 + entry.percent / 100;
+			changed = true;
+		}
+		if (entry.delta !== 0) {
+			result += entry.delta;
+			changed = true;
+		}
+	}
 
-  return changed ? result : value;
+	return changed ? result : value;
 }
 
 export function applyGlobalModifierToRow(
-  modifier: GlobalModifier,
-  row: Record<string, string | number>,
+	modifier: GlobalModifier,
+	row: Record<string, string | number>,
 ): Record<string, string | number> {
-  if (!isGlobalModifierActive(modifier)) return row;
+	if (!isGlobalModifierActive(modifier)) return row;
 
-  const out = { ...row };
-  for (const [key, value] of Object.entries(row)) {
-    const modified = applyGlobalModifierDisplay(modifier, key, value);
-    if (modified !== value) out[key] = modified as string | number;
-  }
-  return out;
+	const out = { ...row };
+	for (const [key, value] of Object.entries(row)) {
+		const modified = applyGlobalModifierDisplay(modifier, key, value);
+		if (modified !== value) out[key] = modified as string | number;
+	}
+	return out;
 }

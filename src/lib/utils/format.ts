@@ -4,132 +4,132 @@ import { settingsStore } from "$lib/stores/settings.svelte";
  * Strips garbage ref tag for visual display.
  */
 export function stripRefs(s: unknown): string {
-  if (s === undefined || s === null) return "";
-  return String(s)
-    .replace(/<ref\b[^>]*>[\s\S]*?<\/ref>/gi, "")
-    .replace(/<ref\b[^>]*\/>/gi, "");
+	if (s === undefined || s === null) return "";
+	return String(s)
+		.replace(/<ref\b[^>]*>[\s\S]*?<\/ref>/gi, "")
+		.replace(/<ref\b[^>]*\/>/gi, "");
 }
 
 /**
  * Normalizes a column key by stripping refs and wikilinks, and removing $refs$.
  */
 export function normalizeColumnKey(s: unknown): string {
-  if (s === undefined || s === null) return "";
-  return stripRefs(String(s))
-    .replace(/\[\[([^|\]]+)(?:\|[^\]]+)?\]\]/g, "$1")
-    .replace(/\$[A-Z0-9_-]+\$/gi, "")
-    .trim();
+	if (s === undefined || s === null) return "";
+	return stripRefs(String(s))
+		.replace(/\[\[([^|\]]+)(?:\|[^\]]+)?\]\]/g, "$1")
+		.replace(/\$[A-Z0-9_-]+\$/gi, "")
+		.trim();
 }
 
 /**
  * True if `rest` starts with <ref>...</ref> or a ref-only $VAR$.
  */
 function startsWithRef(rest: string, tokens: Record<string, string>): boolean {
-  if (/^<ref\b/i.test(rest)) return true;
-  const tok = rest.match(/^\$[A-Z0-9_-]+\$/i)?.[0];
-  if (!tok) return false;
-  const def = (tokens[tok] ?? "").trim();
-  return /<ref\b/i.test(def) && !stripRefs(def).trim();
+	if (/^<ref\b/i.test(rest)) return true;
+	const tok = rest.match(/^\$[A-Z0-9_-]+\$/i)?.[0];
+	if (!tok) return false;
+	const def = (tokens[tok] ?? "").trim();
+	return /<ref\b/i.test(def) && !stripRefs(def).trim();
 }
 
 /**
  * Leading value (number or N/A) + ref suffix ($REF$ or <ref>).
  */
 function parseEditableRefSuffix(
-  value: string,
-  tokens: Record<string, string>,
+	value: string,
+	tokens: Record<string, string>,
 ): { numeric: string; rest: string } | null {
-  const s = value.trim();
-  const headMatch = s.match(/^(N\/A|-?[\d.,]+)/i);
-  if (!headMatch) return null;
-  const numeric = headMatch[1];
-  const rest = s.slice(headMatch[0].length);
-  if (!rest || !startsWithRef(rest, tokens)) return null;
-  return { numeric, rest };
+	const s = value.trim();
+	const headMatch = s.match(/^(N\/A|-?[\d.,]+)/i);
+	if (!headMatch) return null;
+	const numeric = headMatch[1];
+	const rest = s.slice(headMatch[0].length);
+	if (!rest || !startsWithRef(rest, tokens)) return null;
+	return { numeric, rest };
 }
 
 export function isEditableRefSuffixCell(
-  value: unknown,
-  tokens: Record<string, string>,
+	value: unknown,
+	tokens: Record<string, string>,
 ): boolean {
-  if (typeof value !== "string") return false;
-  return parseEditableRefSuffix(value, tokens) !== null;
+	if (typeof value !== "string") return false;
+	return parseEditableRefSuffix(value, tokens) !== null;
 }
 
 function refSuffixSource(
-  formulaToken: unknown,
-  previous: unknown,
-  newValue: unknown,
-  tokens: Record<string, string>,
+	formulaToken: unknown,
+	previous: unknown,
+	newValue: unknown,
+	tokens: Record<string, string>,
 ): string | null {
-  for (const v of [formulaToken, previous, newValue]) {
-    if (typeof v === "string" && isEditableRefSuffixCell(v, tokens)) return v;
-  }
-  return null;
+	for (const v of [formulaToken, previous, newValue]) {
+		if (typeof v === "string" && isEditableRefSuffixCell(v, tokens)) return v;
+	}
+	return null;
 }
 
 function refSuffixHead(
-  value: string,
-  tokens: Record<string, string>,
+	value: string,
+	tokens: Record<string, string>,
 ): string | number | null {
-  const parsed = parseEditableRefSuffix(value, tokens);
-  if (!parsed) return null;
-  const n = parseNumeric(parsed.numeric);
-  return Number.isFinite(n) ? n : parsed.numeric;
+	const parsed = parseEditableRefSuffix(value, tokens);
+	if (!parsed) return null;
+	const n = parseNumeric(parsed.numeric);
+	return Number.isFinite(n) ? n : parsed.numeric;
 }
 
 export function stripRefOnlyVarSuffix(
-  value: unknown,
-  tokens: Record<string, string>,
+	value: unknown,
+	tokens: Record<string, string>,
 ): string | number | null | undefined {
-  if (value === undefined || value === null) return value;
-  if (typeof value === "number") return value;
-  if (typeof value !== "string") return undefined;
+	if (value === undefined || value === null) return value;
+	if (typeof value === "number") return value;
+	if (typeof value !== "string") return undefined;
 
-  const parsed = parseEditableRefSuffix(value, tokens);
-  if (!parsed) return value;
+	const parsed = parseEditableRefSuffix(value, tokens);
+	if (!parsed) return value;
 
-  // drop only the leading pure-ref suffix
-  // leave later text and refs for CellRefs
-  let after = parsed.rest;
-  after = after.replace(/^(?:<ref\b[^>]*>[\s\S]*?<\/ref>|<ref\b[^>]*\/>)/i, "");
-  after = after.replace(/^\$[A-Z0-9_-]+\$/i, (tok) =>
-    startsWithRef(tok, tokens) ? "" : tok,
-  );
+	// drop only the leading pure-ref suffix
+	// leave later text and refs for CellRefs
+	let after = parsed.rest;
+	after = after.replace(/^(?:<ref\b[^>]*>[\s\S]*?<\/ref>|<ref\b[^>]*\/>)/i, "");
+	after = after.replace(/^\$[A-Z0-9_-]+\$/i, (tok) =>
+		startsWithRef(tok, tokens) ? "" : tok,
+	);
 
-  const n = parseNumeric(parsed.numeric);
-  const head = Number.isFinite(n) ? n : parsed.numeric;
-  return after ? `${head}${after}` : head;
+	const n = parseNumeric(parsed.numeric);
+	const head = Number.isFinite(n) ? n : parsed.numeric;
+	return after ? `${head}${after}` : head;
 }
 
 export function syncRefOnlyCellToken(
-  formulaToken: string,
-  newValue: string | number,
-  tokens: Record<string, string>,
-  appendRef: boolean,
+	formulaToken: string,
+	newValue: string | number,
+	tokens: Record<string, string>,
+	appendRef: boolean,
 ): string | null {
-  const parsed = parseEditableRefSuffix(formulaToken, tokens);
-  if (!parsed) return null;
+	const parsed = parseEditableRefSuffix(formulaToken, tokens);
+	if (!parsed) return null;
 
-  if (typeof newValue === "number") {
-    const n = formatNumber(newValue);
-    return appendRef ? `${n}${parsed.rest}` : n;
-  }
+	if (typeof newValue === "number") {
+		const n = formatNumber(newValue);
+		return appendRef ? `${n}${parsed.rest}` : n;
+	}
 
-  const s = String(newValue).trim();
-  const fromInput = parseEditableRefSuffix(s, tokens);
-  if (fromInput) return `${fromInput.numeric}${fromInput.rest}`;
+	const s = String(newValue).trim();
+	const fromInput = parseEditableRefSuffix(s, tokens);
+	if (fromInput) return `${fromInput.numeric}${fromInput.rest}`;
 
-  if (/^n\/a$/i.test(s)) {
-    return appendRef ? `N/A${parsed.rest}` : "N/A";
-  }
+	if (/^n\/a$/i.test(s)) {
+		return appendRef ? `N/A${parsed.rest}` : "N/A";
+	}
 
-  if (/^-?[\d.,]+$/.test(s)) {
-    return appendRef ? `${s}${parsed.rest}` : s;
-  }
+	if (/^-?[\d.,]+$/.test(s)) {
+		return appendRef ? `${s}${parsed.rest}` : s;
+	}
 
-  const n = s.match(/^(N\/A|-?[\d.,]+)/i)?.[0] ?? s;
-  return appendRef ? `${n}${parsed.rest}` : n;
+	const n = s.match(/^(N\/A|-?[\d.,]+)/i)?.[0] ?? s;
+	return appendRef ? `${n}${parsed.rest}` : n;
 }
 
 /**
@@ -137,24 +137,24 @@ export function syncRefOnlyCellToken(
  * head = value stored on the row
  */
 export function applyRefSuffixEdit(
-  formulaToken: unknown,
-  previous: unknown,
-  newValue: string | number,
-  tokens: Record<string, string>,
-  appendRef: boolean,
+	formulaToken: unknown,
+	previous: unknown,
+	newValue: string | number,
+	tokens: Record<string, string>,
+	appendRef: boolean,
 ): { formula: string; head: string | number } | null {
-  const source = refSuffixSource(formulaToken, previous, newValue, tokens);
-  if (!source) return null;
-  const formula = syncRefOnlyCellToken(source, newValue, tokens, appendRef);
-  if (!formula) return null;
-  return { formula, head: refSuffixHead(formula, tokens) ?? newValue };
+	const source = refSuffixSource(formulaToken, previous, newValue, tokens);
+	if (!source) return null;
+	const formula = syncRefOnlyCellToken(source, newValue, tokens, appendRef);
+	if (!formula) return null;
+	return { formula, head: refSuffixHead(formula, tokens) ?? newValue };
 }
 
 export function columnKeysEqual(a: string, b: string): boolean {
-  const na = normalizeColumnKey(a);
-  const nb = normalizeColumnKey(b);
-  if (na === nb) return true;
-  return na.replace(/\s+/g, "") === nb.replace(/\s+/g, "");
+	const na = normalizeColumnKey(a);
+	const nb = normalizeColumnKey(b);
+	if (na === nb) return true;
+	return na.replace(/\s+/g, "") === nb.replace(/\s+/g, "");
 }
 
 /**
@@ -162,10 +162,10 @@ export function columnKeysEqual(a: string, b: string): boolean {
  * Commas are stripped before conversion.
  */
 export function parseNumeric(v: string | number): number {
-  if (typeof v === "number") return v;
-  const s = String(v).replace(/,/g, "").trim();
-  if (s === "") return NaN;
-  return Number(s);
+	if (typeof v === "number") return v;
+	const s = String(v).replace(/,/g, "").trim();
+	if (s === "") return NaN;
+	return Number(s);
 }
 
 /**
@@ -173,34 +173,34 @@ export function parseNumeric(v: string | number): number {
  * Uses up to 10 significant decimal digits then strips trailing zeros.
  */
 export function formatNumber(n: number): string {
-  if (!Number.isFinite(n)) return String(n);
-  return n.toLocaleString("en-US", { maximumFractionDigits: 10 });
+	if (!Number.isFinite(n)) return String(n);
+	return n.toLocaleString("en-US", { maximumFractionDigits: 10 });
 }
 
 /**
  * Round formula results to 2dp/10dp before row store / chaining
  */
 export function wikiRound(
-  n: number,
-  fullPrecision = settingsStore.fullPrecision,
+	n: number,
+	fullPrecision = settingsStore.fullPrecision,
 ): number {
-  return Number(n.toFixed(fullPrecision ? 10 : 2));
+	return Number(n.toFixed(fullPrecision ? 10 : 2));
 }
 
 /**
  * Formats a calculated number with separators + 2 or 10 decimals.
  */
 export function formatReadOnly(
-  v: unknown,
-  fullPrecision = settingsStore.fullPrecision,
+	v: unknown,
+	fullPrecision = settingsStore.fullPrecision,
 ): string {
-  if (v === undefined || v === null || v === "") return "-";
-  const n = typeof v === "number" ? v : parseNumeric(String(v));
-  return Number.isFinite(n)
-    ? n.toLocaleString("en-US", {
-        maximumFractionDigits: fullPrecision ? 10 : 2,
-      })
-    : stripRefs(v);
+	if (v === undefined || v === null || v === "") return "-";
+	const n = typeof v === "number" ? v : parseNumeric(String(v));
+	return Number.isFinite(n)
+		? n.toLocaleString("en-US", {
+				maximumFractionDigits: fullPrecision ? 10 : 2,
+			})
+		: stripRefs(v);
 }
 
 /**
@@ -210,99 +210,99 @@ export function formatReadOnly(
  * Other types are JSON stringified.
  */
 export function formatValue(v: unknown): string {
-  if (v === undefined || v === null) return "-";
-  if (typeof v === "number") return formatNumber(v);
-  if (typeof v === "boolean") return v ? "true" : "false";
-  if (typeof v === "string") return stripRefs(v);
-  return JSON.stringify(v);
+	if (v === undefined || v === null) return "-";
+	if (typeof v === "number") return formatNumber(v);
+	if (typeof v === "boolean") return v ? "true" : "false";
+	if (typeof v === "string") return stripRefs(v);
+	return JSON.stringify(v);
 }
 
 export const ROF_KEYS = [
-  "$FNC-ROFBUG-2019$",
-  "$FNC-ROFBUG-2020$",
-  "$FNC-ROFBUG-2022$",
-  "$FNC-ROFBUG$",
+	"$FNC-ROFBUG-2019$",
+	"$FNC-ROFBUG-2020$",
+	"$FNC-ROFBUG-2022$",
+	"$FNC-ROFBUG$",
 ];
 
 /**
  * Returns the Rate of Fire Bug version and columns from the given tokens.
  */
 export function getRofBugVer(
-  tokens: Record<string, string> | undefined | null,
+	tokens: Record<string, string> | undefined | null,
 ) {
-  let type = "$FNC-ROFBUG-2022$";
-  let colsStr = "";
+	let type = "$FNC-ROFBUG-2022$";
+	let colsStr = "";
 
-  if (tokens) {
-    for (const key of Object.keys(tokens)) {
-      if (ROF_KEYS.includes(key)) {
-        colsStr = tokens[key];
-        type = key;
-      }
-    }
-  }
+	if (tokens) {
+		for (const key of Object.keys(tokens)) {
+			if (ROF_KEYS.includes(key)) {
+				colsStr = tokens[key];
+				type = key;
+			}
+		}
+	}
 
-  return {
-    type,
-    cols: colsStr
-      ? colsStr
-          .split(";")
-          .map((s) => s.trim())
-          .filter(Boolean)
-      : [],
-  };
+	return {
+		type,
+		cols: colsStr
+			? colsStr
+					.split(";")
+					.map((s) => s.trim())
+					.filter(Boolean)
+			: [],
+	};
 }
 
 /**
  * Formats with ROF bug into account
  */
 export function applyRofBug(
-  seconds: number,
-  type: string = "$FNC-ROFBUG-2022$",
+	seconds: number,
+	type: string = "$FNC-ROFBUG-2022$",
 ): number {
-  if (isNaN(seconds) || seconds <= 0) return seconds;
+	if (isNaN(seconds) || seconds <= 0) return seconds;
 
-  const norm = type.replace(/^\$?FNC-?/, "").replace(/\$$/, "");
-  if (norm === "ROFBUG-2019") {
-    return Math.round((seconds + 0.05) * 1000) / 1000;
-  }
+	const norm = type.replace(/^\$?FNC-?/, "").replace(/\$$/, "");
+	if (norm === "ROFBUG-2019") {
+		return Math.round((seconds + 0.05) * 1000) / 1000;
+	}
 
-  if (norm === "ROFBUG-2020") {
-    return Math.round((seconds + 0.03) * 1000) / 1000;
-  }
+	if (norm === "ROFBUG-2020") {
+		return Math.round((seconds + 0.03) * 1000) / 1000;
+	}
 
-  const raw_frames = seconds * 60;
-  const frames =
-    Math.abs(raw_frames - Math.round(raw_frames)) < 1e-9
-      ? Math.round(raw_frames) + 1.5
-      : Math.ceil(raw_frames) + 1;
-  // return frames / 60; // look into this later
-  return Math.round((frames / 60) * 1000) / 1000;
+	const raw_frames = seconds * 60;
+	const frames =
+		Math.abs(raw_frames - Math.round(raw_frames)) < 1e-9
+			? Math.round(raw_frames) + 1.5
+			: Math.ceil(raw_frames) + 1;
+	// return frames / 60; // look into this later
+	return Math.round((frames / 60) * 1000) / 1000;
 }
 
 /**
  * Parses a raw cell value to a number
  */
 export function toNumericValue(v: unknown): number | null {
-  let n: number;
-  if (typeof v === "number") {
-    n = v;
-  } else if (typeof v === "string") {
-    const cleaned = stripRefs(v).replace(/,/g, "").trim();
-    n = parseFloat(cleaned);
-  } else {
-    return null;
-  }
-  return Number.isFinite(n) ? n : null;
+	let n: number;
+	if (typeof v === "number") {
+		n = v;
+	} else if (typeof v === "string") {
+		const cleaned = stripRefs(v).replace(/,/g, "").trim();
+		n = parseFloat(cleaned);
+	} else {
+		return null;
+	}
+	return Number.isFinite(n) ? n : null;
 }
 
 /**
  * Same numeric value the cell shows after {@link renderCellHtml}'s formatting
  */
 export function toDisplayNumber(v: unknown, readOnly: boolean): number | null {
-  if (v === undefined || v === null) return null;
-  const s = readOnly ? formatReadOnly(v) : formatValue(v);
-  if (s === "-" || s === "") return null;
-  const n = parseNumeric(s);
-  return Number.isFinite(n) ? n : null;
+	if (v === undefined || v === null) return null;
+	const s = readOnly ? formatReadOnly(v) : formatValue(v);
+	if (s === "-" || s === "") return null;
+	const n = parseNumeric(s);
+	return Number.isFinite(n) ? n : null;
 }

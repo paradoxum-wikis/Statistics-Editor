@@ -6,14 +6,14 @@ import lucidePreprocess from "vite-plugin-lucide-preprocess";
 import { towersPlugin } from "./src/lib/plugins/index.js";
 
 export default defineConfig({
-  plugins: [
-    lucidePreprocess(),
-    enhancedImages(),
-    tailwindcss(),
-    sveltekit(),
-    towersPlugin(),
-  ],
-  server: {
-    open: false,
-  },
+	plugins: [
+		lucidePreprocess(),
+		enhancedImages(),
+		tailwindcss(),
+		sveltekit(),
+		towersPlugin(),
+	],
+	server: {
+		open: false,
+	},
 });

@@ -1,17 +1,17 @@
 <script lang="ts">
-  import type { Snippet } from "svelte";
+	import type { Snippet } from "svelte";
 
-  let {
-    class: className = "",
-    children,
-    ...restProps
-  }: {
-    class?: string;
-    children: Snippet;
-    [key: string]: unknown;
-  } = $props();
+	let {
+		class: className = "",
+		children,
+		...restProps
+	}: {
+		class?: string;
+		children: Snippet;
+		[key: string]: unknown;
+	} = $props();
 </script>
 
 <div class="card {className}" {...restProps}>
-  {@render children()}
+	{@render children()}
 </div>

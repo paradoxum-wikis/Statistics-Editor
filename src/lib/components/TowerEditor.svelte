@@ -1,743 +1,743 @@
 <script lang="ts">
-  import { Tabs, Popover } from "bits-ui";
-  import Separator from "./smol/Separator.svelte";
-  import Btn from "./smol/Btn.svelte";
-  import Switch from "./smol/Switch.svelte";
-  import Tip from "./smol/Tip.svelte";
-  import { tabPill } from "$lib/utils/tabPill.svelte";
-  import type Tower from "$lib/towerComponents/tower";
-  import type SkinData from "$lib/towerComponents/skinData";
-  import { settingsStore } from "$lib/stores/settings.svelte";
-  import { towerStore } from "$lib/stores/tower.svelte";
-  import { modifierStore } from "$lib/stores/modifier.svelte";
-  import { noFetchTowers } from "$lib/services/fetchTowerWiki";
-  import {
-    createShare,
-    parseShareRef,
-    sharePageUrl,
-  } from "$lib/services/shareTower";
-  import { authStore } from "$lib/stores/auth.svelte";
-  import WorkshopFormModal from "./workshop/WorkshopFormModal.svelte";
-  import { analytics } from "$lib/services/analytics";
-  import { toast } from "$lib/toast";
-  import { isCustomTower } from "$lib/towerComponents/customTowers";
-  import { hasSeDiff, mkCellKey } from "$lib/neowtext/directives";
-  import {
-    applyRefSuffixEdit,
-    stripRefs,
-    toDisplayNumber,
-  } from "$lib/utils/format";
-  import TowerDataTable from "./table/TowerDataTable.svelte";
-  import {
-    buildSkinRefState,
-    ensureSkinRows,
-    getCompareValueForKey as getCompareValueFromCache,
-    refEntryKey,
-    tableCacheKey,
-    type SkinRowsSession,
-    type TableConfig,
-  } from "$lib/towerTable";
-  import NotesSection from "./NotesSection.svelte";
-  import MemosSection from "./MemosSection.svelte";
-  import { profileStore } from "$lib/stores/profile.svelte";
+	import { Tabs, Popover } from "bits-ui";
+	import Separator from "./smol/Separator.svelte";
+	import Btn from "./smol/Btn.svelte";
+	import Switch from "./smol/Switch.svelte";
+	import Tip from "./smol/Tip.svelte";
+	import { tabPill } from "$lib/utils/tabPill.svelte";
+	import type Tower from "$lib/towerComponents/tower";
+	import type SkinData from "$lib/towerComponents/skinData";
+	import { settingsStore } from "$lib/stores/settings.svelte";
+	import { towerStore } from "$lib/stores/tower.svelte";
+	import { modifierStore } from "$lib/stores/modifier.svelte";
+	import { noFetchTowers } from "$lib/services/fetchTowerWiki";
+	import {
+		createShare,
+		parseShareRef,
+		sharePageUrl,
+	} from "$lib/services/shareTower";
+	import { authStore } from "$lib/stores/auth.svelte";
+	import WorkshopFormModal from "./workshop/WorkshopFormModal.svelte";
+	import { analytics } from "$lib/services/analytics";
+	import { toast } from "$lib/toast";
+	import { isCustomTower } from "$lib/towerComponents/customTowers";
+	import { hasSeDiff, mkCellKey } from "$lib/neowtext/directives";
+	import {
+		applyRefSuffixEdit,
+		stripRefs,
+		toDisplayNumber,
+	} from "$lib/utils/format";
+	import TowerDataTable from "./table/TowerDataTable.svelte";
+	import {
+		buildSkinRefState,
+		ensureSkinRows,
+		getCompareValueForKey as getCompareValueFromCache,
+		refEntryKey,
+		tableCacheKey,
+		type SkinRowsSession,
+		type TableConfig,
+	} from "$lib/towerTable";
+	import NotesSection from "./NotesSection.svelte";
+	import MemosSection from "./MemosSection.svelte";
+	import { profileStore } from "$lib/stores/profile.svelte";
 
-  let {
-    tower = null,
-    disabled = false,
-  }: {
-    tower: Tower | null;
-    disabled?: boolean;
-  } = $props();
+	let {
+		tower = null,
+		disabled = false,
+	}: {
+		tower: Tower | null;
+		disabled?: boolean;
+	} = $props();
 
-  const availableSkins = $derived(tower?.skinNames ?? []);
-  const selectedSkinName = $derived(towerStore.selectedSkinName);
-  const modifier = $derived({ entries: modifierStore.entries });
+	const availableSkins = $derived(tower?.skinNames ?? []);
+	const selectedSkinName = $derived(towerStore.selectedSkinName);
+	const modifier = $derived({ entries: modifierStore.entries });
 
-  // Session outlives derived re-runs so skin tabs reuse rows; `id` resets it.
-  const skinRowsSession: SkinRowsSession = {
-    id: "",
-    display: new Map(),
-    compare: new Map(),
-    tables: new Map(),
-  };
+	// Session outlives derived re-runs so skin tabs reuse rows; `id` resets it.
+	const skinRowsSession: SkinRowsSession = {
+		id: "",
+		display: new Map(),
+		compare: new Map(),
+		tables: new Map(),
+	};
 
-  const skinRows = $derived.by(() =>
-    ensureSkinRows(
-      skinRowsSession,
-      `${tower?.name}|${towerStore.refreshTrigger}|${settingsStore.rofBug}|${settingsStore.fullPrecision}|${JSON.stringify(modifierStore.entries)}`,
-      tower,
-      selectedSkinName,
-      settingsStore.rofBug,
-      modifier,
-    ),
-  );
+	const skinRows = $derived.by(() =>
+		ensureSkinRows(
+			skinRowsSession,
+			`${tower?.name}|${towerStore.refreshTrigger}|${settingsStore.rofBug}|${settingsStore.fullPrecision}|${JSON.stringify(modifierStore.entries)}`,
+			tower,
+			selectedSkinName,
+			settingsStore.rofBug,
+			modifier,
+		),
+	);
 
-  const activeSkinData = $derived(skinRows.active);
-  const displayRowsCache = $derived(skinRows.display);
-  const compareRowsCache = $derived(skinRows.compare);
+	const activeSkinData = $derived(skinRows.active);
+	const displayRowsCache = $derived(skinRows.display);
+	const compareRowsCache = $derived(skinRows.compare);
 
-  const skinRefs = $derived.by(() =>
-    buildSkinRefState(activeSkinData, displayRowsCache, modifier),
-  );
+	const skinRefs = $derived.by(() =>
+		buildSkinRefState(activeSkinData, displayRowsCache, modifier),
+	);
 
-  const getSkinRefNum = $derived.by(() => {
-    const map = skinRefs.refNumberMap;
-    return (content: string, name?: string | null) =>
-      map.get(refEntryKey(content, name)) ?? 1;
-  });
+	const getSkinRefNum = $derived.by(() => {
+		const map = skinRefs.refNumberMap;
+		return (content: string, name?: string | null) =>
+			map.get(refEntryKey(content, name)) ?? 1;
+	});
 
-  let showDiff = $state(settingsStore.seeValueDifference);
-  let isFetching = $state(false);
-  let shareOpen = $state(false);
-  let isSharing = $state(false);
-  let shareLink = $state<string | null>(null);
-  let shareError = $state<string | null>(null);
-  let shareAsOwner = $state(true);
-  let publishOpen = $state(false);
-  let publishShareId = $state<string | null>(null);
+	let showDiff = $state(settingsStore.seeValueDifference);
+	let isFetching = $state(false);
+	let shareOpen = $state(false);
+	let isSharing = $state(false);
+	let shareLink = $state<string | null>(null);
+	let shareError = $state<string | null>(null);
+	let shareAsOwner = $state(true);
+	let publishOpen = $state(false);
+	let publishShareId = $state<string | null>(null);
 
-  function openPublish() {
-    publishShareId = shareLink ? parseShareRef(shareLink) : null;
-    shareOpen = false;
-    if (publishShareId) publishOpen = true;
-  }
+	function openPublish() {
+		publishShareId = shareLink ? parseShareRef(shareLink) : null;
+		shareOpen = false;
+		if (publishShareId) publishOpen = true;
+	}
 
-  function parseEditValue(value: string): string | number | boolean {
-    if (value === "true") return true;
-    if (value === "false") return false;
-    return value.trim() !== "" && !isNaN(Number(value)) ? Number(value) : value;
-  }
+	function parseEditValue(value: string): string | number | boolean {
+		if (value === "true") return true;
+		if (value === "false") return false;
+		return value.trim() !== "" && !isNaN(Number(value)) ? Number(value) : value;
+	}
 
-  function updateStatForSkin(
-    skinData: SkinData,
-    levelIndex: number,
-    attribute: string,
-    value: string,
-  ) {
-    if (disabled) return;
-    const parsedValue = parseEditValue(value);
-    if (settingsStore.debugMode) {
-      console.log(
-        `[TowerEditor] updateStat: Level ${levelIndex}, ${attribute} = ${parsedValue}`,
-      );
-    }
-    skinData.set(levelIndex, attribute, parsedValue);
-    towerStore.markDirty();
-  }
+	function updateStatForSkin(
+		skinData: SkinData,
+		levelIndex: number,
+		attribute: string,
+		value: string,
+	) {
+		if (disabled) return;
+		const parsedValue = parseEditValue(value);
+		if (settingsStore.debugMode) {
+			console.log(
+				`[TowerEditor] updateStat: Level ${levelIndex}, ${attribute} = ${parsedValue}`,
+			);
+		}
+		skinData.set(levelIndex, attribute, parsedValue);
+		towerStore.markDirty();
+	}
 
-  function updateRowStat(
-    skinData: SkinData,
-    extraTableIndex: number,
-    rowIdx: number,
-    header: string,
-    value: string,
-  ) {
-    if (disabled) return;
-    const extraTable = skinData.extraTables?.[extraTableIndex];
-    const row = extraTable?.rows?.[rowIdx];
-    if (!row) return;
+	function updateRowStat(
+		skinData: SkinData,
+		extraTableIndex: number,
+		rowIdx: number,
+		header: string,
+		value: string,
+	) {
+		if (disabled) return;
+		const extraTable = skinData.extraTables?.[extraTableIndex];
+		const row = extraTable?.rows?.[rowIdx];
+		if (!row) return;
 
-    const parsedValue = parseEditValue(value);
-    let stored: string | number | boolean = parsedValue;
-    if (typeof parsedValue !== "boolean") {
-      const applied = applyRefSuffixEdit(
-        extraTable?.cellFormulaTokens?.[String(rowIdx)]?.[header],
-        row[header],
-        parsedValue,
-        skinData.formulaTokens,
-        !settingsStore.clearOnEdit || settingsStore.restoreRefOnClearEdit,
-      );
-      if (applied) {
-        extraTable.cellFormulaTokens ??= {};
-        extraTable.cellFormulaTokens[String(rowIdx)] ??= {};
-        extraTable.cellFormulaTokens[String(rowIdx)][header] = applied.formula;
-        stored = applied.head;
-      }
-    }
+		const parsedValue = parseEditValue(value);
+		let stored: string | number | boolean = parsedValue;
+		if (typeof parsedValue !== "boolean") {
+			const applied = applyRefSuffixEdit(
+				extraTable?.cellFormulaTokens?.[String(rowIdx)]?.[header],
+				row[header],
+				parsedValue,
+				skinData.formulaTokens,
+				!settingsStore.clearOnEdit || settingsStore.restoreRefOnClearEdit,
+			);
+			if (applied) {
+				extraTable.cellFormulaTokens ??= {};
+				extraTable.cellFormulaTokens[String(rowIdx)] ??= {};
+				extraTable.cellFormulaTokens[String(rowIdx)][header] = applied.formula;
+				stored = applied.head;
+			}
+		}
 
-    row[header] = stored as string | number;
+		row[header] = stored as string | number;
 
-    const level = skinData.upgradeLevelForExtraTableCell(
-      extraTableIndex,
-      rowIdx,
-    );
-    if (level != null) {
-      const upgradeStats = skinData.data?.Upgrades?.[level - 1]?.Stats;
-      if (upgradeStats && typeof upgradeStats === "object")
-        upgradeStats[header] = stored;
-      skinData.set(level, header, stored);
-    } else {
-      skinData.refreshDerivedData();
-    }
+		const level = skinData.upgradeLevelForExtraTableCell(
+			extraTableIndex,
+			rowIdx,
+		);
+		if (level != null) {
+			const upgradeStats = skinData.data?.Upgrades?.[level - 1]?.Stats;
+			if (upgradeStats && typeof upgradeStats === "object")
+				upgradeStats[header] = stored;
+			skinData.set(level, header, stored);
+		} else {
+			skinData.refreshDerivedData();
+		}
 
-    towerStore.markDirty();
-  }
+		towerStore.markDirty();
+	}
 
-  function captureBaselineIfMissing(
-    config: TableConfig,
-    rowIdx: number,
-    header: string,
-  ) {
-    const key = mkCellKey(config.skinName, config.tableIdx, rowIdx, header);
-    if (key in towerStore.baseline) return;
-    const row = compareRowsCache.get(
-      tableCacheKey(config.skinName, config.tableIdx),
-    )?.[rowIdx];
-    if (row)
-      towerStore.captureBaselineCell(
-        key,
-        header === "Level" ? rowIdx : row[header],
-      );
-  }
+	function captureBaselineIfMissing(
+		config: TableConfig,
+		rowIdx: number,
+		header: string,
+	) {
+		const key = mkCellKey(config.skinName, config.tableIdx, rowIdx, header);
+		if (key in towerStore.baseline) return;
+		const row = compareRowsCache.get(
+			tableCacheKey(config.skinName, config.tableIdx),
+		)?.[rowIdx];
+		if (row)
+			towerStore.captureBaselineCell(
+				key,
+				header === "Level" ? rowIdx : row[header],
+			);
+	}
 
-  function commitEdit(
-    config: TableConfig,
-    rowIdx: number,
-    header: string,
-    value: string,
-  ) {
-    captureBaselineIfMissing(config, rowIdx, header);
-    if (config.skinData) {
-      updateStatForSkin(config.skinData, rowIdx, header, value);
-      return;
-    }
+	function commitEdit(
+		config: TableConfig,
+		rowIdx: number,
+		header: string,
+		value: string,
+	) {
+		captureBaselineIfMissing(config, rowIdx, header);
+		if (config.skinData) {
+			updateStatForSkin(config.skinData, rowIdx, header, value);
+			return;
+		}
 
-    const skin = activeSkinData?.skin;
-    const extraTableIndex = config.sourceExtraTableIndex ?? -1;
-    if (skin && extraTableIndex >= 0)
-      updateRowStat(skin, extraTableIndex, rowIdx, header, value);
-  }
+		const skin = activeSkinData?.skin;
+		const extraTableIndex = config.sourceExtraTableIndex ?? -1;
+		if (skin && extraTableIndex >= 0)
+			updateRowStat(skin, extraTableIndex, rowIdx, header, value);
+	}
 
-  async function handleDiscard() {
-    if (settingsStore.debugMode) {
-      console.log(
-        `[TowerEditor] Discard requested (tower=${tower?.name ?? "null"}, skin=${selectedSkinName})`,
-      );
-    }
-    await towerStore.discardChanges();
-    towerStore.refresh();
-    toast.success("Changes discarded.");
-  }
+	async function handleDiscard() {
+		if (settingsStore.debugMode) {
+			console.log(
+				`[TowerEditor] Discard requested (tower=${tower?.name ?? "null"}, skin=${selectedSkinName})`,
+			);
+		}
+		await towerStore.discardChanges();
+		towerStore.refresh();
+		toast.success("Changes discarded.");
+	}
 
-  function handleClearDiff() {
-    if (settingsStore.debugMode) {
-      console.log(
-        `[TowerEditor] Clear diff requested (tower=${tower?.name ?? "null"}, skin=${selectedSkinName})`,
-      );
-    }
-    towerStore.clearDiff();
-    towerStore.refresh();
-    toast.success("Difference cleared.");
-  }
+	function handleClearDiff() {
+		if (settingsStore.debugMode) {
+			console.log(
+				`[TowerEditor] Clear diff requested (tower=${tower?.name ?? "null"}, skin=${selectedSkinName})`,
+			);
+		}
+		towerStore.clearDiff();
+		towerStore.refresh();
+		toast.success("Difference cleared.");
+	}
 
-  function getCompareValueForKey(key: string): string | number | undefined {
-    return getCompareValueFromCache(compareRowsCache, key);
-  }
+	function getCompareValueForKey(key: string): string | number | undefined {
+		return getCompareValueFromCache(compareRowsCache, key);
+	}
 
-  function collectChangedBaseline(): Record<string, unknown> {
-    if (!tower) return {};
-    const out: Record<string, unknown> = {};
-    for (const [key, baseVal] of Object.entries(towerStore.baseline)) {
-      const current = getCompareValueForKey(key);
-      const baseN = toDisplayNumber(baseVal, false);
-      const currentN = toDisplayNumber(current, false);
-      if (baseN == null || currentN == null) continue;
-      if (Math.abs(currentN - baseN) >= 1e-9) out[key] = baseVal;
-    }
-    return out;
-  }
+	function collectChangedBaseline(): Record<string, unknown> {
+		if (!tower) return {};
+		const out: Record<string, unknown> = {};
+		for (const [key, baseVal] of Object.entries(towerStore.baseline)) {
+			const current = getCompareValueForKey(key);
+			const baseN = toDisplayNumber(baseVal, false);
+			const currentN = toDisplayNumber(current, false);
+			if (baseN == null || currentN == null) continue;
+			if (Math.abs(currentN - baseN) >= 1e-9) out[key] = baseVal;
+		}
+		return out;
+	}
 
-  function handleSave() {
-    const fromShare = !!towerStore.sharePreviewId;
-    towerStore.save(collectChangedBaseline());
-    toast.success(fromShare ? "Applied to profile!" : "Changes saved!");
-  }
+	function handleSave() {
+		const fromShare = !!towerStore.sharePreviewId;
+		towerStore.save(collectChangedBaseline());
+		toast.success(fromShare ? "Applied to profile!" : "Changes saved!");
+	}
 
-  async function handleResetOrDelete() {
-    if (towerStore.isCustomSelected()) {
-      if (await towerStore.confirmDeleteTower())
-        toast.success("Tower deleted.");
-    } else if (await towerStore.reset()) {
-      toast.success("Tower reset.");
-    }
-  }
+	async function handleResetOrDelete() {
+		if (towerStore.isCustomSelected()) {
+			if (await towerStore.confirmDeleteTower())
+				toast.success("Tower deleted.");
+		} else if (await towerStore.reset()) {
+			toast.success("Tower reset.");
+		}
+	}
 
-  function resetShareState() {
-    shareLink = null;
-    shareError = null;
-  }
+	function resetShareState() {
+		shareLink = null;
+		shareError = null;
+	}
 
-  const canShareUrl = $derived(!towerStore.isDirty);
-  const shareUrlTip = $derived(
-    towerStore.isDirty
-      ? "There are unsaved changes. Save or clear before sharing a link"
-      : "Create a short link to share this tower's stats",
-  );
+	const canShareUrl = $derived(!towerStore.isDirty);
+	const shareUrlTip = $derived(
+		towerStore.isDirty
+			? "There are unsaved changes. Save or clear before sharing a link"
+			: "Create a short link to share this tower's stats",
+	);
 
-  async function handleShare() {
-    if (!tower || isSharing || towerStore.isDirty) return;
-    isSharing = true;
-    shareError = null;
-    shareLink = null;
-    try {
-      const neowtext = towerStore.buildShareNeowtext(collectChangedBaseline());
-      if (!neowtext?.trim()) {
-        shareError = "Nothing to share for this tower.";
-        analytics.track("share", {
-          method: "link",
-          content_type: "tower",
-          item_id: tower.name,
-          success: false,
-        });
-        return;
-      }
-      const id = await createShare(
-        neowtext,
-        tower.name,
-        !!authStore.user && shareAsOwner,
-      );
-      shareLink = sharePageUrl(id);
-      analytics.track("share", {
-        method: "link",
-        content_type: "tower",
-        item_id: tower.name,
-        success: true,
-      });
-    } catch (e) {
-      shareError = e instanceof Error ? e.message : "Share failed.";
-      analytics.track("share", {
-        method: "link",
-        content_type: "tower",
-        item_id: tower.name,
-        success: false,
-      });
-    } finally {
-      isSharing = false;
-    }
-  }
+	async function handleShare() {
+		if (!tower || isSharing || towerStore.isDirty) return;
+		isSharing = true;
+		shareError = null;
+		shareLink = null;
+		try {
+			const neowtext = towerStore.buildShareNeowtext(collectChangedBaseline());
+			if (!neowtext?.trim()) {
+				shareError = "Nothing to share for this tower.";
+				analytics.track("share", {
+					method: "link",
+					content_type: "tower",
+					item_id: tower.name,
+					success: false,
+				});
+				return;
+			}
+			const id = await createShare(
+				neowtext,
+				tower.name,
+				!!authStore.user && shareAsOwner,
+			);
+			shareLink = sharePageUrl(id);
+			analytics.track("share", {
+				method: "link",
+				content_type: "tower",
+				item_id: tower.name,
+				success: true,
+			});
+		} catch (e) {
+			shareError = e instanceof Error ? e.message : "Share failed.";
+			analytics.track("share", {
+				method: "link",
+				content_type: "tower",
+				item_id: tower.name,
+				success: false,
+			});
+		} finally {
+			isSharing = false;
+		}
+	}
 
-  function onShareOpenChange(open: boolean) {
-    if (open && towerStore.isDirty) {
-      shareOpen = false;
-      return;
-    }
-    if (!open) resetShareState();
-    else if (!shareLink && !shareError && !isSharing) void handleShare();
-  }
+	function onShareOpenChange(open: boolean) {
+		if (open && towerStore.isDirty) {
+			shareOpen = false;
+			return;
+		}
+		if (!open) resetShareState();
+		else if (!shareLink && !shareError && !isSharing) void handleShare();
+	}
 
-  async function copyShareLink() {
-    if (!shareLink) return;
-    try {
-      await navigator.clipboard.writeText(shareLink);
-      toast.success("Link copied!");
-    } catch {
-      toast.error("Couldn't copy link, sorry...");
-    }
-  }
+	async function copyShareLink() {
+		if (!shareLink) return;
+		try {
+			await navigator.clipboard.writeText(shareLink);
+			toast.success("Link copied!");
+		} catch {
+			toast.error("Couldn't copy link, sorry...");
+		}
+	}
 
-  async function handleFetchWiki() {
-    if (!tower) return;
+	async function handleFetchWiki() {
+		if (!tower) return;
 
-    isFetching = true;
-    try {
-      const { fetchTowerWiki } = await import("$lib/services/fetchTowerWiki");
-      const { setWikiOverride } = await import("$lib/neowtext/wikiSource");
-      const wikitext = await fetchTowerWiki(tower.name, true);
-      if (wikitext) {
-        setWikiOverride(profileStore.current, tower.name, wikitext);
-        towerStore.isDirty = false;
-        await towerStore.forceReload();
+		isFetching = true;
+		try {
+			const { fetchTowerWiki } = await import("$lib/services/fetchTowerWiki");
+			const { setWikiOverride } = await import("$lib/neowtext/wikiSource");
+			const wikitext = await fetchTowerWiki(tower.name, true);
+			if (wikitext) {
+				setWikiOverride(profileStore.current, tower.name, wikitext);
+				towerStore.isDirty = false;
+				await towerStore.forceReload();
 
-        analytics.track("wiki_fetch", {
-          tower_name: tower.name,
-          success: true,
-        });
-        toast.success("Fetched latest from the Wiki!");
-      } else {
-        analytics.track("wiki_fetch", {
-          tower_name: tower.name,
-          success: false,
-        });
-        toast.error("Failed to fetch Neowtext from the Wiki.");
-      }
-    } catch (e) {
-      console.error(e);
-      analytics.track("wiki_fetch", {
-        tower_name: tower.name,
-        success: false,
-      });
-      toast.error("Error fetching from the Wiki.");
-    } finally {
-      isFetching = false;
-    }
-  }
+				analytics.track("wiki_fetch", {
+					tower_name: tower.name,
+					success: true,
+				});
+				toast.success("Fetched latest from the Wiki!");
+			} else {
+				analytics.track("wiki_fetch", {
+					tower_name: tower.name,
+					success: false,
+				});
+				toast.error("Failed to fetch Neowtext from the Wiki.");
+			}
+		} catch (e) {
+			console.error(e);
+			analytics.track("wiki_fetch", {
+				tower_name: tower.name,
+				success: false,
+			});
+			toast.error("Error fetching from the Wiki.");
+		} finally {
+			isFetching = false;
+		}
+	}
 
-  const hasDiffData = $derived.by(() => {
-    compareRowsCache;
-    if (!tower || Object.keys(towerStore.baseline).length === 0) return false;
-    for (const [key, baseVal] of Object.entries(towerStore.baseline)) {
-      const current = getCompareValueForKey(key);
-      const baseN = toDisplayNumber(baseVal, false);
-      const currentN = toDisplayNumber(current, false);
-      if (baseN == null || currentN == null) continue;
-      if (Math.abs(currentN - baseN) >= 1e-9) return true;
-    }
-    return false;
-  });
+	const hasDiffData = $derived.by(() => {
+		compareRowsCache;
+		if (!tower || Object.keys(towerStore.baseline).length === 0) return false;
+		for (const [key, baseVal] of Object.entries(towerStore.baseline)) {
+			const current = getCompareValueForKey(key);
+			const baseN = toDisplayNumber(baseVal, false);
+			const currentN = toDisplayNumber(current, false);
+			if (baseN == null || currentN == null) continue;
+			if (Math.abs(currentN - baseN) >= 1e-9) return true;
+		}
+		return false;
+	});
 
-  const hasSavedDiff = $derived.by(() => {
-    const text =
-      towerStore.originalWikitext || towerStore.effectiveWikitext || "";
-    return hasSeDiff(text) || towerStore.baselineLocked;
-  });
+	const hasSavedDiff = $derived.by(() => {
+		const text =
+			towerStore.originalWikitext || towerStore.effectiveWikitext || "";
+		return hasSeDiff(text) || towerStore.baselineLocked;
+	});
 </script>
 
 <div class="space-y-4">
-  {#if tower}
-    {#if towerStore.sharePreviewId}
-      <div
-        class="flex flex-wrap items-center justify-between gap-2 rounded-md border border-sky-500/30 bg-sky-500/10 px-3 py-2"
-      >
-        <p class="text-sm text-sky-950 dark:text-sky-100">
-          {#if towerStore.shareOwner}
-            You are viewing a tower shared by
-            <span class="font-semibold"
-              >{towerStore.shareOwner.fandom_username}</span
-            >. Your data stays unchanged until you explicitly apply.
-          {:else}
-            You are viewing a shared tower, your data stays unchanged until you
-            explicitly apply.
-          {/if}
-        </p>
-        <Btn
-          variant="outline"
-          onclick={() => void towerStore.exitSharePreview()}
-        >
-          Back to My Stats
-        </Btn>
-      </div>
-    {/if}
-    <Tabs.Root
-      value={towerStore.selectedSkinName}
-      onValueChange={(v) => {
-        if (!v || !tower) return;
-        towerStore.selectedSkinName = v;
-        analytics.track("skin_change", {
-          tower_name: tower.name,
-          skin_name: v,
-        });
-      }}
-    >
-      {#if availableSkins.length > 1 || settingsStore.alwaysShowSkinTabs}
-        <div
-          class="tabs-list stretch mb-4 overflow-x-auto"
-          use:tabPill={() => selectedSkinName}
-        >
-          <Tabs.List class="contents">
-            {#each availableSkins as skinName (skinName)}
-              <Tabs.Trigger value={skinName} class="tabs-trigger"
-                >{skinName}</Tabs.Trigger
-              >
-            {/each}
-          </Tabs.List>
-        </div>
-      {/if}
+	{#if tower}
+		{#if towerStore.sharePreviewId}
+			<div
+				class="flex flex-wrap items-center justify-between gap-2 rounded-md border border-sky-500/30 bg-sky-500/10 px-3 py-2"
+			>
+				<p class="text-sm text-sky-950 dark:text-sky-100">
+					{#if towerStore.shareOwner}
+						You are viewing a tower shared by
+						<span class="font-semibold"
+							>{towerStore.shareOwner.fandom_username}</span
+						>. Your data stays unchanged until you explicitly apply.
+					{:else}
+						You are viewing a shared tower, your data stays unchanged until you
+						explicitly apply.
+					{/if}
+				</p>
+				<Btn
+					variant="outline"
+					onclick={() => void towerStore.exitSharePreview()}
+				>
+					Back to My Stats
+				</Btn>
+			</div>
+		{/if}
+		<Tabs.Root
+			value={towerStore.selectedSkinName}
+			onValueChange={(v) => {
+				if (!v || !tower) return;
+				towerStore.selectedSkinName = v;
+				analytics.track("skin_change", {
+					tower_name: tower.name,
+					skin_name: v,
+				});
+			}}
+		>
+			{#if availableSkins.length > 1 || settingsStore.alwaysShowSkinTabs}
+				<div
+					class="tabs-list stretch mb-4 overflow-x-auto"
+					use:tabPill={() => selectedSkinName}
+				>
+					<Tabs.List class="contents">
+						{#each availableSkins as skinName (skinName)}
+							<Tabs.Trigger value={skinName} class="tabs-trigger"
+								>{skinName}</Tabs.Trigger
+							>
+						{/each}
+					</Tabs.List>
+				</div>
+			{/if}
 
-      <Tabs.Content value={selectedSkinName}>
-        {#if activeSkinData}
-          {#each activeSkinData.orderedTables as table, orderedIdx (tableCacheKey(table.skinName, table.tableIdx))}
-            <TowerDataTable
-              config={table}
-              displayRows={displayRowsCache.get(
-                tableCacheKey(table.skinName, table.tableIdx),
-              ) ?? []}
-              compareRows={compareRowsCache.get(
-                tableCacheKey(table.skinName, table.tableIdx),
-              ) ?? []}
-              baseline={towerStore.baseline}
-              globalModifier={modifier}
-              {showDiff}
-              {disabled}
-              isFirst={orderedIdx === 0}
-              refTokenRegistry={skinRefs.registry}
-              getRefNum={getSkinRefNum}
-              commit={commitEdit}
-            />
-          {/each}
-        {:else}
-          <div class="text-center py-4 text-muted-foreground">
-            No skin data available.
-          </div>
-        {/if}
-      </Tabs.Content>
-    </Tabs.Root>
+			<Tabs.Content value={selectedSkinName}>
+				{#if activeSkinData}
+					{#each activeSkinData.orderedTables as table, orderedIdx (tableCacheKey(table.skinName, table.tableIdx))}
+						<TowerDataTable
+							config={table}
+							displayRows={displayRowsCache.get(
+								tableCacheKey(table.skinName, table.tableIdx),
+							) ?? []}
+							compareRows={compareRowsCache.get(
+								tableCacheKey(table.skinName, table.tableIdx),
+							) ?? []}
+							baseline={towerStore.baseline}
+							globalModifier={modifier}
+							{showDiff}
+							{disabled}
+							isFirst={orderedIdx === 0}
+							refTokenRegistry={skinRefs.registry}
+							getRefNum={getSkinRefNum}
+							commit={commitEdit}
+						/>
+					{/each}
+				{:else}
+					<div class="text-center py-4 text-muted-foreground">
+						No skin data available.
+					</div>
+				{/if}
+			</Tabs.Content>
+		</Tabs.Root>
 
-    <Separator class="mt-4" />
-    <div class="tower-editor-actions flex justify-end gap-2">
-      <Popover.Root bind:open={shareOpen} onOpenChange={onShareOpenChange}>
-        <Tip content={shareUrlTip}>
-          {#snippet children({ props })}
-            <span class="inline-flex" {...props}>
-              <Popover.Trigger class="btn secondary" disabled={!canShareUrl}>
-                <span class="max-md:hidden">Share URL</span>
-                <span class="hidden max-md:inline">Share</span>
-              </Popover.Trigger>
-            </span>
-          {/snippet}
-        </Tip>
-        <Popover.Content class="popover-content w-80" sideOffset={6}>
-          <div class="space-y-3">
-            <p class="text-sm text-muted-foreground">
-              Share this lovely tower with a short link! Anyone who opens it can
-              view these stats in the editor.
-            </p>
-            {#if authStore.user}
-              <label class="flex items-center justify-between gap-3 text-sm">
-                <span class="min-w-0 leading-snug">
-                  Have my account own this link
-                </span>
-                <Switch
-                  size="sm"
-                  bind:checked={shareAsOwner}
-                  onCheckedChange={() => {
-                    if (shareLink && !isSharing) void handleShare();
-                  }}
-                />
-              </label>
-            {/if}
-            {#if isSharing}
-              <p class="text-sm text-muted-foreground">Creating link...</p>
-            {:else if shareError}
-              <p class="text-sm text-destructive">{shareError}</p>
-              <div class="flex justify-end">
-                <Popover.Close class="btn outline">Close</Popover.Close>
-              </div>
-            {:else if shareLink}
-              <input
-                class="input short w-full font-mono text-xs"
-                readonly
-                value={shareLink}
-                onclick={(e) => (e.currentTarget as HTMLInputElement).select()}
-              />
-              <div class="flex justify-end gap-2">
-                {#if authStore.user}
-                  <Btn variant="secondary" onclick={openPublish}>
-                    Publish to Workshop
-                  </Btn>
-                {:else}
-                  <Tip
-                    content="Sign in with Fandom to publish this build to the Workshop."
-                  >
-                    {#snippet children({ props })}
-                      <span class="inline-flex" {...props}>
-                        <Btn variant="secondary" disabled>
-                          Publish to Workshop
-                        </Btn>
-                      </span>
-                    {/snippet}
-                  </Tip>
-                {/if}
-                <Btn onclick={copyShareLink}>Copy</Btn>
-              </div>
-            {/if}
-          </div>
-        </Popover.Content>
-      </Popover.Root>
-      {#if tower && !noFetchTowers.has(tower.name) && !isCustomTower(tower.name)}
-        <Popover.Root>
-          <Tip content="Fetch latest Neowtext from the TDS Wiki">
-            {#snippet children({ props })}
-              <Popover.Trigger
-                class="btn secondary"
-                disabled={isFetching}
-                {...props}
-              >
-                {#if isFetching}
-                  Fetching...
-                {:else}
-                  <span class="max-md:hidden">Fetch Latest Data</span>
-                  <span class="hidden max-md:inline">Fetch Latest</span>
-                {/if}
-              </Popover.Trigger>
-            {/snippet}
-          </Tip>
-          <Popover.Content class="popover-content" sideOffset={6}>
-            <div class="space-y-2">
-              <h4 class="font-medium leading-none">Confirm Fetch</h4>
-              <p class="text-sm text-muted-foreground">
-                Are you sure you want to replace your current data with the
-                latest from Tower Defense Simulator Wiki? This will overwrite
-                your local changes.
-              </p>
-            </div>
-            <div class="flex justify-end mt-4 gap-2">
-              <Popover.Close class="btn outline">Cancel</Popover.Close>
-              <Popover.Close class="btn primary" onclick={handleFetchWiki}>
-                Confirm
-              </Popover.Close>
-            </div>
-          </Popover.Content>
-        </Popover.Root>
-      {/if}
-      <Btn
-        variant={showDiff ? "primary" : "secondary"}
-        onclick={() => (showDiff = !showDiff)}
-        disabled={!hasDiffData}
-        title={hasDiffData
-          ? showDiff
-            ? "Hide value differences"
-            : "Show value differences"
-          : "No differences"}
-      >
-        <span class="inline-flex items-center gap-1.5">
-          <span class="max-md:hidden"
-            >{showDiff ? "Hide Difference" : "View Difference"}</span
-          >
-          <span class="hidden max-md:inline"
-            >{showDiff ? "Hide Diff" : "View Diff"}</span
-          >
-        </span>
-      </Btn>
-      <Btn
-        variant="secondary"
-        onclick={towerStore.isDirty
-          ? () => void handleDiscard()
-          : handleClearDiff}
-        disabled={!(towerStore.isDirty || hasSavedDiff)}
-        title={towerStore.isDirty
-          ? "Discard unsaved changes"
-          : "Clear saved difference (@se-diff)"}
-      >
-        {#if towerStore.isDirty}
-          <span class="max-md:hidden">Clear Changes</span>
-          <span class="hidden max-md:inline">Clear</span>
-        {:else}
-          <span class="max-md:hidden">Clear Difference</span>
-          <span class="hidden max-md:inline">Clear</span>
-        {/if}
-      </Btn>
-      <Popover.Root>
-        <Popover.Trigger class="btn destructive text-white">
-          <span class="max-md:hidden"
-            >{towerStore.isCustomSelected()
-              ? "Delete Tower"
-              : "Reset Tower"}</span
-          >
-          <span class="hidden max-md:inline"
-            >{towerStore.isCustomSelected() ? "Delete" : "Reset"}</span
-          >
-        </Popover.Trigger>
-        <Popover.Content class="popover-content" sideOffset={6}>
-          <div class="space-y-2">
-            <h4 class="font-medium leading-none">
-              {towerStore.isCustomSelected()
-                ? "Confirm Delete"
-                : "Confirm Reset"}
-            </h4>
-            <p class="text-sm text-muted-foreground">
-              {#if towerStore.isCustomSelected()}
-                Are you sure you want to permanently delete
-                <span class="font-bold">{towerStore.selectedName}</span>? This
-                removes the tower and all saved data across every profile.
-              {:else}
-                Are you sure you want to reset all changes for
-                <span class="font-bold">{towerStore.selectedName}</span>
-                in profile
-                <span class="font-bold">{profileStore.current}</span>? This
-                action cannot be undone.
-              {/if}
-            </p>
-          </div>
-          <div class="mt-4 flex justify-end gap-2">
-            <Popover.Close class="btn outline">Cancel</Popover.Close>
-            <Popover.Close
-              class="btn destructive-fill text-white"
-              onclick={() => void handleResetOrDelete()}
-            >
-              Confirm
-            </Popover.Close>
-          </div>
-        </Popover.Content>
-      </Popover.Root>
-      {#if towerStore.sharePreviewId}
-        <Popover.Root>
-          <Tip content="Write these stats to your current profile">
-            {#snippet children({ props })}
-              <Popover.Trigger
-                class="btn primary tower-editor-actions-primary"
-                disabled={!towerStore.isDirty}
-                {...props}
-              >
-                <span class="max-md:hidden">Apply to Profile</span>
-                <span class="hidden max-md:inline">Apply</span>
-              </Popover.Trigger>
-            {/snippet}
-          </Tip>
-          <Popover.Content class="popover-content" sideOffset={6}>
-            <div class="space-y-2">
-              <h4 class="font-medium leading-none">Apply to Profile?</h4>
-              <p class="text-sm text-muted-foreground">
-                This saves the shared stats (and any edits you've made) to your
-                profile for this tower, replacing your existing tower in this
-                profile.
-              </p>
-            </div>
-            <div class="flex justify-end mt-4 gap-2">
-              <Popover.Close class="btn outline">Cancel</Popover.Close>
-              <Popover.Close class="btn primary" onclick={handleSave}>
-                Confirm
-              </Popover.Close>
-            </div>
-          </Popover.Content>
-        </Popover.Root>
-      {:else}
-        <Btn
-          variant="primary"
-          class="tower-editor-actions-primary"
-          onclick={handleSave}
-          disabled={!towerStore.isDirty}
-          title={towerStore.isDirty ? "Save to profile" : "No unsaved changes"}
-        >
-          <span class="max-md:hidden">Save Changes</span>
-          <span class="hidden max-md:inline">Save</span>
-        </Btn>
-      {/if}
-    </div>
+		<Separator class="mt-4" />
+		<div class="tower-editor-actions flex justify-end gap-2">
+			<Popover.Root bind:open={shareOpen} onOpenChange={onShareOpenChange}>
+				<Tip content={shareUrlTip}>
+					{#snippet children({ props })}
+						<span class="inline-flex" {...props}>
+							<Popover.Trigger class="btn secondary" disabled={!canShareUrl}>
+								<span class="max-md:hidden">Share URL</span>
+								<span class="hidden max-md:inline">Share</span>
+							</Popover.Trigger>
+						</span>
+					{/snippet}
+				</Tip>
+				<Popover.Content class="popover-content w-80" sideOffset={6}>
+					<div class="space-y-3">
+						<p class="text-sm text-muted-foreground">
+							Share this lovely tower with a short link! Anyone who opens it can
+							view these stats in the editor.
+						</p>
+						{#if authStore.user}
+							<label class="flex items-center justify-between gap-3 text-sm">
+								<span class="min-w-0 leading-snug">
+									Have my account own this link
+								</span>
+								<Switch
+									size="sm"
+									bind:checked={shareAsOwner}
+									onCheckedChange={() => {
+										if (shareLink && !isSharing) void handleShare();
+									}}
+								/>
+							</label>
+						{/if}
+						{#if isSharing}
+							<p class="text-sm text-muted-foreground">Creating link...</p>
+						{:else if shareError}
+							<p class="text-sm text-destructive">{shareError}</p>
+							<div class="flex justify-end">
+								<Popover.Close class="btn outline">Close</Popover.Close>
+							</div>
+						{:else if shareLink}
+							<input
+								class="input short w-full font-mono text-xs"
+								readonly
+								value={shareLink}
+								onclick={(e) => (e.currentTarget as HTMLInputElement).select()}
+							/>
+							<div class="flex justify-end gap-2">
+								{#if authStore.user}
+									<Btn variant="secondary" onclick={openPublish}>
+										Publish to Workshop
+									</Btn>
+								{:else}
+									<Tip
+										content="Sign in with Fandom to publish this build to the Workshop."
+									>
+										{#snippet children({ props })}
+											<span class="inline-flex" {...props}>
+												<Btn variant="secondary" disabled>
+													Publish to Workshop
+												</Btn>
+											</span>
+										{/snippet}
+									</Tip>
+								{/if}
+								<Btn onclick={copyShareLink}>Copy</Btn>
+							</div>
+						{/if}
+					</div>
+				</Popover.Content>
+			</Popover.Root>
+			{#if tower && !noFetchTowers.has(tower.name) && !isCustomTower(tower.name)}
+				<Popover.Root>
+					<Tip content="Fetch latest Neowtext from the TDS Wiki">
+						{#snippet children({ props })}
+							<Popover.Trigger
+								class="btn secondary"
+								disabled={isFetching}
+								{...props}
+							>
+								{#if isFetching}
+									Fetching...
+								{:else}
+									<span class="max-md:hidden">Fetch Latest Data</span>
+									<span class="hidden max-md:inline">Fetch Latest</span>
+								{/if}
+							</Popover.Trigger>
+						{/snippet}
+					</Tip>
+					<Popover.Content class="popover-content" sideOffset={6}>
+						<div class="space-y-2">
+							<h4 class="font-medium leading-none">Confirm Fetch</h4>
+							<p class="text-sm text-muted-foreground">
+								Are you sure you want to replace your current data with the
+								latest from Tower Defense Simulator Wiki? This will overwrite
+								your local changes.
+							</p>
+						</div>
+						<div class="flex justify-end mt-4 gap-2">
+							<Popover.Close class="btn outline">Cancel</Popover.Close>
+							<Popover.Close class="btn primary" onclick={handleFetchWiki}>
+								Confirm
+							</Popover.Close>
+						</div>
+					</Popover.Content>
+				</Popover.Root>
+			{/if}
+			<Btn
+				variant={showDiff ? "primary" : "secondary"}
+				onclick={() => (showDiff = !showDiff)}
+				disabled={!hasDiffData}
+				title={hasDiffData
+					? showDiff
+						? "Hide value differences"
+						: "Show value differences"
+					: "No differences"}
+			>
+				<span class="inline-flex items-center gap-1.5">
+					<span class="max-md:hidden"
+						>{showDiff ? "Hide Difference" : "View Difference"}</span
+					>
+					<span class="hidden max-md:inline"
+						>{showDiff ? "Hide Diff" : "View Diff"}</span
+					>
+				</span>
+			</Btn>
+			<Btn
+				variant="secondary"
+				onclick={towerStore.isDirty
+					? () => void handleDiscard()
+					: handleClearDiff}
+				disabled={!(towerStore.isDirty || hasSavedDiff)}
+				title={towerStore.isDirty
+					? "Discard unsaved changes"
+					: "Clear saved difference (@se-diff)"}
+			>
+				{#if towerStore.isDirty}
+					<span class="max-md:hidden">Clear Changes</span>
+					<span class="hidden max-md:inline">Clear</span>
+				{:else}
+					<span class="max-md:hidden">Clear Difference</span>
+					<span class="hidden max-md:inline">Clear</span>
+				{/if}
+			</Btn>
+			<Popover.Root>
+				<Popover.Trigger class="btn destructive text-white">
+					<span class="max-md:hidden"
+						>{towerStore.isCustomSelected()
+							? "Delete Tower"
+							: "Reset Tower"}</span
+					>
+					<span class="hidden max-md:inline"
+						>{towerStore.isCustomSelected() ? "Delete" : "Reset"}</span
+					>
+				</Popover.Trigger>
+				<Popover.Content class="popover-content" sideOffset={6}>
+					<div class="space-y-2">
+						<h4 class="font-medium leading-none">
+							{towerStore.isCustomSelected()
+								? "Confirm Delete"
+								: "Confirm Reset"}
+						</h4>
+						<p class="text-sm text-muted-foreground">
+							{#if towerStore.isCustomSelected()}
+								Are you sure you want to permanently delete
+								<span class="font-bold">{towerStore.selectedName}</span>? This
+								removes the tower and all saved data across every profile.
+							{:else}
+								Are you sure you want to reset all changes for
+								<span class="font-bold">{towerStore.selectedName}</span>
+								in profile
+								<span class="font-bold">{profileStore.current}</span>? This
+								action cannot be undone.
+							{/if}
+						</p>
+					</div>
+					<div class="mt-4 flex justify-end gap-2">
+						<Popover.Close class="btn outline">Cancel</Popover.Close>
+						<Popover.Close
+							class="btn destructive-fill text-white"
+							onclick={() => void handleResetOrDelete()}
+						>
+							Confirm
+						</Popover.Close>
+					</div>
+				</Popover.Content>
+			</Popover.Root>
+			{#if towerStore.sharePreviewId}
+				<Popover.Root>
+					<Tip content="Write these stats to your current profile">
+						{#snippet children({ props })}
+							<Popover.Trigger
+								class="btn primary tower-editor-actions-primary"
+								disabled={!towerStore.isDirty}
+								{...props}
+							>
+								<span class="max-md:hidden">Apply to Profile</span>
+								<span class="hidden max-md:inline">Apply</span>
+							</Popover.Trigger>
+						{/snippet}
+					</Tip>
+					<Popover.Content class="popover-content" sideOffset={6}>
+						<div class="space-y-2">
+							<h4 class="font-medium leading-none">Apply to Profile?</h4>
+							<p class="text-sm text-muted-foreground">
+								This saves the shared stats (and any edits you've made) to your
+								profile for this tower, replacing your existing tower in this
+								profile.
+							</p>
+						</div>
+						<div class="flex justify-end mt-4 gap-2">
+							<Popover.Close class="btn outline">Cancel</Popover.Close>
+							<Popover.Close class="btn primary" onclick={handleSave}>
+								Confirm
+							</Popover.Close>
+						</div>
+					</Popover.Content>
+				</Popover.Root>
+			{:else}
+				<Btn
+					variant="primary"
+					class="tower-editor-actions-primary"
+					onclick={handleSave}
+					disabled={!towerStore.isDirty}
+					title={towerStore.isDirty ? "Save to profile" : "No unsaved changes"}
+				>
+					<span class="max-md:hidden">Save Changes</span>
+					<span class="hidden max-md:inline">Save</span>
+				</Btn>
+			{/if}
+		</div>
 
-    <MemosSection />
-    <NotesSection notes={skinRefs.notes} />
-    {#if publishShareId}
-      <WorkshopFormModal
-        mode="create"
-        shareId={publishShareId}
-        towerName={tower.name}
-        bind:open={publishOpen}
-      />
-    {/if}
-  {:else}
-    <div class="text-center py-8 text-muted-foreground">
-      Select a tower to edit its skins.
-    </div>
-  {/if}
+		<MemosSection />
+		<NotesSection notes={skinRefs.notes} />
+		{#if publishShareId}
+			<WorkshopFormModal
+				mode="create"
+				shareId={publishShareId}
+				towerName={tower.name}
+				bind:open={publishOpen}
+			/>
+		{/if}
+	{:else}
+		<div class="text-center py-8 text-muted-foreground">
+			Select a tower to edit its skins.
+		</div>
+	{/if}
 </div>
 
 <style>
-  .tower-editor-actions {
-    @media (width < 48rem) {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 0.375rem;
+	.tower-editor-actions {
+		@media (width < 48rem) {
+			display: grid;
+			grid-template-columns: repeat(2, 1fr);
+			gap: 0.375rem;
 
-      :global(.btn) {
-        width: 100%;
-        height: 2rem;
-        padding: 0 1rem;
-        font-size: 0.75rem;
-      }
+			:global(.btn) {
+				width: 100%;
+				height: 2rem;
+				padding: 0 1rem;
+				font-size: 0.75rem;
+			}
 
-      :global(.tower-editor-actions-primary) {
-        grid-column: 1 / -1;
-      }
-    }
-  }
+			:global(.tower-editor-actions-primary) {
+				grid-column: 1 / -1;
+			}
+		}
+	}
 </style>

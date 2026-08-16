@@ -3,172 +3,172 @@ import { settingsStore } from "$lib/stores/settings.svelte";
 const WIKI_OVERRIDE_PREFIX = "tds_wiki_override::";
 
 function canUseLocalStorage(): boolean {
-  return typeof localStorage !== "undefined";
+	return typeof localStorage !== "undefined";
 }
 
 function overrideKey(profileName: string, towerName: string): string {
-  return `${WIKI_OVERRIDE_PREFIX}${profileName}::${towerName.trim().toLowerCase()}`;
+	return `${WIKI_OVERRIDE_PREFIX}${profileName}::${towerName.trim().toLowerCase()}`;
 }
 
 // older builds wrote Title Case
 // current writes lowercase
 function overrideKeys(profileName: string, towerName: string): string[] {
-  const prefix = `${WIKI_OVERRIDE_PREFIX}${profileName}::`;
-  const wanted = towerName.trim().toLowerCase();
-  const keys: string[] = [];
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (
-      key?.startsWith(prefix) &&
-      key.slice(prefix.length).toLowerCase() === wanted
-    )
-      keys.push(key);
-  }
-  return keys;
+	const prefix = `${WIKI_OVERRIDE_PREFIX}${profileName}::`;
+	const wanted = towerName.trim().toLowerCase();
+	const keys: string[] = [];
+	for (let i = 0; i < localStorage.length; i++) {
+		const key = localStorage.key(i);
+		if (
+			key?.startsWith(prefix) &&
+			key.slice(prefix.length).toLowerCase() === wanted
+		)
+			keys.push(key);
+	}
+	return keys;
 }
 
 function dropKeys(keys: string[], keep?: string): void {
-  for (const key of keys) {
-    if (key !== keep) localStorage.removeItem(key);
-  }
+	for (const key of keys) {
+		if (key !== keep) localStorage.removeItem(key);
+	}
 }
 
 export function getWikiOverride(
-  profileName: string,
-  towerName: string,
+	profileName: string,
+	towerName: string,
 ): string | null {
-  if (!canUseLocalStorage()) return null;
+	if (!canUseLocalStorage()) return null;
 
-  const key = overrideKey(profileName, towerName);
-  const twins = overrideKeys(profileName, towerName);
-  let value = localStorage.getItem(key);
-  if (!value?.trim()) {
-    for (const twin of twins) {
-      const legacy = localStorage.getItem(twin);
-      if (!legacy?.trim()) continue;
-      localStorage.setItem(key, legacy);
-      value = legacy;
-      break;
-    }
-  }
-  dropKeys(twins, value?.trim() ? key : undefined);
+	const key = overrideKey(profileName, towerName);
+	const twins = overrideKeys(profileName, towerName);
+	let value = localStorage.getItem(key);
+	if (!value?.trim()) {
+		for (const twin of twins) {
+			const legacy = localStorage.getItem(twin);
+			if (!legacy?.trim()) continue;
+			localStorage.setItem(key, legacy);
+			value = legacy;
+			break;
+		}
+	}
+	dropKeys(twins, value?.trim() ? key : undefined);
 
-  if (settingsStore.debugMode) {
-    console.log(
-      `[wikiSource] getWikiOverride key="${key}" found=${!!value} length=${value?.length}`,
-    );
-  }
-  return value?.trim() ? value : null;
+	if (settingsStore.debugMode) {
+		console.log(
+			`[wikiSource] getWikiOverride key="${key}" found=${!!value} length=${value?.length}`,
+		);
+	}
+	return value?.trim() ? value : null;
 }
 
 export function listWikiOverrides(
-  profileName: string,
+	profileName: string,
 ): ReadonlyMap<string, string> {
-  const overrides = new Map<string, string>();
-  if (!canUseLocalStorage()) return overrides;
+	const overrides = new Map<string, string>();
+	if (!canUseLocalStorage()) return overrides;
 
-  const prefix = `${WIKI_OVERRIDE_PREFIX}${profileName}::`;
-  const towers = new Set<string>();
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (key?.startsWith(prefix))
-      towers.add(key.slice(prefix.length).toLowerCase());
-  }
-  for (const tower of towers) {
-    const value = getWikiOverride(profileName, tower);
-    if (value) overrides.set(tower, value);
-  }
+	const prefix = `${WIKI_OVERRIDE_PREFIX}${profileName}::`;
+	const towers = new Set<string>();
+	for (let i = 0; i < localStorage.length; i++) {
+		const key = localStorage.key(i);
+		if (key?.startsWith(prefix))
+			towers.add(key.slice(prefix.length).toLowerCase());
+	}
+	for (const tower of towers) {
+		const value = getWikiOverride(profileName, tower);
+		if (value) overrides.set(tower, value);
+	}
 
-  return overrides;
+	return overrides;
 }
 
 export function setWikiOverride(
-  profileName: string,
-  towerName: string,
-  wikitext: string | null,
+	profileName: string,
+	towerName: string,
+	wikitext: string | null,
 ): void {
-  if (!canUseLocalStorage()) return;
+	if (!canUseLocalStorage()) return;
 
-  const key = overrideKey(profileName, towerName);
-  const content = (wikitext ?? "").trim();
-  const twins = overrideKeys(profileName, towerName);
+	const key = overrideKey(profileName, towerName);
+	const content = (wikitext ?? "").trim();
+	const twins = overrideKeys(profileName, towerName);
 
-  if (settingsStore.debugMode) {
-    console.log(
-      `[wikiSource] setWikiOverride key="${key}" content_length=${content.length}`,
-    );
-  }
+	if (settingsStore.debugMode) {
+		console.log(
+			`[wikiSource] setWikiOverride key="${key}" content_length=${content.length}`,
+		);
+	}
 
-  if (!content) {
-    if (settingsStore.debugMode) {
-      console.log(`[wikiSource] Clearing override for ${key}`);
-    }
-    dropKeys(twins);
-    return;
-  }
+	if (!content) {
+		if (settingsStore.debugMode) {
+			console.log(`[wikiSource] Clearing override for ${key}`);
+		}
+		dropKeys(twins);
+		return;
+	}
 
-  localStorage.setItem(key, content);
-  dropKeys(twins, key);
+	localStorage.setItem(key, content);
+	dropKeys(twins, key);
 }
 
 export function hasWikiOverride(
-  profileName: string,
-  towerName: string,
+	profileName: string,
+	towerName: string,
 ): boolean {
-  return getWikiOverride(profileName, towerName) != null;
+	return getWikiOverride(profileName, towerName) != null;
 }
 
 export function clearWikiOverride(
-  profileName: string,
-  towerName: string,
+	profileName: string,
+	towerName: string,
 ): void {
-  setWikiOverride(profileName, towerName, null);
+	setWikiOverride(profileName, towerName, null);
 }
 
 export function clearProfileWikiOverrides(profileName: string): void {
-  if (!canUseLocalStorage()) return;
+	if (!canUseLocalStorage()) return;
 
-  const prefix = `${WIKI_OVERRIDE_PREFIX}${profileName}::`;
-  const keys: string[] = [];
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (key?.startsWith(prefix)) keys.push(key);
-  }
-  dropKeys(keys);
+	const prefix = `${WIKI_OVERRIDE_PREFIX}${profileName}::`;
+	const keys: string[] = [];
+	for (let i = 0; i < localStorage.length; i++) {
+		const key = localStorage.key(i);
+		if (key?.startsWith(prefix)) keys.push(key);
+	}
+	dropKeys(keys);
 }
 
 export function clearTowerWikiOverrides(towerName: string): void {
-  if (!canUseLocalStorage()) return;
+	if (!canUseLocalStorage()) return;
 
-  const wanted = towerName.trim().toLowerCase();
-  for (let i = localStorage.length - 1; i >= 0; i--) {
-    const key = localStorage.key(i);
-    if (!key?.startsWith(WIKI_OVERRIDE_PREFIX)) continue;
-    if (key.slice(key.lastIndexOf("::") + 2).toLowerCase() === wanted)
-      localStorage.removeItem(key);
-  }
+	const wanted = towerName.trim().toLowerCase();
+	for (let i = localStorage.length - 1; i >= 0; i--) {
+		const key = localStorage.key(i);
+		if (!key?.startsWith(WIKI_OVERRIDE_PREFIX)) continue;
+		if (key.slice(key.lastIndexOf("::") + 2).toLowerCase() === wanted)
+			localStorage.removeItem(key);
+	}
 }
 
 export async function loadEffectiveWikitext(
-  profileName: string,
-  towerName: string,
-  loadBase: () => Promise<string>,
+	profileName: string,
+	towerName: string,
+	loadBase: () => Promise<string>,
 ): Promise<{ source: "override" | "base"; text: string }> {
-  const override = getWikiOverride(profileName, towerName);
-  if (override != null) {
-    if (settingsStore.debugMode) {
-      console.log(
-        `[wikiSource] loadEffectiveWikitext: returning override for ${towerName}`,
-      );
-    }
-    return { source: "override", text: override };
-  }
+	const override = getWikiOverride(profileName, towerName);
+	if (override != null) {
+		if (settingsStore.debugMode) {
+			console.log(
+				`[wikiSource] loadEffectiveWikitext: returning override for ${towerName}`,
+			);
+		}
+		return { source: "override", text: override };
+	}
 
-  if (settingsStore.debugMode) {
-    console.log(
-      `[wikiSource] loadEffectiveWikitext: loading base for ${towerName}`,
-    );
-  }
-  const base = await loadBase();
-  return { source: "base", text: base };
+	if (settingsStore.debugMode) {
+		console.log(
+			`[wikiSource] loadEffectiveWikitext: loading base for ${towerName}`,
+		);
+	}
+	const base = await loadBase();
+	return { source: "base", text: base };
 }

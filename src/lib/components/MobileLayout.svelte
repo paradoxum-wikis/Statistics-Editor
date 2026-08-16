@@ -1,579 +1,579 @@
 <script lang="ts">
-  import { goto } from "$app/navigation";
-  import { resolve } from "$app/paths";
-  import { page } from "$app/state";
-  import { cubicOut } from "svelte/easing";
-  import { fly } from "svelte/transition";
+	import { goto } from "$app/navigation";
+	import { resolve } from "$app/paths";
+	import { page } from "$app/state";
+	import { cubicOut } from "svelte/easing";
+	import { fly } from "svelte/transition";
 
-  import { towerStore } from "$lib/stores/tower.svelte";
-  import { profileStore } from "$lib/stores/profile.svelte";
-  import { settingsStore } from "$lib/stores/settings.svelte";
-  import { toast } from "$lib/toast";
+	import { towerStore } from "$lib/stores/tower.svelte";
+	import { profileStore } from "$lib/stores/profile.svelte";
+	import { settingsStore } from "$lib/stores/settings.svelte";
+	import { toast } from "$lib/toast";
 
-  import Sidebar from "./Sidebar.svelte";
-  import TowerEditor from "./TowerEditor.svelte";
-  import HomeView from "./HomeView.svelte";
-  import NotFoundView from "./NotFoundView.svelte";
-  import TowerPicker from "./TowerPicker.svelte";
-  import SettingsModal from "./SettingsModal.svelte";
-  import { announcementsStore } from "$lib/stores/announcements.svelte";
-  import GlobalModifier from "./tool/GlobalModifier.svelte";
-  import GlobalModifierModal from "./tool/GlobalModifierModal.svelte";
-  import StatsChart from "./tool/StatsChart.svelte";
-  import StatsChartModal from "./tool/StatsChartModal.svelte";
-  import CreateTower from "./tool/CreateTower.svelte";
+	import Sidebar from "./Sidebar.svelte";
+	import TowerEditor from "./TowerEditor.svelte";
+	import HomeView from "./HomeView.svelte";
+	import NotFoundView from "./NotFoundView.svelte";
+	import TowerPicker from "./TowerPicker.svelte";
+	import SettingsModal from "./SettingsModal.svelte";
+	import { announcementsStore } from "$lib/stores/announcements.svelte";
+	import GlobalModifier from "./tool/GlobalModifier.svelte";
+	import GlobalModifierModal from "./tool/GlobalModifierModal.svelte";
+	import StatsChart from "./tool/StatsChart.svelte";
+	import StatsChartModal from "./tool/StatsChartModal.svelte";
+	import CreateTower from "./tool/CreateTower.svelte";
 
-  import { DropdownMenu, Popover } from "bits-ui";
-  import { Drawer } from "vaul-svelte";
-  import ModeToggle from "./smol/ModeToggle.svelte";
-  import AuthMenu from "./smol/AuthMenu.svelte";
-  import Modal from "./smol/Modal.svelte";
-  import Card from "./smol/Card.svelte";
-  import LoadingCard from "./smol/LoadingCard.svelte";
-  import Btn from "./smol/Btn.svelte";
-  import IconBtn from "./smol/IconBtn.svelte";
-  import Tip from "./smol/Tip.svelte";
-  import TextInput from "./smol/TextInput.svelte";
+	import { DropdownMenu, Popover } from "bits-ui";
+	import { Drawer } from "vaul-svelte";
+	import ModeToggle from "./smol/ModeToggle.svelte";
+	import AuthMenu from "./smol/AuthMenu.svelte";
+	import Modal from "./smol/Modal.svelte";
+	import Card from "./smol/Card.svelte";
+	import LoadingCard from "./smol/LoadingCard.svelte";
+	import Btn from "./smol/Btn.svelte";
+	import IconBtn from "./smol/IconBtn.svelte";
+	import Tip from "./smol/Tip.svelte";
+	import TextInput from "./smol/TextInput.svelte";
 
-  import Alert from "./smol/Alert.svelte";
-  import DiscardMessage, {
-    type PendingDiscardAction,
-  } from "./smol/DiscardMessage.svelte";
-  import {
-    Check,
-    Trash2,
-    PanelLeft,
-    User,
-    Wrench,
-    House,
-    Settings,
-    Sun,
-    Moon,
-    SunMoon,
-    Store,
-    Megaphone,
-  } from "@lucide/svelte";
+	import Alert from "./smol/Alert.svelte";
+	import DiscardMessage, {
+		type PendingDiscardAction,
+	} from "./smol/DiscardMessage.svelte";
+	import {
+		Check,
+		Trash2,
+		PanelLeft,
+		User,
+		Wrench,
+		House,
+		Settings,
+		Sun,
+		Moon,
+		SunMoon,
+		Store,
+		Megaphone,
+	} from "@lucide/svelte";
 
-  let { isClient }: { isClient: boolean } = $props();
+	let { isClient }: { isClient: boolean } = $props();
 
-  type EditorMode = "cells" | "wiki";
+	type EditorMode = "cells" | "wiki";
 
-  let editorMode = $state<EditorMode>("cells");
-  let editorModeDirection = $state(1);
-  let sidebarOpen = $state(false);
-  let settingsOpen = $state(false);
-  let wikiEditorModule = $state<Awaited<
-    typeof import("./WikiEditor.svelte")
-  > | null>(null);
-  let wikiEditorLoadFailed = $state(false);
+	let editorMode = $state<EditorMode>("cells");
+	let editorModeDirection = $state(1);
+	let sidebarOpen = $state(false);
+	let settingsOpen = $state(false);
+	let wikiEditorModule = $state<Awaited<
+		typeof import("./WikiEditor.svelte")
+	> | null>(null);
+	let wikiEditorLoadFailed = $state(false);
 
-  $effect(() => {
-    if (!isClient || !towerStore.selectedData) return;
-    wikiEditorLoadFailed = false;
-    void import("./WikiEditor.svelte")
-      .then((mod) => {
-        wikiEditorModule = mod;
-      })
-      .catch(() => {
-        wikiEditorLoadFailed = true;
-      });
-  });
+	$effect(() => {
+		if (!isClient || !towerStore.selectedData) return;
+		wikiEditorLoadFailed = false;
+		void import("./WikiEditor.svelte")
+			.then((mod) => {
+				wikiEditorModule = mod;
+			})
+			.catch(() => {
+				wikiEditorLoadFailed = true;
+			});
+	});
 
-  let toolsOpen = $state(false);
-  let modifierOpen = $state(false);
-  let chartOpen = $state(false);
+	let toolsOpen = $state(false);
+	let modifierOpen = $state(false);
+	let chartOpen = $state(false);
 
-  const isNotFound = $derived(page.status >= 400 || towerStore.missingTower);
-  const mainFill = $derived(!towerStore.selectedData);
+	const isNotFound = $derived(page.status >= 400 || towerStore.missingTower);
+	const mainFill = $derived(!towerStore.selectedData);
 
-  const mainKey = $derived(
-    !isClient
-      ? "init"
-      : isNotFound
-        ? "not-found"
-        : towerStore.selectedName
-          ? `tower:${towerStore.selectedName}`
-          : "intro",
-  );
+	const mainKey = $derived(
+		!isClient
+			? "init"
+			: isNotFound
+				? "not-found"
+				: towerStore.selectedName
+					? `tower:${towerStore.selectedName}`
+					: "intro",
+	);
 
-  async function performGoHome() {
-    sidebarOpen = false;
-    towerStore.unload();
-    editorMode = "cells";
-    await goto(resolve("/"), { keepFocus: true, noScroll: true });
-  }
+	async function performGoHome() {
+		sidebarOpen = false;
+		towerStore.unload();
+		editorMode = "cells";
+		await goto(resolve("/"), { keepFocus: true, noScroll: true });
+	}
 
-  async function performTowerSelect(tower: string) {
-    const success = await towerStore.load(tower);
-    if (success) {
-      await goto(resolve("/tower/[name]", { name: towerStore.selectedName }), {
-        keepFocus: true,
-        noScroll: true,
-      });
-    }
-  }
+	async function performTowerSelect(tower: string) {
+		const success = await towerStore.load(tower);
+		if (success) {
+			await goto(resolve("/tower/[name]", { name: towerStore.selectedName }), {
+				keepFocus: true,
+				noScroll: true,
+			});
+		}
+	}
 
-  async function handleSelect(itemValue: string | undefined) {
-    if (
-      !itemValue ||
-      itemValue.toLowerCase() === towerStore.selectedName.toLowerCase()
-    )
-      return;
-    if (towerStore.isDirty) {
-      requestDiscard({ type: "switch-tower", tower: itemValue });
-      return;
-    }
-    await performTowerSelect(itemValue);
-  }
+	async function handleSelect(itemValue: string | undefined) {
+		if (
+			!itemValue ||
+			itemValue.toLowerCase() === towerStore.selectedName.toLowerCase()
+		)
+			return;
+		if (towerStore.isDirty) {
+			requestDiscard({ type: "switch-tower", tower: itemValue });
+			return;
+		}
+		await performTowerSelect(itemValue);
+	}
 
-  let discardOpen = $state(false);
-  let pendingDiscardAction = $state<PendingDiscardAction | null>(null);
+	let discardOpen = $state(false);
+	let pendingDiscardAction = $state<PendingDiscardAction | null>(null);
 
-  async function performProfileSwitch(profile: string) {
-    if (profileStore.switch(profile)) {
-      await towerStore.switchProfile(profile);
-    }
-  }
+	async function performProfileSwitch(profile: string) {
+		if (profileStore.switch(profile)) {
+			await towerStore.switchProfile(profile);
+		}
+	}
 
-  function requestDiscard(action: PendingDiscardAction) {
-    pendingDiscardAction = action;
-    discardOpen = true;
-  }
+	function requestDiscard(action: PendingDiscardAction) {
+		pendingDiscardAction = action;
+		discardOpen = true;
+	}
 
-  async function handleProfileChange(newProfile: string) {
-    if (newProfile === profileStore.current) return;
-    if (towerStore.isDirty) {
-      requestDiscard({ type: "switch-profile", profile: newProfile });
-      return;
-    }
-    await performProfileSwitch(newProfile);
-  }
+	async function handleProfileChange(newProfile: string) {
+		if (newProfile === profileStore.current) return;
+		if (towerStore.isDirty) {
+			requestDiscard({ type: "switch-profile", profile: newProfile });
+			return;
+		}
+		await performProfileSwitch(newProfile);
+	}
 
-  function cancelDiscard() {
-    pendingDiscardAction = null;
-  }
+	function cancelDiscard() {
+		pendingDiscardAction = null;
+	}
 
-  let createProfileOpen = $state(false);
-  let newProfileName = $state("");
+	let createProfileOpen = $state(false);
+	let newProfileName = $state("");
 
-  async function createProfile(name: string) {
-    if (profileStore.create(name)) {
-      await towerStore.switchProfile(name);
-      newProfileName = "";
-      createProfileOpen = false;
-      toast.success("Profile created!");
-    }
-  }
+	async function createProfile(name: string) {
+		if (profileStore.create(name)) {
+			await towerStore.switchProfile(name);
+			newProfileName = "";
+			createProfileOpen = false;
+			toast.success("Profile created!");
+		}
+	}
 
-  async function confirmDiscard() {
-    const pending = pendingDiscardAction;
-    pendingDiscardAction = null;
-    discardOpen = false;
-    if (!pending) return;
+	async function confirmDiscard() {
+		const pending = pendingDiscardAction;
+		pendingDiscardAction = null;
+		discardOpen = false;
+		if (!pending) return;
 
-    switch (pending.type) {
-      case "create-profile":
-        await createProfile(pending.name);
-        break;
-      case "switch-profile":
-        await performProfileSwitch(pending.profile);
-        break;
-      case "switch-tower":
-        await performTowerSelect(pending.tower);
-        break;
-      case "go-home":
-        await performGoHome();
-        break;
-    }
-  }
+		switch (pending.type) {
+			case "create-profile":
+				await createProfile(pending.name);
+				break;
+			case "switch-profile":
+				await performProfileSwitch(pending.profile);
+				break;
+			case "switch-tower":
+				await performTowerSelect(pending.tower);
+				break;
+			case "go-home":
+				await performGoHome();
+				break;
+		}
+	}
 
-  function openCreateProfileDialog() {
-    newProfileName = "";
-  }
+	function openCreateProfileDialog() {
+		newProfileName = "";
+	}
 
-  async function goHome() {
-    if (towerStore.isDirty) {
-      requestDiscard({ type: "go-home" });
-      return;
-    }
-    await performGoHome();
-  }
+	async function goHome() {
+		if (towerStore.isDirty) {
+			requestDiscard({ type: "go-home" });
+			return;
+		}
+		await performGoHome();
+	}
 
-  async function confirmCreateProfile() {
-    const name = newProfileName.trim();
-    if (!name) return;
-    if (towerStore.isDirty) {
-      requestDiscard({ type: "create-profile", name });
-      return;
-    }
-    await createProfile(name);
-  }
+	async function confirmCreateProfile() {
+		const name = newProfileName.trim();
+		if (!name) return;
+		if (towerStore.isDirty) {
+			requestDiscard({ type: "create-profile", name });
+			return;
+		}
+		await createProfile(name);
+	}
 
-  function handleCreateProfileInputKeydown(e: KeyboardEvent) {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      void confirmCreateProfile();
-    }
-  }
+	function handleCreateProfileInputKeydown(e: KeyboardEvent) {
+		if (e.key === "Enter") {
+			e.preventDefault();
+			void confirmCreateProfile();
+		}
+	}
 
-  let deleteProfileOpen = $state(false);
-  let profileToDelete = $state<string | null>(null);
+	let deleteProfileOpen = $state(false);
+	let profileToDelete = $state<string | null>(null);
 
-  function openDeleteProfileDialog(profile: string, e: Event) {
-    e.stopPropagation();
-    profileToDelete = profile;
-    deleteProfileOpen = true;
-  }
+	function openDeleteProfileDialog(profile: string, e: Event) {
+		e.stopPropagation();
+		profileToDelete = profile;
+		deleteProfileOpen = true;
+	}
 
-  async function confirmDeleteProfile() {
-    if (profileToDelete) {
-      const deletedCurrent = profileToDelete === profileStore.current;
-      if (profileStore.delete(profileToDelete)) {
-        if (deletedCurrent)
-          await towerStore.switchProfile(profileStore.current);
-        toast.success("Profile deleted.");
-      }
-      profileToDelete = null;
-    }
-    deleteProfileOpen = false;
-  }
+	async function confirmDeleteProfile() {
+		if (profileToDelete) {
+			const deletedCurrent = profileToDelete === profileStore.current;
+			if (profileStore.delete(profileToDelete)) {
+				if (deletedCurrent)
+					await towerStore.switchProfile(profileStore.current);
+				toast.success("Profile deleted.");
+			}
+			profileToDelete = null;
+		}
+		deleteProfileOpen = false;
+	}
 </script>
 
 <div class="flex h-screen flex-col bg-background">
-  <Drawer.Root
-    open={sidebarOpen}
-    onOpenChange={(v) => (sidebarOpen = v)}
-    direction="left"
-    shouldScaleBackground={false}
-  >
-    <Drawer.Portal>
-      <Drawer.Overlay class="dialog-overlay" />
-      <Drawer.Content
-        class="fixed inset-y-0 left-0 z-57 flex h-full w-72 max-w-[85vw] flex-col bg-card outline-none"
-      >
-        <Drawer.Title class="sr-only">Sidebar</Drawer.Title>
-        <Sidebar class="h-full w-full" />
-      </Drawer.Content>
-    </Drawer.Portal>
-  </Drawer.Root>
+	<Drawer.Root
+		open={sidebarOpen}
+		onOpenChange={(v) => (sidebarOpen = v)}
+		direction="left"
+		shouldScaleBackground={false}
+	>
+		<Drawer.Portal>
+			<Drawer.Overlay class="dialog-overlay" />
+			<Drawer.Content
+				class="fixed inset-y-0 left-0 z-57 flex h-full w-72 max-w-[85vw] flex-col bg-card outline-none"
+			>
+				<Drawer.Title class="sr-only">Sidebar</Drawer.Title>
+				<Sidebar class="h-full w-full" />
+			</Drawer.Content>
+		</Drawer.Portal>
+	</Drawer.Root>
 
-  <!-- Header -->
-  <header
-    class="sticky top-0 z-17 flex flex-col items-center gap-2 border-b bg-card px-4 py-1"
-  >
-    <h1 class="text-sm font-bold text-foreground tracking-wide">
-      {towerStore.selectedName || "TDS Statistics Editor"}
-    </h1>
+	<!-- Header -->
+	<header
+		class="sticky top-0 z-17 flex flex-col items-center gap-2 border-b bg-card px-4 py-1"
+	>
+		<h1 class="text-sm font-bold text-foreground tracking-wide">
+			{towerStore.selectedName || "TDS Statistics Editor"}
+		</h1>
 
-    {#if isClient}
-      <TowerPicker
-        variant="compact"
-        selected={towerStore.selectedName}
-        onSelect={handleSelect}
-      />
+		{#if isClient}
+			<TowerPicker
+				variant="compact"
+				selected={towerStore.selectedName}
+				onSelect={handleSelect}
+			/>
 
-      <div class="flex items-center justify-center gap-2">
-        <IconBtn
-          class="h-8 p-1!"
-          onclick={() =>
-            goto(resolve("/workshop"), { keepFocus: true, noScroll: true })}
-          title="Workshop"
-        >
-          <Store size={20} />
-        </IconBtn>
-        <ModeToggle
-          class="h-8"
-          bind:mode={editorMode}
-          disableCells={towerStore.selectedData?.isMalformed ?? false}
-          onModeChange={(next) =>
-            (editorModeDirection = next === "wiki" ? 1 : -1)}
-        />
-        <AuthMenu />
-      </div>
-    {/if}
-  </header>
+			<div class="flex items-center justify-center gap-2">
+				<IconBtn
+					class="h-8 p-1!"
+					onclick={() =>
+						goto(resolve("/workshop"), { keepFocus: true, noScroll: true })}
+					title="Workshop"
+				>
+					<Store size={20} />
+				</IconBtn>
+				<ModeToggle
+					class="h-8"
+					bind:mode={editorMode}
+					disableCells={towerStore.selectedData?.isMalformed ?? false}
+					onModeChange={(next) =>
+						(editorModeDirection = next === "wiki" ? 1 : -1)}
+				/>
+				<AuthMenu />
+			</div>
+		{/if}
+	</header>
 
-  <!-- Main Content -->
-  <main class="mb-14 min-h-0 flex-1 overflow-x-auto overflow-y-auto">
-    {#key mainKey}
-      <div
-        class={mainFill ? "h-full min-h-0 p-4" : "box-border min-h-full p-4"}
-        in:fly={{ y: 12, duration: 160, easing: cubicOut }}
-      >
-        {#if isNotFound}
-          <NotFoundView onHome={goHome} tower={!!page.params.name} />
-        {:else if isClient && !towerStore.selectedData && !towerStore.isLoading}
-          <HomeView onSelect={handleSelect} />
-        {:else if !isClient}
-          <LoadingCard message="Engineer is setting up the editor for you..." />
-        {:else if towerStore.selectedData}
-          {#key editorMode}
-            <div
-              in:fly={{
-                x: editorModeDirection * 80,
-                duration: 180,
-                easing: cubicOut,
-              }}
-            >
-              {#if editorMode === "cells" && !towerStore.selectedData.isMalformed}
-                <TowerEditor tower={towerStore.selectedData} />
-              {:else if wikiEditorModule}
-                {@const WikiEditor = wikiEditorModule.default}
-                <WikiEditor towerName={towerStore.selectedName} open={true} />
-              {:else if wikiEditorLoadFailed}
-                <Card class="p-8 text-center">
-                  <p class="text-red-600">Failed to load the source editor.</p>
-                </Card>
-              {:else}
-                <LoadingCard
-                  message="Brawler is unpacking the source editor..."
-                />
-              {/if}
-            </div>
-          {/key}
-        {:else}
-          <LoadingCard
-            message="Commander is getting this tower's files ready..."
-          />
-        {/if}
-      </div>
-    {/key}
-  </main>
+	<!-- Main Content -->
+	<main class="mb-14 min-h-0 flex-1 overflow-x-auto overflow-y-auto">
+		{#key mainKey}
+			<div
+				class={mainFill ? "h-full min-h-0 p-4" : "box-border min-h-full p-4"}
+				in:fly={{ y: 12, duration: 160, easing: cubicOut }}
+			>
+				{#if isNotFound}
+					<NotFoundView onHome={goHome} tower={!!page.params.name} />
+				{:else if isClient && !towerStore.selectedData && !towerStore.isLoading}
+					<HomeView onSelect={handleSelect} />
+				{:else if !isClient}
+					<LoadingCard message="Engineer is setting up the editor for you..." />
+				{:else if towerStore.selectedData}
+					{#key editorMode}
+						<div
+							in:fly={{
+								x: editorModeDirection * 80,
+								duration: 180,
+								easing: cubicOut,
+							}}
+						>
+							{#if editorMode === "cells" && !towerStore.selectedData.isMalformed}
+								<TowerEditor tower={towerStore.selectedData} />
+							{:else if wikiEditorModule}
+								{@const WikiEditor = wikiEditorModule.default}
+								<WikiEditor towerName={towerStore.selectedName} open={true} />
+							{:else if wikiEditorLoadFailed}
+								<Card class="p-8 text-center">
+									<p class="text-red-600">Failed to load the source editor.</p>
+								</Card>
+							{:else}
+								<LoadingCard
+									message="Brawler is unpacking the source editor..."
+								/>
+							{/if}
+						</div>
+					{/key}
+				{:else}
+					<LoadingCard
+						message="Commander is getting this tower's files ready..."
+					/>
+				{/if}
+			</div>
+		{/key}
+	</main>
 
-  <!-- Bottom Bar -->
-  <div
-    class="fixed inset-x-0 bottom-0 z-37 flex h-14 items-center justify-around border-t border-border bg-card px-6"
-  >
-    <IconBtn
-      onclick={() => (sidebarOpen = !sidebarOpen)}
-      title={towerStore.selectedData ? "Toggle Sidebar" : "Recent Updates"}
-      aria-label={towerStore.selectedData ? "Toggle sidebar" : "Recent updates"}
-    >
-      <PanelLeft size={20} />
-    </IconBtn>
+	<!-- Bottom Bar -->
+	<div
+		class="fixed inset-x-0 bottom-0 z-37 flex h-14 items-center justify-around border-t border-border bg-card px-6"
+	>
+		<IconBtn
+			onclick={() => (sidebarOpen = !sidebarOpen)}
+			title={towerStore.selectedData ? "Toggle Sidebar" : "Recent Updates"}
+			aria-label={towerStore.selectedData ? "Toggle sidebar" : "Recent updates"}
+		>
+			<PanelLeft size={20} />
+		</IconBtn>
 
-    <!-- Profile -->
-    <DropdownMenu.Root>
-      <Tip content="Profile">
-        {#snippet children({ props })}
-          <DropdownMenu.Trigger
-            class="icon-btn"
-            aria-label="Profile"
-            {...props}
-          >
-            <User size={20} />
-          </DropdownMenu.Trigger>
-        {/snippet}
-      </Tip>
-      <DropdownMenu.Content
-        align="center"
-        side="top"
-        sideOffset={6}
-        class="dropdown-content"
-      >
-        <DropdownMenu.Group>
-          <DropdownMenu.GroupHeading class="px-2 py-1.5 text-sm font-semibold">
-            <h4 class="text-sm font-medium">Profiles</h4>
-          </DropdownMenu.GroupHeading>
-          {#each profileStore.list as profile (profile)}
-            <DropdownMenu.Item
-              onclick={() => handleProfileChange(profile)}
-              class="dropdown-item"
-            >
-              <span>{profile}</span>
-              {#if profile === profileStore.current}
-                <span class="ms-auto"><Check size={14} /></span>
-              {:else if profile !== "Default"}
-                <button
-                  class="ms-2 text-muted-foreground hover:text-destructive opacity-0 transition-opacity"
-                  onclick={(e) => openDeleteProfileDialog(profile, e)}
-                >
-                  <Trash2 size={14} />
-                </button>
-              {/if}
-            </DropdownMenu.Item>
-          {/each}
-        </DropdownMenu.Group>
-        <DropdownMenu.Separator class="-mx-1 my-1 h-px bg-border" />
+		<!-- Profile -->
+		<DropdownMenu.Root>
+			<Tip content="Profile">
+				{#snippet children({ props })}
+					<DropdownMenu.Trigger
+						class="icon-btn"
+						aria-label="Profile"
+						{...props}
+					>
+						<User size={20} />
+					</DropdownMenu.Trigger>
+				{/snippet}
+			</Tip>
+			<DropdownMenu.Content
+				align="center"
+				side="top"
+				sideOffset={6}
+				class="dropdown-content"
+			>
+				<DropdownMenu.Group>
+					<DropdownMenu.GroupHeading class="px-2 py-1.5 text-sm font-semibold">
+						<h4 class="text-sm font-medium">Profiles</h4>
+					</DropdownMenu.GroupHeading>
+					{#each profileStore.list as profile (profile)}
+						<DropdownMenu.Item
+							onclick={() => handleProfileChange(profile)}
+							class="dropdown-item"
+						>
+							<span>{profile}</span>
+							{#if profile === profileStore.current}
+								<span class="ms-auto"><Check size={14} /></span>
+							{:else if profile !== "Default"}
+								<button
+									class="ms-2 text-muted-foreground hover:text-destructive opacity-0 transition-opacity"
+									onclick={(e) => openDeleteProfileDialog(profile, e)}
+								>
+									<Trash2 size={14} />
+								</button>
+							{/if}
+						</DropdownMenu.Item>
+					{/each}
+				</DropdownMenu.Group>
+				<DropdownMenu.Separator class="-mx-1 my-1 h-px bg-border" />
 
-        <Modal
-          bind:open={createProfileOpen}
-          title="Create Profile"
-          description="Enter a name for the new profile."
-          onOpenChange={(v) => {
-            if (v) openCreateProfileDialog();
-          }}
-        >
-          {#snippet trigger({ props })}
-            <button
-              type="button"
-              class="dropdown-item w-full text-start"
-              {...props}
-            >
-              <span>+ Create Profile</span>
-            </button>
-          {/snippet}
+				<Modal
+					bind:open={createProfileOpen}
+					title="Create Profile"
+					description="Enter a name for the new profile."
+					onOpenChange={(v) => {
+						if (v) openCreateProfileDialog();
+					}}
+				>
+					{#snippet trigger({ props })}
+						<button
+							type="button"
+							class="dropdown-item w-full text-start"
+							{...props}
+						>
+							<span>+ Create Profile</span>
+						</button>
+					{/snippet}
 
-          <div class="space-y-2">
-            <TextInput
-              type="text"
-              placeholder="My Profile"
-              bind:value={newProfileName}
-              onkeydown={handleCreateProfileInputKeydown}
-            />
-          </div>
+					<div class="space-y-2">
+						<TextInput
+							type="text"
+							placeholder="My Profile"
+							bind:value={newProfileName}
+							onkeydown={handleCreateProfileInputKeydown}
+						/>
+					</div>
 
-          {#snippet footer()}
-            <div class="flex justify-end gap-2">
-              <Btn
-                variant="outline"
-                onclick={() => (createProfileOpen = false)}
-              >
-                Cancel
-              </Btn>
-              <Btn
-                variant="primary"
-                onclick={confirmCreateProfile}
-                disabled={!newProfileName.trim()}
-              >
-                Create
-              </Btn>
-            </div>
-          {/snippet}
-        </Modal>
+					{#snippet footer()}
+						<div class="flex justify-end gap-2">
+							<Btn
+								variant="outline"
+								onclick={() => (createProfileOpen = false)}
+							>
+								Cancel
+							</Btn>
+							<Btn
+								variant="primary"
+								onclick={confirmCreateProfile}
+								disabled={!newProfileName.trim()}
+							>
+								Create
+							</Btn>
+						</div>
+					{/snippet}
+				</Modal>
 
-        {#if profileStore.current !== "Default"}
-          <DropdownMenu.Item
-            class="dropdown-item text-destructive hover:bg-destructive/10"
-            onclick={(e) => openDeleteProfileDialog(profileStore.current, e)}
-          >
-            <span>Delete Current</span>
-          </DropdownMenu.Item>
-        {/if}
-      </DropdownMenu.Content>
-    </DropdownMenu.Root>
+				{#if profileStore.current !== "Default"}
+					<DropdownMenu.Item
+						class="dropdown-item text-destructive hover:bg-destructive/10"
+						onclick={(e) => openDeleteProfileDialog(profileStore.current, e)}
+					>
+						<span>Delete Current</span>
+					</DropdownMenu.Item>
+				{/if}
+			</DropdownMenu.Content>
+		</DropdownMenu.Root>
 
-    <!-- Tools -->
-    <Popover.Root bind:open={toolsOpen}>
-      <Tip content="Tools">
-        {#snippet children({ props })}
-          <Popover.Trigger class="icon-btn" aria-label="Tools" {...props}>
-            <Wrench size={20} />
-          </Popover.Trigger>
-        {/snippet}
-      </Tip>
-      <Popover.Content
-        class="popover-content w-auto! min-w-52"
-        side="top"
-        align="end"
-        sideOffset={6}
-      >
-        <h4 class="font-medium text-sm mb-2">Tools</h4>
-        <div class="grid gap-0.5">
-          <button class="dropdown-item w-full justify-start!" onclick={goHome}>
-            <House class="me-2 h-4 w-4" />
-            <span>Home</span>
-          </button>
+		<!-- Tools -->
+		<Popover.Root bind:open={toolsOpen}>
+			<Tip content="Tools">
+				{#snippet children({ props })}
+					<Popover.Trigger class="icon-btn" aria-label="Tools" {...props}>
+						<Wrench size={20} />
+					</Popover.Trigger>
+				{/snippet}
+			</Tip>
+			<Popover.Content
+				class="popover-content w-auto! min-w-52"
+				side="top"
+				align="end"
+				sideOffset={6}
+			>
+				<h4 class="font-medium text-sm mb-2">Tools</h4>
+				<div class="grid gap-0.5">
+					<button class="dropdown-item w-full justify-start!" onclick={goHome}>
+						<House class="me-2 h-4 w-4" />
+						<span>Home</span>
+					</button>
 
-          <Popover.Root>
-            <Popover.Trigger class="dropdown-item w-full justify-start!">
-              {#if settingsStore.theme === "light"}
-                <Sun class="me-2 h-4 w-4" />
-              {:else if settingsStore.theme === "dark"}
-                <Moon class="me-2 h-4 w-4" />
-              {:else}
-                <SunMoon class="me-2 h-4 w-4" />
-              {/if}
-              <span>Theme</span>
-            </Popover.Trigger>
-            <Popover.Content
-              class="popover-content w-auto! min-w-40"
-              side="top"
-              align="start"
-              sideOffset={6}
-            >
-              <h4 class="font-medium text-sm mb-1">Theme</h4>
-              <div class="grid gap-0.5">
-                <button
-                  class="dropdown-item w-full justify-start!"
-                  onclick={() => settingsStore.setTheme("light")}
-                >
-                  <Sun class="me-2 h-4 w-4" />
-                  <span>Light</span>
-                  {#if settingsStore.theme === "light"}
-                    <Check class="ms-2 h-4 w-4" />
-                  {/if}
-                </button>
-                <button
-                  class="dropdown-item w-full justify-start!"
-                  onclick={() => settingsStore.setTheme("dark")}
-                >
-                  <Moon class="me-2 h-4 w-4" />
-                  <span>Dark</span>
-                  {#if settingsStore.theme === "dark"}
-                    <Check class="ms-2 h-4 w-4" />
-                  {/if}
-                </button>
-                <button
-                  class="dropdown-item w-full justify-start!"
-                  onclick={() => settingsStore.setTheme("system")}
-                >
-                  <SunMoon class="me-2 h-4 w-4" />
-                  <span>System</span>
-                  {#if settingsStore.theme === "system"}
-                    <Check class="ms-2 h-4 w-4" />
-                  {/if}
-                </button>
-              </div>
-            </Popover.Content>
-          </Popover.Root>
+					<Popover.Root>
+						<Popover.Trigger class="dropdown-item w-full justify-start!">
+							{#if settingsStore.theme === "light"}
+								<Sun class="me-2 h-4 w-4" />
+							{:else if settingsStore.theme === "dark"}
+								<Moon class="me-2 h-4 w-4" />
+							{:else}
+								<SunMoon class="me-2 h-4 w-4" />
+							{/if}
+							<span>Theme</span>
+						</Popover.Trigger>
+						<Popover.Content
+							class="popover-content w-auto! min-w-40"
+							side="top"
+							align="start"
+							sideOffset={6}
+						>
+							<h4 class="font-medium text-sm mb-1">Theme</h4>
+							<div class="grid gap-0.5">
+								<button
+									class="dropdown-item w-full justify-start!"
+									onclick={() => settingsStore.setTheme("light")}
+								>
+									<Sun class="me-2 h-4 w-4" />
+									<span>Light</span>
+									{#if settingsStore.theme === "light"}
+										<Check class="ms-2 h-4 w-4" />
+									{/if}
+								</button>
+								<button
+									class="dropdown-item w-full justify-start!"
+									onclick={() => settingsStore.setTheme("dark")}
+								>
+									<Moon class="me-2 h-4 w-4" />
+									<span>Dark</span>
+									{#if settingsStore.theme === "dark"}
+										<Check class="ms-2 h-4 w-4" />
+									{/if}
+								</button>
+								<button
+									class="dropdown-item w-full justify-start!"
+									onclick={() => settingsStore.setTheme("system")}
+								>
+									<SunMoon class="me-2 h-4 w-4" />
+									<span>System</span>
+									{#if settingsStore.theme === "system"}
+										<Check class="ms-2 h-4 w-4" />
+									{/if}
+								</button>
+							</div>
+						</Popover.Content>
+					</Popover.Root>
 
-          <button
-            class="dropdown-item w-full justify-start!"
-            onclick={() => (settingsOpen = true)}
-          >
-            <Settings class="me-2 h-4 w-4" />
-            <span>Settings</span>
-          </button>
+					<button
+						class="dropdown-item w-full justify-start!"
+						onclick={() => (settingsOpen = true)}
+					>
+						<Settings class="me-2 h-4 w-4" />
+						<span>Settings</span>
+					</button>
 
-          <button
-            class="dropdown-item w-full justify-start!"
-            onclick={() => {
-              toolsOpen = false;
-              announcementsStore.openList();
-            }}
-          >
-            <Megaphone class="me-2 h-4 w-4" />
-            <span>Announcements</span>
-          </button>
+					<button
+						class="dropdown-item w-full justify-start!"
+						onclick={() => {
+							toolsOpen = false;
+							announcementsStore.openList();
+						}}
+					>
+						<Megaphone class="me-2 h-4 w-4" />
+						<span>Announcements</span>
+					</button>
 
-          <GlobalModifier
-            variant="menu"
-            onOpen={() => {
-              toolsOpen = false;
-              modifierOpen = true;
-            }}
-          />
+					<GlobalModifier
+						variant="menu"
+						onOpen={() => {
+							toolsOpen = false;
+							modifierOpen = true;
+						}}
+					/>
 
-          <StatsChart
-            variant="menu"
-            onOpen={() => {
-              toolsOpen = false;
-              chartOpen = true;
-            }}
-          />
+					<StatsChart
+						variant="menu"
+						onOpen={() => {
+							toolsOpen = false;
+							chartOpen = true;
+						}}
+					/>
 
-          <CreateTower
-            variant="menu"
-            onCreated={async (name) => {
-              toolsOpen = false;
-              await performTowerSelect(name);
-            }}
-          />
-        </div>
-      </Popover.Content>
-    </Popover.Root>
-  </div>
+					<CreateTower
+						variant="menu"
+						onCreated={async (name) => {
+							toolsOpen = false;
+							await performTowerSelect(name);
+						}}
+					/>
+				</div>
+			</Popover.Content>
+		</Popover.Root>
+	</div>
 </div>
 
 <SettingsModal bind:open={settingsOpen} />
@@ -581,37 +581,37 @@
 <StatsChartModal bind:open={chartOpen} />
 
 {#snippet discardBody()}
-  {#if pendingDiscardAction}
-    <DiscardMessage
-      action={pendingDiscardAction}
-      towerName={towerStore.selectedName}
-      profileName={profileStore.current}
-    />
-  {/if}
+	{#if pendingDiscardAction}
+		<DiscardMessage
+			action={pendingDiscardAction}
+			towerName={towerStore.selectedName}
+			profileName={profileStore.current}
+		/>
+	{/if}
 {/snippet}
 
 <Alert
-  bind:open={discardOpen}
-  title="Discard unsaved changes?"
-  body={discardBody}
-  confirmLabel="Discard and continue"
-  confirmClass="btn destructive-fill text-white"
-  onConfirm={confirmDiscard}
-  onCancel={cancelDiscard}
+	bind:open={discardOpen}
+	title="Discard unsaved changes?"
+	body={discardBody}
+	confirmLabel="Discard and continue"
+	confirmClass="btn destructive-fill text-white"
+	onConfirm={confirmDiscard}
+	onCancel={cancelDiscard}
 />
 
 {#snippet deleteProfileBody()}
-  This action cannot be undone. This will permanently delete the profile
-  <span class="font-bold text-foreground">{profileToDelete}</span>
-  and remove all data associated with it.
+	This action cannot be undone. This will permanently delete the profile
+	<span class="font-bold text-foreground">{profileToDelete}</span>
+	and remove all data associated with it.
 {/snippet}
 
 <Alert
-  bind:open={deleteProfileOpen}
-  title="Are you absolutely sure?"
-  body={deleteProfileBody}
-  confirmLabel="Delete"
-  confirmClass="btn destructive-fill text-white"
-  onConfirm={confirmDeleteProfile}
-  onCancel={() => (profileToDelete = null)}
+	bind:open={deleteProfileOpen}
+	title="Are you absolutely sure?"
+	body={deleteProfileBody}
+	confirmLabel="Delete"
+	confirmClass="btn destructive-fill text-white"
+	onConfirm={confirmDeleteProfile}
+	onCancel={() => (profileToDelete = null)}
 />

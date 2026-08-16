@@ -1,429 +1,429 @@
 <script lang="ts">
-  import { onMount, untrack } from "svelte";
-  import { Popover } from "bits-ui";
-  import Btn from "./smol/Btn.svelte";
-  import Tip from "./smol/Tip.svelte";
-  import { Annotation, EditorState } from "@codemirror/state";
-  import { lintGutter } from "@codemirror/lint";
-  import { EditorView, keymap, lineNumbers } from "@codemirror/view";
-  import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
-  import {
-    defaultHighlightStyle,
-    syntaxHighlighting,
-  } from "@codemirror/language";
-  import { mediawiki } from "@bhsd/codemirror-wikitext";
-  import parserConfig from "wikiparser-node/config/default.json" with { type: "json" };
-  import type { ConfigData } from "wikiparser-node";
-  import { neowtextSupport } from "$lib/neowtext/codemirror";
-  import { towerStore } from "$lib/stores/tower.svelte";
-  import { profileStore } from "$lib/stores/profile.svelte";
-  import { settingsStore } from "$lib/stores/settings.svelte";
-  import { setWikiOverride } from "$lib/neowtext/wikiSource";
-  import { noFetchTowers } from "$lib/services/fetchTowerWiki";
-  import { isCustomTower } from "$lib/towerComponents/customTowers";
-  import { analytics } from "$lib/services/analytics";
-  import { toast } from "$lib/toast";
+	import { onMount, untrack } from "svelte";
+	import { Popover } from "bits-ui";
+	import Btn from "./smol/Btn.svelte";
+	import Tip from "./smol/Tip.svelte";
+	import { Annotation, EditorState } from "@codemirror/state";
+	import { lintGutter } from "@codemirror/lint";
+	import { EditorView, keymap, lineNumbers } from "@codemirror/view";
+	import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
+	import {
+		defaultHighlightStyle,
+		syntaxHighlighting,
+	} from "@codemirror/language";
+	import { mediawiki } from "@bhsd/codemirror-wikitext";
+	import parserConfig from "wikiparser-node/config/default.json" with { type: "json" };
+	import type { ConfigData } from "wikiparser-node";
+	import { neowtextSupport } from "$lib/neowtext/codemirror";
+	import { towerStore } from "$lib/stores/tower.svelte";
+	import { profileStore } from "$lib/stores/profile.svelte";
+	import { settingsStore } from "$lib/stores/settings.svelte";
+	import { setWikiOverride } from "$lib/neowtext/wikiSource";
+	import { noFetchTowers } from "$lib/services/fetchTowerWiki";
+	import { isCustomTower } from "$lib/towerComponents/customTowers";
+	import { analytics } from "$lib/services/analytics";
+	import { toast } from "$lib/toast";
 
-  const syncFromStoreAnnotation = Annotation.define<boolean>();
-  const editorTheme = EditorView.theme({
-    "&": {
-      fontSize: ".75rem",
-      lineHeight: "1.25rem",
-      color: "var(--foreground)",
-      backgroundColor: "transparent",
-    },
-    "&.cm-editor": {
-      maxHeight: "min(48rem, calc(100dvh - 12rem))",
-      outline: "none",
-      border: "1px solid var(--border)",
-      borderRadius: "var(--radius)",
-      backgroundColor: "var(--card)",
-    },
-    ".cm-scroller": {
-      overflow: "auto",
-    },
-    ".cm-content": {
-      padding: ".5rem .75rem",
-      caretColor: "var(--foreground)",
-    },
-    ".cm-gutters": {
-      backgroundColor: "color-mix(in oklch, var(--muted) 30%, transparent)",
-      color: "var(--muted-foreground)",
-      borderRight: "1px solid var(--border)",
-    },
-    ".cm-lineNumbers .cm-gutterElement": {
-      minWidth: "2.25rem",
-      padding: "0 .35rem 0 .5rem",
-    },
-    ".cm-foldGutter .cm-gutterElement": {
-      width: "0.85rem",
-      padding: "0 .15rem",
-    },
-    ".cm-panel.cm-panel-lint, .cm-panel-status": {
-      borderTop: "1px solid var(--border)",
-      backgroundColor:
-        "color-mix(in oklch, var(--muted) 25%, var(--background))",
-      color: "var(--foreground)",
-      fontSize: ".7rem",
-      borderRadius: "0 0 var(--radius) var(--radius)",
-    },
-    ".cm-panels": {
-      zIndex: "37",
-    },
-    ".cm-panels-bottom": {
-      borderTop: "none",
-      backgroundColor: "transparent",
-    },
-    ".cm-activeLineGutter": {
-      backgroundColor: "color-mix(in oklch, var(--muted) 50%, transparent)",
-    },
-    ".cm-activeLine": {
-      backgroundColor: "color-mix(in oklch, var(--muted) 35%, transparent)",
-    },
-    "&.cm-focused .cm-selectionBackground, .cm-selectionBackground": {
-      backgroundColor: "color-mix(in oklch, var(--primary) 25%, transparent)",
-    },
-    ".cm-tooltip": {
-      border: "1px solid var(--border)",
-      backgroundColor: "var(--popover)",
-      color: "var(--popover-foreground)",
-    },
-    ".cm-tooltip-section:not(:first-child)": {
-      borderTop: "1px solid var(--border)",
-    },
-    ".cm-tooltip-autocomplete ul li[aria-selected]": {
-      backgroundColor: "var(--accent)",
-      color: "var(--accent-foreground)",
-    },
-    ".cm-diagnosticAction": {
-      backgroundColor: "var(--secondary)",
-      color: "var(--secondary-foreground)",
-    },
-  });
+	const syncFromStoreAnnotation = Annotation.define<boolean>();
+	const editorTheme = EditorView.theme({
+		"&": {
+			fontSize: ".75rem",
+			lineHeight: "1.25rem",
+			color: "var(--foreground)",
+			backgroundColor: "transparent",
+		},
+		"&.cm-editor": {
+			maxHeight: "min(48rem, calc(100dvh - 12rem))",
+			outline: "none",
+			border: "1px solid var(--border)",
+			borderRadius: "var(--radius)",
+			backgroundColor: "var(--card)",
+		},
+		".cm-scroller": {
+			overflow: "auto",
+		},
+		".cm-content": {
+			padding: ".5rem .75rem",
+			caretColor: "var(--foreground)",
+		},
+		".cm-gutters": {
+			backgroundColor: "color-mix(in oklch, var(--muted) 30%, transparent)",
+			color: "var(--muted-foreground)",
+			borderRight: "1px solid var(--border)",
+		},
+		".cm-lineNumbers .cm-gutterElement": {
+			minWidth: "2.25rem",
+			padding: "0 .35rem 0 .5rem",
+		},
+		".cm-foldGutter .cm-gutterElement": {
+			width: "0.85rem",
+			padding: "0 .15rem",
+		},
+		".cm-panel.cm-panel-lint, .cm-panel-status": {
+			borderTop: "1px solid var(--border)",
+			backgroundColor:
+				"color-mix(in oklch, var(--muted) 25%, var(--background))",
+			color: "var(--foreground)",
+			fontSize: ".7rem",
+			borderRadius: "0 0 var(--radius) var(--radius)",
+		},
+		".cm-panels": {
+			zIndex: "37",
+		},
+		".cm-panels-bottom": {
+			borderTop: "none",
+			backgroundColor: "transparent",
+		},
+		".cm-activeLineGutter": {
+			backgroundColor: "color-mix(in oklch, var(--muted) 50%, transparent)",
+		},
+		".cm-activeLine": {
+			backgroundColor: "color-mix(in oklch, var(--muted) 35%, transparent)",
+		},
+		"&.cm-focused .cm-selectionBackground, .cm-selectionBackground": {
+			backgroundColor: "color-mix(in oklch, var(--primary) 25%, transparent)",
+		},
+		".cm-tooltip": {
+			border: "1px solid var(--border)",
+			backgroundColor: "var(--popover)",
+			color: "var(--popover-foreground)",
+		},
+		".cm-tooltip-section:not(:first-child)": {
+			borderTop: "1px solid var(--border)",
+		},
+		".cm-tooltip-autocomplete ul li[aria-selected]": {
+			backgroundColor: "var(--accent)",
+			color: "var(--accent-foreground)",
+		},
+		".cm-diagnosticAction": {
+			backgroundColor: "var(--secondary)",
+			color: "var(--secondary-foreground)",
+		},
+	});
 
-  let {
-    towerName,
-    open = false,
-  }: {
-    towerName: string;
-    open?: boolean;
-  } = $props();
+	let {
+		towerName,
+		open = false,
+	}: {
+		towerName: string;
+		open?: boolean;
+	} = $props();
 
-  let saving = $state(false);
-  let errorMessage = $state<string | null>(null);
-  let editorContainer = $state<HTMLElement>();
-  let editorView: EditorView | undefined;
-  let editorReady = $state(false);
+	let saving = $state(false);
+	let errorMessage = $state<string | null>(null);
+	let editorContainer = $state<HTMLElement>();
+	let editorView: EditorView | undefined;
+	let editorReady = $state(false);
 
-  function syncToStore(doc: string) {
-    const dirty = doc !== towerStore.originalWikitext;
-    if (doc === towerStore.effectiveWikitext && towerStore.isDirty === dirty) {
-      return;
-    }
+	function syncToStore(doc: string) {
+		const dirty = doc !== towerStore.originalWikitext;
+		if (doc === towerStore.effectiveWikitext && towerStore.isDirty === dirty) {
+			return;
+		}
 
-    towerStore.updateSourceWikitext(doc);
+		towerStore.updateSourceWikitext(doc);
 
-    if (settingsStore.debugMode) {
-      console.log(
-        "[WikiEditor] syncToStore -> effectiveWikitext length:",
-        doc.length,
-      );
-    }
-  }
+		if (settingsStore.debugMode) {
+			console.log(
+				"[WikiEditor] syncToStore -> effectiveWikitext length:",
+				doc.length,
+			);
+		}
+	}
 
-  function setEditorDoc(doc: string) {
-    if (!editorView) return;
+	function setEditorDoc(doc: string) {
+		if (!editorView) return;
 
-    const current = editorView.state.doc.toString();
-    if (current === doc) return;
+		const current = editorView.state.doc.toString();
+		if (current === doc) return;
 
-    editorView.dispatch({
-      changes: { from: 0, to: current.length, insert: doc },
-      annotations: syncFromStoreAnnotation.of(true),
-    });
-  }
+		editorView.dispatch({
+			changes: { from: 0, to: current.length, insert: doc },
+			annotations: syncFromStoreAnnotation.of(true),
+		});
+	}
 
-  function createEditor(container: HTMLElement) {
-    towerStore.guaraWikitextSynced();
-    return new EditorView({
-      state: EditorState.create({
-        doc: towerStore.effectiveWikitext,
-        extensions: [
-          history(),
-          keymap.of([...defaultKeymap, ...historyKeymap]),
-          lineNumbers(),
-          lintGutter(),
-          mediawiki(parserConfig as unknown as ConfigData),
-          neowtextSupport,
-          syntaxHighlighting(defaultHighlightStyle),
-          EditorView.lineWrapping,
-          editorTheme,
-          EditorView.updateListener.of((update) => {
-            if (
-              !update.docChanged ||
-              update.transactions.some((tr) =>
-                tr.annotation(syncFromStoreAnnotation),
-              )
-            ) {
-              return;
-            }
-            syncToStore(update.state.doc.toString());
-          }),
-        ],
-      }),
-      parent: container,
-    });
-  }
+	function createEditor(container: HTMLElement) {
+		towerStore.guaraWikitextSynced();
+		return new EditorView({
+			state: EditorState.create({
+				doc: towerStore.effectiveWikitext,
+				extensions: [
+					history(),
+					keymap.of([...defaultKeymap, ...historyKeymap]),
+					lineNumbers(),
+					lintGutter(),
+					mediawiki(parserConfig as unknown as ConfigData),
+					neowtextSupport,
+					syntaxHighlighting(defaultHighlightStyle),
+					EditorView.lineWrapping,
+					editorTheme,
+					EditorView.updateListener.of((update) => {
+						if (
+							!update.docChanged ||
+							update.transactions.some((tr) =>
+								tr.annotation(syncFromStoreAnnotation),
+							)
+						) {
+							return;
+						}
+						syncToStore(update.state.doc.toString());
+					}),
+				],
+			}),
+			parent: container,
+		});
+	}
 
-  async function discardChanges() {
-    if (!towerStore.isDirty) return;
+	async function discardChanges() {
+		if (!towerStore.isDirty) return;
 
-    await towerStore.discardChanges();
-    errorMessage = null;
-    setEditorDoc(towerStore.effectiveWikitext);
-    toast.success("Changes discarded.");
-  }
+		await towerStore.discardChanges();
+		errorMessage = null;
+		setEditorDoc(towerStore.effectiveWikitext);
+		toast.success("Changes discarded.");
+	}
 
-  function saveOverride() {
-    if (!towerName) return;
+	function saveOverride() {
+		if (!towerName) return;
 
-    saving = true;
-    errorMessage = null;
+		saving = true;
+		errorMessage = null;
 
-    try {
-      towerStore.guaraWikitextSynced();
-      setWikiOverride(
-        profileStore.current,
-        towerName,
-        towerStore.effectiveWikitext,
-      );
-      towerStore.isDirty = false;
-      void towerStore.forceReload();
-      toast.success("Override saved!");
-    } catch (err) {
-      console.error("[WikiEditor] saveOverride error:", err);
-      errorMessage = err instanceof Error ? err.message : String(err);
-      toast.error(errorMessage);
-    } finally {
-      saving = false;
-    }
-  }
+		try {
+			towerStore.guaraWikitextSynced();
+			setWikiOverride(
+				profileStore.current,
+				towerName,
+				towerStore.effectiveWikitext,
+			);
+			towerStore.isDirty = false;
+			void towerStore.forceReload();
+			toast.success("Override saved!");
+		} catch (err) {
+			console.error("[WikiEditor] saveOverride error:", err);
+			errorMessage = err instanceof Error ? err.message : String(err);
+			toast.error(errorMessage);
+		} finally {
+			saving = false;
+		}
+	}
 
-  async function handleResetOrDelete() {
-    if (towerStore.isCustomSelected()) {
-      if (await towerStore.confirmDeleteTower())
-        toast.success("Tower deleted.");
-    } else if (await towerStore.reset()) {
-      toast.success("Tower reset.");
-    }
-  }
+	async function handleResetOrDelete() {
+		if (towerStore.isCustomSelected()) {
+			if (await towerStore.confirmDeleteTower())
+				toast.success("Tower deleted.");
+		} else if (await towerStore.reset()) {
+			toast.success("Tower reset.");
+		}
+	}
 
-  let isFetching = $state(false);
+	let isFetching = $state(false);
 
-  async function handleFetchWiki() {
-    if (!towerName) return;
+	async function handleFetchWiki() {
+		if (!towerName) return;
 
-    isFetching = true;
-    try {
-      const { fetchTowerWiki } = await import("$lib/services/fetchTowerWiki");
-      const { setWikiOverride } = await import("$lib/neowtext/wikiSource");
-      const wikitext = await fetchTowerWiki(towerName, true);
-      if (wikitext) {
-        setWikiOverride(profileStore.current, towerName, wikitext);
-        towerStore.isDirty = false;
-        await towerStore.forceReload();
-        analytics.track("wiki_fetch", {
-          tower_name: towerName,
-          success: true,
-        });
-        toast.success("Fetched latest from the Wiki!");
-      } else {
-        analytics.track("wiki_fetch", {
-          tower_name: towerName,
-          success: false,
-        });
-        toast.error("Failed to fetch Neowtext from the Wiki.");
-      }
-    } catch (e) {
-      console.error(e);
-      analytics.track("wiki_fetch", {
-        tower_name: towerName,
-        success: false,
-      });
-      toast.error("Error fetching from the Wiki.");
-    } finally {
-      isFetching = false;
-    }
-  }
+		isFetching = true;
+		try {
+			const { fetchTowerWiki } = await import("$lib/services/fetchTowerWiki");
+			const { setWikiOverride } = await import("$lib/neowtext/wikiSource");
+			const wikitext = await fetchTowerWiki(towerName, true);
+			if (wikitext) {
+				setWikiOverride(profileStore.current, towerName, wikitext);
+				towerStore.isDirty = false;
+				await towerStore.forceReload();
+				analytics.track("wiki_fetch", {
+					tower_name: towerName,
+					success: true,
+				});
+				toast.success("Fetched latest from the Wiki!");
+			} else {
+				analytics.track("wiki_fetch", {
+					tower_name: towerName,
+					success: false,
+				});
+				toast.error("Failed to fetch Neowtext from the Wiki.");
+			}
+		} catch (e) {
+			console.error(e);
+			analytics.track("wiki_fetch", {
+				tower_name: towerName,
+				success: false,
+			});
+			toast.error("Error fetching from the Wiki.");
+		} finally {
+			isFetching = false;
+		}
+	}
 
-  onMount(() => {
-    if (!editorContainer) return;
+	onMount(() => {
+		if (!editorContainer) return;
 
-    editorView = createEditor(editorContainer);
-    editorReady = true;
+		editorView = createEditor(editorContainer);
+		editorReady = true;
 
-    return () => {
-      editorView?.destroy();
-      editorView = undefined;
-      editorReady = false;
-    };
-  });
+		return () => {
+			editorView?.destroy();
+			editorView = undefined;
+			editorReady = false;
+		};
+	});
 
-  $effect(() => {
-    if (!editorReady || !editorView) return;
+	$effect(() => {
+		if (!editorReady || !editorView) return;
 
-    towerStore.refreshTrigger;
-    untrack(() => {
-      towerStore.guaraWikitextSynced();
-      setEditorDoc(towerStore.effectiveWikitext);
-    });
-  });
+		towerStore.refreshTrigger;
+		untrack(() => {
+			towerStore.guaraWikitextSynced();
+			setEditorDoc(towerStore.effectiveWikitext);
+		});
+	});
 
-  const canSave = $derived(
-    editorReady &&
-      !!towerName &&
-      towerStore.effectiveWikitext.trim().length > 0,
-  );
+	const canSave = $derived(
+		editorReady &&
+			!!towerName &&
+			towerStore.effectiveWikitext.trim().length > 0,
+	);
 </script>
 
 {#if open}
-  <div class="flex justify-end gap-2 mb-4">
-    {#if !noFetchTowers.has(towerName) && !isCustomTower(towerName)}
-      <Popover.Root>
-        <Tip content="Fetch latest Neowtext from the TDS Wiki">
-          {#snippet children({ props })}
-            <Popover.Trigger
-              class="btn secondary"
-              disabled={isFetching || saving}
-              {...props}
-            >
-              {isFetching ? "Fetching..." : "Fetch Latest Data"}
-            </Popover.Trigger>
-          {/snippet}
-        </Tip>
-        <Popover.Content class="popover-content" sideOffset={6}>
-          <div class="space-y-2">
-            <h4 class="font-medium leading-none">Confirm Fetch</h4>
-            <p class="text-sm text-muted-foreground">
-              Are you sure you want to replace your current data with the latest
-              from Tower Defense Simulator Wiki? This will overwrite your local
-              changes.
-            </p>
-          </div>
-          <div class="flex justify-end mt-4 gap-2">
-            <Popover.Close class="btn outline">Cancel</Popover.Close>
-            <Popover.Close class="btn primary" onclick={handleFetchWiki}>
-              Confirm
-            </Popover.Close>
-          </div>
-        </Popover.Content>
-      </Popover.Root>
-    {/if}
+	<div class="flex justify-end gap-2 mb-4">
+		{#if !noFetchTowers.has(towerName) && !isCustomTower(towerName)}
+			<Popover.Root>
+				<Tip content="Fetch latest Neowtext from the TDS Wiki">
+					{#snippet children({ props })}
+						<Popover.Trigger
+							class="btn secondary"
+							disabled={isFetching || saving}
+							{...props}
+						>
+							{isFetching ? "Fetching..." : "Fetch Latest Data"}
+						</Popover.Trigger>
+					{/snippet}
+				</Tip>
+				<Popover.Content class="popover-content" sideOffset={6}>
+					<div class="space-y-2">
+						<h4 class="font-medium leading-none">Confirm Fetch</h4>
+						<p class="text-sm text-muted-foreground">
+							Are you sure you want to replace your current data with the latest
+							from Tower Defense Simulator Wiki? This will overwrite your local
+							changes.
+						</p>
+					</div>
+					<div class="flex justify-end mt-4 gap-2">
+						<Popover.Close class="btn outline">Cancel</Popover.Close>
+						<Popover.Close class="btn primary" onclick={handleFetchWiki}>
+							Confirm
+						</Popover.Close>
+					</div>
+				</Popover.Content>
+			</Popover.Root>
+		{/if}
 
-    <Btn
-      variant="secondary"
-      onclick={() => void discardChanges()}
-      disabled={!towerStore.isDirty || saving}
-      title="Discard unsaved changes"
-    >
-      Discard
-    </Btn>
+		<Btn
+			variant="secondary"
+			onclick={() => void discardChanges()}
+			disabled={!towerStore.isDirty || saving}
+			title="Discard unsaved changes"
+		>
+			Discard
+		</Btn>
 
-    <Popover.Root>
-      <Popover.Trigger class="btn destructive text-white">
-        {towerStore.isCustomSelected() ? "Delete Tower" : "Reset Tower"}
-      </Popover.Trigger>
-      <Popover.Content class="popover-content" sideOffset={6}>
-        <div class="space-y-2">
-          <h4 class="font-medium leading-none">
-            {towerStore.isCustomSelected() ? "Confirm Delete" : "Confirm Reset"}
-          </h4>
-          <p class="text-sm text-muted-foreground">
-            {#if towerStore.isCustomSelected()}
-              Are you sure you want to permanently delete
-              <span class="font-bold">{towerName}</span>? This removes the tower
-              and all saved data across every profile.
-            {:else}
-              Are you sure you want to reset all changes for
-              <span class="font-bold">{towerName}</span>
-              in profile
-              <span class="font-bold">{profileStore.current}</span>? This action
-              cannot be undone.
-            {/if}
-          </p>
-        </div>
-        <div class="mt-4 flex justify-end gap-2">
-          <Popover.Close class="btn outline">Cancel</Popover.Close>
-          <Popover.Close
-            class="btn destructive-fill text-white"
-            onclick={() => void handleResetOrDelete()}
-          >
-            Confirm
-          </Popover.Close>
-        </div>
-      </Popover.Content>
-    </Popover.Root>
+		<Popover.Root>
+			<Popover.Trigger class="btn destructive text-white">
+				{towerStore.isCustomSelected() ? "Delete Tower" : "Reset Tower"}
+			</Popover.Trigger>
+			<Popover.Content class="popover-content" sideOffset={6}>
+				<div class="space-y-2">
+					<h4 class="font-medium leading-none">
+						{towerStore.isCustomSelected() ? "Confirm Delete" : "Confirm Reset"}
+					</h4>
+					<p class="text-sm text-muted-foreground">
+						{#if towerStore.isCustomSelected()}
+							Are you sure you want to permanently delete
+							<span class="font-bold">{towerName}</span>? This removes the tower
+							and all saved data across every profile.
+						{:else}
+							Are you sure you want to reset all changes for
+							<span class="font-bold">{towerName}</span>
+							in profile
+							<span class="font-bold">{profileStore.current}</span>? This action
+							cannot be undone.
+						{/if}
+					</p>
+				</div>
+				<div class="mt-4 flex justify-end gap-2">
+					<Popover.Close class="btn outline">Cancel</Popover.Close>
+					<Popover.Close
+						class="btn destructive-fill text-white"
+						onclick={() => void handleResetOrDelete()}
+					>
+						Confirm
+					</Popover.Close>
+				</div>
+			</Popover.Content>
+		</Popover.Root>
 
-    <Popover.Root>
-      <Tip
-        content={towerStore.sharePreviewId
-          ? "Exit share preview or apply from the visual editor first"
-          : "Save as profile override"}
-      >
-        {#snippet children({ props })}
-          <Popover.Trigger
-            class="btn primary"
-            disabled={!canSave ||
-              !towerStore.isDirty ||
-              saving ||
-              !!towerStore.sharePreviewId}
-            {...props}
-          >
-            {saving ? "Saving..." : "Save Override"}
-          </Popover.Trigger>
-        {/snippet}
-      </Tip>
-      <Popover.Content class="popover-content" sideOffset={6}>
-        <div class="space-y-2">
-          <h4 class="font-medium leading-none">Confirm Override</h4>
-          <p class="text-sm text-muted-foreground">
-            This writes the source neowtext directly to your profile and reloads
-            the tower, effectively setting a new baseline. This means no new
-            delta difference will be taken into account, for example.
-          </p>
-        </div>
-        <div class="flex justify-end mt-4 gap-2">
-          <Popover.Close class="btn outline">Cancel</Popover.Close>
-          <Popover.Close class="btn primary" onclick={saveOverride}>
-            Confirm
-          </Popover.Close>
-        </div>
-      </Popover.Content>
-    </Popover.Root>
-  </div>
+		<Popover.Root>
+			<Tip
+				content={towerStore.sharePreviewId
+					? "Exit share preview or apply from the visual editor first"
+					: "Save as profile override"}
+			>
+				{#snippet children({ props })}
+					<Popover.Trigger
+						class="btn primary"
+						disabled={!canSave ||
+							!towerStore.isDirty ||
+							saving ||
+							!!towerStore.sharePreviewId}
+						{...props}
+					>
+						{saving ? "Saving..." : "Save Override"}
+					</Popover.Trigger>
+				{/snippet}
+			</Tip>
+			<Popover.Content class="popover-content" sideOffset={6}>
+				<div class="space-y-2">
+					<h4 class="font-medium leading-none">Confirm Override</h4>
+					<p class="text-sm text-muted-foreground">
+						This writes the source neowtext directly to your profile and reloads
+						the tower, effectively setting a new baseline. This means no new
+						delta difference will be taken into account, for example.
+					</p>
+				</div>
+				<div class="flex justify-end mt-4 gap-2">
+					<Popover.Close class="btn outline">Cancel</Popover.Close>
+					<Popover.Close class="btn primary" onclick={saveOverride}>
+						Confirm
+					</Popover.Close>
+				</div>
+			</Popover.Content>
+		</Popover.Root>
+	</div>
 
-  {#if errorMessage}
-    <div class="rounded-md border border-red-500/30 bg-red-500/10 p-3">
-      <div class="text-sm font-medium text-red-600">Error</div>
-      <div class="text-xs text-red-600/90 wrap-break-word mt-1">
-        {errorMessage}
-      </div>
-    </div>
-  {/if}
+	{#if errorMessage}
+		<div class="rounded-md border border-red-500/30 bg-red-500/10 p-3">
+			<div class="text-sm font-medium text-red-600">Error</div>
+			<div class="text-xs text-red-600/90 wrap-break-word mt-1">
+				{errorMessage}
+			</div>
+		</div>
+	{/if}
 
-  <div class="space-y-2">
-    <div class="wiki-cm-host w-full" bind:this={editorContainer}></div>
+	<div class="space-y-2">
+		<div class="wiki-cm-host w-full" bind:this={editorContainer}></div>
 
-    <p class="text-xs text-muted-foreground">
-      The source editor uses Neowtext, which includes features such as variables
-      and is likely to be unfamiliar to most people. Refer to the
-      <a
-        href="https://tds.fandom.com/wiki/Help:Neowtext"
-        target="_blank"
-        rel="noopener"
-        class="text-blue-500 underline">help page</a
-      >
-      to learn more about it.
-    </p>
-  </div>
+		<p class="text-xs text-muted-foreground">
+			The source editor uses Neowtext, which includes features such as variables
+			and is likely to be unfamiliar to most people. Refer to the
+			<a
+				href="https://tds.fandom.com/wiki/Help:Neowtext"
+				target="_blank"
+				rel="noopener"
+				class="text-blue-500 underline">help page</a
+			>
+			to learn more about it.
+		</p>
+	</div>
 {/if}

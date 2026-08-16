@@ -4,111 +4,111 @@ import { formatNumber } from "$lib/utils/format";
 interface TableRow extends Record<string, string | number | boolean | object> {}
 
 interface SkinDataJSON {
-  Headers: string[];
-  RawHeaders?: string[];
-  RawRows: TableRow[];
-  MoneyColumns?: string[];
-  Name?: string;
+	Headers: string[];
+	RawHeaders?: string[];
+	RawRows: TableRow[];
+	MoneyColumns?: string[];
+	Name?: string;
 }
 
 function formatMoneyNumber(n: number): string {
-  if (settingsStore.fullPrecision) return formatNumber(n);
-  const s = Number.isInteger(n) ? n.toString() : n.toFixed(2);
-  return s.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+	if (settingsStore.fullPrecision) return formatNumber(n);
+	const s = Number.isInteger(n) ? n.toString() : n.toFixed(2);
+	return s.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
 function normalizeCellLineBreaks(value: string): string {
-  return value.replace(/\r?\n/g, "<br/>");
+	return value.replace(/\r?\n/g, "<br/>");
 }
 
 function serializeRow(
-  row: TableRow,
-  headers: string[],
-  moneyColumns: string[],
+	row: TableRow,
+	headers: string[],
+	moneyColumns: string[],
 ): string {
-  const parts: string[] = [];
+	const parts: string[] = [];
 
-  for (const header of headers) {
-    let val = row[header];
+	for (const header of headers) {
+		let val = row[header];
 
-    if (val === undefined || val === null) {
-      val = "";
-    }
+		if (val === undefined || val === null) {
+			val = "";
+		}
 
-    if (typeof val === "object") {
-      val = JSON.stringify(val);
-    }
+		if (typeof val === "object") {
+			val = JSON.stringify(val);
+		}
 
-    let strVal = normalizeCellLineBreaks(String(val));
+		let strVal = normalizeCellLineBreaks(String(val));
 
-    if (moneyColumns.includes(header)) {
-      const s = String(val).trim();
-      const formatted =
-        typeof val === "number"
-          ? formatMoneyNumber(val)
-          : s === ""
-            ? ""
-            : /[.,]/.test(s)
-              ? s
-              : Number.isFinite(+s)
-                ? formatMoneyNumber(+s)
-                : s;
-      strVal = `{{Money|${normalizeCellLineBreaks(formatted)}}}`;
-    }
+		if (moneyColumns.includes(header)) {
+			const s = String(val).trim();
+			const formatted =
+				typeof val === "number"
+					? formatMoneyNumber(val)
+					: s === ""
+						? ""
+						: /[.,]/.test(s)
+							? s
+							: Number.isFinite(+s)
+								? formatMoneyNumber(+s)
+								: s;
+			strVal = `{{Money|${normalizeCellLineBreaks(formatted)}}}`;
+		}
 
-    parts.push(strVal);
-  }
+		parts.push(strVal);
+	}
 
-  return `| ${parts.join(" || ")}`;
+	return `| ${parts.join(" || ")}`;
 }
 
 export function serializeTable(data: SkinDataJSON): string {
-  const { Headers, RawHeaders, RawRows, MoneyColumns = [], Name = "" } = data;
-  if (!Headers || !RawRows) return "";
+	const { Headers, RawHeaders, RawRows, MoneyColumns = [], Name = "" } = data;
+	if (!Headers || !RawRows) return "";
 
-  const lines: string[] = [];
+	const lines: string[] = [];
 
-  lines.push(`{| class="wikitable stats-table"`);
+	lines.push(`{| class="wikitable stats-table"`);
 
-  if (Name) {
-    lines.push(`! colspan="${Headers.length}" |${Name}`);
-    lines.push("|-");
-  }
+	if (Name) {
+		lines.push(`! colspan="${Headers.length}" |${Name}`);
+		lines.push("|-");
+	}
 
-  lines.push(`! ${(RawHeaders?.length ? RawHeaders : Headers).join(" !! ")}`);
+	lines.push(`! ${(RawHeaders?.length ? RawHeaders : Headers).join(" !! ")}`);
 
-  const sortedRows = rowsAreLevelSorted(RawRows)
-    ? RawRows
-    : [...RawRows].sort((a, b) => Number(a["Level"]) - Number(b["Level"]));
+	const sortedRows = rowsAreLevelSorted(RawRows)
+		? RawRows
+		: [...RawRows].sort((a, b) => Number(a["Level"]) - Number(b["Level"]));
 
-  for (const row of sortedRows) {
-    lines.push("|-");
-    lines.push(serializeRow(row, Headers, MoneyColumns));
-  }
+	for (const row of sortedRows) {
+		lines.push("|-");
+		lines.push(serializeRow(row, Headers, MoneyColumns));
+	}
 
-  lines.push("|}");
+	lines.push("|}");
 
-  return lines.join("\n");
+	return lines.join("\n");
 }
 
 function rowsAreLevelSorted(rows: TableRow[]): boolean {
-  let previous = -Infinity;
-  for (const row of rows) {
-    const current = Number(row["Level"]);
-    if (!Number.isFinite(current) || current < previous) return false;
-    previous = current;
-  }
-  return true;
+	let previous = -Infinity;
+	for (const row of rows) {
+		const current = Number(row["Level"]);
+		if (!Number.isFinite(current) || current < previous) return false;
+		previous = current;
+	}
+	return true;
 }
 
 export function serializeVariables(variables: Record<string, string>): string {
-  const lines: string[] = [];
-  lines.push("<var>");
+	const lines: string[] = [];
+	lines.push("<var>");
 
-  for (const [key, val] of Object.entries(variables)) {
-    lines.push(`${key} = ${val}`);
-  }
+	for (const [key, val] of Object.entries(variables)) {
+		lines.push(`${key} = ${val}`);
+	}
 
-  lines.push("</var>");
-  return lines.join("\n");
+	lines.push("</var>");
+	return lines.join("\n");
 }

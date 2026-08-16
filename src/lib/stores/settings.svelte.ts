@@ -1,428 +1,428 @@
 import type { Component } from "svelte";
 import {
-  Bug,
-  ChartLine,
-  Diff,
-  Eraser,
-  Columns2,
-  ImageOff,
-  Scaling,
-  DecimalsArrowRight,
-  Skull,
-  SquareDashedBottom,
-  Superscript,
-  Rows3,
+	Bug,
+	ChartLine,
+	Diff,
+	Eraser,
+	Columns2,
+	ImageOff,
+	Scaling,
+	DecimalsArrowRight,
+	Skull,
+	SquareDashedBottom,
+	Superscript,
+	Rows3,
 } from "@lucide/svelte";
 import { analytics } from "$lib/services/analytics";
 
 export type SettingTab = "editor" | "appearance" | "advanced";
 
 export type BooleanSettingKey =
-  | "clearOnEdit"
-  | "restoreRefOnClearEdit"
-  | "rofBug"
-  | "fullPrecision"
-  | "seeValueDifference"
-  | "alwaysShowSkinTabs"
-  | "minTableWidth"
-  | "hideCellWrapper"
-  | "compactPathTabs"
-  | "hideWikiBanner"
-  | "debugMode"
-  | "analyticsConsent";
+	| "clearOnEdit"
+	| "restoreRefOnClearEdit"
+	| "rofBug"
+	| "fullPrecision"
+	| "seeValueDifference"
+	| "alwaysShowSkinTabs"
+	| "minTableWidth"
+	| "hideCellWrapper"
+	| "compactPathTabs"
+	| "hideWikiBanner"
+	| "debugMode"
+	| "analyticsConsent";
 
 type BooleanSettingDef = {
-  storageKey: string;
-  default: boolean;
-  id: string;
-  tab: SettingTab;
-  icon: Component;
-  label: string;
-  description: string;
-  dependsOn?: BooleanSettingKey;
+	storageKey: string;
+	default: boolean;
+	id: string;
+	tab: SettingTab;
+	icon: Component;
+	label: string;
+	description: string;
+	dependsOn?: BooleanSettingKey;
 };
 
 const SETTING_DEFS: Record<BooleanSettingKey, BooleanSettingDef> = {
-  clearOnEdit: {
-    storageKey: "tdse_coe",
-    default: true,
-    id: "clear-on-edit",
-    tab: "editor",
-    icon: Eraser,
-    label: "Clear Cell on Edit",
-    description:
-      "Clears the cell's input box on click instead of keeping the old text.",
-  },
-  restoreRefOnClearEdit: {
-    storageKey: "tdse_coe_ref",
-    default: true,
-    id: "restore-ref-on-clear-edit",
-    tab: "editor",
-    icon: Superscript,
-    label: "Restore Reference Suffixes",
-    description:
-      "Re-appends cell references automatically when you save a cleared cell.",
-    dependsOn: "clearOnEdit",
-  },
-  rofBug: {
-    storageKey: "tdse_rof_bug",
-    default: false,
-    id: "rof-bug",
-    tab: "editor",
-    icon: Skull,
-    label: "ROF Bug",
-    description: "Calculate statistics with the infamous Rate of Fire bug.",
-  },
-  fullPrecision: {
-    storageKey: "tdse_fdp",
-    default: false,
-    id: "full-precision",
-    tab: "editor",
-    icon: DecimalsArrowRight,
-    label: "Full Precision",
-    description: "Uncaps the 2 decimal limit used in the game and wiki.",
-  },
-  seeValueDifference: {
-    storageKey: "tdse_see_delta",
-    default: true,
-    id: "see-value-difference",
-    tab: "appearance",
-    icon: Diff,
-    label: "See Difference by Default",
-    description: "Always compare value differences when you open a tower.",
-  },
-  alwaysShowSkinTabs: {
-    storageKey: "tdse_always_skin_tabs",
-    default: false,
-    id: "always-show-skin-tabs",
-    tab: "appearance",
-    icon: Columns2,
-    label: "Always Show Tabs",
-    description: "Keeps variation tabs visible even with a single variation.",
-  },
-  minTableWidth: {
-    storageKey: "tdse_mctw",
-    default: false,
-    id: "min-content-table-width",
-    tab: "appearance",
-    icon: Scaling,
-    label: "Compact Table Width",
-    description: "Prevents the table from stretching to all available space.",
-  },
-  hideCellWrapper: {
-    storageKey: "tdse_hcw",
-    default: true,
-    id: "compact-cell",
-    tab: "appearance",
-    icon: SquareDashedBottom,
-    label: "Compact Cell",
-    description: "Uses tighter table cells, making tables leaner in general.",
-  },
-  compactPathTabs: {
-    storageKey: "tdse_compact_paths",
-    default: false,
-    id: "compact-path-tabs",
-    tab: "appearance",
-    icon: Rows3,
-    label: "Compact Paths",
-    description:
-      "Hides the path labels above split-path upgrade tabs for a tighter sidebar.",
-  },
-  hideWikiBanner: {
-    storageKey: "tdse_hwb",
-    default: false,
-    id: "hide-wiki-banner",
-    tab: "appearance",
-    icon: ImageOff,
-    label: "Hide Wiki Banner",
-    description:
-      "Hides the Tower Defense Simulator Wiki banner at the top of the sidebar.",
-  },
-  debugMode: {
-    storageKey: "tdse_debug",
-    default: false,
-    id: "debug-mode",
-    tab: "advanced",
-    icon: Bug,
-    label: "Debug Mode",
-    description: "Enables detailed logging in the console.",
-  },
-  analyticsConsent: {
-    storageKey: "analyticsConsent",
-    default: true,
-    id: "analytics-toggle",
-    tab: "advanced",
-    icon: ChartLine,
-    label: "Analytics",
-    description: "Help us improve by sharing anonymous usage data.",
-  },
+	clearOnEdit: {
+		storageKey: "tdse_coe",
+		default: true,
+		id: "clear-on-edit",
+		tab: "editor",
+		icon: Eraser,
+		label: "Clear Cell on Edit",
+		description:
+			"Clears the cell's input box on click instead of keeping the old text.",
+	},
+	restoreRefOnClearEdit: {
+		storageKey: "tdse_coe_ref",
+		default: true,
+		id: "restore-ref-on-clear-edit",
+		tab: "editor",
+		icon: Superscript,
+		label: "Restore Reference Suffixes",
+		description:
+			"Re-appends cell references automatically when you save a cleared cell.",
+		dependsOn: "clearOnEdit",
+	},
+	rofBug: {
+		storageKey: "tdse_rof_bug",
+		default: false,
+		id: "rof-bug",
+		tab: "editor",
+		icon: Skull,
+		label: "ROF Bug",
+		description: "Calculate statistics with the infamous Rate of Fire bug.",
+	},
+	fullPrecision: {
+		storageKey: "tdse_fdp",
+		default: false,
+		id: "full-precision",
+		tab: "editor",
+		icon: DecimalsArrowRight,
+		label: "Full Precision",
+		description: "Uncaps the 2 decimal limit used in the game and wiki.",
+	},
+	seeValueDifference: {
+		storageKey: "tdse_see_delta",
+		default: true,
+		id: "see-value-difference",
+		tab: "appearance",
+		icon: Diff,
+		label: "See Difference by Default",
+		description: "Always compare value differences when you open a tower.",
+	},
+	alwaysShowSkinTabs: {
+		storageKey: "tdse_always_skin_tabs",
+		default: false,
+		id: "always-show-skin-tabs",
+		tab: "appearance",
+		icon: Columns2,
+		label: "Always Show Tabs",
+		description: "Keeps variation tabs visible even with a single variation.",
+	},
+	minTableWidth: {
+		storageKey: "tdse_mctw",
+		default: false,
+		id: "min-content-table-width",
+		tab: "appearance",
+		icon: Scaling,
+		label: "Compact Table Width",
+		description: "Prevents the table from stretching to all available space.",
+	},
+	hideCellWrapper: {
+		storageKey: "tdse_hcw",
+		default: true,
+		id: "compact-cell",
+		tab: "appearance",
+		icon: SquareDashedBottom,
+		label: "Compact Cell",
+		description: "Uses tighter table cells, making tables leaner in general.",
+	},
+	compactPathTabs: {
+		storageKey: "tdse_compact_paths",
+		default: false,
+		id: "compact-path-tabs",
+		tab: "appearance",
+		icon: Rows3,
+		label: "Compact Paths",
+		description:
+			"Hides the path labels above split-path upgrade tabs for a tighter sidebar.",
+	},
+	hideWikiBanner: {
+		storageKey: "tdse_hwb",
+		default: false,
+		id: "hide-wiki-banner",
+		tab: "appearance",
+		icon: ImageOff,
+		label: "Hide Wiki Banner",
+		description:
+			"Hides the Tower Defense Simulator Wiki banner at the top of the sidebar.",
+	},
+	debugMode: {
+		storageKey: "tdse_debug",
+		default: false,
+		id: "debug-mode",
+		tab: "advanced",
+		icon: Bug,
+		label: "Debug Mode",
+		description: "Enables detailed logging in the console.",
+	},
+	analyticsConsent: {
+		storageKey: "analyticsConsent",
+		default: true,
+		id: "analytics-toggle",
+		tab: "advanced",
+		icon: ChartLine,
+		label: "Analytics",
+		description: "Help us improve by sharing anonymous usage data.",
+	},
 };
 
 export type BooleanSetting = BooleanSettingDef & { key: BooleanSettingKey };
 
 export const BOOLEAN_SETTINGS: BooleanSetting[] = (
-  Object.entries(SETTING_DEFS) as [BooleanSettingKey, BooleanSettingDef][]
+	Object.entries(SETTING_DEFS) as [BooleanSettingKey, BooleanSettingDef][]
 ).map(([key, def]) => ({ key, ...def }));
 
 export type SettingGroup = {
-  parent: BooleanSetting;
-  children: BooleanSetting[];
+	parent: BooleanSetting;
+	children: BooleanSetting[];
 };
 
 export function settingGroupsForTab(tab: SettingTab): SettingGroup[] {
-  const tabSettings = BOOLEAN_SETTINGS.filter((setting) => setting.tab === tab);
-  const parents = tabSettings.filter((setting) => !setting.dependsOn);
-  return parents.map((parent) => ({
-    parent,
-    children: tabSettings.filter((setting) => setting.dependsOn === parent.key),
-  }));
+	const tabSettings = BOOLEAN_SETTINGS.filter((setting) => setting.tab === tab);
+	const parents = tabSettings.filter((setting) => !setting.dependsOn);
+	return parents.map((parent) => ({
+		parent,
+		children: tabSettings.filter((setting) => setting.dependsOn === parent.key),
+	}));
 }
 
 type SettingString<T extends string> = {
-  key: string;
-  default: T;
+	key: string;
+	default: T;
 };
 
 const THEME_SETTING: SettingString<"light" | "dark" | "system"> = {
-  key: "tdse_theme",
-  default: "system",
+	key: "tdse_theme",
+	default: "system",
 };
 
 const PINS_STORAGE_KEY = "tdse_pinned_settings";
 const SETTING_KEY_SET = new Set<string>(Object.keys(SETTING_DEFS));
 
 function readBoolean(storageKey: string, defaultValue: boolean): boolean {
-  if (typeof localStorage === "undefined") return defaultValue;
-  const raw = localStorage.getItem(storageKey);
-  if (raw == null) return defaultValue;
-  return raw === "true";
+	if (typeof localStorage === "undefined") return defaultValue;
+	const raw = localStorage.getItem(storageKey);
+	if (raw == null) return defaultValue;
+	return raw === "true";
 }
 
 function writeBoolean(storageKey: string, value: boolean): void {
-  if (typeof localStorage === "undefined") return;
-  localStorage.setItem(storageKey, String(value));
+	if (typeof localStorage === "undefined") return;
+	localStorage.setItem(storageKey, String(value));
 }
 
 function readStringSetting<T extends string>(def: SettingString<T>): T {
-  if (typeof localStorage === "undefined") return def.default;
-  const raw = localStorage.getItem(def.key);
-  if (raw == null) return def.default;
-  return raw as T;
+	if (typeof localStorage === "undefined") return def.default;
+	const raw = localStorage.getItem(def.key);
+	if (raw == null) return def.default;
+	return raw as T;
 }
 
 function writeStringSetting<T extends string>(
-  def: SettingString<T>,
-  value: T,
+	def: SettingString<T>,
+	value: T,
 ): void {
-  if (typeof localStorage === "undefined") return;
-  localStorage.setItem(def.key, value);
+	if (typeof localStorage === "undefined") return;
+	localStorage.setItem(def.key, value);
 }
 
 function readPinnedKeys(): BooleanSettingKey[] {
-  if (typeof localStorage === "undefined") return [];
-  const raw = localStorage.getItem(PINS_STORAGE_KEY);
-  if (!raw) return [];
-  const parsed: unknown = JSON.parse(raw);
-  if (!Array.isArray(parsed)) return [];
-  return parsed.filter(
-    (key): key is BooleanSettingKey =>
-      typeof key === "string" && SETTING_KEY_SET.has(key),
-  );
+	if (typeof localStorage === "undefined") return [];
+	const raw = localStorage.getItem(PINS_STORAGE_KEY);
+	if (!raw) return [];
+	const parsed: unknown = JSON.parse(raw);
+	if (!Array.isArray(parsed)) return [];
+	return parsed.filter(
+		(key): key is BooleanSettingKey =>
+			typeof key === "string" && SETTING_KEY_SET.has(key),
+	);
 }
 
 function writePinnedKeys(keys: BooleanSettingKey[]): void {
-  if (typeof localStorage === "undefined") return;
-  localStorage.setItem(PINS_STORAGE_KEY, JSON.stringify(keys));
+	if (typeof localStorage === "undefined") return;
+	localStorage.setItem(PINS_STORAGE_KEY, JSON.stringify(keys));
 }
 
 class SettingsStore {
-  debugMode = $state<boolean>(SETTING_DEFS.debugMode.default);
-  seeValueDifference = $state<boolean>(SETTING_DEFS.seeValueDifference.default);
-  alwaysShowSkinTabs = $state<boolean>(SETTING_DEFS.alwaysShowSkinTabs.default);
-  hideCellWrapper = $state<boolean>(SETTING_DEFS.hideCellWrapper.default);
-  compactPathTabs = $state<boolean>(SETTING_DEFS.compactPathTabs.default);
-  hideWikiBanner = $state<boolean>(SETTING_DEFS.hideWikiBanner.default);
-  minTableWidth = $state<boolean>(SETTING_DEFS.minTableWidth.default);
-  clearOnEdit = $state<boolean>(SETTING_DEFS.clearOnEdit.default);
-  restoreRefOnClearEdit = $state<boolean>(
-    SETTING_DEFS.restoreRefOnClearEdit.default,
-  );
-  rofBug = $state<boolean>(SETTING_DEFS.rofBug.default);
-  fullPrecision = $state<boolean>(SETTING_DEFS.fullPrecision.default);
-  analyticsConsent = $state<boolean>(SETTING_DEFS.analyticsConsent.default);
-  theme = $state(THEME_SETTING.default);
-  pinnedKeys = $state<BooleanSettingKey[]>([]);
+	debugMode = $state<boolean>(SETTING_DEFS.debugMode.default);
+	seeValueDifference = $state<boolean>(SETTING_DEFS.seeValueDifference.default);
+	alwaysShowSkinTabs = $state<boolean>(SETTING_DEFS.alwaysShowSkinTabs.default);
+	hideCellWrapper = $state<boolean>(SETTING_DEFS.hideCellWrapper.default);
+	compactPathTabs = $state<boolean>(SETTING_DEFS.compactPathTabs.default);
+	hideWikiBanner = $state<boolean>(SETTING_DEFS.hideWikiBanner.default);
+	minTableWidth = $state<boolean>(SETTING_DEFS.minTableWidth.default);
+	clearOnEdit = $state<boolean>(SETTING_DEFS.clearOnEdit.default);
+	restoreRefOnClearEdit = $state<boolean>(
+		SETTING_DEFS.restoreRefOnClearEdit.default,
+	);
+	rofBug = $state<boolean>(SETTING_DEFS.rofBug.default);
+	fullPrecision = $state<boolean>(SETTING_DEFS.fullPrecision.default);
+	analyticsConsent = $state<boolean>(SETTING_DEFS.analyticsConsent.default);
+	theme = $state(THEME_SETTING.default);
+	pinnedKeys = $state<BooleanSettingKey[]>([]);
 
-  private assignBoolean(key: BooleanSettingKey, value: boolean) {
-    switch (key) {
-      case "clearOnEdit":
-        this.clearOnEdit = value;
-        break;
-      case "restoreRefOnClearEdit":
-        this.restoreRefOnClearEdit = value;
-        break;
-      case "rofBug":
-        this.rofBug = value;
-        break;
-      case "fullPrecision":
-        this.fullPrecision = value;
-        break;
-      case "seeValueDifference":
-        this.seeValueDifference = value;
-        break;
-      case "alwaysShowSkinTabs":
-        this.alwaysShowSkinTabs = value;
-        break;
-      case "minTableWidth":
-        this.minTableWidth = value;
-        break;
-      case "hideCellWrapper":
-        this.hideCellWrapper = value;
-        break;
-      case "compactPathTabs":
-        this.compactPathTabs = value;
-        break;
-      case "hideWikiBanner":
-        this.hideWikiBanner = value;
-        break;
-      case "debugMode":
-        this.debugMode = value;
-        break;
-      case "analyticsConsent":
-        this.analyticsConsent = value;
-        break;
-    }
-  }
+	private assignBoolean(key: BooleanSettingKey, value: boolean) {
+		switch (key) {
+			case "clearOnEdit":
+				this.clearOnEdit = value;
+				break;
+			case "restoreRefOnClearEdit":
+				this.restoreRefOnClearEdit = value;
+				break;
+			case "rofBug":
+				this.rofBug = value;
+				break;
+			case "fullPrecision":
+				this.fullPrecision = value;
+				break;
+			case "seeValueDifference":
+				this.seeValueDifference = value;
+				break;
+			case "alwaysShowSkinTabs":
+				this.alwaysShowSkinTabs = value;
+				break;
+			case "minTableWidth":
+				this.minTableWidth = value;
+				break;
+			case "hideCellWrapper":
+				this.hideCellWrapper = value;
+				break;
+			case "compactPathTabs":
+				this.compactPathTabs = value;
+				break;
+			case "hideWikiBanner":
+				this.hideWikiBanner = value;
+				break;
+			case "debugMode":
+				this.debugMode = value;
+				break;
+			case "analyticsConsent":
+				this.analyticsConsent = value;
+				break;
+		}
+	}
 
-  constructor() {
-    for (const key of Object.keys(SETTING_DEFS) as BooleanSettingKey[]) {
-      const def = SETTING_DEFS[key];
-      this.assignBoolean(key, readBoolean(def.storageKey, def.default));
-    }
-    this.theme = readStringSetting(THEME_SETTING);
-    this.pinnedKeys = readPinnedKeys();
-  }
+	constructor() {
+		for (const key of Object.keys(SETTING_DEFS) as BooleanSettingKey[]) {
+			const def = SETTING_DEFS[key];
+			this.assignBoolean(key, readBoolean(def.storageKey, def.default));
+		}
+		this.theme = readStringSetting(THEME_SETTING);
+		this.pinnedKeys = readPinnedKeys();
+	}
 
-  isPinned(key: BooleanSettingKey): boolean {
-    return this.pinnedKeys.includes(key);
-  }
+	isPinned(key: BooleanSettingKey): boolean {
+		return this.pinnedKeys.includes(key);
+	}
 
-  togglePin(key: BooleanSettingKey): void {
-    this.pinnedKeys = this.isPinned(key)
-      ? this.pinnedKeys.filter((k) => k !== key)
-      : [...this.pinnedKeys, key];
-    writePinnedKeys(this.pinnedKeys);
-    analytics.track("setting_pin", {
-      setting_name: key,
-      pinned: String(this.isPinned(key)),
-    });
-  }
+	togglePin(key: BooleanSettingKey): void {
+		this.pinnedKeys = this.isPinned(key)
+			? this.pinnedKeys.filter((k) => k !== key)
+			: [...this.pinnedKeys, key];
+		writePinnedKeys(this.pinnedKeys);
+		analytics.track("setting_pin", {
+			setting_name: key,
+			pinned: String(this.isPinned(key)),
+		});
+	}
 
-  get pinnedSettings(): BooleanSetting[] {
-    const byKey = new Map(BOOLEAN_SETTINGS.map((s) => [s.key, s]));
-    return this.pinnedKeys
-      .map((key) => byKey.get(key))
-      .filter((s): s is BooleanSetting => s != null);
-  }
+	get pinnedSettings(): BooleanSetting[] {
+		const byKey = new Map(BOOLEAN_SETTINGS.map((s) => [s.key, s]));
+		return this.pinnedKeys
+			.map((key) => byKey.get(key))
+			.filter((s): s is BooleanSetting => s != null);
+	}
 
-  init() {
-    this.applyTheme(this.theme);
+	init() {
+		this.applyTheme(this.theme);
 
-    if (typeof window !== "undefined") {
-      const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-      mediaQuery.addEventListener("change", () => {
-        if (this.theme === "system") {
-          this.applyTheme("system");
-        }
-      });
-    }
-  }
+		if (typeof window !== "undefined") {
+			const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+			mediaQuery.addEventListener("change", () => {
+				if (this.theme === "system") {
+					this.applyTheme("system");
+				}
+			});
+		}
+	}
 
-  getBoolean(key: BooleanSettingKey): boolean {
-    switch (key) {
-      case "clearOnEdit":
-        return this.clearOnEdit;
-      case "restoreRefOnClearEdit":
-        return this.restoreRefOnClearEdit;
-      case "rofBug":
-        return this.rofBug;
-      case "fullPrecision":
-        return this.fullPrecision;
-      case "seeValueDifference":
-        return this.seeValueDifference;
-      case "alwaysShowSkinTabs":
-        return this.alwaysShowSkinTabs;
-      case "minTableWidth":
-        return this.minTableWidth;
-      case "hideCellWrapper":
-        return this.hideCellWrapper;
-      case "compactPathTabs":
-        return this.compactPathTabs;
-      case "hideWikiBanner":
-        return this.hideWikiBanner;
-      case "debugMode":
-        return this.debugMode;
-      case "analyticsConsent":
-        return this.analyticsConsent;
-    }
-  }
+	getBoolean(key: BooleanSettingKey): boolean {
+		switch (key) {
+			case "clearOnEdit":
+				return this.clearOnEdit;
+			case "restoreRefOnClearEdit":
+				return this.restoreRefOnClearEdit;
+			case "rofBug":
+				return this.rofBug;
+			case "fullPrecision":
+				return this.fullPrecision;
+			case "seeValueDifference":
+				return this.seeValueDifference;
+			case "alwaysShowSkinTabs":
+				return this.alwaysShowSkinTabs;
+			case "minTableWidth":
+				return this.minTableWidth;
+			case "hideCellWrapper":
+				return this.hideCellWrapper;
+			case "compactPathTabs":
+				return this.compactPathTabs;
+			case "hideWikiBanner":
+				return this.hideWikiBanner;
+			case "debugMode":
+				return this.debugMode;
+			case "analyticsConsent":
+				return this.analyticsConsent;
+		}
+	}
 
-  setBoolean(key: BooleanSettingKey, value: boolean): void {
-    const def = SETTING_DEFS[key];
-    if (value && def.dependsOn && !this.getBoolean(def.dependsOn)) {
-      return;
-    }
+	setBoolean(key: BooleanSettingKey, value: boolean): void {
+		const def = SETTING_DEFS[key];
+		if (value && def.dependsOn && !this.getBoolean(def.dependsOn)) {
+			return;
+		}
 
-    this.assignBoolean(key, value);
-    if (key === "analyticsConsent") {
-      analytics.setConsent(value);
-    } else {
-      writeBoolean(def.storageKey, value);
-    }
+		this.assignBoolean(key, value);
+		if (key === "analyticsConsent") {
+			analytics.setConsent(value);
+		} else {
+			writeBoolean(def.storageKey, value);
+		}
 
-    if (!value) {
-      for (const child of BOOLEAN_SETTINGS) {
-        if (child.dependsOn !== key || !this.getBoolean(child.key)) continue;
-        this.assignBoolean(child.key, false);
-        writeBoolean(SETTING_DEFS[child.key].storageKey, false);
-      }
-    }
+		if (!value) {
+			for (const child of BOOLEAN_SETTINGS) {
+				if (child.dependsOn !== key || !this.getBoolean(child.key)) continue;
+				this.assignBoolean(child.key, false);
+				writeBoolean(SETTING_DEFS[child.key].storageKey, false);
+			}
+		}
 
-    if (key !== "analyticsConsent") {
-      analytics.track("setting_change", {
-        setting_name: key,
-        setting_value: String(value),
-      });
-    }
-  }
+		if (key !== "analyticsConsent") {
+			analytics.track("setting_change", {
+				setting_name: key,
+				setting_value: String(value),
+			});
+		}
+	}
 
-  parentOf(setting: BooleanSetting): BooleanSetting | undefined {
-    if (!setting.dependsOn) return undefined;
-    return BOOLEAN_SETTINGS.find((s) => s.key === setting.dependsOn);
-  }
+	parentOf(setting: BooleanSetting): BooleanSetting | undefined {
+		if (!setting.dependsOn) return undefined;
+		return BOOLEAN_SETTINGS.find((s) => s.key === setting.dependsOn);
+	}
 
-  setTheme(value: "light" | "dark" | "system") {
-    this.theme = value;
-    writeStringSetting(THEME_SETTING, value);
-    this.applyTheme(value);
-    analytics.track("theme_change", { theme: value });
-  }
+	setTheme(value: "light" | "dark" | "system") {
+		this.theme = value;
+		writeStringSetting(THEME_SETTING, value);
+		this.applyTheme(value);
+		analytics.track("theme_change", { theme: value });
+	}
 
-  private applyTheme(theme: "light" | "dark" | "system") {
-    if (typeof document === "undefined") return;
+	private applyTheme(theme: "light" | "dark" | "system") {
+		if (typeof document === "undefined") return;
 
-    const root = document.documentElement;
-    const isDark =
-      theme === "dark" ||
-      (theme === "system" &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches);
+		const root = document.documentElement;
+		const isDark =
+			theme === "dark" ||
+			(theme === "system" &&
+				window.matchMedia("(prefers-color-scheme: dark)").matches);
 
-    if (isDark) {
-      root.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
-    }
-  }
+		if (isDark) {
+			root.classList.add("dark");
+		} else {
+			root.classList.remove("dark");
+		}
+	}
 }
 
 export const settingsStore = new SettingsStore();

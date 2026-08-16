@@ -7,14 +7,14 @@ import { towerStore } from "$lib/stores/tower.svelte";
 let ready: Promise<void> | null = null;
 
 export function bootstrap(): Promise<void> {
-  ready ??= (async () => {
-    profileStore.init();
-    settingsStore.init();
-    await Promise.all([
-      towerStore.init(profileStore.current),
-      authStore.init(),
-    ]);
-    void announcementsStore.init().catch(() => {});
-  })();
-  return ready;
+	ready ??= (async () => {
+		profileStore.init();
+		settingsStore.init();
+		await Promise.all([
+			towerStore.init(profileStore.current),
+			authStore.init(),
+		]);
+		void announcementsStore.init().catch(() => {});
+	})();
+	return ready;
 }
