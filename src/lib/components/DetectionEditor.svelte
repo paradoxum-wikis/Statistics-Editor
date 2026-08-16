@@ -156,7 +156,7 @@
         val === "none" ? null : parseInt(val, 10),
       )}
   >
-    <Select.Trigger class="select-trigger w-22.5 shrink-0">
+    <Select.Trigger class="select-trigger h-7! w-22.5 shrink-0">
       <span class="truncate">
         {options.find((o) => o.value === value)?.label}
       </span>

@@ -810,7 +810,7 @@ h4,
 
 .select-trigger {
   display: inline-flex;
-  height: 1.75rem;
+  height: 2rem;
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;

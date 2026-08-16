@@ -329,7 +329,7 @@
                   class="pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 text-muted-foreground"
                 />
                 <TextInput
-                  class="short pl-8!"
+                  class="short pl-8! text-sm!"
                   placeholder="Search title, towers, or creators..."
                   aria-label="Search Workshop"
                   bind:value={q}
