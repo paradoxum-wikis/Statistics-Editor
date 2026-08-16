@@ -105,6 +105,7 @@ export function resolveFNC(
   tableCache?: TableCache,
   applyRofToCache = false,
   depth = 0,
+  fullPrecision?: boolean,
 ): number | undefined {
   const upper = name.toUpperCase();
 
@@ -152,6 +153,7 @@ export function resolveFNC(
       branchOverride,
       branchMap,
       variantPrefix,
+      fullPrecision,
     );
     if (typeof res === "number") {
       if (Number.isFinite(res)) total += res;

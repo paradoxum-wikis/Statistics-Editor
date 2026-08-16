@@ -187,6 +187,7 @@ export function resolveToken(
   branchOverride?: string,
   branchMap?: Record<string, string>,
   variantPrefix?: string,
+  fullPrecision?: boolean,
 ): string | number | undefined {
   token = stripRefs(token).trim();
   if (depth > 10) return undefined;
@@ -215,6 +216,7 @@ export function resolveToken(
       pinnedBranch,
       cachedBranchMap,
       variantPrefix,
+      fullPrecision,
     );
   }
 
@@ -236,6 +238,7 @@ export function resolveToken(
       activeBranch,
       cachedBranchMap,
       variantPrefix,
+      fullPrecision,
     );
   }
 
@@ -258,10 +261,11 @@ export function resolveToken(
         activeBranch,
         cachedBranchMap,
         variantPrefix,
+        fullPrecision,
       );
 
       if (typeof resolved === "number") {
-        return formatReadOnly(resolved);
+        return formatReadOnly(resolved, fullPrecision);
       }
       return resolved !== undefined ? String(resolved) : match;
     });
@@ -283,6 +287,7 @@ export function resolveToken(
       tableCache,
       applyRofToCache,
       depth,
+      fullPrecision,
     );
   }
 
@@ -322,6 +327,7 @@ export function resolveToken(
           activeBranch,
           cachedBranchMap,
           variantPrefix,
+          fullPrecision,
         );
         return resolved !== undefined ? resolved : stripRefs(String(cachedVal));
       }
@@ -370,6 +376,7 @@ export function resolveToken(
         activeBranch,
         cachedBranchMap,
         variantPrefix,
+        fullPrecision,
       );
 
       const numStr =
@@ -439,6 +446,7 @@ export function resolveToken(
         activeBranch,
         cachedBranchMap,
         variantPrefix,
+        fullPrecision,
       );
     }
 
@@ -456,6 +464,7 @@ export function resolveToken(
         activeBranch,
         cachedBranchMap,
         variantPrefix,
+        fullPrecision,
       );
       return resolved !== undefined ? String(resolved) : "0";
     });
@@ -576,7 +585,7 @@ export function resolveToken(
 
     const result = evaluateFormula(val, context);
     // fragment var expansion
-    if (!Number.isNaN(result)) return wikiRound(result);
+    if (!Number.isNaN(result)) return wikiRound(result, fullPrecision);
     return val;
   }
 

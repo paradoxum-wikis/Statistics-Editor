@@ -200,6 +200,7 @@ export function buildDisplayRows(
   globalModifier: GlobalModifier,
   applyDisplayRofBug = true,
   applyGlobalModifier = true,
+  fullPrecision?: boolean,
 ): TableRow[] {
   if (config.rows.length === 0) return [];
 
@@ -245,6 +246,7 @@ export function buildDisplayRows(
             undefined,
             undefined,
             config.variantPrefix,
+            fullPrecision,
           );
           if (res != null) {
             const colKey = stripRefs(col);
@@ -286,7 +288,14 @@ export function buildCompareRowsCache(
       if (config?.rows.length) {
         cache.set(
           tableCacheKey(skinName, tableIdx),
-          buildDisplayRows(config, rofInfo, globalModifier, false, false),
+          buildDisplayRows(
+            config,
+            rofInfo,
+            globalModifier,
+            false,
+            false,
+            false,
+          ),
         );
       }
     }
@@ -375,7 +384,7 @@ export function ensureSkinRows(
     if (!session.compare.has(key)) {
       session.compare.set(
         key,
-        buildDisplayRows(config, rofInfo, globalModifier, false, false),
+        buildDisplayRows(config, rofInfo, globalModifier, false, false, false),
       );
     }
   }
