@@ -488,7 +488,7 @@
             </Popover.Trigger>
             <Popover.Content
               class="popover-content w-auto! min-w-40"
-              side="left"
+              side="top"
               align="start"
               sideOffset={6}
             >
