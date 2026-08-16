@@ -64,7 +64,7 @@
   const skinRows = $derived.by(() =>
     ensureSkinRows(
       skinRowsSession,
-      `${tower?.name}|${towerStore.refreshTrigger}|${settingsStore.rofBug}|${JSON.stringify(modifierStore.entries)}`,
+      `${tower?.name}|${towerStore.refreshTrigger}|${settingsStore.rofBug}|${settingsStore.fullPrecision}|${JSON.stringify(modifierStore.entries)}`,
       tower,
       selectedSkinName,
       settingsStore.rofBug,

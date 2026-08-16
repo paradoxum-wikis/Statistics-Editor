@@ -7,6 +7,7 @@ import {
   Columns2,
   ImageOff,
   Scaling,
+  Sigma,
   Skull,
   SquareDashedBottom,
   Superscript,
@@ -20,6 +21,7 @@ export type BooleanSettingKey =
   | "clearOnEdit"
   | "restoreRefOnClearEdit"
   | "rofBug"
+  | "fullPrecision"
   | "seeValueDifference"
   | "alwaysShowSkinTabs"
   | "minTableWidth"
@@ -70,6 +72,15 @@ const SETTING_DEFS: Record<BooleanSettingKey, BooleanSettingDef> = {
     icon: Skull,
     label: "ROF Bug",
     description: "Calculate statistics with the infamous Rate of Fire bug.",
+  },
+  fullPrecision: {
+    storageKey: "tdse_fdp",
+    default: false,
+    id: "full-precision",
+    tab: "editor",
+    icon: Sigma,
+    label: "Full Precision",
+    description: "Uncaps the 2 decimal limit used in the game and wiki.",
   },
   seeValueDifference: {
     storageKey: "tdse_see_delta",
@@ -237,6 +248,7 @@ class SettingsStore {
     SETTING_DEFS.restoreRefOnClearEdit.default,
   );
   rofBug = $state<boolean>(SETTING_DEFS.rofBug.default);
+  fullPrecision = $state<boolean>(SETTING_DEFS.fullPrecision.default);
   analyticsConsent = $state<boolean>(SETTING_DEFS.analyticsConsent.default);
   theme = $state(THEME_SETTING.default);
   pinnedKeys = $state<BooleanSettingKey[]>([]);
@@ -251,6 +263,9 @@ class SettingsStore {
         break;
       case "rofBug":
         this.rofBug = value;
+        break;
+      case "fullPrecision":
+        this.fullPrecision = value;
         break;
       case "seeValueDifference":
         this.seeValueDifference = value;
@@ -331,6 +346,8 @@ class SettingsStore {
         return this.restoreRefOnClearEdit;
       case "rofBug":
         return this.rofBug;
+      case "fullPrecision":
+        return this.fullPrecision;
       case "seeValueDifference":
         return this.seeValueDifference;
       case "alwaysShowSkinTabs":

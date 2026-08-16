@@ -98,6 +98,7 @@
     towerStore.refreshTrigger;
     modifierStore.entries;
     settingsStore.rofBug;
+    settingsStore.fullPrecision;
     comparatorStore.seriesDefs;
     comparatorStore.xKey;
     comparatorStore.towerCache;

@@ -1,3 +1,5 @@
+import { settingsStore } from "$lib/stores/settings.svelte";
+
 /**
  * Strips garbage ref tag for visual display.
  */
@@ -176,20 +178,22 @@ export function formatNumber(n: number): string {
 }
 
 /**
- * Round formula results to 2dp before row store / chaining.
+ * Round formula results to 2dp/10dp before row store / chaining
  */
 export function wikiRound(n: number): number {
-  return Number(n.toFixed(2));
+  return Number(n.toFixed(settingsStore.fullPrecision ? 10 : 2));
 }
 
 /**
- * Formats a calculated number with separators + 2 decimal places.
+ * Formats a calculated number with separators + 2 or 10 decimals.
  */
 export function formatReadOnly(v: unknown): string {
   if (v === undefined || v === null || v === "") return "-";
   const n = typeof v === "number" ? v : parseNumeric(String(v));
   return Number.isFinite(n)
-    ? n.toLocaleString("en-US", { maximumFractionDigits: 2 })
+    ? n.toLocaleString("en-US", {
+        maximumFractionDigits: settingsStore.fullPrecision ? 10 : 2,
+      })
     : stripRefs(v);
 }
 

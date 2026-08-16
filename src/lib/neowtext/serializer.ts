@@ -1,3 +1,6 @@
+import { settingsStore } from "$lib/stores/settings.svelte";
+import { formatNumber } from "$lib/utils/format";
+
 interface TableRow extends Record<string, string | number | boolean | object> {}
 
 interface SkinDataJSON {
@@ -9,6 +12,7 @@ interface SkinDataJSON {
 }
 
 function formatMoneyNumber(n: number): string {
+  if (settingsStore.fullPrecision) return formatNumber(n);
   const s = Number.isInteger(n) ? n.toString() : n.toFixed(2);
   return s.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
