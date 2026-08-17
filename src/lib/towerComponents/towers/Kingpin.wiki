@@ -32,6 +32,7 @@ $RC$ = $FNC-RECURSION$
 |-
 | 3 || {{Money|$TP$}} || 12 || 0.14 || 20 || 2 || $DPS$ || {{Money|$CE$}}
 |}
+</div>
 
 <div class="overflow-box">
 {| class="wikitable stats-table"
@@ -39,11 +40,11 @@ $RC$ = $FNC-RECURSION$
 |-
 ! Level !! Total Price !! Damage !! Firerate !! Range !! Unit Queue !! Reward Percentage !! Reward Cap !! DPS !! Cost Efficiency
 |-
-| 4 || {{Money|$TP$}} || 160 || 1.65 || 20 || 2 || 50% || {{Money|10,000}} || $DPS$ || {{Money|$CE$}}
+| 4 || {{Money|$TP$}} || 160 || 1.65 || 20 || 2 || 60% || {{Money|10,000}} || $DPS$ || {{Money|$CE$}}
 |-
-| 5 || {{Money|$TP$}} || 295 || 1.65 || 20 || 2 || 70% || {{Money|25,000}} || $DPS$ || {{Money|$CE$}}
+| 5 || {{Money|$TP$}} || 295 || 1.65 || 20 || 2 || 80% || {{Money|25,000}} || $DPS$ || {{Money|$CE$}}
 |-
-| 6 || {{Money|$TP$}} || 225 || 0.8 || 21.5 || 2 || 100% || {{Money|60,000}} || $DPS$ || {{Money|$CE$}}
+| 6 || {{Money|$TP$}} || 225 || 0.8 || 21.5 || 2 || 100% || {{Money|50,000}} || $DPS$ || {{Money|$CE$}}
 |}
 </div>
 
@@ -75,7 +76,7 @@ $RC$ = $FNC-RECURSION$
 |-
 | 6A/5B || 200 || 6 || 25 || 0.16 || 75 || 24.5 || Hidden || $DPS$ || $RDPS$
 |-
-| 6B || 300 || 8 || 25 || 0.12 || 75 || 27 || Hidden || $DPS$ || $RDPS$
+| 6B || 300 || 7 || 25 || 0.12 || 75 || 25 || Hidden || $DPS$ || $RDPS$
 |}
 </div>
 
@@ -103,7 +104,7 @@ $RC$ = $FNC-RECURSION$
 |-
 ! Level !! Health !! Defense !! Damage !! Spawn Time !! Firerate !! Lifespan !! Range !! Detections !! DPS !! Ram DPS
 |-
-| 4B || 550 || N/A || 25 || 45 || 0.5 || 75 || 8 || Hidden, Lead || $DPS$ || $RDPS2$
+| 4B || 500 || N/A || 25 || 45 || 0.5 || 75 || 8 || Hidden, Lead || $DPS$ || $RDPS2$
 |-
 | 5B || 750 || 10% || 35 || 40 || 0.5 || 75 || 8 || Hidden, Lead || $DPS$ || $RDPS2$
 |-
@@ -117,7 +118,7 @@ $RC$ = $FNC-RECURSION$
 |-
 ! Level !! Health !! Damage !! Spawn Time !! Firerate !! Lifespan !! Range !! Detections !! DPS !! Ram DPS
 |-
-| 6B || 200 || 165 || 60 || 2 || 70 || 35 || Hidden, Flying, Lead || $DPS$ || $RDPS$
+| 6B || 400 || 170 || 60 || 2 || 75 || 35 || Hidden, Flying, Lead || $DPS$ || $RDPS$
 |}
 </div>
 <!-- @se-ignore -->

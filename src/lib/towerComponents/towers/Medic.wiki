@@ -1,6 +1,6 @@
 <var>
 $TP$ = $FNC-TOTALPRICE$
-$FNC-COST$ = 400; 425; 650; 2950; 6000; 14000
+$FNC-COST$ = 400; 425; 650; 2400; 5000; 12000
 $FSE-UPGRADE$ = Medical Precautions; Prescribed Vitamins; BIG BRAIN; Medical Pack; MD-PhD
 $FSE-UPGRADEICON$ = 117008581932706; 71546954858462; 130592941614779; 112504548905627; 112504548905627
 $FSE-META$ = Intermediate; File:DefaultMedicIconAug25.png
@@ -15,10 +15,10 @@ $FSE-META$ = Intermediate; File:DefaultMedicIconAug25.png
 |-
 | 2 || {{Money|$TP$}} || 15% || 0% || 14 || 10 || 100 || 3 || 6 || 0.5 || N/A
 |-
-| 3 || {{Money|$TP$}} || 15% || 20% || 15 || 10 || 100 || 3 || 6 || 0.5 || 10
+| 3 || {{Money|$TP$}} || 15% || 20% || 15 || 10 || 100 || 3 || 6 || 0.5 || 7.5
 |-
-| 4 || {{Money|$TP$}} || 15% || 27.5% || 18 || 20 || 100 || 4 || 5 || 0.5 || 12.5
+| 4 || {{Money|$TP$}} || 15% || 27.5% || 18 || 20 || 100 || 4 || 5 || 0.5 || 10
 |-
-| 5 || {{Money|$TP$}} || 15% || 35% || 20 || 20 || 100 || 5 || 4.5 || 0.5 || 15
+| 5 || {{Money|$TP$}} || 15% || 35% || 20 || 20 || 100 || 5 || 4.5 || 0.5 || 10
 |}
 </div>
