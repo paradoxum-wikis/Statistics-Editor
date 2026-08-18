@@ -9,7 +9,7 @@ import {
 const HELP_PAGE = "https://tds.fandom.com/wiki/Help:Neowtext";
 
 const FNC: Record<string, string> = {
-	COST: "An array of upgrade costs for each level starting from Level 0 (e.g., 8250; 3250; 7500).",
+	COST: "An array of upgrade costs for each level starting from Level 0 (e.g., 8250; 3250; 7500). Declaring this shows the Costs sidebar in the Statistics Editor. $FNC-TOTALPRICE$ sums it.",
 	BRANCH:
 		"An array of table names to indicate which table corresponds to which upgrade branch, depending on the branch's declaration order on the schema.",
 	INDEX:
@@ -29,8 +29,7 @@ Later declarations take priority.`,
 };
 
 const FSE: Record<string, string> = {
-	CATEGORY: `Category on the Statistics Editor home page (e.g., Golden Perks). "Custom" if empty.
-Deprecated; use META.`,
+	CATEGORY: `Category on the Statistics Editor home page (e.g., Golden Perks). "Custom" if empty.`,
 	DETECTION:
 		"A 3-item array of levels where the tower gains Hidden, Lead, and Flying. Empty is a passthrough; -1 means never. Each SCHEMA split path adds 3 more slots. All values start at -1.",
 	META: 'Category and image on the Statistics Editor home page (e.g., Evolved; File:DefaultOperator0.png). "Custom" if empty.',
@@ -40,14 +39,13 @@ Respects SCHEMA.`,
 Respects SCHEMA.`,
 };
 
-const TOTAL = `For any variable: $FNC-TOTAL-NAME$ sums $NAME$ from level 0 up to the current level. Works with a semicolon array or a formula / #expr. Supports @N and @N@branch pins.
-Do not use this in place of $FNC-TOTALPRICE$.`;
+const TOTAL = `For any variable: $FNC-TOTAL-NAME$ sums $NAME$ from level 0 up to the current level. Works with a semicolon array or a formula / #expr. Supports @N and @N@branch pins.`;
 
 const DOT =
 	"Pull a column from a specific table (Table.Column). Untitled tables inherit the Regular title in the same position. Supports @N and @N@branch pins.";
 
-const VAR =
-	"Declare in a <var> block as $Name$ = value. A name without the dollar syntax will be treated as a table column if it matches one.";
+const VAR = `Declare in a <var> block as $Name$ = value. A name without the dollar syntax will be treated as a table column if it matches one.
+A semicolon-separated list of numbers is an array. Bare $Name$ is the element at the current level with respect to SCHEMA. $Name@N$ pins a level; $Name@N@branch$ pins a branch. A non-numeric semicolon list renders as the whole text unless pinned.`;
 
 export function helpHash(ref: DollarRef): string {
 	if (ref.kind === "var" && ref.base.includes(".")) return "Dot_Notation";
@@ -83,16 +81,14 @@ export function describeRef(ref: DollarRef): string {
 			return TOTAL;
 		}
 		if (ref.kind === "fnc" && upper.startsWith("ROFBUG")) return FNC.ROFBUG;
-		const deprecated = deprecatedFn(ref);
 		const text =
 			ref.kind === "fse"
 				? FSE[upper]
-				: (FNC[upper] ?? (deprecated ? FSE[upper] : undefined));
+				: (FNC[upper] ?? (deprecatedFn(ref) ? FSE[upper] : undefined));
 		if (!text) return `Unknown ${ref.prefix}.`;
-		let out = text;
-		if (ref.pvp) out += "\nPVP-scoped; inherits the non-PVP value if unset.";
-		if (deprecated) out += `\n${deprecated}`;
-		return out;
+		return ref.pvp
+			? `${text}\nTab-scoped; inherits the unprefixed value if unset.`
+			: text;
 	}
 	if (ref.kind === "var" && ref.base.includes(".")) return DOT;
 	return VAR;
@@ -104,11 +100,11 @@ export function kindLabel(ref: DollarRef): string {
 			? ` · @${ref.pinLevel}${ref.pinBranch ? `@${ref.pinBranch}` : ""}`
 			: "";
 	if (ref.kind === "fnc")
-		return (ref.pvp ? "Function · PVP" : "Function") + pin;
+		return (ref.pvp ? "Function · tab" : "Function") + pin;
 	if (ref.kind === "fse")
 		return (
 			(ref.pvp
-				? "Function Statistics Editor · PVP"
+				? "Function Statistics Editor · tab"
 				: "Function Statistics Editor") + pin
 		);
 	if (ref.kind === "var" && ref.base.includes(".")) return "Dot Notation" + pin;

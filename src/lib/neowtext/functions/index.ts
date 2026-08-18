@@ -3,6 +3,9 @@ export {
 	getFncValue,
 	getEffectiveFncKey,
 	getDefaultFncKey,
+	getCostKeys,
+	getCostValue,
+	getEffectiveCostKey,
 } from "./keys";
 export { resolveFNC } from "./total";
 export { resolveToken, type TableCache } from "../resolve";

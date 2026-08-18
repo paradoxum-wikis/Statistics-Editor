@@ -4,6 +4,7 @@ import { fetchTowerWiki } from "$lib/services/fetchTowerWiki";
 import {
 	getDefaultFncKey,
 	getFncValue,
+	getCostValue,
 	resolveToken,
 	type TableCache,
 	DETECTION_TYPES,
@@ -345,14 +346,6 @@ export default class TowerManager {
 				const rows = expandPrimaryRows(tableData.rows);
 
 				const formulaTokens = { ...parsed.variables };
-				if (variantPrefix) {
-					const prefixToken = `$${variantPrefix}-`;
-					Object.entries(parsed.variables).forEach(([k, v]) => {
-						if (k.startsWith(prefixToken)) {
-							formulaTokens[`$${k.slice(prefixToken.length)}`] = v;
-						}
-					});
-				}
 
 				const getArr = (val?: string) =>
 					val ? val.split(";").map((s) => s.trim()) : [];
@@ -399,7 +392,7 @@ export default class TowerManager {
 					});
 				}
 
-				const baseCosts = getArr(getFncValue(v, "COST"));
+				const baseCosts = getArr(getCostValue(v));
 				const baseDetects = getArr(getFncValue(v, "DETECTION"));
 				const baseUpgs = getArr(getFncValue(v, "UPGRADE"));
 				const baseIcons = getArr(getFncValue(v, "UPGRADEICON"));
@@ -415,7 +408,7 @@ export default class TowerManager {
 
 				const costs = mergeArrays(
 					baseCosts,
-					getArr(getFncValue(v, "COST", variantPrefix)),
+					getArr(getCostValue(v, variantPrefix)),
 				);
 				const detects = mergeArrays(
 					baseDetects,
@@ -430,7 +423,6 @@ export default class TowerManager {
 					getArr(getFncValue(v, "UPGRADEICON", variantPrefix)),
 				);
 
-				formulaTokens[getDefaultFncKey("COST")] = costs.join("; ");
 				formulaTokens[getDefaultFncKey("DETECTION")] = detects.join("; ");
 				formulaTokens[getDefaultFncKey("UPGRADE")] = upgs.join("; ");
 				formulaTokens[getDefaultFncKey("UPGRADEICON")] = icons.join("; ");
@@ -503,7 +495,7 @@ export default class TowerManager {
 						}
 					}
 
-					const tpRaw = row["Total Price"];
+					const tpRaw = row["Total Cost"] ?? row["Total Price"];
 					const totalPrice =
 						typeof tpRaw === "string"
 							? Number(tpRaw.replace(/[^0-9.-]+/g, ""))
@@ -535,7 +527,10 @@ export default class TowerManager {
 					}
 
 					if (Number.isFinite(numericLevel) && numericLevel === 0) {
-						Object.assign(defaults, row, { Price: totalPrice });
+						const parsedPrice = Number(costs[0]?.replace(/[^0-9.-]+/g, ""));
+						Object.assign(defaults, row, {
+							Price: !isNaN(parsedPrice) ? parsedPrice : totalPrice,
+						});
 						if (Object.keys(detections).length)
 							defaults.Detections = detections;
 						prevPrice = totalPrice;
@@ -585,6 +580,9 @@ export default class TowerManager {
 
 					if (extra.headers.includes("Total Price")) {
 						extraReadOnly.add("Total Price");
+					}
+					if (extra.headers.includes("Total Cost")) {
+						extraReadOnly.add("Total Cost");
 					}
 
 					const cellFormulaTokens: Record<string, Record<string, string>> = {};

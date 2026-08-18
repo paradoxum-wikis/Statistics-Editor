@@ -1,7 +1,11 @@
 import type Tower from "$lib/towerComponents/tower";
 import type { TableData } from "./parser";
 import { serializeTable, serializeVariables } from "./serializer";
-import { getDefaultFncKey, getFncValue } from "./functions";
+import {
+	getDefaultFncKey,
+	getEffectiveCostKey,
+	getFncValue,
+} from "./functions";
 import {
 	flagsFromSkinJson,
 	parseSchema,
@@ -141,7 +145,8 @@ function buildVariablesMap(tower: Tower): Record<string, string> {
 
 	const baseFnc = baseSkinJson ? extractFncArrays(baseSkinJson) : null;
 	if (baseFnc) {
-		if (baseFnc.costStr) variables[getDefaultFncKey("COST")] = baseFnc.costStr;
+		if (baseFnc.costStr)
+			variables[getEffectiveCostKey(tokens)] = baseFnc.costStr;
 		if (hasDetections(baseFnc.detStr))
 			variables[getDefaultFncKey("DETECTION")] = baseFnc.detStr;
 		if (baseFnc.upgradeStr)
@@ -167,7 +172,8 @@ function buildVariablesMap(tower: Tower): Record<string, string> {
 		if (!prefix || !baseFnc) continue;
 
 		if (variant.costStr !== baseFnc.costStr)
-			variables[getDefaultFncKey("COST", prefix)] = variant.costStr;
+			variables[getEffectiveCostKey(skin.formulaTokens, prefix)] =
+				variant.costStr;
 
 		if (variant.detStr !== baseFnc.detStr && hasDetections(variant.detStr))
 			variables[getDefaultFncKey("DETECTION", prefix)] = variant.detStr;

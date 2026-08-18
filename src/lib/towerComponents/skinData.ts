@@ -415,12 +415,10 @@ class SkinData {
 	}
 
 	setCost(level: number, value: number): void {
-		const costKey = getEffectiveFncKey(
-			this.formulaTokens,
-			"COST",
-			this.variantPrefix,
-		);
-		const costs = (this.formulaTokens[costKey] || "")
+		const costKey = getDefaultFncKey("COST", this.variantPrefix);
+		const costs = (
+			getFncValue(this.formulaTokens, "COST", this.variantPrefix) || ""
+		)
 			.split(";")
 			.map((s) => s.trim());
 		costs[level] = String(value);
@@ -430,23 +428,11 @@ class SkinData {
 		if (this.data.FormulaTokens) this.data.FormulaTokens[costKey] = newCostStr;
 
 		this.recomputeCalculatedColumns();
-		if (this.rawRows?.length) {
-			const sorted = [...this.rawRows].sort(
-				(a, b) => Number(a.Level) - Number(b.Level),
-			);
-			let previous = 0;
-			for (const row of sorted) {
-				const lvl = Number(row.Level);
-				const totalPrice =
-					typeof row["Total Price"] === "number" ? row["Total Price"] : 0;
-				if (lvl === 0) {
-					if (this.data.Defaults) this.data.Defaults.Price = totalPrice;
-				} else {
-					const upgrade = this.data.Upgrades?.[lvl - 1];
-					if (upgrade) upgrade.Cost = totalPrice - previous;
-				}
-				previous = totalPrice;
-			}
+		if (level === 0) {
+			if (this.data.Defaults) this.data.Defaults.Price = value;
+		} else {
+			const upgrade = this.data.Upgrades?.[level - 1];
+			if (upgrade) upgrade.Cost = value;
 		}
 		this.createData();
 	}

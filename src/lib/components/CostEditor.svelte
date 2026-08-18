@@ -6,7 +6,7 @@
 	import Tip from "./smol/Tip.svelte";
 	import { CircleDollarSign } from "@lucide/svelte";
 	import { parseNumeric, stripRefs } from "$lib/utils/format";
-	import { getEffectiveFncKey, getFncValue } from "$lib/neowtext/functions";
+	import { getFncValue } from "$lib/neowtext/functions";
 	import { mkCellKey } from "$lib/neowtext/directives";
 	import type SkinData from "$lib/towerComponents/skinData";
 
@@ -21,24 +21,27 @@
 		towerStore.selectedData?.getSkin(towerStore.selectedSkinName),
 	);
 
-	function costKeyFor(skin: SkinData): string {
-		return skin.isPvp &&
-			getFncValue(skin.formulaTokens, "PVP-COST") !== undefined
-			? getEffectiveFncKey(skin.formulaTokens, "PVP-COST")
-			: getEffectiveFncKey(skin.formulaTokens, "COST", skin.variantPrefix);
-	}
+	let hasFncCost = $derived.by(() => {
+		towerStore.refreshTrigger;
+		return (
+			skinData != null &&
+			getFncValue(skinData.formulaTokens, "COST", skinData.variantPrefix) !==
+				undefined
+		);
+	});
 
 	function costAt(skin: SkinData, level: number): number {
 		const num = parseNumeric(
-			(skin.formulaTokens[costKeyFor(skin)] || "").split(";")[level]?.trim() ||
-				"0",
+			(getFncValue(skin.formulaTokens, "COST", skin.variantPrefix) || "")
+				.split(";")
+				[level]?.trim() || "0",
 		);
 		return Number.isNaN(num) ? 0 : num;
 	}
 
 	let costRows = $derived.by((): CostRow[] => {
 		towerStore.refreshTrigger;
-		if (!skinData?.formulaTokens) return [];
+		if (!hasFncCost || !skinData?.formulaTokens) return [];
 
 		const levels = skinData.levels?.levels ?? [];
 		const upgrades = skinData.upgrades ?? [];
@@ -75,7 +78,10 @@
 					costAt(skin, level),
 				);
 			}
-			const totalHeader = headers.find((h) => stripRefs(h) === "Total Price");
+			const totalHeader = headers.find((h) => {
+				const n = stripRefs(h);
+				return n === "Total Cost" || n === "Total Price";
+			});
 			if (totalHeader) {
 				for (let i = level; i < skin.levels.levels.length; i++) {
 					towerStore.captureBaselineCell(
@@ -91,13 +97,13 @@
 	}
 </script>
 
-<CollapsibleSide
-	title="Costs"
-	icon={CircleDollarSign}
-	bind:open
-	isPvp={skinData?.isPvp ?? false}
->
-	{#if costRows.length > 0}
+{#if hasFncCost}
+	<CollapsibleSide
+		title="Costs"
+		icon={CircleDollarSign}
+		bind:open
+		isPvp={skinData?.isPvp ?? false}
+	>
 		<div class="grid gap-1.5">
 			{#each costRows as row (row.level)}
 				<SubtleRow class="flex min-w-0 items-center px-1.5 py-1">
@@ -130,11 +136,5 @@
 				</SubtleRow>
 			{/each}
 		</div>
-	{:else if skinData}
-		<p class="text-xs text-muted-foreground px-1">No cost variables defined.</p>
-	{:else}
-		<p class="text-xs text-muted-foreground px-1">
-			Select a tower to edit costs.
-		</p>
-	{/if}
-</CollapsibleSide>
+	</CollapsibleSide>
+{/if}

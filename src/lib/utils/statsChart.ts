@@ -17,7 +17,7 @@ import {
 	schemaBranches,
 	schemaIndexToLevel,
 } from "$lib/neowtext/functions/schema";
-import { getEffectiveFncKey, getFncValue } from "$lib/neowtext/functions/keys";
+import { getCostValue, getFncValue } from "$lib/neowtext/functions/keys";
 import type SkinData from "$lib/towerComponents/skinData";
 import type Tower from "$lib/towerComponents/tower";
 import type { GlobalModifier } from "$lib/utils/globalModifier";
@@ -81,17 +81,9 @@ function headerLabel(h: string): string {
 	return normalizeColumnKey(h);
 }
 
-function extractCostArray(
-	skin: SkinData | null | undefined,
-	isPvp: boolean,
-): number[] {
+function extractCostArray(skin: SkinData | null | undefined): number[] {
 	if (!skin?.formulaTokens) return [];
-	const tokens = skin.formulaTokens;
-	const key =
-		isPvp && getFncValue(tokens, "PVP-COST") !== undefined
-			? getEffectiveFncKey(tokens, "PVP-COST")
-			: getEffectiveFncKey(tokens, "COST", skin.variantPrefix);
-	const raw = tokens[key] || "";
+	const raw = getCostValue(skin.formulaTokens, skin.variantPrefix) || "";
 	if (!raw) return [];
 	return raw.split(";").map((part) => {
 		const n = parseNumeric(part.trim());
@@ -181,7 +173,7 @@ function towerCtx(
 	return {
 		active,
 		cache: buildDisplayRowsCache(active, skinName, rofInfo, modifier),
-		costs: extractCostArray(active.skin, !!active.skin.isPvp),
+		costs: extractCostArray(active.skin),
 		schema,
 		trunk: schemaBranches(schema)[0] || "N",
 	};

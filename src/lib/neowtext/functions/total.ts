@@ -8,9 +8,10 @@ import {
 import { resolveToken, type TableCache } from "../resolve";
 
 /**
- * True when the var body is a semicolon list of numbers (FNC-COST-) and not a formula.
+ * True when the var body is a numeric semicolon list and not a formula.
+ * Empty bodies return true as callers that need a `;` marker must gate on `includes(";")`.
  */
-function isNumericArrayBody(raw: string): boolean {
+export function isNumericArrayBody(raw: string): boolean {
 	const s = stripRefs(raw).trim();
 	if (!s) return true;
 	if (/\{\{|#expr/i.test(s)) return false;

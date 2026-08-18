@@ -119,6 +119,12 @@ export function deprecatedFn(ref: DollarRef): string | undefined {
 	if (ref.kind === "fse" && n === "CATEGORY") {
 		return `$FSE-${pvp}CATEGORY$ is deprecated; use $FSE-${pvp}META$.`;
 	}
+	if (ref.kind === "fnc" && n === "COST") {
+		return `$FNC-${pvp}COST$ is deprecated; use array variables such as $${pvp}COST$.`;
+	}
+	if (ref.kind === "fnc" && n === "TOTALPRICE") {
+		return `$FNC-TOTALPRICE$ is deprecated; use the generic TOTAL function such as $FNC-TOTAL-${pvp}COST$.`;
+	}
 	if (ref.kind === "fnc" && COMPAT_FSE.has(n)) {
 		return `$FNC-${pvp}${n}$ is deprecated; use $FSE-${pvp}${n}$.`;
 	}

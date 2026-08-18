@@ -7,17 +7,21 @@ import {
 	applyRofBug,
 	normalizeColumnKey,
 	columnKeysEqual,
+	parseNumeric,
 } from "$lib/utils/format";
 import { settingsStore } from "$lib/stores/settings.svelte";
 import {
 	getTableCacheRowAt,
 	type TableRowCache,
 } from "$lib/neowtext/tableCache";
-import { resolveFNC } from "$lib/neowtext/functions/total";
+import { isNumericArrayBody, resolveFNC } from "$lib/neowtext/functions/total";
+import { getFncValue } from "$lib/neowtext/functions/keys";
 import {
 	buildBranchMap,
+	getSchemaIndex,
 	parseLevelBranch,
 	parseLevelNumber,
+	parseSchema,
 	resolveBranchSpec,
 } from "$lib/neowtext/functions/schema";
 
@@ -448,6 +452,20 @@ export function resolveToken(
 				variantPrefix,
 				fullPrecision,
 			);
+		}
+
+		if (isVar && !/^\$F(?:NC|SE)-/i.test(token) && val.includes(";")) {
+			if (!levelLocked && !isNumericArrayBody(val)) return val;
+			const idx = getSchemaIndex(
+				parseSchema(getFncValue(tokens, "SCHEMA")),
+				parseLevelNumber(level),
+				activeBranch || "",
+			);
+			const parts = val.split(";").map((s) => s.trim());
+			if (idx < 0 || idx >= parts.length) return undefined;
+			const el = parts[idx];
+			const n = parseNumeric(el);
+			return Number.isNaN(n) ? el : n;
 		}
 
 		val = val.replace(/\$[^$]+\$/g, (match) => {

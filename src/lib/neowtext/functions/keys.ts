@@ -81,3 +81,40 @@ export function getVariantFncKey(
 	}
 	return getDefaultFncKey(suffix, variantPrefix);
 }
+
+export function getCostKeys(variantPrefix?: string): string[] {
+	const keys: string[] = [];
+	if (variantPrefix) {
+		keys.push(`$${variantPrefix}-COST$`);
+		keys.push(`$FNC-${variantPrefix}-COST$`);
+	}
+	keys.push("$COST$");
+	keys.push("$FNC-COST$");
+	return keys;
+}
+
+export function getCostValue(
+	tokens: Record<string, string>,
+	variantPrefix?: string,
+): string | undefined {
+	for (const key of getCostKeys(variantPrefix)) {
+		if (tokens[key] !== undefined) return tokens[key];
+	}
+	return undefined;
+}
+
+export function getEffectiveCostKey(
+	tokens: Record<string, string>,
+	variantPrefix?: string,
+): string {
+	const keys = variantPrefix
+		? [`$${variantPrefix}-COST$`, `$FNC-${variantPrefix}-COST$`]
+		: getCostKeys();
+	for (const key of keys) {
+		if (tokens[key] !== undefined) return key;
+	}
+	if (!variantPrefix) return "$COST$";
+	return tokens["$FNC-COST$"] !== undefined
+		? `$FNC-${variantPrefix}-COST$`
+		: `$${variantPrefix}-COST$`;
+}

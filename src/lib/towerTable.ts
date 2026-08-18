@@ -60,6 +60,7 @@ const INVERSE_STATS = new Set([
 	"firerate",
 	"cost",
 	"total price",
+	"total cost",
 	"cost efficiency",
 	"price",
 	"rev-up time",
