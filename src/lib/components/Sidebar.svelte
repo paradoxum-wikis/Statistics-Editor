@@ -10,6 +10,7 @@
 	import { settingsStore } from "$lib/stores/settings.svelte";
 	import { applyRofBug, toNumericValue, getRofBugVer } from "$lib/utils/format";
 	import { schemaIndexToLevel } from "$lib/neowtext/functions/schema";
+	import { untrack } from "svelte";
 
 	import type { Picture } from "@sveltejs/enhanced-img";
 	import DamageIcon from "$lib/assets/Damage.png?enhanced";
@@ -38,6 +39,17 @@
 	});
 
 	let numUpgrades = $derived(currentSkin?.upgrades?.length ?? 0);
+
+	$effect(() => {
+		const n = numUpgrades;
+		untrack(() => {
+			if (n <= 0) return;
+			const i = Number(selectedUpgrade);
+			if (Number.isNaN(i) || i < 0 || i >= n) {
+				selectedUpgrade = String(Math.max(n - 1, 0));
+			}
+		});
+	});
 
 	let upgradeNames = $derived.by(() => {
 		towerStore.refreshTrigger;
