@@ -6,7 +6,7 @@ export interface TableData {
 	headers: string[];
 	rawHeaders: string[];
 	rows: Record<string, string | number>[];
-	moneyColumns: string[];
+	moneyCells: string[][];
 	readOnlyColumns: string[];
 	cellFormulaTokens?: Record<string, Record<string, string>>;
 	branchSuffix?: string;
@@ -285,7 +285,8 @@ function parseTable(
 	let currentRow: Record<string, string | number> = {};
 	let colIdx = 0;
 
-	const moneyColumns = new Set<string>();
+	const moneyCells: string[][] = [];
+	let currentMoney: string[] = [];
 
 	const cleanCell = (val: string, header?: string): string | number => {
 		val = val.trim();
@@ -293,7 +294,7 @@ function parseTable(
 		const templateMatch = val.match(/{{([^|{}]+)\|([^}]+)}}/);
 		if (templateMatch) {
 			if (templateMatch[1].trim() === "Money" && header)
-				moneyColumns.add(header);
+				currentMoney.push(header);
 			val = templateMatch[2].trim();
 		}
 
@@ -318,8 +319,12 @@ function parseTable(
 		if (line.startsWith("{|") || line.startsWith("|}")) continue;
 
 		if (line.startsWith("|-")) {
-			if (Object.keys(currentRow).length > 0) rows.push(currentRow);
+			if (Object.keys(currentRow).length > 0) {
+				rows.push(currentRow);
+				moneyCells.push(currentMoney);
+			}
 			currentRow = {};
+			currentMoney = [];
 			colIdx = 0;
 			continue;
 		}
@@ -370,7 +375,10 @@ function parseTable(
 		}
 	}
 
-	if (Object.keys(currentRow).length > 0) rows.push(currentRow);
+	if (Object.keys(currentRow).length > 0) {
+		rows.push(currentRow);
+		moneyCells.push(currentMoney);
+	}
 	if (headers.length === 0) return null;
 
 	return {
@@ -378,7 +386,7 @@ function parseTable(
 		headers,
 		rawHeaders,
 		rows,
-		moneyColumns: Array.from(moneyColumns),
+		moneyCells,
 		readOnlyColumns: [],
 	};
 }

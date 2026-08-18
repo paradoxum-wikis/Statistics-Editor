@@ -729,7 +729,7 @@ export default class TowerManager {
 					FormulaTokens: formulaTokens,
 					CellFormulaTokens: cellFormulaTokens,
 					IsPvp: isPvp,
-					MoneyColumns: tableData.moneyColumns ?? [],
+					MoneyCells: tableData.moneyCells ?? [],
 					ExtraTables: resolvedExtraTables,
 					TableCache: outCache,
 					PrimaryTableIndex: primaryTableIndex,

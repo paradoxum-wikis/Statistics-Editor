@@ -28,7 +28,7 @@ export interface TableConfig {
 	headers: string[];
 	rawHeaders?: string[];
 	rows: TableRow[];
-	moneyColumns: string[];
+	moneyCells: string[][];
 	readOnlyColumns: string[];
 	skinData: SkinData | null;
 	formulaTokens?: Record<string, string>;
@@ -165,7 +165,7 @@ export function buildTableConfigForSkin(
 			headers,
 			rawHeaders,
 			rows: skin.levels.levels.slice(0, skin.rawRows.length),
-			moneyColumns: skin.moneyColumns,
+			moneyCells: skin.moneyCells,
 			readOnlyColumns: [],
 			skinData: skin,
 			branchSuffix: undefined,
@@ -184,7 +184,7 @@ export function buildTableConfigForSkin(
 		headers: extra.headers,
 		rawHeaders: extra.rawHeaders,
 		rows: [...extra.rows],
-		moneyColumns: extra.moneyColumns,
+		moneyCells: extra.moneyCells,
 		readOnlyColumns: extra.readOnlyColumns,
 		skinData: null,
 		cellFormulaTokens: extra.cellFormulaTokens,

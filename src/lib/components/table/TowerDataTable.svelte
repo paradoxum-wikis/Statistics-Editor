@@ -122,7 +122,8 @@
 							</td>
 						{:else}
 							{@const editable = isCellEditable(config, header)}
-							{@const isMoney = config.moneyColumns.includes(header)}
+							{@const isMoney =
+								config.moneyCells?.[rowIdx]?.includes(header) === true}
 							{@const rawValue = getEditableCellRawValue(
 								config,
 								rowIdx,

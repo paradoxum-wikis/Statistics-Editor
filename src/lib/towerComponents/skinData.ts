@@ -48,7 +48,7 @@ class SkinData {
 	rawRows: any[] = [];
 	readOnlyAttributes: string[] = [];
 	isPvp: boolean = false;
-	moneyColumns: string[] = [];
+	moneyCells: string[][] = [];
 	extraTables: TableData[] = [];
 	tableCache: TableCache = {};
 	primaryTableIndex: number = 0;
@@ -146,8 +146,8 @@ class SkinData {
 				.CellFormulaTokens as CellFormulaTokenMap;
 		}
 
-		if (this.data.MoneyColumns && Array.isArray(this.data.MoneyColumns)) {
-			this.moneyColumns = this.data.MoneyColumns;
+		if (this.data.MoneyCells && Array.isArray(this.data.MoneyCells)) {
+			this.moneyCells = this.data.MoneyCells;
 		}
 
 		if (this.data.ExtraTables && Array.isArray(this.data.ExtraTables)) {

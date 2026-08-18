@@ -7,7 +7,7 @@ interface SkinDataJSON {
 	Headers: string[];
 	RawHeaders?: string[];
 	RawRows: TableRow[];
-	MoneyColumns?: string[];
+	MoneyCells?: string[][];
 	Name?: string;
 }
 
@@ -24,7 +24,7 @@ function normalizeCellLineBreaks(value: string): string {
 function serializeRow(
 	row: TableRow,
 	headers: string[],
-	moneyColumns: string[],
+	moneyHeaders: string[],
 ): string {
 	const parts: string[] = [];
 
@@ -41,7 +41,7 @@ function serializeRow(
 
 		let strVal = normalizeCellLineBreaks(String(val));
 
-		if (moneyColumns.includes(header)) {
+		if (moneyHeaders.includes(header)) {
 			const s = String(val).trim();
 			const formatted =
 				typeof val === "number"
@@ -63,7 +63,7 @@ function serializeRow(
 }
 
 export function serializeTable(data: SkinDataJSON): string {
-	const { Headers, RawHeaders, RawRows, MoneyColumns = [], Name = "" } = data;
+	const { Headers, RawHeaders, RawRows, MoneyCells = [], Name = "" } = data;
 	if (!Headers || !RawRows) return "";
 
 	const lines: string[] = [];
@@ -77,13 +77,19 @@ export function serializeTable(data: SkinDataJSON): string {
 
 	lines.push(`! ${(RawHeaders?.length ? RawHeaders : Headers).join(" !! ")}`);
 
-	const sortedRows = rowsAreLevelSorted(RawRows)
-		? RawRows
-		: [...RawRows].sort((a, b) => Number(a["Level"]) - Number(b["Level"]));
+	const paired = RawRows.map((row, i) => ({
+		row,
+		money: MoneyCells[i] ?? [],
+	}));
+	const sorted = rowsAreLevelSorted(RawRows)
+		? paired
+		: [...paired].sort(
+				(a, b) => Number(a.row["Level"]) - Number(b.row["Level"]),
+			);
 
-	for (const row of sortedRows) {
+	for (const { row, money } of sorted) {
 		lines.push("|-");
-		lines.push(serializeRow(row, Headers, MoneyColumns));
+		lines.push(serializeRow(row, Headers, money));
 	}
 
 	lines.push("|}");
