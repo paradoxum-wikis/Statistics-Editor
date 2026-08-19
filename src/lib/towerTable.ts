@@ -8,6 +8,7 @@ import {
 import {
 	applyRofBug,
 	formatNumber,
+	formatReadOnly,
 	getRofBugVer,
 	stripRefOnlyVarSuffix,
 	stripRefs,
@@ -390,6 +391,47 @@ export function ensureSkinRows(
 		}
 	}
 	return { active, display: session.display, compare: session.compare };
+}
+
+export function expandHeaderDisplay(
+	raw: string,
+	tokens: Record<string, string>,
+	config?: Pick<
+		TableConfig,
+		"isPvp" | "tableCache" | "skinData" | "variantPrefix"
+	> | null,
+): string {
+	if (!raw.includes("$")) return raw;
+	const isPvp = config?.skinData?.isPvp ?? config?.isPvp ?? false;
+	const tableCache = config?.skinData?.tableCache ?? config?.tableCache;
+	return raw.replace(/\$[^$\s]+\$/g, (tok) => {
+		const def = tokens[tok];
+		if (typeof def !== "string") return tok;
+		if (/<ref\b/i.test(def) && !stripRefs(def).trim()) return tok;
+		const resolved = resolveToken(
+			tok,
+			0,
+			{},
+			tokens,
+			isPvp,
+			0,
+			tableCache,
+			false,
+			false,
+			undefined,
+			undefined,
+			config?.variantPrefix,
+		);
+		if (typeof resolved === "number" && Number.isFinite(resolved)) {
+			return formatReadOnly(resolved);
+		}
+		if (typeof resolved === "string" && resolved !== tok) {
+			const body = stripRefs(def).trim();
+			if (resolved === body && /[+*/]|#expr|\*\*|{{/.test(body)) return tok;
+			return resolved;
+		}
+		return tok;
+	});
 }
 
 function getCellFormulaToken(

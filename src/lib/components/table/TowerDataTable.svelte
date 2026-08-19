@@ -3,6 +3,7 @@
 	import {
 		cellDisplaySource,
 		displayCellValue,
+		expandHeaderDisplay,
 		formulaSourceTip,
 		getDeltaForCell,
 		getEditableCellRawValue,
@@ -56,6 +57,15 @@
 		>,
 	);
 
+	const tableNameDisplay = $derived(
+		expandHeaderDisplay(config.tableName, fTokens, config),
+	);
+	const headerDisplays = $derived(
+		config.headers.map((h, i) =>
+			expandHeaderDisplay(config.rawHeaders?.[i] || h, fTokens, config),
+		),
+	);
+
 	function resolveContentFor(rowIdx: number, row: TableRow) {
 		return (content: string) =>
 			resolveRefContent(content, config, rowIdx, row, globalModifier);
@@ -73,7 +83,7 @@
 				<tr>
 					<th colspan={config.headers.length} class="table-name-header">
 						<CellRefs
-							value={config.tableName}
+							value={tableNameDisplay}
 							readOnly={true}
 							tokens={fTokens}
 							{getRefNum}
@@ -95,7 +105,7 @@
 						onmouseleave={() => (hoveredCol = null)}
 					>
 						<CellRefs
-							value={config.rawHeaders?.[hIdx] || header}
+							value={headerDisplays[hIdx] || header}
 							readOnly={true}
 							tokens={fTokens}
 							{getRefNum}
