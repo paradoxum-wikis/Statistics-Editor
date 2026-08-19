@@ -497,6 +497,7 @@ export function resolveToken(
 				variantPrefix,
 				fullPrecision,
 			);
+			if (resolved === undefined) return match;
 			if (inExpr) {
 				if (typeof resolved === "number" && Number.isFinite(resolved)) {
 					return String(resolved);
@@ -504,7 +505,7 @@ export function resolveToken(
 				const n = toNumericValue(resolved);
 				return n !== null ? String(n) : match;
 			}
-			return resolved !== undefined ? String(resolved) : "0";
+			return String(resolved);
 		});
 
 		const context = Object.fromEntries(
