@@ -8,6 +8,7 @@ import {
 	normalizeColumnKey,
 	columnKeysEqual,
 	parseNumeric,
+	toNumericValue,
 } from "$lib/utils/format";
 import { settingsStore } from "$lib/stores/settings.svelte";
 import {
@@ -87,6 +88,15 @@ function maybeApplyRofToCachedRow(
 	}
 
 	return adjusted;
+}
+
+function numericizeCached(v: string | number): string | number {
+	if (typeof v === "number") return v;
+	const n = toNumericValue(v);
+	if (n !== null) return n;
+	const s = stripRefs(v).trim();
+	if (s === "" || s === "-" || /^n\/?a$/i.test(s)) return 0;
+	return s;
 }
 
 function splitTopLevelPipes(input: string): string[] {
@@ -333,7 +343,9 @@ export function resolveToken(
 					variantPrefix,
 					fullPrecision,
 				);
-				return resolved !== undefined ? resolved : stripRefs(String(cachedVal));
+				return numericizeCached(
+					resolved !== undefined ? resolved : stripRefs(String(cachedVal)),
+				);
 			}
 		}
 
@@ -560,9 +572,11 @@ export function resolveToken(
 						});
 					}
 
-					return resolved !== undefined
-						? String(resolved)
-						: stripRefs(String(cachedVal));
+					return String(
+						numericizeCached(
+							resolved !== undefined ? resolved : stripRefs(String(cachedVal)),
+						),
+					);
 				}
 
 				if (settingsStore.debugMode) {
