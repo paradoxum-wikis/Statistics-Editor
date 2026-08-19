@@ -480,6 +480,7 @@ export function resolveToken(
 			return Number.isNaN(n) ? el : n;
 		}
 
+		const inExpr = /{{#expr:/i.test(val);
 		val = val.replace(/\$[^$]+\$/g, (match) => {
 			const resolved = resolveToken(
 				match,
@@ -496,6 +497,13 @@ export function resolveToken(
 				variantPrefix,
 				fullPrecision,
 			);
+			if (inExpr) {
+				if (typeof resolved === "number" && Number.isFinite(resolved)) {
+					return String(resolved);
+				}
+				const n = toNumericValue(resolved);
+				return n !== null ? String(n) : match;
+			}
 			return resolved !== undefined ? String(resolved) : "0";
 		});
 
