@@ -110,6 +110,7 @@ class ImageLoaderService {
 	private cache: Map<string, string> = new Map();
 	private loading: LoadingState = new Map();
 	private failed: FailedRequests = new Set();
+	private inflightAsset = new Map<string, Promise<string | null>>();
 
 	private config: CacheConfig = { ...DEFAULT_CONFIG };
 
@@ -423,29 +424,50 @@ class ImageLoaderService {
 				return null;
 			}
 
-			const resolveResponse = await fetch(
-				proxyImageUrl(`https://assetdelivery.roblox.com/v2/assetId/${assetId}`),
-			);
-			const resolveData = await resolveResponse.json();
-			const finalUrl: string | null =
-				resolveData?.locations?.[0]?.location || null;
+			let assetPromise = this.inflightAsset.get(imageIdStr);
+			if (!assetPromise) {
+				assetPromise = (async (): Promise<string | null> => {
+					try {
+						const resolveResponse = await fetch(
+							proxyImageUrl(
+								`https://assetdelivery.roblox.com/v2/assetId/${assetId}`,
+							),
+						);
+						const resolveData = await resolveResponse.json();
+						const finalUrl: string | null =
+							resolveData?.locations?.[0]?.location || null;
+						if (!finalUrl) return null;
 
-			if (!finalUrl) {
+						const imageResponse = await fetch(finalUrl, { mode: "cors" });
+						if (!imageResponse.ok) {
+							throw new Error(`Image fetch failed: ${imageResponse.status}`);
+						}
+
+						const imageClone = imageResponse.clone();
+						const blob = await imageResponse.blob();
+						const objectUrl = URL.createObjectURL(blob);
+						this.objectUrlsByKey.set(
+							this.cacheKeyForAssetId(imageIdStr),
+							objectUrl,
+						);
+
+						void this.cachePutBlob(imageIdStr, imageClone);
+						return objectUrl;
+					} catch (error) {
+						console.error(`Failed to fetch asset image ${imageIdStr}:`, error);
+						return null;
+					} finally {
+						this.inflightAsset.delete(imageIdStr);
+					}
+				})();
+				this.inflightAsset.set(imageIdStr, assetPromise);
+			}
+
+			const objectUrl = await assetPromise;
+			if (!objectUrl) {
 				this.failed.add(requestKey);
 				return null;
 			}
-
-			// Fetch the actual image and cache it
-			const imageResponse = await fetch(finalUrl, { mode: "cors" });
-			if (!imageResponse.ok) {
-				throw new Error(`Image fetch failed: ${imageResponse.status}`);
-			}
-
-			await this.cachePutBlob(imageIdStr, imageResponse);
-
-			const blob = await imageResponse.blob();
-			const objectUrl = URL.createObjectURL(blob);
-			this.objectUrlsByKey.set(this.cacheKeyForAssetId(imageIdStr), objectUrl);
 
 			this.cache.set(requestKey, objectUrl);
 
