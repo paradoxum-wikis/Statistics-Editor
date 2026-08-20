@@ -192,6 +192,7 @@ class SkinData {
 			tableName: string | undefined,
 			headers: string[],
 			rows: Record<string, string | number>[],
+			cellTokens?: Record<string, Record<string, string>>,
 		) => {
 			if (!tableName || !headers.length) return;
 
@@ -199,7 +200,11 @@ class SkinData {
 			const indexCol =
 				indexOverrides[cleanName] || indexOverrides[tableName] || headers[0];
 
-			this.tableCache[tableName] = indexRowsByLevelKeys(rows, indexCol);
+			this.tableCache[tableName] = indexRowsByLevelKeys(
+				rows,
+				indexCol,
+				cellTokens,
+			);
 			const tCache = this.tableCache[tableName];
 			this.tableCache[cleanName] = tCache;
 			this.tableCache[cleanName.replace(/\s+/g, "")] = tCache;
@@ -213,6 +218,7 @@ class SkinData {
 			this.tableName || (base && base.tableName),
 			this.headers,
 			this.rawRows,
+			this.cellFormulaTokens,
 		);
 
 		for (let i = 0; i < this.extraTables.length; i++) {
@@ -221,6 +227,7 @@ class SkinData {
 				table.name || (base && base.extraTables[i].name),
 				table.headers,
 				table.rows,
+				table.cellFormulaTokens,
 			);
 		}
 	}

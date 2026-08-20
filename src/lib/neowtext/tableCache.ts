@@ -63,9 +63,22 @@ export function getTableCacheRowAt(
 export function indexRowsByLevelKeys(
 	rows: Record<string, string | number>[],
 	indexCol: string,
+	cellFormulaTokens?: Record<string, Record<string, string>>,
 ): TableRowCache {
 	const tCache: TableRowCache = {};
-	for (const row of rows) {
+	for (let i = 0; i < rows.length; i++) {
+		const src = rows[i];
+		const toks = cellFormulaTokens?.[String(i)];
+		let row = src;
+		if (toks) {
+			// Table.Col re-evals $tokens$
+			// live rows keep the numeric result
+			row = { ...src };
+			for (const [col, tok] of Object.entries(toks)) {
+				if (!tok.trim()) continue;
+				row[col] = tok;
+			}
+		}
 		for (const key of parseLevelKeys(String(row[indexCol] ?? ""))) {
 			tCache[key] = row;
 		}

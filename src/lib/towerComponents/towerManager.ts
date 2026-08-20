@@ -282,6 +282,7 @@ export default class TowerManager {
 					const tCache: TableRowCache = indexRowsByLevelKeys(
 						table.rows,
 						indexCol,
+						table.cellFormulaTokens,
 					);
 					cache[table.name] = tCache;
 					cache[cleanName] = tCache;
