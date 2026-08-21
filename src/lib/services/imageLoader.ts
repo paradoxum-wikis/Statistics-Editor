@@ -40,7 +40,10 @@ const EXTERNAL_IMAGE_PREFIXES = [
 ];
 
 export function resolveWikiFileUrl(imageIdStr: string): string | null {
-	const s = imageIdStr.trim();
+	const s = imageIdStr
+		.trim()
+		.replace(/^\[\[:?\s*(.+?)(?:\|.*)?\]\]$/, "$1")
+		.trim();
 	if (!s || !/^((File|Image)\s*:)/i.test(s)) return null;
 
 	try {
