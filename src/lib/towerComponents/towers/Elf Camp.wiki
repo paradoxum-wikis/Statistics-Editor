@@ -4,9 +4,9 @@ $BDPS$ = (Damage * Burst Count) / (Cooldown + (Firerate * Burst Count))
 $SDPS$ = [[Splash Damage]] / Firerate
 $RDPS$ = Health / Spawnrate
 $BRDPS$ = (Health + [[Splash Damage]]) / Spawnrate
-$CE$ = Total Price / Combined DPS
-$TP$ = $FNC-TOTALPRICE$
-$FNC-COST$ = 300; 350; 1800; 4500; 10750
+$CE$ = Total Cost / Combined DPS
+$TP$ = $FNC-TOTAL-COST$
+$COST$ = 300; 350; 1800; 4500; 10750
 $FSE-DETECTION$ = 0; 0; 4
 $FSE-UPGRADE$ = Sno'ball Training; Unpaid Labor; Cookie Cutting; A Violent Night
 $FSE-UPGRADEICON$ = 125956529169231; 75868965324711; 120660526589244; 70951173324126
@@ -17,14 +17,21 @@ $GREF$ = <ref>Two [[Gunner Elf|Gunner Elves]] spawn at once.</ref>
 $SREF$ = <ref>DPS assumes that only one enemy is hit and it receives full splash damage.</ref>
 $BEREF$ = <ref>The [[Bomber Elf (Unit)|Bomber Elf]] only explodes upon death.</ref>
 $BDREF$ = <ref>For the [[Bomber Elf (Unit)|Bomber Elf]], the explosion on death damage is included in ram DPS as its health.</ref>
+$R$ = $FNC-RECURSION$
 </var>
 <div class="overflow-box">
 {| class="wikitable stats-table"
-! colspan="5" |Total Cost
+! Level !! Cost !! Total Cost
 |-
-! Level 0 !! Level 1 !! Level 2 !! Level 3 !! Level 4
+| 0 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$
 |-
-| {{Money|$FNC-TOTALPRICE@0$}} || {{Money|$FNC-TOTALPRICE@1$}} || {{Money|$FNC-TOTALPRICE@2$}} || {{Money|$FNC-TOTALPRICE@3$}} || {{Money|$FNC-TOTALPRICE@4$}}
+| 1 || $R$ || $R$
+|-
+| 2 || $R$ || $R$
+|-
+| 3 || $R$ || $R$
+|-
+| 4 || $R$ || $R$
 |}
 </div>
 

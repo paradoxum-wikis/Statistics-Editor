@@ -1,9 +1,9 @@
 <var>
 $DPS$ = Splash Damage / Firerate
-$CE$ = Total Price / DPS
-$TP$ = $FNC-TOTALPRICE$
-$FNC-COST$ = 700; 300; 950; 2400; 5500
-$FNC-PVP-COST$ = 575; 150; 500; 1500; 6000
+$CE$ = Total Cost / DPS
+$TP$ = $FNC-TOTAL-COST$
+$COST$ = 700; 300; 950; 2400; 5500
+$PVP-COST$ = 575; 150; 500; 1500; 6000
 $FSE-DETECTION$ = 2; 0;
 $FSE-PVP-DETECTION$ = ; 0;
 $FSE-UPGRADE$ = Faster Throwing; Ullapool Caber; Loch-n-Load; Expert's Ordnance
@@ -13,38 +13,39 @@ $FSE-PVP-UPGRADEICON$ = ; 5523227714; 5523228733; 5523229364
 $FSE-META$ = Starter; File:DefaultDemomanIcon2.png
 $AREF$ = <ref name=aim>Aim Time happens before the '''Demoman''' throws a grenade. This does not affect its firerate.</ref>
 $DREF$ = <ref name=dps>DPS does not consider projectile travel time.</ref>
+$R$ = $FNC-RECURSION$
 </var>
 <div class="mobile-tabber"><tabber>
 |-|Regular =
 <div class="overflow-box">
 {| class="wikitable stats-table"
-! Level !! Total Price !! Splash Damage !! Firerate !! Aim Time$AREF$ !! Range !! Explosion Range !! DPS$DREF$ !! Cost Efficiency
+! Level !! Cost !! Total Cost !! Splash Damage !! Firerate !! Aim Time$AREF$ !! Range !! Explosion Range !! DPS$DREF$ !! Cost Efficiency
 |-
-| 0 || {{Money|$TP$}} || 8 || 2.6 || 1 || 10 || 4.5 || $DPS$ || {{Money|$CE$}}
+| 0 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 8 || 2.6 || 1 || 10 || 4.5 || $DPS$ || {{Money|$CE$}}
 |-
-| 1 || {{Money|$TP$}} || 8 || 1.9 || 1 || 12 || 4.5 || $DPS$ || {{Money|$CE$}}
+| 1 || $R$ || $R$ || 8 || 1.9 || 1 || 12 || 4.5 || $DPS$ || {{Money|$CE$}}
 |-
-| 2 || {{Money|$TP$}} || 18 || 1.9 || 1 || 12 || 5 || $DPS$ || {{Money|$CE$}}
+| 2 || $R$ || $R$ || 18 || 1.9 || 1 || 12 || 5 || $DPS$ || {{Money|$CE$}}
 |-
-| 3 || {{Money|$TP$}} || 25 || 1.5 || 0 || 14 || 5.5 || $DPS$ || {{Money|$CE$}}
+| 3 || $R$ || $R$ || 25 || 1.5 || 0 || 14 || 5.5 || $DPS$ || {{Money|$CE$}}
 |-
-| 4 || {{Money|$TP$}} || 35 || 1 || 0 || 16 || 5.5 || $DPS$ || {{Money|$CE$}}
+| 4 || $R$ || $R$ || 35 || 1 || 0 || 16 || 5.5 || $DPS$ || {{Money|$CE$}}
 |}
 </div>
 |-|PVP =
 <div class="overflow-box">
 {| class="wikitable stats-table"
-! Level !! Total Price !! Splash Damage !! Firerate !! Aim Time$AREF$ !! Range !! Explosion Range !! DPS$DREF$ !! Cost Efficiency
+! Level !! Cost !! Total Cost !! Splash Damage !! Firerate !! Aim Time$AREF$ !! Range !! Explosion Range !! DPS$DREF$ !! Cost Efficiency
 |-
-| 0 || {{Money|$TP$}} || 6 || 1.75 || 1 || 9 || 4.5 || $DPS$ || {{Money|$CE$}}
+| 0 || {{Money|$PVP-COST$}}$R$ || {{Money|$TP$}}$R$ || 6 || 1.75 || 1 || 9 || 4.5 || $DPS$ || {{Money|$CE$}}
 |-
-| 1 || {{Money|$TP$}} || 6 || 1.5 || 1 || 11 || 4.5 || $DPS$ || {{Money|$CE$}}
+| 1 || $R$ || $R$ || 6 || 1.5 || 1 || 11 || 4.5 || $DPS$ || {{Money|$CE$}}
 |-
-| 2 || {{Money|$TP$}} || 10 || 1.5 || 1 || 11 || 5.5 || $DPS$ || {{Money|$CE$}}
+| 2 || $R$ || $R$ || 10 || 1.5 || 1 || 11 || 5.5 || $DPS$ || {{Money|$CE$}}
 |-
-| 3 || {{Money|$TP$}} || 15 || 1.35 || 0 || 14 || 5.5 || $DPS$ || {{Money|$CE$}}
+| 3 || $R$ || $R$ || 15 || 1.35 || 0 || 14 || 5.5 || $DPS$ || {{Money|$CE$}}
 |-
-| 4 || {{Money|$TP$}} || 34 || 1 || 0 || 16 || 5.5 || $DPS$ || {{Money|$CE$}}
+| 4 || $R$ || $R$ || 34 || 1 || 0 || 16 || 5.5 || $DPS$ || {{Money|$CE$}}
 |}
 </div>
 </tabber></div>

@@ -1,26 +1,27 @@
 <var>
 $DPS$ = Damage / Firerate
 $CE$ = $TP$ / DPS
-$TP$ = $FNC-TOTALPRICE$
-$FNC-COST$ = 850; 350; 1500; 3800; 9500
+$TP$ = $FNC-TOTAL-COST$
+$COST$ = 850; 350; 1500; 3800; 9500
 $FSE-DETECTION$ = 1; 0;
 $FSE-UPGRADE$ = Endurance; Piercing Cold; Subzero Hero; Hyper Icer Rifle
 $FSE-UPGRADEICON$ = 15686412605; 15686412501; 15686412400; 15686412306
 $FSE-META$ = Exclusive; File:KRFrostBlasterIcon.png
 $DREF$ = <ref>DPS assumes its projectile only hits one enemy.</ref>
+$R$ = $FNC-RECURSION$
 </var>
 <div class="overflow-box">
 {| class="wikitable stats-table"
-! Level !! Total Price !! Damage !! Firerate !! Tick !! Slowdown per Hit !! Max Slowdown !! Freeze Time !! Slowdown Time !! Defense Melt !! Max Hits !! Range !! Projectile Speed !! DPS$DREF$ !! Cost Efficiency
+! Level !! Cost !! Total Cost !! Damage !! Firerate !! Tick !! Slowdown per Hit !! Max Slowdown !! Freeze Time !! Slowdown Time !! Defense Melt !! Max Hits !! Range !! Projectile Speed !! DPS$DREF$ !! Cost Efficiency
 |-
-| 0 || {{Money|$TP$}} || 4 || 0.8 || 0.25 || 15% || 15% || 0.2 || 0.2 || N/A || 2 || 12 || 60 || $DPS$ || {{Money|$CE$}}
+| 0 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 4 || 0.8 || 0.25 || 15% || 15% || 0.2 || 0.2 || N/A || 2 || 12 || 60 || $DPS$ || {{Money|$CE$}}
 |-
-| 1 || {{Money|$TP$}} || 4 || 0.6 || 0.25 || 15% || 15% || 0.3 || 0.3 || N/A || 2 || 15 || 60 || $DPS$ || {{Money|$CE$}}
+| 1 || $R$ || $R$ || 4 || 0.6 || 0.25 || 15% || 15% || 0.3 || 0.3 || N/A || 2 || 15 || 60 || $DPS$ || {{Money|$CE$}}
 |-
-| 2 || {{Money|$TP$}} || 8 || 0.6 || 0.25 || 25% || 25% || 0.3 || 0.3 || 15% || 3 || 15 || 60 || $DPS$ || {{Money|$CE$}}
+| 2 || $R$ || $R$ || 8 || 0.6 || 0.25 || 25% || 25% || 0.3 || 0.3 || 15% || 3 || 15 || 60 || $DPS$ || {{Money|$CE$}}
 |-
-| 3 || {{Money|$TP$}} || 12 || 0.45 || 0.25 || 25% || 25% || 0.3 || 0.3 || 15% || 3 || 17.5 || 60 || $DPS$ || {{Money|$CE$}}
+| 3 || $R$ || $R$ || 12 || 0.45 || 0.25 || 25% || 25% || 0.3 || 0.3 || 15% || 3 || 17.5 || 60 || $DPS$ || {{Money|$CE$}}
 |-
-| 4 || {{Money|$TP$}} || 53 || 0.9 || 0.25 || 25% || 25% || 0.6 || 0.6 || 35% || 4 || 22.5 || 90 || $DPS$ || {{Money|$CE$}}
+| 4 || $R$ || $R$ || 53 || 0.9 || 0.25 || 25% || 25% || 0.6 || 0.6 || 35% || 4 || 22.5 || 90 || $DPS$ || {{Money|$CE$}}
 |}
 </div>

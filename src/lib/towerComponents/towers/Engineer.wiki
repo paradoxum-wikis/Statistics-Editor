@@ -4,10 +4,10 @@ $MDPS$ = Splash Damage * Rocket Count / Rocket Firerate
 $SDPS$ = $DPS$ + $MDPS$
 $FNC-INDEX$ = Sentry Stats.Level
 $CDPS$ = DPS + Sentry Stats.DPS * Max Units
-$CE$ = Total Price / Combined DPS
-$TP$ = $FNC-TOTALPRICE$
-$FNC-COST$ = 600; 325; 900; 2077; 6250; 12500; 32500
-$FNC-PVP-COST$ = 700; 250; 400; 1800; 2600; 12500; 32500
+$CE$ = Total Cost / Combined DPS
+$TP$ = $FNC-TOTAL-COST$
+$COST$ = 600; 325; 900; 2077; 6250; 12500; 32500
+$PVP-COST$ = 700; 250; 400; 1800; 2600; 12500; 32500
 $FSE-DETECTION$ = 2; 0; 0
 $FSE-PVP-DETECTION$ = 2; 0; 2
 $FSE-UPGRADE$ = Precise Calculations; Makeshift Radar; Auto Converter; Heavy Construction; Improved Blueprints; Illegal Gun Parts
@@ -22,82 +22,83 @@ $SREF$ = <ref name="sentry">Sentries are not affected by all buffs and debuffs.<
 $SDREF$ = <ref name="sentrydps">Assumes only one sentry is placed down and does not include '''Engineer''' DPS.<br/>DPS is calculated as Gun DPS + Splash DPS.</ref>
 $RREF$ = <ref name="ref">Rev-up time of 1.5 seconds is not considered into the DPS.</ref>
 $LREF$ = <ref name="lead">Through War Machine Sentry splash damage.</ref>
+$R$ = $FNC-RECURSION$
 </var>
 <div class="mobile-tabber"><tabber>
 |-|Regular =
 <div class="overflow-box">
 {| class="wikitable stats-table"
-! colspan="11" |Engineer Stats
+! colspan="12" |Engineer Stats
 |-
-! Level !! Total Price !! Damage !! Firerate !! Range !! Deadzone Range !! Build Range !! Max Units !! DPS$DREF$ !! Combined DPS$CDREF$ !! Cost Efficiency$CEREF$
+! Level !! Cost !! Total Cost !! Damage !! Firerate !! Range !! Deadzone Range !! Build Range !! Max Units !! DPS$DREF$ !! Combined DPS$CDREF$ !! Cost Efficiency$CEREF$
 |-
-| 0 || {{Money|$TP$}} || 4 || 1.4 || 13 || 1.5 || 4 || 1 || $DPS$ || $CDPS$ || {{Money|$CE$}}
+| 0 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 4 || 1.4 || 13 || 1.5 || 4 || 1 || $DPS$ || $CDPS$ || {{Money|$CE$}}
 |-
-| 1 || {{Money|$TP$}} || 6 || 1.2 || 16 || 1.5 || 4 || 1 || $DPS$ || $CDPS$ || {{Money|$CE$}}
+| 1 || $R$ || $R$ || 6 || 1.2 || 16 || 1.5 || 4 || 1 || $DPS$ || $CDPS$ || {{Money|$CE$}}
 |-
-| 2 || {{Money|$TP$}} || 10 || 1.2 || 18 || 1.5 || 4 || 1 || $DPS$ || $CDPS$ || {{Money|$CE$}}
+| 2 || $R$ || $R$ || 10 || 1.2 || 18 || 1.5 || 4 || 1 || $DPS$ || $CDPS$ || {{Money|$CE$}}
 |-
-| 3 || {{Money|$TP$}} || 20 || 1 || 18 || 1.5 || 4 || 2 || $DPS$ || $CDPS$ || {{Money|$CE$}}
+| 3 || $R$ || $R$ || 20 || 1 || 18 || 1.5 || 4 || 2 || $DPS$ || $CDPS$ || {{Money|$CE$}}
 |-
-| 4 || {{Money|$TP$}} || 30 || 0.9 || 21 || 1.5 || 3 || 2 || $DPS$ || $CDPS$ || {{Money|$CE$}}
+| 4 || $R$ || $R$ || 30 || 0.9 || 21 || 1.5 || 3 || 2 || $DPS$ || $CDPS$ || {{Money|$CE$}}
 |-
-| 5 || {{Money|$TP$}} || 80 || 0.75 || 21 || 1.5 || 3 || 3 || $DPS$ || $CDPS$ || {{Money|$CE$}}
+| 5 || $R$ || $R$ || 80 || 0.75 || 21 || 1.5 || 3 || 3 || $DPS$ || $CDPS$ || {{Money|$CE$}}
 |-
-| 6 || {{Money|$TP$}} || 90 || 0.6 || 22.5 || 1.5 || 2 || 4 || $DPS$ || $CDPS$ || {{Money|$CE$}}
+| 6 || $R$ || $R$ || 90 || 0.6 || 22.5 || 1.5 || 2 || 4 || $DPS$ || $CDPS$ || {{Money|$CE$}}
 |}
 </div>
 
 <div class="overflow-box">
 {| class="wikitable stats-table"
-! colspan="14" |Sentry Stats$SREF$
+! colspan="15" |Sentry Stats$SREF$
 |-
-! Level !! Sentry !! Health !! Damage !! Splash Damage !! Rocket Count !! Firerate !! Rocket Firerate !! Range !! Explosion Range !! Lifespan !! Scrap Meter !! Detections !! DPS$SDREF$
+! Level !! Sentry !! Health !! Damage !! Splash Damage !! Rocket Count !! Firerate !! Rocket Firerate !! Range !! Explosion Range !! Lifespan !! Build Time !! Scrap Meter !! Detections !! DPS$SDREF$
 |-
-| 0–1 || [[Sentry (Unit)|Sentry]] || 100 || 2 || N/A || N/A || 1 || N/A || 18 || N/A || 20s || 8 || N/A || $DPS$
+| 0–1 || [[Sentry (Unit)|Sentry]] || 100 || 2 || N/A || N/A || 1 || N/A || 18 || N/A || 20s || 1.25 || 8 || N/A || $DPS$
 |-
-| 2–3 || [[Rifle Sentry]] || 400 || 1 || N/A || N/A || 0.2 || N/A || 20 || N/A || 30s || 32 || Hidden || $DPS$
+| 2–3 || [[Rifle Sentry]] || 400 || 1 || N/A || N/A || 0.2 || N/A || 20 || N/A || 30s || 1.5 || 32 || Hidden || $DPS$
 |-
-| 4–5 || [[Minigun Sentry]] || 750 || 3 || N/A || N/A || 0.15 || N/A || 22 || N/A || 45s || 150 || Hidden || $DPS$$RREF$
+| 4–5 || [[Minigun Sentry]] || 750 || 3 || N/A || N/A || 0.15 || N/A || 22 || N/A || 45s || 1.75 || 150 || Hidden || $DPS$$RREF$
 |-
-| 6 || [[War Machine Sentry]] || 1,000 || 3 || 60 || 2 || 0.125 || 4 || 24 || 5 || 60s || 340 || Hidden, Lead$LREF$ || $SDPS$<ref>$DPS$ Gun DPS + $MDPS$ Rocket DPS.<br>Rev-up time of 1.5 seconds is not considered into the DPS.<br/>Rocket DPS assumes only one enemy is hit and receives full splash damage.</ref>
+| 6 || [[War Machine Sentry]] || 1,000 || 3 || 60 || 2 || 0.125 || 4 || 24 || 5 || 60s || 1.75 || 340 || Hidden, Lead$LREF$ || $SDPS$<ref>$DPS$ Gun DPS + $MDPS$ Rocket DPS.<br>Rev-up time of 1.5 seconds is not considered into the DPS.<br/>Rocket DPS assumes only one enemy is hit and receives full splash damage.</ref>
 |}
 </div>
 |-|PVP = 
 <div class="overflow-box">
 {| class="wikitable stats-table"
-! colspan="11" |Engineer Stats
+! colspan="12" |Engineer Stats
 |-
-! Level !! Total Price !! Damage !! Firerate !! Range !! Deadzone Range !! Build Range !! Max Units !! DPS$DREF$ !! Combined DPS$CDREF$ !! Cost Efficiency$CEREF$
+! Level !! Cost !! Total Cost !! Damage !! Firerate !! Range !! Deadzone Range !! Build Range !! Max Units !! DPS$DREF$ !! Combined DPS$CDREF$ !! Cost Efficiency$CEREF$
 |-
-|0 || {{Money|$TP$}} || 4 || 1.2 || 13 || 1 || 4 || 1 || $DPS$ || $CDPS$ || {{Money|$CE$}}
+| 0 || {{Money|$PVP-COST$}}$R$ || {{Money|$TP$}}$R$ || 4 || 1.2 || 13 || 1 || 4 || 1 || $DPS$ || $CDPS$ || {{Money|$CE$}}
 |-
-| 1 || {{Money|$TP$}} || 6 || 1.2 || 15 || 1 || 4 || 1 || $DPS$ || $CDPS$ || {{Money|$CE$}}
+| 1 || $R$ || $R$ || 6 || 1.2 || 15 || 1 || 4 || 1 || $DPS$ || $CDPS$ || {{Money|$CE$}}
 |-
-| 2 || {{Money|$TP$}} || 6 || 1.2 || 17 || 1 || 4 || 2 || $DPS$ || $CDPS$ || {{Money|$CE$}}
+| 2 || $R$ || $R$ || 6 || 1.2 || 17 || 1 || 4 || 2 || $DPS$ || $CDPS$ || {{Money|$CE$}}
 |-
-| 3 || {{Money|$TP$}} || 16 || 1.2 || 17 || 1 || 4 || 2 || $DPS$ || $CDPS$ || {{Money|$CE$}}
+| 3 || $R$ || $R$ || 16 || 1.2 || 17 || 1 || 4 || 2 || $DPS$ || $CDPS$ || {{Money|$CE$}}
 |-
-| 4 || {{Money|$TP$}} || 22 || 0.75 || 20 || 1 || 4 || 2 || $DPS$ || $CDPS$ || {{Money|$CE$}}
+| 4 || $R$ || $R$ || 22 || 0.75 || 20 || 1 || 4 || 2 || $DPS$ || $CDPS$ || {{Money|$CE$}}
 |-
-| 5 || {{Money|$TP$}} || 30 || 0.75 || 20 || 1 || 4 || 3 || $DPS$ || $CDPS$ || {{Money|$CE$}}
+| 5 || $R$ || $R$ || 30 || 0.75 || 20 || 1 || 4 || 3 || $DPS$ || $CDPS$ || {{Money|$CE$}}
 |-
-| 6 || {{Money|$TP$}} || 50 || 0.6 || 22 || 0.5 || 4 || 3 || $DPS$ || $CDPS$ || {{Money|$CE$}}
+| 6 || $R$ || $R$ || 50 || 0.6 || 22 || 0.5 || 4 || 3 || $DPS$ || $CDPS$ || {{Money|$CE$}}
 |}
 </div>
 
 <div class="overflow-box">
 {| class="wikitable stats-table"
-! colspan="14" |Sentry Stats<ref name="sentry"/>
+! colspan="15" |Sentry Stats<ref name="sentry"/>
 |-
-! Level !! Sentry !! Health !! Damage !! Splash Damage !! Rocket Count !! Firerate !! Rocket Firerate !! Range !! Explosion Range !! Lifespan !! Scrap Meter !! Detections !! DPS$SDREF$
+! Level !! Sentry !! Health !! Damage !! Splash Damage !! Rocket Count !! Firerate !! Rocket Firerate !! Range !! Explosion Range !! Lifespan !! Build Time !! Scrap Meter !! Detections !! DPS$SDREF$
 |-
-| 0–2 || [[Sentry (Unit)|Sentry]] || 20 || 2 || N/A || N/A || 0.45 || N/A || 18 || N/A || 20s || 16 || N/A || $DPS$
+| 0–2 || [[Sentry (Unit)|Sentry]] || 20 || 2 || N/A || N/A || 0.45 || N/A || 18 || N/A || 20s || 1.25 || 16 || N/A || $DPS$
 |-
-| 3–4 || [[Rifle Sentry]] || 40 || 2 || N/A || N/A || 0.2 || N/A || 20 || N/A || 30s || 32 || N/A || $DPS$
+| 3–4 || [[Rifle Sentry]] || 40 || 2 || N/A || N/A || 0.2 || N/A || 20 || N/A || 30s || 1.5 || 32 || N/A || $DPS$
 |-
-| 5 || [[Minigun Sentry]] || 60 || 6 || N/A || N/A || 0.15 || N/A || 20 || N/A || 45s || 120 || Hidden || $DPS$$RREF$
+| 5 || [[Minigun Sentry]] || 60 || 6 || N/A || N/A || 0.15 || N/A || 20 || N/A || 45s || 1.75 || 120 || Hidden || $DPS$$RREF$
 |-
-| 6 || [[War Machine Sentry]] || 250 || 8 || 28 || 2 || 0.1 || 4 || 24 || 5 || 60s || 250 || Hidden, Lead$LREF$ || $SDPS$<ref>$DPS$ Gun DPS + $MDPS$ Rocket DPS.<br>Rev-up time of 1.5 seconds is not considered into the DPS.<br/>Rocket DPS assumes only one enemy is hit and receives full splash damage.</ref>
+| 6 || [[War Machine Sentry]] || 250 || 8 || 28 || 2 || 0.1 || 4 || 24 || 5 || 60s || 1.75 || 250 || Hidden, Lead$LREF$ || $SDPS$<ref>$DPS$ Gun DPS + $MDPS$ Rocket DPS.<br>Rev-up time of 1.5 seconds is not considered into the DPS.<br/>Rocket DPS assumes only one enemy is hit and receives full splash damage.</ref>
 |}
 </div>
 </tabber></div>

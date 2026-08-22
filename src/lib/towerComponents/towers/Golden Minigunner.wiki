@@ -1,26 +1,27 @@
 <var>
 $DPS$ = Damage / Firerate
-$CE$ = Total Price / DPS
-$TP$ = $FNC-TOTALPRICE$
-$FNC-COST$ = 2400; 1000; 4800; 13500; 27500
+$CE$ = Total Cost / DPS
+$TP$ = $FNC-TOTAL-COST$
+$COST$ = 2400; 1000; 4800; 13500; 27500
 $FSE-DETECTION$ = 2; ;
 $FSE-UPGRADE$ = Improved Handling; Thermal Vision; High Tech Armory; 24 Karat Gatling Gun
 $FSE-UPGRADEICON$ = 15184753790; 15184753514; 15184753289; 15184752970
 $FSE-META$ = Golden Perks; File:Goldenminigunner.png
 $DREF$ = <ref name=dps>DPS does not consider rev-up time.</ref>
+$R$ = $FNC-RECURSION$
 </var>
 <div class="overflow-box">
 {|class="wikitable stats-table"
-! Level !! Total Price !! Damage !! Firerate !! Rev-Up Time !! Range !! DPS$DREF$ !! Cost Efficiency
+! Level !! Cost !! Total Cost !! Damage !! Firerate !! Rev-Up Time !! Range !! DPS$DREF$ !! Cost Efficiency
 |-
-| 0 || {{Money|$TP$}} || 3 || 0.16 || 0.8 || 16 || $DPS$ || {{Money|$CE$}}
+| 0 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 3 || 0.16 || 0.8 || 16 || $DPS$ || {{Money|$CE$}}$R$
 |-
-| 1  || {{Money|$TP$}} || 3 || 0.12 || 0.8 || 16 || $DPS$ || {{Money|$CE$}}
+| 1  || $R$ || $R$ || 3 || 0.12 || 0.8 || 16 || $DPS$$R$ || $R$
 |-
-| 2 || {{Money|$TP$}} || 7 || 0.12 || 0.8 || 20 || $DPS$ || {{Money|$CE$}}
+| 2 || $R$ || $R$ || 7 || 0.12 || 0.8 || 20 || $R$ || $R$
 |-
-| 3 || {{Money|$TP$}} || 13 || 0.1 || 0.6 || 20 || $DPS$ || {{Money|$CE$}}
+| 3 || $R$ || $R$ || 13 || 0.1 || 0.6 || 20 || $R$ || $R$
 |-
-| 4 || {{Money|$TP$}} || 20 || 0.1 || 0.6 || 22 || $DPS$ || {{Money|$CE$}}
+| 4 || $R$ || $R$ || 20 || 0.1 || 0.6 || 22 || $R$ || $R$
 |}
 </div>

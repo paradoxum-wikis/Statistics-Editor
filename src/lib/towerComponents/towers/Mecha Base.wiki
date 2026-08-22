@@ -4,9 +4,9 @@ $GDPS$ = Normal Damage / Firerate
 $MDPS$ = Missile Damage * Missile Count / Missile Cooldown
 $TDPS$ = $RDPS$ + DPS
 $NDPS$ = $GDPS$ + $MDPS$
-$CE$ = Total Price / $TDPS$
-$TP$ = $FNC-TOTALPRICE$
-$FNC-COST$ = 6000; 1200; 2000; 4000; 8000; 80000
+$CE$ = Total Cost / $TDPS$
+$TP$ = $FNC-TOTAL-COST$
+$COST$ = 6000; 1200; 2000; 4000; 8000; 80000
 $FSE-DETECTION$ = 0; 0; 5
 $FSE-UPGRADE$ = ROCKET MECHA; EPIC MECHA; SIGMA MECHA; OMEGA MECHA; Z.O.D. MACHINE
 $FSE-UPGRADEICON$ = 7610093373; 7610093373; 7610093373; 7610093373; 7610093373
@@ -14,21 +14,22 @@ $FSE-META$ = Exclusive; File:OUMechaBaseIcon.png
 $DREF$ = <ref>DPS is only based on ranged weapons, not collision health.<br/>Missile DPS assumes only one enemy is hit and receives full splash damage.</ref>
 $RREF$ = <ref>DPS dealt with its collisions. It is calculated as Health ÷ Spawnrate.</ref>
 $CREF$ = <ref>Cost efficiency accounts for both regular and ram DPS.</ref>
+$R$ = $FNC-RECURSION$
 </var>
 <div class="overflow-box">
 {| class="wikitable stats-table"
-! Level !! Total Price !! Health !! Defense !! Spawnrate !! Normal Damage !! Missile Damage !! Missile Count !! Firerate !! Missile Cooldown !! Range !! Explosion Range !! DPS$DREF$ !! Ram DPS$RREF$ !! Cost Efficiency$CREF$
+! Level !! Cost !! Total Cost !! Health !! Defense !! Spawnrate !! Normal Damage !! Missile Damage !! Missile Count !! Firerate !! Missile Cooldown !! Range !! Explosion Range !! DPS$DREF$ !! Ram DPS$RREF$ !! Cost Efficiency$CREF$
 |-
-| 0 || {{Money|$TP$}} || 500 || N/A || 45 || 10 || N/A || N/A || 0.2 || N/A || 30 || N/A || $GDPS$ || $RDPS$ || {{Money|$CE$}}
+| 0 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 500 || N/A || 45 || 10 || N/A || N/A || 0.2 || N/A || 30 || N/A || $GDPS$ || $RDPS$ || {{Money|$CE$}}
 |-
-| 1 || {{Money|$TP$}} || 500 || N/A || 30 || 10 || 25 || 1 || 0.2 || 7 || 30 || 5 || $NDPS$<ref>$GDPS$ Normal Ranged DPS + $MDPS$ Missile DPS</ref> || $RDPS$ || {{Money|$CE$}}
+| 1 || $R$ || $R$ || 500 || N/A || 30 || 10 || 25 || 1 || 0.2 || 7 || 30 || 5 || $NDPS$<ref>$GDPS$ Normal Ranged DPS + $MDPS$ Missile DPS</ref> || $RDPS$ || {{Money|$CE$}}
 |-
-|2 || {{Money|$TP$}} || 1,000 || N/A || 30 || 12 || 40 || 1 || 0.15 || 7 || 35 || 5 || $NDPS$<ref>$GDPS$ Normal Ranged DPS + $MDPS$ Missile DPS</ref> || $RDPS$ || {{Money|$CE$}}
+| 2 || $R$ || $R$ || 1,000 || N/A || 30 || 12 || 40 || 1 || 0.15 || 7 || 35 || 5 || $NDPS$<ref>$GDPS$ Normal Ranged DPS + $MDPS$ Missile DPS</ref> || $RDPS$ || {{Money|$CE$}}
 |-
-| 3 || {{Money|$TP$}} || 1,500 || N/A || 30 || 10 || 60 || 1 || 0.1 || 3.5 || 35 || 5 || $NDPS$<ref>$GDPS$ Normal Ranged DPS + $MDPS$ Missile DPS</ref> || $RDPS$ || {{Money|$CE$}}
+| 3 || $R$ || $R$ || 1,500 || N/A || 30 || 10 || 60 || 1 || 0.1 || 3.5 || 35 || 5 || $NDPS$<ref>$GDPS$ Normal Ranged DPS + $MDPS$ Missile DPS</ref> || $RDPS$ || {{Money|$CE$}}
 |-
-| 4 || {{Money|$TP$}} || 2,500 || N/A || 30 || 22 || 60 || 4 || 0.1 || 5 || 50 || 5 || $NDPS$<ref>$GDPS$ Normal Ranged DPS + $MDPS$ Missile DPS</ref> || $RDPS$ || {{Money|$CE$}}
+| 4 || $R$ || $R$ || 2,500 || N/A || 30 || 22 || 60 || 4 || 0.1 || 5 || 50 || 5 || $NDPS$<ref>$GDPS$ Normal Ranged DPS + $MDPS$ Missile DPS</ref> || $RDPS$ || {{Money|$CE$}}
 |-
-| 5 || {{Money|$TP$}} || 10,000 || 30% || 30 || 34 || 50 || 4 || 0.1 || 2 || 50 || 5 || $NDPS$<ref>$GDPS$ Normal Ranged DPS + $MDPS$ Missile DPS</ref> || $RDPS$ || {{Money|$CE$}}
+| 5 || $R$ || $R$ || 10,000 || 30% || 30 || 34 || 50 || 4 || 0.1 || 2 || 50 || 5 || $NDPS$<ref>$GDPS$ Normal Ranged DPS + $MDPS$ Missile DPS</ref> || $RDPS$ || {{Money|$CE$}}
 |}
 </div>

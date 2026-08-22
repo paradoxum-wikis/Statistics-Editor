@@ -2,47 +2,48 @@
 $DPS$ = Damage / Firerate
 $SDPS$ = Splash Damage / Firerate
 $TDPS$ = $DPS$ + $SDPS$
-$CE$ = Total Price / DPS
-$TP$ = $FNC-TOTALPRICE$
-$FNC-COST$ = 4500; 1500; 5500; 15750; 25000
-$FNC-PVP-COST$ = 2000; 650; 2400; 8500; 17000
+$CE$ = Total Cost / DPS
+$TP$ = $FNC-TOTAL-COST$
+$COST$ = 4500; 1500; 5500; 15750; 25000
+$PVP-COST$ = 2000; 650; 2400; 8500; 17000
 $FSE-DETECTION$ = ; 2; 0
 $FSE-PVP-DETECTION$ = ; 0; 0
 $FSE-UPGRADE$ = Faster Reloading; Intelligence Radio; Trained Outlaw; Experimental Weapon of Destruction
 $FSE-UPGRADEICON$ = 3280081327; 3381734408; 3381735232; 3381735846
 $FSE-META$ = Advanced; File:Newranger.png
+$R$ = $FNC-RECURSION$
 </var>
 <div class="mobile-tabber"><tabber>
 |-|Regular =
 <div class="overflow-box">
 {| class="wikitable stats-table"
-! Level !! Total Price !! Damage !! Splash Damage !! Firerate !! Range !! Buff Range !! Explosion Range !! Max Hits !! Range Buff !! Buff Time !! DPS !! Cost Efficiency
+! Level !! Cost !! Total Cost !! Damage !! Splash Damage !! Firerate !! Range !! Buff Range !! Explosion Range !! Max Hits !! Range Buff !! Buff Time !! DPS !! Cost Efficiency
 |-
-| 0 || {{Money|$TP$}} || 100 || N/A || 6 || 70 || N/A || N/A || N/A || N/A || N/A || $TDPS$ || {{Money|$CE$}}
+| 0 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 100 || N/A || 6 || 70 || N/A || N/A || N/A || N/A || N/A || $TDPS$ || {{Money|$CE$}}
 |-
-| 1 || {{Money|$TP$}} || 100 || N/A || 4.75 || 70 || N/A || N/A || N/A || N/A || N/A || $DPS$ || {{Money|$CE$}}
+| 1 || $R$ || $R$ || 100 || N/A || 4.75 || 70 || N/A || N/A || N/A || N/A || N/A || $DPS$ || {{Money|$CE$}}
 |-
-| 2 || {{Money|$TP$}} || 185 || N/A || 4.75 || 70 || 12 || N/A || N/A || 10% || 20 || $DPS$ || {{Money|$CE$}}
+| 2 || $R$ || $R$ || 185 || N/A || 4.75 || 70 || 12 || N/A || N/A || 10% || 20 || $DPS$ || {{Money|$CE$}}
 |-
-| 3 || {{Money|$TP$}} || 430 || N/A || 4.5 || 70 || 12 || N/A || N/A || 10% || 20 || $DPS$ || {{Money|$CE$}}
+| 3 || $R$ || $R$ || 430 || N/A || 4.5 || 70 || 12 || N/A || N/A || 10% || 20 || $DPS$ || {{Money|$CE$}}
 |-
-| 4 || {{Money|$TP$}} || 875 || 375 || 8 || 70 || 12 || 5 || 3 || 10% || 20 || $TDPS$<ref>$DPS$ Normal DPS + $SDPS$ Splash DPS.<br/>DPS assumes only one enemy is hit.</ref> || {{Money|$CE$}}
+| 4 || $R$ || $R$ || 875 || 375 || 8 || 70 || 12 || 5 || 3 || 10% || 20 || $TDPS$<ref>$DPS$ Normal DPS + $SDPS$ Splash DPS.<br/>DPS assumes only one enemy is hit.</ref> || {{Money|$CE$}}
 |}
 </div>
 |-|PVP =
 <div class="overflow-box">
 {| class="wikitable stats-table"
-! Level !! Total Price !! Damage !! Splash Damage !! Firerate !! Range !! Buff Range !! Explosion Range !! Range Buff !! Buff Time !! DPS !! Cost Efficiency
+! Level !! Cost !! Total Cost !! Damage !! Splash Damage !! Firerate !! Range !! Buff Range !! Explosion Range !! Range Buff !! Buff Time !! DPS !! Cost Efficiency
 |-
-| 0 || {{Money|$TP$}} || 40 || N/A || 3 || 50 || N/A || N/A || N/A || N/A || $DPS$ || {{Money|$CE$}}
+| 0 || {{Money|$PVP-COST$}}$R$ || {{Money|$TP$}}$R$ || 40 || N/A || 3 || 50 || N/A || N/A || N/A || N/A || $DPS$ || {{Money|$CE$}}
 |-
-| 1 || {{Money|$TP$}} || 40 || N/A || 2.5 || 50 || N/A || N/A || N/A || N/A || $DPS$ || {{Money|$CE$}}
+| 1 || $R$ || $R$ || 40 || N/A || 2.5 || 50 || N/A || N/A || N/A || N/A || $DPS$ || {{Money|$CE$}}
 |-
-| 2 || {{Money|$TP$}} || 74 || N/A || 2.5 || 50 || 12 || N/A || 15% || 120 || $DPS$ || {{Money|$CE$}}
+| 2 || $R$ || $R$ || 74 || N/A || 2.5 || 50 || 12 || N/A || 15% || 120 || $DPS$ || {{Money|$CE$}}
 |-
-| 3 || {{Money|$TP$}} || 148 || N/A || 2 || 50 || 12 || N/A || 15% || 120 || $DPS$ || {{Money|$CE$}}
+| 3 || $R$ || $R$ || 148 || N/A || 2 || 50 || 12 || N/A || 15% || 120 || $DPS$ || {{Money|$CE$}}
 |-
-| 4 || {{Money|$TP$}} || 272 || 25 || 2 || 50 || 12 || 5 || 15% || 120 || $TDPS$<ref>$DPS$ Normal DPS + $SDPS$ Splash DPS.<br/>DPS assumes only one enemy is hit.</ref> || {{Money|$CE$}}
+| 4 || $R$ || $R$ || 272 || 25 || 2 || 50 || 12 || 5 || 15% || 120 || $TDPS$<ref>$DPS$ Normal DPS + $SDPS$ Splash DPS.<br/>DPS assumes only one enemy is hit.</ref> || {{Money|$CE$}}
 |}
 </div>
 </tabber></div>

@@ -3,12 +3,12 @@ $DPS2$ = (Damage * Ammo) / (Reload Time + Rev Time + (Firerate * Ammo))
 $DPS$ = (Damage * Ammo) / (Reload Time + (Firerate * Ammo))
 $MDPS$ = (Splash Damage * Missile Count) / (Missile Cooldown + (Burst Time * Missile Count))
 $TDPS$ = Gun DPS + Missile DPS
-$CE$ = Total Price / Total DPS
-$TP$ = $FNC-TOTALPRICE$
+$CE$ = Total Cost / Total DPS
+$TP$ = $FNC-TOTAL-COST$
 $FNC-SCHEMA$ = N; N; N; N; A; A; B; B;
 $FNC-BRANCH$ = Top Path Stats; Bottom Path Stats
-$FNC-COST$ = 5000; 1750; 3000; 4750; 15000; 47500; 9500; 13500;
-$FNC-PVP-COST$ = 2500; 750; 1500; 3500; 12500; 30000; 7500; 22500;
+$COST$ = 5000; 1750; 3000; 4750; 15000; 47500; 9500; 13500;
+$PVP-COST$ = 2500; 750; 1500; 3500; 12500; 30000; 7500; 22500;
 $FSE-DETECTION$ = ; 3; ; ; 3; ; 4; 3;
 $FSE-PVP-DETECTION$ = ; 1; ; ; 1; ; 4; 1;
 $FSE-UPGRADE$ = AP Rounds; Enhanced Radar; Air to Ground Missiles; Sky Shredder; Leviathan; Modified Payload; Demolition Gunship
@@ -18,78 +18,79 @@ $FSE-META$ = Advanced; File:PursuitNewIcon.png
 $DREF$ = <ref name=dps>Calculated as:<br><math>\frac{\left(\text{Damage}\ \times\ Ammo\right)}{\left(\text{Reload Time}+\left(Firerate\times Ammo\right)\right)}</math></ref>
 $DREF2$ = <ref name=dps2>Calculated as:<br><math>\frac{\left(\text{Damage}\ \times\ Ammo\right)}{\left(\text{Reload Time}+\text{Rev Time}+\left(Firerate\times Ammo\right)\right)}</math></ref>
 $MREF$ = <ref name=missile>Calculated as:<br><math>\frac{\left(\text{Splash Damage} \times\ \text{Missile Count}\right)}{\left(\text{Missile Cooldown}+\left(\text{Burst Time}\times \text{Missile Count}\right)\right)}</math><br>Assumes missiles only hit one enemy.</ref>
+$R$ = $FNC-RECURSION$
 </var>
 <div class="mobile-tabber"><tabber>
 |-|Regular =
 <div class="overflow-box">
 {| class="wikitable stats-table"
-! colspan="19" | Neutral Stats
-|-
-! Level !! Total Price !! Damage !! Splash Damage !! Missile Count !! Ammo !! Firerate !! Missile Cooldown !! Burst Time !! Reload Time !! Range !! Patrol Range !! Explosion Range !! Speed !! Missile Speed !! Gun DPS$DREF$ !! Missile DPS$MREF$ !! Total DPS !! Cost Efficiency
-|-
-| 0 || {{Money|$TP$}} || 7 || N/A || N/A || 50 || 0.225 || N/A || N/A || 3.5 || 7 || 14 || N/A || 45 || N/A || $DPS$ || N/A || $DPS$ || {{Money|$CE$}}
-|-
-| 1 || {{Money|$TP$}} || 10 || N/A || N/A || 50 || 0.225 || N/A || N/A || 3.5 || 7 || 14 || N/A || 45 || N/A || $DPS$ || N/A || $DPS$ || {{Money|$CE$}}
-|-
-| 2 || {{Money|$TP$}} || 10 || N/A || N/A || 75 || 0.175 || N/A || N/A || 3 || 8 || 16 || N/A || 45 || N/A || $DPS$ || N/A || $DPS$ || {{Money|$CE$}}
-|-
-| 3 || {{Money|$TP$}} || 12 || 30 || 2 || 75 || 0.175 || 4 || 0.5 || 3 || 8 || 16 || 4 || 45 || 20 || $DPS$ || $MDPS$ || $TDPS$ || {{Money|$CE$}}
-|}
-
-{| class="wikitable stats-table"
-! colspan="19" | Top Path Stats
-|-
-! Level !! Total Price !! Damage !! Splash Damage !! Missile Count !! Ammo !! Firerate !! Missile Cooldown !! Burst Time !! Reload Time !! Range !! Patrol Range !! Explosion Range !! Speed !! Missile Speed !! Gun DPS$DREF$ !! Missile DPS$MREF$ !! Total DPS !! Cost Efficiency
-|-
-| 4 || {{Money|$TP$}} || 18 || 35 || 4 || 200 || 0.15 || 4 || 0.5 || 3 || 11 || 20 || 3 || 60 || 20 || $DPS$ || $MDPS$ || $TDPS$ || {{Money|$CE$}}
-|-
-| 5 || {{Money|$TP$}} || 46 || 35 || 4 || 200 || 0.15 || 4 || 0.5 || 3 || 11 || 22 || 4 || 60 || 20 || $DPS$ || $MDPS$ || $TDPS$ || {{Money|$CE$}}
-|}
-
-{| class="wikitable stats-table"
-! colspan="19" | Bottom Path Stats
-|-
-! Level !! Total Price !! Damage !! Splash Damage !! Missile Count !! Ammo !! Firerate !! Missile Cooldown !! Burst Time !! Reload Time !! Range !! Patrol Range !! Explosion Range !! Speed !! Missile Speed !! Gun DPS$DREF$ !! Missile DPS$MREF$ !! Total DPS !! Cost Efficiency
-|-
-| 4 || {{Money|$TP$}} || 10 || 35 || 6 || 75 || 0.175 || 4 || 0.25 || 3 || 10 || 20 || 7.5 || 45 || 20 || $DPS$ || $MDPS$ || $TDPS$ || {{Money|$CE$}}
-|-
-| 5 || {{Money|$TP$}} || 10 || 60 || 8 || 75 || 0.175 || 4 || 0.15 || 3 || 12 || 22 || 8.5 || 45 || 20 || $DPS$ || $MDPS$ || $TDPS$ || {{Money|$CE$}}
-|}
-</div>
-|-|PVP =
-<div class="overflow-box">
-{| class="wikitable stats-table"
 ! colspan="20" | Neutral Stats
 |-
-! Level !! Total Price !! Damage !! Splash Damage !! Missile Count !! Ammo !! Firerate !! Missile Cooldown !! Burst Time !! Reload Time !! Rev Time !! Range !! Patrol Range !! Explosion Range !! Speed !! Missile Speed !! Gun DPS$DREF2$ !! Missile DPS$MREF$ !! Total DPS !! Cost Efficiency
+! Level !! Cost !! Total Cost !! Damage !! Splash Damage !! Missile Count !! Ammo !! Firerate !! Missile Cooldown !! Burst Time !! Reload Time !! Range !! Patrol Range !! Explosion Range !! Speed !! Missile Speed !! Gun DPS$DREF$ !! Missile DPS$MREF$ !! Total DPS !! Cost Efficiency
 |-
-| 0 || {{Money|$TP$}} || 6 || N/A || N/A || 35 || 0.25 || N/A || N/A || 4 || N/A || 7 || 14 || N/A || 30 || N/A || $DPS$ || N/A || $DPS$ || {{Money|$CE$}}
+| 0 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 7 || N/A || N/A || 50 || 0.225 || N/A || N/A || 3.5 || 7 || 14 || N/A || 45 || N/A || $DPS$ || N/A || $DPS$ || {{Money|$CE$}}
 |-
-| 1 || {{Money|$TP$}} || 7 || N/A || N/A || 35 || 0.25 || N/A || N/A || 4 || N/A || 8 || 14 || N/A || 16 || N/A || $DPS$ || N/A || $DPS$ || {{Money|$CE$}}
+| 1 || $R$ || $R$ || 10 || N/A || N/A || 50 || 0.225 || N/A || N/A || 3.5 || 7 || 14 || N/A || 45 || N/A || $DPS$ || N/A || $DPS$ || {{Money|$CE$}}
 |-
-| 2 || {{Money|$TP$}} || 10 || N/A || N/A || 35 || 0.25 || N/A || N/A || 4 || N/A || 9.5 || 16 || N/A || 25 || N/A || $DPS$ || N/A || $DPS$ || {{Money|$CE$}}
+| 2 || $R$ || $R$ || 10 || N/A || N/A || 75 || 0.175 || N/A || N/A || 3 || 8 || 16 || N/A || 45 || N/A || $DPS$ || N/A || $DPS$ || {{Money|$CE$}}
 |-
-| 3 || {{Money|$TP$}} || 10 || 32 || 2 || 75 || 0.2 || 7 || 0.5 || 3.5 || N/A || 10.5 || 16 || 3 || 25 || 20 || $DPS$ || $MDPS$ || $TDPS$ || {{Money|$CE$}}
+| 3 || $R$ || $R$ || 12 || 30 || 2 || 75 || 0.175 || 4 || 0.5 || 3 || 8 || 16 || 4 || 45 || 20 || $DPS$ || $MDPS$ || $TDPS$ || {{Money|$CE$}}
 |}
 
 {| class="wikitable stats-table"
 ! colspan="20" | Top Path Stats
 |-
-! Level !! Total Price !! Damage !! Splash Damage !! Missile Count !! Ammo !! Firerate !! Missile Cooldown !! Burst Time !! Reload Time !! Rev Time !! Range !! Patrol Range !! Explosion Range !! Speed !! Missile Speed !! Gun DPS$DREF2$ !! Missile DPS$MREF$ !! Total DPS !! Cost Efficiency
+! Level !! Cost !! Total Cost !! Damage !! Splash Damage !! Missile Count !! Ammo !! Firerate !! Missile Cooldown !! Burst Time !! Reload Time !! Range !! Patrol Range !! Explosion Range !! Speed !! Missile Speed !! Gun DPS$DREF$ !! Missile DPS$MREF$ !! Total DPS !! Cost Efficiency
 |-
-| 4 || {{Money|$TP$}} || 12 || 35 || 4 || 150 || 0.1 || 6 || 0.5 || 3 || 1.5 || 11 || 18.5 || 3 || 25 || 20 || $DPS2$ || $MDPS$ || $TDPS$ || {{Money|$CE$}}
+| 4 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 18 || 35 || 4 || 200 || 0.15 || 4 || 0.5 || 3 || 11 || 20 || 3 || 60 || 20 || $DPS$ || $MDPS$ || $TDPS$ || {{Money|$CE$}}
 |-
-| 5 || {{Money|$TP$}} || 26 || 35 || 4 || 200 || 0.085 || 6 || 0.25 || 2.5 || 1.5 || 12 || 21 || 4 || 25 || 20 || $DPS2$ || $MDPS$ || $TDPS$ || {{Money|$CE$}}
+| 5 || $R$ || $R$ || 46 || 35 || 4 || 200 || 0.15 || 4 || 0.5 || 3 || 11 || 22 || 4 || 60 || 20 || $DPS$ || $MDPS$ || $TDPS$ || {{Money|$CE$}}
 |}
 
 {| class="wikitable stats-table"
 ! colspan="20" | Bottom Path Stats
 |-
-! Level !! Total Price !! Damage !! Splash Damage !! Missile Count !! Ammo !! Firerate !! Missile Cooldown !! Burst Time !! Reload Time !! Rev Time !! Range !! Patrol Range !! Explosion Range !! Speed !! Missile Speed !! Gun DPS$DREF2$ !! Missile DPS$MREF$ !! Total DPS !! Cost Efficiency
+! Level !! Cost !! Total Cost !! Damage !! Splash Damage !! Missile Count !! Ammo !! Firerate !! Missile Cooldown !! Burst Time !! Reload Time !! Range !! Patrol Range !! Explosion Range !! Speed !! Missile Speed !! Gun DPS$DREF$ !! Missile DPS$MREF$ !! Total DPS !! Cost Efficiency
 |-
-| 4 || {{Money|$TP$}} || 10 || 25 || 6 || 75 || 0.2 || 3 || 0.25 || 3.5 || N/A || 11 || 17.5 || 6 || 25 || 20 || $DPS$ || $MDPS$ || $TDPS$ || {{Money|$CE$}}
+| 4 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 10 || 35 || 6 || 75 || 0.175 || 4 || 0.25 || 3 || 10 || 20 || 7.5 || 45 || 20 || $DPS$ || $MDPS$ || $TDPS$ || {{Money|$CE$}}
 |-
-| 5 || {{Money|$TP$}} || 12 || 60 || 8 || 75 || 0.2 || 3 || 0.15 || 2.25 || N/A || 12 || 19.5 || 6 || 25 || 20 || $DPS$ || $MDPS$ || $TDPS$ || {{Money|$CE$}}
+| 5 || $R$ || $R$ || 10 || 60 || 8 || 75 || 0.175 || 4 || 0.15 || 3 || 12 || 22 || 8.5 || 45 || 20 || $DPS$ || $MDPS$ || $TDPS$ || {{Money|$CE$}}
+|}
+</div>
+|-|PVP =
+<div class="overflow-box">
+{| class="wikitable stats-table"
+! colspan="21" | Neutral Stats
+|-
+! Level !! Cost !! Total Cost !! Damage !! Splash Damage !! Missile Count !! Ammo !! Firerate !! Missile Cooldown !! Burst Time !! Reload Time !! Rev Time !! Range !! Patrol Range !! Explosion Range !! Speed !! Missile Speed !! Gun DPS$DREF2$ !! Missile DPS$MREF$ !! Total DPS !! Cost Efficiency
+|-
+| 0 || {{Money|$PVP-COST$}}$R$ || {{Money|$TP$}}$R$ || 6 || N/A || N/A || 35 || 0.25 || N/A || N/A || 4 || N/A || 7 || 14 || N/A || 30 || N/A || $DPS$ || N/A || $DPS$ || {{Money|$CE$}}
+|-
+| 1 || $R$ || $R$ || 7 || N/A || N/A || 35 || 0.25 || N/A || N/A || 4 || N/A || 8 || 14 || N/A || 16 || N/A || $DPS$ || N/A || $DPS$ || {{Money|$CE$}}
+|-
+| 2 || $R$ || $R$ || 10 || N/A || N/A || 35 || 0.25 || N/A || N/A || 4 || N/A || 9.5 || 16 || N/A || 25 || N/A || $DPS$ || N/A || $DPS$ || {{Money|$CE$}}
+|-
+| 3 || $R$ || $R$ || 10 || 32 || 2 || 75 || 0.2 || 7 || 0.5 || 3.5 || N/A || 10.5 || 16 || 3 || 25 || 20 || $DPS$ || $MDPS$ || $TDPS$ || {{Money|$CE$}}
+|}
+
+{| class="wikitable stats-table"
+! colspan="21" | Top Path Stats
+|-
+! Level !! Cost !! Total Cost !! Damage !! Splash Damage !! Missile Count !! Ammo !! Firerate !! Missile Cooldown !! Burst Time !! Reload Time !! Rev Time !! Range !! Patrol Range !! Explosion Range !! Speed !! Missile Speed !! Gun DPS$DREF2$ !! Missile DPS$MREF$ !! Total DPS !! Cost Efficiency
+|-
+| 4 || {{Money|$PVP-COST$}}$R$ || {{Money|$TP$}}$R$ || 12 || 35 || 4 || 150 || 0.1 || 6 || 0.5 || 3 || 1.5 || 11 || 18.5 || 3 || 25 || 20 || $DPS2$ || $MDPS$ || $TDPS$ || {{Money|$CE$}}
+|-
+| 5 || $R$ || $R$ || 26 || 35 || 4 || 200 || 0.085 || 6 || 0.25 || 2.5 || 1.5 || 12 || 21 || 4 || 25 || 20 || $DPS2$ || $MDPS$ || $TDPS$ || {{Money|$CE$}}
+|}
+
+{| class="wikitable stats-table"
+! colspan="21" | Bottom Path Stats
+|-
+! Level !! Cost !! Total Cost !! Damage !! Splash Damage !! Missile Count !! Ammo !! Firerate !! Missile Cooldown !! Burst Time !! Reload Time !! Rev Time !! Range !! Patrol Range !! Explosion Range !! Speed !! Missile Speed !! Gun DPS$DREF2$ !! Missile DPS$MREF$ !! Total DPS !! Cost Efficiency
+|-
+| 4 || {{Money|$PVP-COST$}}$R$ || {{Money|$TP$}}$R$ || 10 || 25 || 6 || 75 || 0.2 || 3 || 0.25 || 3.5 || N/A || 11 || 17.5 || 6 || 25 || 20 || $DPS$ || $MDPS$ || $TDPS$ || {{Money|$CE$}}
+|-
+| 5 || $R$ || $R$ || 12 || 60 || 8 || 75 || 0.2 || 3 || 0.15 || 2.25 || N/A || 12 || 19.5 || 6 || 25 || 20 || $DPS$ || $MDPS$ || $TDPS$ || {{Money|$CE$}}
 |}
 </div>
 </tabber></div>

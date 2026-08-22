@@ -1,11 +1,11 @@
 <var>
 $DPS$ = Damage / Firerate
-$CE$ = Total Price / DPS
-$TP$ = $FNC-TOTALPRICE$
+$CE$ = Total Cost / DPS
+$TP$ = $FNC-TOTAL-COST$
 $TE$ = $FNC-TOTAL-EXP$
 $EXP$ = {{#expr:floor(50 * 1.09^(Level - 1) * (Level > 0))}}
-$FNC-COST$ = 125; 50; 375; 1350; 2200
-$FNC-PVP-COST$ = 300; 100; 650; 1800; 3250
+$COST$ = 125; 50; 375; 1350; 2200
+$PVP-COST$ = 300; 100; 650; 1800; 3250
 $FSE-DETECTION$ = 2; ;
 $FSE-UPGRADE$ = Faster Reloading; Precise Aiming; Stronger Equipment; Akimbo Handguns
 $FSE-UPGRADEICON$ = 3278746120; 3278749117; 3278741672; 3279537687
@@ -16,33 +16,33 @@ $R$ = $FNC-RECURSION$
 |-|Regular =
 <div class="overflow-box">
 {| class="wikitable stats-table"
-! Level !! Total Price !! Damage !! Firerate !! Range !! DPS !! Cost Efficiency
+! Level !! Cost !! Total Cost !! Damage !! Firerate !! Range !! DPS !! Cost Efficiency
 |-
-| 0 || {{Money|$TP$}} || 1 || 1 || 12 || $DPS$ || {{Money|$CE$}}
+| 0 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 1 || 1 || 12 || $DPS$ || {{Money|$CE$}}
 |-
-| 1 || {{Money|$TP$}} || 1 || 0.75 || 12 || $DPS$ || {{Money|$CE$}}
+| 1 || $R$ || $R$ || 1 || 0.75 || 12 || $DPS$ || {{Money|$CE$}}
 |-
-| 2 || {{Money|$TP$}} || 3 || 0.75 || 14 || $DPS$ || {{Money|$CE$}}
+| 2 || $R$ || $R$ || 3 || 0.75 || 14 || $DPS$ || {{Money|$CE$}}
 |-
-| 3 || {{Money|$TP$}} || 8 || 0.65 || 16 || $DPS$ || {{Money|$CE$}}
+| 3 || $R$ || $R$ || 8 || 0.65 || 16 || $DPS$ || {{Money|$CE$}}
 |-
-| 4 || {{Money|$TP$}} || 8 || 0.325 || 16 || $DPS$ || {{Money|$CE$}}
+| 4 || $R$ || $R$ || 8 || 0.325 || 16 || $DPS$ || {{Money|$CE$}}
 |}
 </div>
 |-|PVP =
 <div class="overflow-box">
 {| class="wikitable stats-table"
-! Level !! Total Price !! Damage !! Firerate !! Range !! DPS !! Cost Efficiency
+! Level !! Cost !! Total Cost !! Damage !! Firerate !! Range !! DPS !! Cost Efficiency
 |-
-| 0 || {{Money|$TP$}} || 3 || 0.9 || 14 || $DPS$ || {{Money|$CE$}}
+| 0 || {{Money|$PVP-COST$}}$R$ || {{Money|$TP$}}$R$ || 3 || 0.9 || 14 || $DPS$ || {{Money|$CE$}}
 |-
-| 1 || {{Money|$TP$}} || 4 || 0.9 || 15 || $DPS$ || {{Money|$CE$}}
+| 1 || $R$ || $R$ || 4 || 0.9 || 15 || $DPS$ || {{Money|$CE$}}
 |-
-| 2 || {{Money|$TP$}} || 8 || 0.75 || 16 || $DPS$ || {{Money|$CE$}}
+| 2 || $R$ || $R$ || 8 || 0.75 || 16 || $DPS$ || {{Money|$CE$}}
 |-
-| 3 || {{Money|$TP$}} || 10 || 0.5 || 17 || $DPS$ || {{Money|$CE$}}
+| 3 || $R$ || $R$ || 10 || 0.5 || 17 || $DPS$ || {{Money|$CE$}}
 |-
-| 4 || {{Money|$TP$}} || 13 || 0.3 || 17 || $DPS$ || {{Money|$CE$}}
+| 4 || $R$ || $R$ || 13 || 0.3 || 17 || $DPS$ || {{Money|$CE$}}
 |}
 </div>
 <!-- @se-ignore -->

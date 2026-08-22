@@ -1,31 +1,32 @@
 <var>
 $DPS$ = Damage / Firerate
 $MDPS$ = DPS * Max Hits
-$CE$ = Total Price / DPS
-$MCE$ = Total Price / Max DPS
-$TP$ = $FNC-TOTALPRICE$
-$FNC-COST$ = 650; 275; 950; 2400; 4000; 10000
+$CE$ = Total Cost / DPS
+$MCE$ = Total Cost / Max DPS
+$TP$ = $FNC-TOTAL-COST$
+$COST$ = 650; 275; 950; 2400; 4000; 10000
 $FSE-DETECTION$ = 2; 0;
 $FSE-UPGRADE$ = Higher Voltage; Improved Handling; Faraday's Vest; Shock Force; Zeus Cannon
 $FSE-UPGRADEICON$ = 3280081327; 4675534331; 4675521746; 4675504505; 4675504640
 $FSE-META$ = Intermediate; File:DefaultElectroshockerIcon2.png
 $DREF$ = <ref>Assumes that only one enemy is hit per shock.</ref>
 $MREF$ = <ref>Calculated as DPS × Max Hits.</ref>
+$R$ = $FNC-RECURSION$
 </var>
 <div class="overflow-box">
 {| class="wikitable stats-table"
-! Level !! Total Price !! Damage !! Firerate !! Range !! Chain Range !! Max Hits !! Shock Time !! Defense Melt !! DPS$DREF$ !! Max DPS$MREF$ !! Cost Efficiency !! Max Cost Efficiency
+! Level !! Cost !! Total Cost !! Damage !! Firerate !! Range !! Chain Range !! Max Hits !! Shock Time !! Defense Melt !! DPS$DREF$ !! Max DPS$MREF$ !! Cost Efficiency !! Max Cost Efficiency
 |-
-| 0 || {{Money|$TP$}} || 5 || 1.35 || 10 || 10 || 2 || 0.1 || 0% || $DPS$ || $MDPS$ || {{Money|$CE$}} || {{Money|$MCE$}}
+| 0 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 5 || 1.35 || 10 || 10 || 2 || 0.1 || 0% || $DPS$ || $MDPS$ || {{Money|$CE$}} || {{Money|$MCE$}}
 |-
-| 1 || {{Money|$TP$}} || 6 || 1.15 || 12 || 10 || 2 || 0.1 || 0% || $DPS$ || $MDPS$ || {{Money|$CE$}} || {{Money|$MCE$}}
+| 1 || $R$ || $R$ || 6 || 1.15 || 12 || 10 || 2 || 0.1 || 0% || $DPS$ || $MDPS$ || {{Money|$CE$}} || {{Money|$MCE$}}
 |-
-| 2 || {{Money|$TP$}} || 8 || 1.15 || 13 || 10 || 3 || 0.1 || 0% || $DPS$ || $MDPS$ || {{Money|$CE$}} || {{Money|$MCE$}}
+| 2 || $R$ || $R$ || 8 || 1.15 || 13 || 10 || 3 || 0.1 || 0% || $DPS$ || $MDPS$ || {{Money|$CE$}} || {{Money|$MCE$}}
 |-
-| 3 || {{Money|$TP$}} || 20 || 1.15 || 13 || 12.5 || 3 || 0.1 || 0% || $DPS$ || $MDPS$ || {{Money|$CE$}} || {{Money|$MCE$}}
+| 3 || $R$ || $R$ || 20 || 1.15 || 13 || 12.5 || 3 || 0.1 || 0% || $DPS$ || $MDPS$ || {{Money|$CE$}} || {{Money|$MCE$}}
 |-
-| 4 || {{Money|$TP$}} || 60 || 2.5 || 13 || 12.5 || 4 || 0.15 || 0% || $DPS$ || $MDPS$ || {{Money|$CE$}} || {{Money|$MCE$}}
+| 4 || $R$ || $R$ || 60 || 2.5 || 13 || 12.5 || 4 || 0.15 || 0% || $DPS$ || $MDPS$ || {{Money|$CE$}} || {{Money|$MCE$}}
 |-
-| 5 || {{Money|$TP$}} || 90 || 2.5 || 15 || 15 || 6 || 0.25 || 20% || $DPS$ || $MDPS$ || {{Money|$CE$}} || {{Money|$MCE$}}
+| 5 || $R$ || $R$ || 90 || 2.5 || 15 || 15 || 6 || 0.25 || 20% || $DPS$ || $MDPS$ || {{Money|$CE$}} || {{Money|$MCE$}}
 |}
 </div>

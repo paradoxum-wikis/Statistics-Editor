@@ -1,39 +1,50 @@
 <var>
 $DPS$ = Damage / Swingrate
-$MDPS$ = $DPS$ * Max Hits
-$FNC-COST$ = 525; 450; 1687; 2000; 6000; 13900
-$CE$ = Total Price / DPS
-$MCE$ = Total Price / Max DPS
+$BDPS$ = Gladiator Stats.Total Elapsed Damage / Gladiator Stats.Burn Cooldown
+$CDPS$ = ($DPS$) + ($BDPS$)
+$MDPS$ = DPS * Max Hits
+$MNDPS$ = ($DPS$) * Max Hits
+$MBDPS$ = ($BDPS$) * Gladiator Stats.Max Hits
+$TED$ = Burn Damage * (Burn Duration / Burn Tick Rate)
+$COST$ = 525; 375; 1250; 2125; 6200; 14900
+$CE$ = Total Cost / DPS
+$MCE$ = Total Cost / Max DPS
 $WCFR$ = {{#expr:Gladiator Stats.Swingrate / 1.65 round 3}}
 $WCDPS$ = Gladiator Stats.Damage / Swingrate
-$MWCDPS$ = $WCDPS$ * Gladiator Stats.Max Hits
+$WCBDPS$ = Gladiator Stats.Damage / Swingrate + $BDPS$
+$MWCNDPS$ = ($WCDPS$) * Gladiator Stats.Max Hits
+$MWCDPS$ = DPS * Gladiator Stats.Max Hits
 $WCCE$ = $TP$ / DPS
 $MWCCE$ = $TP$ / Max DPS
-$TP$ = $FNC-TOTALPRICE$
-$FSE-UPGRADE$ = Warrior Armor; Dangersense; Extra Protection; Illumina; Darkheart Swordsman
+$TP$ = $FNC-TOTAL-COST$
+$FSE-UPGRADE$ = Arena Conditioning; Warrior's Call; Champion's Flame; Centurion; King of the Arena
 $FSE-UPGRADEICON$ = 3356186535; 141745478; 4118882122; 16620737; 16868189
-$FSE-DETECTION$ = 0; ;
+$FSE-DETECTION$ = 0; 3;
 $FSE-META$ = Exclusive; File:GladiatorIconn.png
 $DREF$ = <ref>DPS assumes that only one enemy is hit per swing.<br />Ability is not taken into account.</ref>
+$D2REF$ = <ref>DPS assumes that only one enemy is hit per swing.</ref>
 $MDREF$ = <ref>DPS assumes that the maximum number of enemies are hit per swing.<br/>Ability is not taken into account.</ref>
+$M2DREF$ = <ref>DPS assumes that the maximum number of enemies are hit per swing.</ref>
+$TREF$ = <ref>Total Elapsed Damage is calculated as Burn Damage × (Burn Duration ÷ Burn  Tick).</ref>
+$R$ = $FNC-RECURSION$
 </var>
 <div class="overflow-box">
 {| class="wikitable stats-table"
-! colspan="11" | Gladiator Stats
+! colspan="16" | Gladiator Stats
 |-
-! Level !! Total Price !! Damage !! Swingrate !! Max Hits !! Range !! Parry Cooldown !! DPS$DREF$ !! Max DPS$MDREF$ !! Cost Efficiency !! Max Cost Efficiency
+! Level !! Cost !! Total Cost !! Damage !! Swingrate !! Max Hits !! Range !! Burn Damage !! Burn Tick Rate !! Burn Duration !! Burn Cooldown !! Total Elapsed Damage$TREF$ !! DPS$DREF$ !! Max DPS$MDREF$ !! Cost Efficiency !! Max Cost Efficiency
 |-
-| 0 || {{Money|$TP$}} || 5 || 0.95 || 2 || 5.5 || 1.25 || $DPS$ || $MDPS$ || {{Money|$CE$}} || {{Money|$MCE$}}
+| 0 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 5 || 0.95 || 2 || 5.5 || N/A || N/A || N/A || N/A || N/A || $DPS$ || $MDPS$ || {{Money|$CE$}} || {{Money|$MCE$}}
 |-
-| 1  || {{Money|$TP$}} || 7 || 0.75 || 2 || 5.5 || 1.25 || $DPS$ || $MDPS$ || {{Money|$CE$}} || {{Money|$MCE$}}
+| 1 || $R$ || $R$ || 7 || 0.8 || 2 || 5.5 || N/A || N/A || N/A || N/A || N/A || $DPS$ || $MDPS$ || {{Money|$CE$}} || {{Money|$MCE$}}
 |-
-| 2 || {{Money|$TP$}} || 17 || 0.75 || 2 || 5.5 || 1.25 || $DPS$ || $MDPS$ || {{Money|$CE$}} || {{Money|$MCE$}}
+| 2 || $R$ || $R$ || 17 || 0.8 || 2 || 5.5 || N/A || N/A || N/A || N/A || N/A || $DPS$ || $MDPS$ || {{Money|$CE$}} || {{Money|$MCE$}}
 |-
-| 3 || {{Money|$TP$}} || 37 || 1 || 5 || 6 || 1.25 || $DPS$ || $MDPS$ || {{Money|$CE$}} || {{Money|$MCE$}}
+| 3 || $R$ || $R$ || 27 || 0.7 || 5 || 6 || 2 || 0.3 || 1.2 || 4 || $TED$ || $CDPS$<ref>$DPS$ Normal DPS + $BDPS$ Burn DPS</ref> || $MDPS$<ref>$MNDPS$ Normal DPS + $MBDPS$ Burn DPS</ref> || {{Money|$CE$}} || {{Money|$MCE$}}
 |-
-| 4 || {{Money|$TP$}} || 77 || 1 || 7 || 6 || 1.25 || $DPS$ || $MDPS$ || {{Money|$CE$}} || {{Money|$MCE$}}
+| 4 || $R$ || $R$ || 57 || 0.7 || 7 || 6 || 4 || 0.3 || 1.2 || 3 || $TED$ || $CDPS$<ref>$DPS$ Normal DPS + $BDPS$ Burn DPS</ref> || $MDPS$<ref>$MNDPS$ Normal DPS + $MBDPS$ Burn DPS</ref> || {{Money|$CE$}} || {{Money|$MCE$}}
 |-
-| 5 || {{Money|$TP$}} || 177 || 1.35 || 10 || 6.5 || 1.25 || $DPS$ || $MDPS$ || {{Money|$CE$}} || {{Money|$MCE$}}
+| 5 || $R$ || $R$ || 77 || 0.55 || 10 || 6.5 || 7 || 0.15 || 1.5 || 2 || $TED$ || $CDPS$<ref>$DPS$ Normal DPS + $BDPS$ Burn DPS</ref> || $MDPS$<ref>$MNDPS$ Normal DPS + $MBDPS$ Burn DPS</ref> || {{Money|$CE$}} || {{Money|$MCE$}}
 |}
 </div>
 
@@ -41,12 +52,14 @@ $MDREF$ = <ref>DPS assumes that the maximum number of enemies are hit per swing.
 {| class="wikitable stats-table"
 ! colspan="6" | Ability Stats
 |-
-! Level !! Swingrate !! DPS$DREF$ !! Max DPS$MDREF$ !! Cost Efficiency !! Max Cost Efficiency
+! Level !! Swingrate !! DPS$D2REF$ !! Max DPS$M2DREF$ !! Cost Efficiency !! Max Cost Efficiency
 |-
-| 3 || $WCFR$ || $WCDPS$ || $MWCDPS$ || {{Money|$WCCE$}} || {{Money|$MWCCE$}}
+| 2 || $WCFR$ || $WCDPS$ || $MWCDPS$ || {{Money|$WCCE$}} || {{Money|$MWCCE$}}
 |-
-| 4 || $WCFR$ || $WCDPS$ || $MWCDPS$ || {{Money|$WCCE$}} || {{Money|$MWCCE$}}
+| 3 || $WCFR$ || $WCBDPS$<ref>$WCDPS$ Normal DPS + $BDPS$ Burn DPS</ref> || $MWCDPS$<ref>$MWCNDPS$ Normal DPS + $MBDPS$ Burn DPS</ref> || {{Money|$WCCE$}} || {{Money|$MWCCE$}}
 |-
-| 5 || $WCFR$ || $WCDPS$ || $MWCDPS$ || {{Money|$WCCE$}} || {{Money|$MWCCE$}}
+| 4 || $WCFR$ || $WCBDPS$<ref>$WCDPS$ Normal DPS + $BDPS$ Burn DPS</ref> || $MWCDPS$<ref>$MWCNDPS$ Normal DPS + $MBDPS$ Burn DPS</ref> || {{Money|$WCCE$}} || {{Money|$MWCCE$}}
+|-
+| 5 || $WCFR$ || $WCBDPS$<ref>$WCDPS$ Normal DPS + $BDPS$ Burn DPS</ref> || $MWCDPS$<ref>$MWCNDPS$ Normal DPS + $MBDPS$ Burn DPS</ref> || {{Money|$WCCE$}} || {{Money|$MWCCE$}}
 |}
 </div>

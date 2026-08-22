@@ -2,12 +2,12 @@
 $DPS$ = Damage / Firerate
 $RDPS$ = Health / Spawnrate
 $TDPS$ = Gun DPS + Ram DPS
-$CE$ = Total Price / DPS
-$TP$ = $FNC-TOTALPRICE$
+$CE$ = Total Cost / DPS
+$TP$ = $FNC-TOTAL-COST$
 $TE$ = $FNC-TOTAL-EXP$
 $EXP$ = {{#expr:floor(50 * 1.09^(Level - 1) * (Level > 0))}}
-$FNC-COST$ = 2250; 1500; 2750; 14000; 47500
-$FNC-PVP-COST$ = 800; 525; 1000; 5000; 16000
+$COST$ = 2250; 1500; 2750; 14000; 47500
+$PVP-COST$ = 800; 525; 1000; 5000; 16000
 $FSE-DETECTION$ = 2; ; 1
 $FSE-PVP-DETECTION$ = 2; ;2
 $FSE-UPGRADE$ = Quick Getaway; Double Trouble; Tommy Goons; The Godfather
@@ -21,19 +21,19 @@ $R$ = $FNC-RECURSION$
 |-|Regular =
 <div class="overflow-box">
 {| class="wikitable stats-table"
-! colspan="7" | Crook Boss Stats
+! colspan="8" | Crook Boss Stats
 |-
-! Level !! Total Price !! Damage !! Firerate !! Range !! DPS !! Cost Efficiency$CREF$
+! Level !! Cost !! Total Cost !! Damage !! Firerate !! Range !! DPS !! Cost Efficiency$CREF$
 |-
-| 0 || {{Money|$TP$}} || 12 || 0.9 || 16.5 || $DPS$ || {{Money|$CE$}}
+| 0 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 12 || 0.9 || 16.5 || $DPS$ || {{Money|$CE$}}
 |-
-| 1 || {{Money|$TP$}} || 16 || 0.6 || 16.5 || $DPS$ || {{Money|$CE$}}
+| 1 || $R$ || $R$ || 16 || 0.6 || 16.5 || $DPS$ || {{Money|$CE$}}
 |-
-| 2 || {{Money|$TP$}} || 23 || 0.6 || 19 || $DPS$ || {{Money|$CE$}}
+| 2 || $R$ || $R$ || 23 || 0.6 || 19 || $DPS$ || {{Money|$CE$}}
 |-
-| 3 || {{Money|$TP$}} || 23 || 0.2 || 22 || $DPS$ || {{Money|$CE$}}
+| 3 || $R$ || $R$ || 23 || 0.2 || 22 || $DPS$ || {{Money|$CE$}}
 |-
-| 4 || {{Money|$TP$}} || 38 || 0.12 || 22 || $DPS$ || {{Money|$CE$}}
+| 4 || $R$ || $R$ || 38 || 0.12 || 22 || $DPS$ || {{Money|$CE$}}
 |}
 
 {| class="wikitable stats-table"
@@ -51,19 +51,19 @@ $R$ = $FNC-RECURSION$
 |-|PVP =
 <div class="overflow-box">
 {| class="wikitable stats-table"
-! colspan="7" | Crook Boss Stats
+! colspan="8" | Crook Boss Stats
 |-
-! Level !! Total Price !! Damage !! Firerate !! Range !! DPS !! Cost Efficiency$CREF$
+! Level !! Cost !! Total Cost !! Damage !! Firerate !! Range !! DPS !! Cost Efficiency$CREF$
 |-
-| 0 || {{Money|$TP$}} || 5 || 1 || 14 || $DPS$ || {{Money|$CE$}}
+| 0 || {{Money|$PVP-COST$}}$R$ || {{Money|$TP$}}$R$ || 5 || 1 || 14 || $DPS$ || {{Money|$CE$}}
 |-
-| 1 || {{Money|$TP$}} || 6 || 0.6 || 14 || $DPS$ || {{Money|$CE$}}
+| 1 || $R$ || $R$ || 6 || 0.6 || 14 || $DPS$ || {{Money|$CE$}}
 |-
-| 2 || {{Money|$TP$}} || 10 || 0.6 || 15 || $DPS$ || {{Money|$CE$}}
+| 2 || $R$ || $R$ || 10 || 0.6 || 15 || $DPS$ || {{Money|$CE$}}
 |-
-| 3 || {{Money|$TP$}} || 10 || 0.2 || 16.5 || $DPS$ || {{Money|$CE$}}
+| 3 || $R$ || $R$ || 10 || 0.2 || 16.5 || $DPS$ || {{Money|$CE$}}
 |-
-| 4 || {{Money|$TP$}} || 14 || 0.12 || 17.5 || $DPS$ || {{Money|$CE$}}
+| 4 || $R$ || $R$ || 14 || 0.12 || 17.5 || $DPS$ || {{Money|$CE$}}
 |}
 
 {| class="wikitable stats-table"

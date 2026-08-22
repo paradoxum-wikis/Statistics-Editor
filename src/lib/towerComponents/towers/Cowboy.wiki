@@ -1,11 +1,11 @@
 <var>
 $DPS$ = (Damage * Cash Shot) / (Spin Time + (Firerate * (Cash Shot--)))
-$CE$ = Total Price / DPS
+$CE$ = Total Cost / DPS
 $IPS$ = Income / (Spin Time + (Firerate * (Cash Shot--)))
 $IE$ = (Income + Cash Shot * Damage) / (Cash Shot * Damage)
-$TP$ = $FNC-TOTALPRICE$
-$FNC-COST$ = 550; 200; 600; 2000; 3000; 7777
-$FNC-PVP-COST$ = 550; 200; 500; 2000; 3500; 7000
+$TP$ = $FNC-TOTAL-COST$
+$COST$ = 550; 200; 600; 2000; 3000; 7777
+$PVP-COST$ = 550; 200; 500; 2000; 3500; 7000
 $FSE-DETECTION$ = 3; ;
 $FSE-UPGRADE$ = Steady Hand; Lucky Shot; Deadly Precision; Double Tap; Outlawed
 $FSE-PVP-UPGRADE$ = Steady Hand; Lucky Shot; Faster Instincts; Double Tap; Outlawed
@@ -14,42 +14,43 @@ $FSE-META$ = Advanced; File:WDDefaultCowboyIcon.png
 $DREF$ = <ref name=dps>DPS is calculated as (Damage × Cash Shot) ÷ (Spin Time + (Firerate × (Cash Shot - 1))).</ref>
 $IREF$ = <ref name=ips>This is calculated as Income ÷ (Spin Time + (Firerate × (Cash Shot - 1))).</ref>
 $IEREF$ = <ref name=ie>Money generated per 1 damage is calculated as (Income + Cash Shot × Damage) ÷ (Cash Shot × Damage).</ref>
+$R$ = $FNC-RECURSION$
 </var>
 <div class="mobile-tabber"><tabber>
 |-|Regular =
 <div class="overflow-box">
 {| class="wikitable stats-table"
-! Level !! Total Price !! Damage !! Firerate !! Spin Time !! Cash Shot !! Income !! Range !! DPS$DREF$ !! Cost Efficiency !! Income Per Second$IREF$ !! Income Efficiency$IEREF$
+! Level !! Cost !! Total Cost !! Damage !! Firerate !! Spin Time !! Cash Shot !! Income !! Range !! DPS$DREF$ !! Cost Efficiency !! Income Per Second$IREF$ !! Income Efficiency$IEREF$
 |-
-| 0 || {{Money|$TP$}} || 3 || 1 || 2 || 6 || {{Money|30}} || 13 || $DPS$ || {{Money|$CE$}} || {{Money|$IPS$}} || {{Money|$IE$}}
+| 0 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 3 || 1 || 2 || 6 || {{Money|30}} || 13 || $DPS$ || {{Money|$CE$}} || {{Money|$IPS$}} || {{Money|$IE$}}
 |-
-| 1 || {{Money|$TP$}} || 3 || 0.9 || 1.25 || 6 || {{Money|30}} || 15 || $DPS$ || {{Money|$CE$}} || {{Money|$IPS$}} || {{Money|$IE$}}
+| 1 || $R$ || $R$ || 3 || 0.9 || 1.25 || 6 || {{Money|30}} || 15 || $DPS$ || {{Money|$CE$}} || {{Money|$IPS$}} || {{Money|$IE$}}
 |-
-| 2 || {{Money|$TP$}} || 5 || 0.9 || 1.25 || 6 || {{Money|50}} || 15 || $DPS$ || {{Money|$CE$}} || {{Money|$IPS$}} || {{Money|$IE$}}
+| 2 || $R$ || $R$ || 5 || 0.9 || 1.25 || 6 || {{Money|50}} || 15 || $DPS$ || {{Money|$CE$}} || {{Money|$IPS$}} || {{Money|$IE$}}
 |-
-| 3 || {{Money|$TP$}} || 10 || 0.6 || 1 || 6 || {{Money|50}} || 17.5 || $DPS$ || {{Money|$CE$}} || {{Money|$IPS$}} || {{Money|$IE$}}
+| 3 || $R$ || $R$ || 10 || 0.6 || 1 || 6 || {{Money|50}} || 17.5 || $DPS$ || {{Money|$CE$}} || {{Money|$IPS$}} || {{Money|$IE$}}
 |-
-| 4 || {{Money|$TP$}} || 10 || 0.35 || 1 || 12 || {{Money|125}} || 20 || $DPS$ || {{Money|$CE$}} || {{Money|$IPS$}} || {{Money|$IE$}}
+| 4 || $R$ || $R$ || 10 || 0.35 || 1 || 12 || {{Money|125}} || 20 || $DPS$ || {{Money|$CE$}} || {{Money|$IPS$}} || {{Money|$IE$}}
 |-
-| 5 || {{Money|$TP$}} || 24 || 0.35 || 1 || 12 || {{Money|185}} || 20 || $DPS$ || {{Money|$CE$}} || {{Money|$IPS$}} || {{Money|$IE$}}
+| 5 || $R$ || $R$ || 24 || 0.35 || 1 || 12 || {{Money|185}} || 20 || $DPS$ || {{Money|$CE$}} || {{Money|$IPS$}} || {{Money|$IE$}}
 |}
 </div>
 |-|PVP =
 <div class="overflow-box">
 {| class="wikitable stats-table"
-! Level !! Total Price !! Damage !! Firerate !! Spin Time !! Cash Shot !! Income !! Range !! DPS$DREF$ !! Cost Efficiency !! Income Per Second$IREF$ !! Income Efficiency$IEREF$
+! Level !! Cost !! Total Cost !! Damage !! Firerate !! Spin Time !! Cash Shot !! Income !! Range !! DPS$DREF$ !! Cost Efficiency !! Income Per Second$IREF$ !! Income Efficiency$IEREF$
 |-
-| 0 || {{Money|$TP$}} || 4 || 1 || 1.25 || 6 || {{Money|50}} || 14 || $DPS$ || {{Money|$CE$}} || {{Money|$IPS$}} || {{Money|$IE$}}
+| 0 || {{Money|$PVP-COST$}}$R$ || {{Money|$TP$}}$R$ || 4 || 1 || 1.25 || 6 || {{Money|50}} || 14 || $DPS$ || {{Money|$CE$}} || {{Money|$IPS$}} || {{Money|$IE$}}
 |-
-| 1 || {{Money|$TP$}} || 4 || 0.8 || 1 || 6 || {{Money|50}} || 14.5 || $DPS$ || {{Money|$CE$}} || {{Money|$IPS$}} || {{Money|$IE$}}
+| 1 || $R$ || $R$ || 4 || 0.8 || 1 || 6 || {{Money|50}} || 14.5 || $DPS$ || {{Money|$CE$}} || {{Money|$IPS$}} || {{Money|$IE$}}
 |-
-| 2 || {{Money|$TP$}} || 6 || 0.8 || 1 || 6 || {{Money|60}} || 16 || $DPS$ || {{Money|$CE$}} || {{Money|$IPS$}} || {{Money|$IE$}}
+| 2 || $R$ || $R$ || 6 || 0.8 || 1 || 6 || {{Money|60}} || 16 || $DPS$ || {{Money|$CE$}} || {{Money|$IPS$}} || {{Money|$IE$}}
 |-
-| 3 || {{Money|$TP$}} || 10 || 0.5 || 0.75 || 6 || {{Money|75}} || 18 || $DPS$ || {{Money|$CE$}} || {{Money|$IPS$}} || {{Money|$IE$}}
+| 3 || $R$ || $R$ || 10 || 0.5 || 0.75 || 6 || {{Money|75}} || 18 || $DPS$ || {{Money|$CE$}} || {{Money|$IPS$}} || {{Money|$IE$}}
 |-
-| 4 || {{Money|$TP$}} || 10 || 0.25 || 0.75 || 12 || {{Money|175}} || 20 || $DPS$ || {{Money|$CE$}} || {{Money|$IPS$}} || {{Money|$IE$}}
+| 4 || $R$ || $R$ || 10 || 0.25 || 0.75 || 12 || {{Money|175}} || 20 || $DPS$ || {{Money|$CE$}} || {{Money|$IPS$}} || {{Money|$IE$}}
 |-
-| 5 || {{Money|$TP$}} || 16 || 0.25 || 0.75 || 12 || {{Money|300}} || 20 || $DPS$ || {{Money|$CE$}} || {{Money|$IPS$}} || {{Money|$IE$}}
+| 5 || $R$ || $R$ || 16 || 0.25 || 0.75 || 12 || {{Money|300}} || 20 || $DPS$ || {{Money|$CE$}} || {{Money|$IPS$}} || {{Money|$IE$}}
 |}
 </div>
 </tabber></div>

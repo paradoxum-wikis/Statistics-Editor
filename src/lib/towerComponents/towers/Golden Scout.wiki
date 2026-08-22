@@ -1,25 +1,26 @@
 <var>
 $DPS$ = Damage / Firerate
-$CE$ = Total Price / DPS
-$TP$ = $FNC-TOTALPRICE$
-$FNC-COST$ = 250; 150; 600; 1800; 4000
+$CE$ = Total Cost / DPS
+$TP$ = $FNC-TOTAL-COST$
+$COST$ = 250; 150; 600; 1800; 4000
 $FSE-UPGRADE$ = Higher Caliber; Precise Aiming; Golden Deagle; Twin Sovereigns
 $FSE-UPGRADEICON$ = 3032133716; 115730014; 3278741672; 3279537687
 $FSE-DETECTION$ = 2; 3;
 $FSE-META$ = Golden Perks; File:GoldenScout3.png
+$R$ = $FNC-RECURSION$
 </var>
 <div class="overflow-box">
 {| class="wikitable stats-table"
-! Level !! Total Price !! Damage !! Firerate !! Range !! DPS !! Cost Efficiency
+! Level !! Cost !! Total Cost !! Damage !! Firerate !! Range !! DPS !! Cost Efficiency
 |-
-| 0 || {{Money|$TP$}} || 2 || 0.75 || 14 || $DPS$ || {{Money|$CE$}}
+| 0 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 2 || 0.75 || 14 || $DPS$ || {{Money|$CE$}}
 |-
-| 1 || {{Money|$TP$}} || 2 || 0.5 || 15 || $DPS$ || {{Money|$CE$}}
+| 1 || $R$ || $R$ || 2 || 0.5 || 15 || $DPS$ || {{Money|$CE$}}
 |-
-| 2 || {{Money|$TP$}} || 5 || 0.5 || 15 || $DPS$ || {{Money|$CE$}}
+| 2 || $R$ || $R$ || 5 || 0.5 || 15 || $DPS$ || {{Money|$CE$}}
 |-
-| 3 || {{Money|$TP$}} || 30 || 1.2 || 18 || $DPS$ || {{Money|$CE$}}
+| 3 || $R$ || $R$ || 30 || 1.2 || 18 || $DPS$ || {{Money|$CE$}}
 |-
-| 4 || {{Money|$TP$}} || 36 || 0.6 || 18 || $DPS$ || {{Money|$CE$}}
+| 4 || $R$ || $R$ || 36 || 0.6 || 18 || $DPS$ || {{Money|$CE$}}
 |}
 </div>

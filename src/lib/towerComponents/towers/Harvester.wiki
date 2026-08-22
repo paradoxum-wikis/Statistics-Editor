@@ -3,52 +3,53 @@ $DPS$ = Damage / Firerate
 $TDPS$ = Thorns Damage / Thorns Tick
 $CE$ = $TP$ / DPS
 $TCE$ = $TP$ / Thorns DPS
-$TP$ = $FNC-TOTALPRICE$
+$TP$ = $FNC-TOTAL-COST$
 $TED$ = Thorns Damage * (Thorns Duration / Thorns Tick)
-$FNC-COST$ = 2000; 625; 1500; 4000; 8750; 24300
+$COST$ = 2000; 625; 1500; 4000; 8750; 24300
 $FSE-DETECTION$ = 3; ; 0
 $FSE-UPGRADE$ = Sharper Thorns; Early Harvest; Nature's Vengence; Cold-Hearted Scarecrow; Harvesting Season
 $FSE-UPGRADEICON$ = 84794687219284; 128833693887182; 140040939003373; 83141210249578; 117691212648454
 $FSE-META$ = Exclusive; File:HarvesterIcon.png
 $TREF$ = <ref>Assuming the enemy stays inside the Thorns' full duration.<br/>Total Elapsed Damage is calculated as Thorns Damage × (Thorns Duration ÷ Thorns Tick)</ref>
 $DREF$ = <ref>DPS assumes thorns only hit one enemy.</ref>
+$R$ = $FNC-RECURSION$
 </var>
 <div class="overflow-box">
 {| class="wikitable stats-table"
-! colspan="8" |Harvester Stats
+! colspan="9" |Harvester Stats
 |-
-! Level !! Total Price !! Damage !! Firerate !! Range !! Projectile Speed !! DPS !! Cost Efficiency
+! Level !! Cost !! Total Cost !! Damage !! Firerate !! Range !! Projectile Speed !! DPS !! Cost Efficiency
 |-
-| 0 || {{Money|$TP$}} || 20 || 1.4 || 20 || 50 || $DPS$ || {{Money|$CE$}}
+| 0 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 20 || 1.4 || 20 || 50 || $DPS$ || {{Money|$CE$}}
 |-
-| 1 || {{Money|$TP$}} || 20 || 1.2 || 20 || 50 || $DPS$ || {{Money|$CE$}}
+| 1 || $R$ || $R$ || 20 || 1.2 || 20 || 50 || $DPS$ || {{Money|$CE$}}
 |-
-| 2 || {{Money|$TP$}} || 35 || 1.2 || 20 || 50 || $DPS$ || {{Money|$CE$}}
+| 2 || $R$ || $R$ || 35 || 1.2 || 20 || 50 || $DPS$ || {{Money|$CE$}}
 |-
-| 3 || {{Money|$TP$}} || 65 || 1.2 || 20 || 50 || $DPS$ || {{Money|$CE$}}
+| 3 || $R$ || $R$ || 65 || 1.2 || 20 || 50 || $DPS$ || {{Money|$CE$}}
 |-
-| 4 || {{Money|$TP$}} || 90 || 0.75 || 25 || 50 || $DPS$ || {{Money|$CE$}}
+| 4 || $R$ || $R$ || 90 || 0.75 || 25 || 50 || $DPS$ || {{Money|$CE$}}
 |-
-| 5 || {{Money|$TP$}} || 420 || 1.75 || 30 || 75 || $DPS$ || {{Money|$CE$}}
+| 5 || $R$ || $R$ || 420 || 1.75 || 30 || 75 || $DPS$ || {{Money|$CE$}}
 |}
 </div>
 
 <div class="overflow-box">
 {| class="wikitable stats-table"
-! colspan="10" |Thorns Stats
+! colspan="11" |Thorns Stats
 |-
-! Level !! Total Price !! Thorns Damage !! Thorns Range !! Thorns Duration !! Thorns Slowdown !! Thorns Tick !! Total Elapsed Damage$TREF$ !! Thorns DPS$DREF$ !! Cost Efficiency
+! Level !! Cost !! Total Cost !! Thorns Damage !! Thorns Range !! Thorns Duration !! Thorns Slowdown !! Thorns Tick !! Total Elapsed Damage$TREF$ !! Thorns DPS$DREF$ !! Cost Efficiency
 |-
-| 0 || {{Money|$TP$}} || 2 || 12  || 8 || 15% || 0.25 || $TED$ || $TDPS$ || {{Money|$TCE$}}
+| 0 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 2 || 12 || 8 || 15% || 0.25 || $TED$ || $TDPS$ || {{Money|$TCE$}}
 |-
-| 1 || {{Money|$TP$}} || 4 || 12 || 8 || 15% || 0.25 || $TED$ || $TDPS$ || {{Money|$TCE$}}
+| 1 || $R$ || $R$ || 4 || 12 || 8 || 15% || 0.25 || $TED$ || $TDPS$ || {{Money|$TCE$}}
 |-
-| 2 || {{Money|$TP$}} || 4 || 14 || 11 || 20% || 0.25 || $TED$ || $TDPS$ || {{Money|$TCE$}}
+| 2 || $R$ || $R$ || 4 || 14 || 11 || 20% || 0.25 || $TED$ || $TDPS$ || {{Money|$TCE$}}
 |-
-| 3 || {{Money|$TP$}} || 8 || 16 || 11 || 20% || 0.2 || $TED$ || $TDPS$ || {{Money|$TCE$}}
+| 3 || $R$ || $R$ || 8 || 16 || 11 || 20% || 0.2 || $TED$ || $TDPS$ || {{Money|$TCE$}}
 |-
-| 4 || {{Money|$TP$}} || 9 || 17 || 12 || 20% || 0.2  || $TED$ || $TDPS$ || {{Money|$TCE$}}
+| 4 || $R$ || $R$ || 9 || 17 || 12 || 20% || 0.2 || $TED$ || $TDPS$ || {{Money|$TCE$}}
 |-
-| 5 || {{Money|$TP$}} || 14  || 18 || 15  || 30% || 0.2 || $TED$ || $TDPS$ || {{Money|$TCE$}}
+| 5 || $R$ || $R$ || 14 || 18 || 15 || 30% || 0.2 || $TED$ || $TDPS$ || {{Money|$TCE$}}
 |}
 </div>

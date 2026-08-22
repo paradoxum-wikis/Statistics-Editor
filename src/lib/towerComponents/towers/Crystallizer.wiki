@@ -2,29 +2,30 @@
 $DPS$ = Damage / Firerate
 $MBU$ = Damage * Crystal Limit
 $CDPS$ = $DPS$ + $BDPS$
-$CE$ = Total Price / DPS
-$TP$ = $FNC-TOTALPRICE$
-$FNC-COST$ = 2000; 800; 2350; 5000; 8500; 22500
+$CE$ = Total Cost / DPS
+$TP$ = $FNC-TOTAL-COST$
+$COST$ = 2000; 800; 2350; 5000; 8500; 22500
 $FSE-DETECTION$ = ; ;
 $FSE-UPGRADE$ = Better Production; Durable Minerals; High Radiation; Larger Isotopes; Nuclear Silo
 $FSE-UPGRADEICON$ = 0; 0; 0; 0; 0
 $FSE-META$ = Unavailable; File:Crystallizer.png
 $FNC-ROFBUG$ = Firerate
+$R$ = $FNC-RECURSION$
 </var>
 <div class="overflow-box">
 {| class="wikitable stats-table"
-! Level !! Total Price !! Damage!! Firerate !! Range !! Crystal Limit !! Damage Vulnerability !! Vulnerability Time !! Max Build Up !! DPS !! Cost Efficiency
+! Level !! Cost !! Total Cost !! Damage !! Firerate !! Range !! Crystal Limit !! Damage Vulnerability !! Vulnerability Time !! Max Build Up !! DPS !! Cost Efficiency
 |-
-| 0 || {{Money|$TP$}} || 20 || 6 || 8 || 3 || N/A || N/A || $MBU$ || $DPS$ || {{Money|$CE$}}
+| 0 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 20 || 6 || 8 || 3 || N/A || N/A || $MBU$ || $DPS$ || {{Money|$CE$}}
 |-
-| 1 || {{Money|$TP$}} || 20 || 5.5 || 10 || 5 || N/A || N/A || $MBU$ || $DPS$ || {{Money|$CE$}}
+| 1 || $R$ || $R$ || 20 || 5.5 || 10 || 5 || N/A || N/A || $MBU$ || $DPS$ || {{Money|$CE$}}
 |-
-| 2 || {{Money|$TP$}} || 35 || 5.5 || 10 || 6 || N/A || N/A || $MBU$ || $DPS$ || {{Money|$CE$}}
+| 2 || $R$ || $R$ || 35 || 5.5 || 10 || 6 || N/A || N/A || $MBU$ || $DPS$ || {{Money|$CE$}}
 |-
-| 3 || {{Money|$TP$}} || 65 || 5.5 || 10 || 6 || 20% || 5 || $MBU$ || $DPS$ || {{Money|$CE$}}
+| 3 || $R$ || $R$ || 65 || 5.5 || 10 || 6 || 20% || 5 || $MBU$ || $DPS$ || {{Money|$CE$}}
 |-
-| 4 || {{Money|$TP$}} || 110 || 5.5 || 10 || 8 || 20% || 5 || $MBU$ || $DPS$ || {{Money|$CE$}}
+| 4 || $R$ || $R$ || 110 || 5.5 || 10 || 8 || 20% || 5 || $MBU$ || $DPS$ || {{Money|$CE$}}
 |-
-| 5 || {{Money|$TP$}} || 225 || 4.75 || 12 || 12 || 30% || 7 || $MBU$ || $DPS$ || {{Money|$CE$}}
+| 5 || $R$ || $R$ || 225 || 4.75 || 12 || 12 || 30% || 7 || $MBU$ || $DPS$ || {{Money|$CE$}}
 |}
 </div>

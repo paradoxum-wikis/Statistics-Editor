@@ -1,6 +1,6 @@
 <var>
-$TP$ = $FNC-TOTALPRICE$
-$FNC-COST$ = 4200; 2500; 6800; 12000; 20000; 30000
+$TP$ = $FNC-TOTAL-COST$
+$COST$ = 4200; 2500; 6800; 12000; 20000; 30000
 $AOEDMG$ = Normal Damage
 $FSE-DETECTION$ = 2; 5;
 $FSE-UPGRADE$ = Alcoyte; Forbidden Arts; Pact of the Blade; Eldritch Knight; Abyss Walker
@@ -9,48 +9,49 @@ $FSE-META$ = Exclusive; File:WarlockNewIcon.png
 $RDPS$ = Damage / Firerate
 $MDPS$ = (Normal Damage + AOE Damage) / Swingrate
 $MaxDPS$ = (Normal Damage + (AOE Damage * Max Hits)) / Swingrate
-$CE$ = Total Price / DPS
+$CE$ = Total Cost / DPS
 $BTDMG$ = {{#expr:ceil((2 * (1^0.9)) * (Health^0.28))}}
 $BCDMG$ = {{formatnum:{{#expr:ceil((2 * (40^0.9)) * (Health^0.28))}}}}
 $AREF$ = <ref>AOE Damage is damage dealt to both the targeted enemies and any additional enemies, with the number being based on the '''Warlock's''' max hits. The damage is the same as the melee attack's damage.</ref>
 $DREF$ = <ref>DPS is calculated as (Damage + AOE Damage) ÷ Swingrate. DPS does not include bleed damage.</ref>
 $MREF$ = <ref>Max DPS is calculated as (Damage + AOE Damage x Max Hits) ÷ Swingrate. Max DPS does not include bleed damage.</ref>
+$R$ = $FNC-RECURSION$
 </var>
 <div class="overflow-box">
 {| class="wikitable stats-table"
-! colspan="8" |Ranged Attack
+! colspan="9" |Ranged Attack
 |-
-! Level !! Total Price !! Damage !! Firerate !! Range !! Knockback Force !! DPS !! Cost Efficiency
+! Level !! Cost !! Total Cost !! Damage !! Firerate !! Range !! Knockback Force !! DPS !! Cost Efficiency
 |-
-| 0 || {{Money|$TP$}} || 25 || 1.1 || 18 || N/A || $RDPS$ || {{Money|$CE$}}
+| 0 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 25 || 1.1 || 18 || N/A || $RDPS$ || {{Money|$CE$}}
 |-
-| 1 || {{Money|$TP$}} || 40 || 1.1 || 19 || N/A || $RDPS$ || {{Money|$CE$}}
+| 1 || $R$ || $R$ || 40 || 1.1 || 19 || N/A || $RDPS$ || {{Money|$CE$}}
 |-
-| 2 || {{Money|$TP$}} || 60 || 0.8 || 22 || 15 || $RDPS$ || {{Money|$CE$}}
+| 2 || $R$ || $R$ || 60 || 0.8 || 22 || 15 || $RDPS$ || {{Money|$CE$}}
 |-
-| 3 || {{Money|$TP$}} || 115 || 0.8 || 22 || 17.5 || $RDPS$ || {{Money|$CE$}}
+| 3 || $R$ || $R$ || 115 || 0.8 || 22 || 17.5 || $RDPS$ || {{Money|$CE$}}
 |-
-| 4 || {{Money|$TP$}} || 190 || 0.8 || 24 || 17.5 || $RDPS$ || {{Money|$CE$}}
+| 4 || $R$ || $R$ || 190 || 0.8 || 24 || 17.5 || $RDPS$ || {{Money|$CE$}}
 |-
-| 5 || {{Money|$TP$}} || 250 || 0.7 || 24 || 20 || $RDPS$ || {{Money|$CE$}}
+| 5 || $R$ || $R$ || 250 || 0.7 || 24 || 20 || $RDPS$ || {{Money|$CE$}}
 |}
 
 {| class="wikitable stats-table"
-! colspan="14" |Melee Attack
+! colspan="15" |Melee Attack
 |-
-! Level !! Total Price !! Normal Damage !! AOE Damage$AREF$ !! Base Bleed Damage !! Swingrate !! Bleed Stack !! EV !! Max Stack !! Range !! Max Hits !! DPS$DREF$ !! Max DPS$MREF$ !! Cost Efficiency
+! Level !! Cost !! Total Cost !! Normal Damage !! AOE Damage$AREF$ !! Base Bleed Damage !! Swingrate !! Bleed Stack !! EV !! Max Stack !! Range !! Max Hits !! DPS$DREF$ !! Max DPS$MREF$ !! Cost Efficiency
 |-
-| 0 || {{Money|$TP$}} || 45 || $AOEDMG$ || N/A || 2 || N/A || N/A || N/A || 7 || 2 || $MDPS$ || $MaxDPS$ || {{Money|$CE$}}
+| 0 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 45 || $AOEDMG$ || N/A || 2 || N/A || N/A || N/A || 7 || 2 || $MDPS$ || $MaxDPS$ || {{Money|$CE$}}
 |-
-| 1 || {{Money|$TP$}} || 75 || $AOEDMG$ || N/A || 2 || N/A || N/A || N/A || 7 || 2 || $MDPS$ || $MaxDPS$ || {{Money|$CE$}}
+| 1 || $R$ || $R$ || 75 || $AOEDMG$ || N/A || 2 || N/A || N/A || N/A || 7 || 2 || $MDPS$ || $MaxDPS$ || {{Money|$CE$}}
 |-
-| 2 || {{Money|$TP$}} || 140 || $AOEDMG$ || N/A || 2 || N/A || N/A || N/A || 7.5 || 2 || $MDPS$ || $MaxDPS$ || {{Money|$CE$}}
+| 2 || $R$ || $R$ || 140 || $AOEDMG$ || N/A || 2 || N/A || N/A || N/A || 7.5 || 2 || $MDPS$ || $MaxDPS$ || {{Money|$CE$}}
 |-
-| 3 || {{Money|$TP$}} || 200 || $AOEDMG$ || N/A || 1.8 || N/A || N/A || N/A || 7.5 || 2 || $MDPS$ || $MaxDPS$ || {{Money|$CE$}}
+| 3 || $R$ || $R$ || 200 || $AOEDMG$ || N/A || 1.8 || N/A || N/A || N/A || 7.5 || 2 || $MDPS$ || $MaxDPS$ || {{Money|$CE$}}
 |-
-| 4 || {{Money|$TP$}} || 350 || $AOEDMG$ || 2 || 1.8 || 3 || 0.28 || 40 || 8 || 3 || $MDPS$ || $MaxDPS$ || {{Money|$CE$}}
+| 4 || $R$ || $R$ || 350 || $AOEDMG$ || 2 || 1.8 || 3 || 0.28 || 40 || 8 || 3 || $MDPS$ || $MaxDPS$ || {{Money|$CE$}}
 |-
-| 5 || {{Money|$TP$}} || 550 || $AOEDMG$ || 2 || 1.8 || 5 || 0.28 || 40 || 9 || 3 || $MDPS$ || $MaxDPS$ || {{Money|$CE$}}
+| 5 || $R$ || $R$ || 550 || $AOEDMG$ || 2 || 1.8 || 5 || 0.28 || 40 || 9 || 3 || $MDPS$ || $MaxDPS$ || {{Money|$CE$}}
 |}
 </div>
 

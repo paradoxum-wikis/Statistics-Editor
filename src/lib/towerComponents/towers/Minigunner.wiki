@@ -1,11 +1,11 @@
 <var>
 $DPS$ = Damage / Firerate
-$CE$ = Total Price / DPS
-$TP$ = $FNC-TOTALPRICE$
+$CE$ = Total Cost / DPS
+$TP$ = $FNC-TOTAL-COST$
 $TE$ = $FNC-TOTAL-EXP$
 $EXP$ = {{#expr:floor(50 * 1.09^(Level - 1) * (Level > 0))}}
-$FNC-COST$ = 1850; 350; 1500; 6500; 21500
-$FNC-PVP-COST$ = 2550; 850; 1550; 8500; 18750
+$COST$ = 1850; 350; 1500; 6500; 21500
+$PVP-COST$ = 2550; 850; 1550; 8500; 18750
 $FSE-DETECTION$ = 1; ;
 $FSE-PVP-DETECTION$ = 2; ;
 $FSE-UPGRADE$ = Improved Handling; Specialized Tech; Geared Up; Futuristic Armory
@@ -18,33 +18,33 @@ $R$ = $FNC-RECURSION$
 |-|Regular =
 <div class="overflow-box">
 {| class="wikitable stats-table"
-! Level !! Total Price !! Damage !! Firerate !! Rev-Up Time !! Range !! DPS$DREF$ !! Cost Efficiency
+! Level !! Cost !! Total Cost !! Damage !! Firerate !! Rev-Up Time !! Range !! DPS$DREF$ !! Cost Efficiency
 |-
-| 0 || {{Money|$TP$}} || 2 || 0.15 || 1.4 || 16 || $DPS$ || {{Money|$CE$}}
+| 0 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 2 || 0.15 || 1.4 || 16 || $DPS$ || {{Money|$CE$}}
 |-
-| 1 || {{Money|$TP$}} || 2 || 0.12 || 1.2 || 16 || $DPS$ || {{Money|$CE$}}
+| 1 || $R$ || $R$ || 2 || 0.12 || 1.2 || 16 || $DPS$ || {{Money|$CE$}}
 |-
-| 2 || {{Money|$TP$}} || 3 || 0.12 || 1.2 || 18 || $DPS$ || {{Money|$CE$}}
+| 2 || $R$ || $R$ || 3 || 0.12 || 1.2 || 18 || $DPS$ || {{Money|$CE$}}
 |-
-| 3 || {{Money|$TP$}} || 7 || 0.1 || 1 || 18 || $DPS$ || {{Money|$CE$}}
+| 3 || $R$ || $R$ || 7 || 0.1 || 1 || 18 || $DPS$ || {{Money|$CE$}}
 |-
-| 4 || {{Money|$TP$}} || 16 || 0.1 || 1 || 21 || $DPS$ || {{Money|$CE$}}
+| 4 || $R$ || $R$ || 16 || 0.1 || 1 || 21 || $DPS$ || {{Money|$CE$}}
 |}
 </div>
 |-|PVP =
 <div class="overflow-box">
 {| class="wikitable stats-table"
-! Level !! Total Price !! Damage !! Firerate !! Rev-Up Time !! Range !! DPS$DREF$ !! Cost Efficiency
+! Level !! Cost !! Total Cost !! Damage !! Firerate !! Rev-Up Time !! Range !! DPS$DREF$ !! Cost Efficiency
 |-
-| 0 || {{Money|$TP$}} || 3 || 0.18 || 1.4 || 16 || $DPS$ || {{Money|$CE$}}
+| 0 || {{Money|$PVP-COST$}}$R$ || {{Money|$TP$}}$R$ || 3 || 0.18 || 1.4 || 16 || $DPS$ || {{Money|$CE$}}
 |-
-| 1 || {{Money|$TP$}} || 3 || 0.17 || 1.2 || 17 || $DPS$ || {{Money|$CE$}}
+| 1 || $R$ || $R$ || 3 || 0.17 || 1.2 || 17 || $DPS$ || {{Money|$CE$}}
 |-
-| 2 || {{Money|$TP$}} || 5 || 0.17 || 1.2 || 18.5 || $DPS$ || {{Money|$CE$}}
+| 2 || $R$ || $R$ || 5 || 0.17 || 1.2 || 18.5 || $DPS$ || {{Money|$CE$}}
 |-
-| 3 || {{Money|$TP$}} || 13 || 0.15 || 1 || 19 || $DPS$ || {{Money|$CE$}}
+| 3 || $R$ || $R$ || 13 || 0.15 || 1 || 19 || $DPS$ || {{Money|$CE$}}
 |-
-| 4 || {{Money|$TP$}} || 20 || 0.1 || 1 || 20 || $DPS$ || {{Money|$CE$}}
+| 4 || $R$ || $R$ || 20 || 0.1 || 1 || 20 || $DPS$ || {{Money|$CE$}}
 |}
 </div>
 <!-- @se-ignore -->

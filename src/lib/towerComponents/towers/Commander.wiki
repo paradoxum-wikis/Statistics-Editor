@@ -3,31 +3,32 @@ $DPS$ = Damage / Firerate
 $TDPS$ = Damage * Missile Count / Firerate 
 $CDPS$ = ((Damage / Firerate) * 10) / 30
 $SDPS$ = ((Damage / Firerate) * 10) / 60
-$CE$ = Total Price / Call to Arms DPS
-$TP$ = $FNC-TOTALPRICE$
-$FNC-COST$ = 650; 400; 2450; 4500; 14000
+$CE$ = Total Cost / Call to Arms DPS
+$TP$ = $FNC-TOTAL-COST$
+$COST$ = 650; 400; 2450; 4500; 14000
 $FSE-DETECTION$ = 2; 2; 2
 $FSE-UPGRADE$ = Leadership; Call to Arms; Intense Training; Strength in Numbers
 $FSE-UPGRADEICON$ = 5525000768; 4594880289; 5525002879; 17512145719
 $FSE-META$ = Advanced; File:Commandernew.png
 $DREF$ = <ref>DPS is calculated as ((Damage ÷ Firerate) × Attack Time) ÷ Ability Cooldown<br>'''Attack Time''' is the time in which the Commander can attack during its abilities while '''Ability Cooldown''' is the minimum time between ability activations.<br>DPS does not include any Firerate Buffs.</ref>
 $SREF$ = <ref>If both abilites are used, DPS is the same as Call to Arms DPS.</ref>
+$R$ = $FNC-RECURSION$
 </var>
 <div class="overflow-box">
 {| class="wikitable stats-table"
-! colspan="10" | Commander Stats
+! colspan="11" | Commander Stats
 |-
-! Level !! Total Price !! Firerate Buff !! Call to Arms Buff !! Damage !! Firerate !! Range !! Call to Arms DPS$DREF$ !! Support Caravan DPS$DREF$ !! Cost Efficiency
+! Level !! Cost !! Total Cost !! Firerate Buff !! Call to Arms Buff !! Damage !! Firerate !! Range !! Call to Arms DPS$DREF$ !! Support Caravan DPS$DREF$ !! Cost Efficiency
 |-
-| 0 || {{Money|$TP$}} || 10% || N/A || N/A || N/A || 10 || N/A || N/A || N/A
+| 0 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 10% || N/A || N/A || N/A || 10 || N/A || N/A || N/A
 |-
-| 1 || {{Money|$TP$}} || 15% || N/A || N/A || N/A || 10 || N/A || N/A || N/A
+| 1 || $R$ || $R$ || 15% || N/A || N/A || N/A || 10 || N/A || N/A || N/A
 |-
-| 2 || {{Money|$TP$}} || 15% || 10% || 15 || 0.6 || 13 || $CDPS$ || N/A || {{Money|$CE$}}
+| 2 || $R$ || $R$ || 15% || 10% || 15 || 0.6 || 13 || $CDPS$ || N/A || {{Money|$CE$}}
 |-
-| 3 || {{Money|$TP$}} || 17.5% || 15% || 30 || 0.6 || 15 || $CDPS$ || N/A || {{Money|$CE$}}
+| 3 || $R$ || $R$ || 17.5% || 15% || 30 || 0.6 || 15 || $CDPS$ || N/A || {{Money|$CE$}}
 |-
-| 4 || {{Money|$TP$}} || 20% || 20% || 50 || 0.6 || 17 || $CDPS$$SREF$ || $SDPS$ || {{Money|$CE$}}
+| 4 || $R$ || $R$ || 20% || 20% || 50 || 0.6 || 17 || $CDPS$$SREF$ || $SDPS$ || {{Money|$CE$}}
 |}
 
 {| class="wikitable stats-table"

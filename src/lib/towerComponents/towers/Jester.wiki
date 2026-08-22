@@ -8,9 +8,9 @@ $BDPS$ = Burn Damage
 $CDPS$ = $DPS$ + $BDPS$
 $PDPS$ = Poison Damage / Poison Tick
 $TED$ = Burn Damage * (Burn Time / Burn Tick)
-$CE$ = Total Price / DPS
-$TP$ = $FNC-TOTALPRICE$
-$FNC-COST$ = 650; 400; 670; 2750; 8500
+$CE$ = Total Cost / DPS
+$TP$ = $FNC-TOTAL-COST$
+$COST$ = 650; 400; 670; 2750; 8500
 $FSE-DETECTION$ = 3; 0;
 $FSE-UPGRADE$ = Trained Juggling; Cold Humor; Potent Bombs; Harlequin of Doom
 $FSE-UPGRADEICON$ = 15332518871; 15332518503; 15332518237; 15332519184
@@ -22,60 +22,61 @@ $IREF$ = <ref>Damage is 20% of the regular damage.</ref>
 $PREF$ = <ref>Poison damage is 30% of base damage.</ref>
 $DPREF$ = <ref>DPS assumes only one enemy is hit from one poisonous puddle and that only one type of bomb is used.</ref>
 $CREF$ =<ref>Damage is 0% of the regular damage.</ref>
+$R$ = $FNC-RECURSION$
 </var>
 <tabber>
 |-|Fire Bomb =
 <div class="overflow-box">
 {| class="wikitable stats-table"
-! colspan="13" |Fire Bomb
+! colspan="14" |Fire Bomb
 |-
-! Level !! Total Price !! Bomb Damage !! Burn Damage$BREF$ !! Firerate !! Burn Tick !! Burn Time !! Range !! Explosion Range !! Max Hits !! Total Elapsed Damage$TREF$ !! DPS$DREF$ !! Cost Efficiency
+! Level !! Cost !! Total Cost !! Bomb Damage !! Burn Damage$BREF$ !! Firerate !! Burn Tick !! Burn Time !! Range !! Explosion Range !! Max Hits !! Total Elapsed Damage$TREF$ !! DPS$DREF$ !! Cost Efficiency
 |-
-| 0 || {{Money|$TP$}} || 4 || $FDMG$ || 1.2 || 0.25 || 0.25 || 10 || 6 || 4 || $TED$ || $CDPS$<ref>$DPS$ regular DPS + $BDPS$ Burn DPS</ref> || {{Money|$CE$}}
+| 0 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 4 || $FDMG$ || 1.2 || 0.25 || 0.25 || 10 || 6 || 4 || $TED$ || $CDPS$<ref>$DPS$ regular DPS + $BDPS$ Burn DPS</ref> || {{Money|$CE$}}
 |-
-| 1 || {{Money|$TP$}} || 6 || $FDMG$ || 1 || 0.25 || 0.25 || 12.3 || 6 || 4 || $TED$ || $CDPS$<ref>$DPS$ regular DPS + $BDPS$ Burn DPS</ref> || {{Money|$CE$}}
+| 1 || $R$ || $R$ || 6 || $FDMG$ || 1 || 0.25 || 0.25 || 12.3 || 6 || 4 || $TED$ || $CDPS$<ref>$DPS$ regular DPS + $BDPS$ Burn DPS</ref> || {{Money|$CE$}}
 |-
-| 2 || {{Money|$TP$}}  || 10 || $FDMG$ || 1 || 0.25 || 0.25 || 13 || 6 || 4 || $TED$ || $CDPS$<ref>$DPS$ regular DPS + $BDPS$ Burn DPS</ref> || {{Money|$CE$}}
+| 2 || $R$ || $R$ || 10 || $FDMG$ || 1 || 0.25 || 0.25 || 13 || 6 || 4 || $TED$ || $CDPS$<ref>$DPS$ regular DPS + $BDPS$ Burn DPS</ref> || {{Money|$CE$}}
 |-
-| 3 || {{Money|$TP$}} || 30 || $FDMG$ || 1 || 0.25 || 0.25 || 13 || 6 || 4 || $TED$ || $CDPS$<ref>$DPS$ regular DPS + $BDPS$ Burn DPS</ref> || {{Money|$CE$}}
+| 3 || $R$ || $R$ || 30 || $FDMG$ || 1 || 0.25 || 0.25 || 13 || 6 || 4 || $TED$ || $CDPS$<ref>$DPS$ regular DPS + $BDPS$ Burn DPS</ref> || {{Money|$CE$}}
 |-
-| 4 || {{Money|$TP$}} || 48 || $FDMG$ || 0.6 || 0.25 || 0.25 || 16 || 6 || 4 || $TED$ || $CDPS$<ref>$DPS$ regular DPS + $BDPS$ Burn DPS</ref> || {{Money|$CE$}}
+| 4 || $R$ || $R$ || 48 || $FDMG$ || 0.6 || 0.25 || 0.25 || 16 || 6 || 4 || $TED$ || $CDPS$<ref>$DPS$ regular DPS + $BDPS$ Burn DPS</ref> || {{Money|$CE$}}
 |}
 </div>
 |-|Ice Bomb =
 <div class="overflow-box">
 {| class="wikitable stats-table"
-! colspan="13" |Ice Bomb
+! colspan="14" |Ice Bomb
 |-
-! Level !! Total Price !! Bomb Damage$IREF$ !! Firerate !! Range !! Explosion Range !! Slowdown Time !! Slowdown per Hit !! Max Slowdown !! Defense Melt !! Max Hits !! DPS$DREF$ !! Cost Efficiency
+! Level !! Cost !! Total Cost !! Bomb Damage$IREF$ !! Firerate !! Range !! Explosion Range !! Slowdown Time !! Slowdown per Hit !! Max Slowdown !! Defense Melt !! Max Hits !! DPS$DREF$ !! Cost Efficiency
 |-
-| 2 || {{Money|$TP$}} || $IDMG$ || 1 || 13 || 6 || 3 || 25% || 25% || 0% || 4 || $DPS$ || {{Money|$CE$}}
+| 2 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || $IDMG$ || 1 || 13 || 6 || 3 || 25% || 25% || 0% || 4 || $DPS$ || {{Money|$CE$}}
 |-
-| 3 || {{Money|$TP$}} || $IDMG$ || 1 || 13 || 7 || 3 || 25% || 25% || 1% || 4 || $DPS$ || {{Money|$CE$}}
+| 3 || $R$ || $R$ || $IDMG$ || 1 || 13 || 7 || 3 || 25% || 25% || 1% || 4 || $DPS$ || {{Money|$CE$}}
 |-
-| 4 || {{Money|$TP$}} || $IDMG$ || 0.6 || 16 || 7 || 3 || 25% || 25% || 1% || 4 || $DPS$ || {{Money|$CE$}}
+| 4 || $R$ || $R$ || $IDMG$ || 0.6 || 16 || 7 || 3 || 25% || 25% || 1% || 4 || $DPS$ || {{Money|$CE$}}
 |}
 </div>
 |-|Poison Bomb =
 <div class="overflow-box">
 {| class="wikitable stats-table"
-! colspan="9" |Poison Bomb
+! colspan="10" |Poison Bomb
 |-
-! Level !! Total Price !! Poison Damage$PREF$ !! Firerate !! Poison Tick !! Range !! Poison Time !! DPS$DPREF$ !! Cost Efficiency
+! Level !! Cost !! Total Cost !! Poison Damage$PREF$ !! Firerate !! Poison Tick !! Range !! Poison Time !! DPS$DPREF$ !! Cost Efficiency
 |-
-| 3 || {{Money|$TP$}} || $PDMG$ || 1 || 0.4 || 13 || 30 || $PDPS$ || {{Money|$CE$}}
+| 3 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || $PDMG$ || 1 || 0.4 || 13 || 30 || $PDPS$ || {{Money|$CE$}}
 |-
-| 4 || {{Money|$TP$}} || $PDMG$ || 0.6 || 0.4 || 16 || 30 || $PDPS$ || {{Money|$CE$}}
+| 4 || $R$ || $R$ || $PDMG$ || 0.6 || 0.4 || 16 || 30 || $PDPS$ || {{Money|$CE$}}
 |}
 </div>
 |-|Confusion Bomb =
 <div class="overflow-box">
 {| class="wikitable stats-table"
-! colspan="11" |Confusion Bomb
+! colspan="12" |Confusion Bomb
 |-
-! Level !! Total Price !! Bomb Damage$CREF$ !! Firerate !! Range !! Explosion Range !! Confusion Time !! Confusion Cooldown !! Max Hits !! DPS$DREF$ !! Cost Efficiency
+! Level !! Cost !! Total Cost !! Bomb Damage$CREF$ !! Firerate !! Range !! Explosion Range !! Confusion Time !! Confusion Cooldown !! Max Hits !! DPS$DREF$ !! Cost Efficiency
 |-
-| 4 || {{Money|$TP$}} || $CDMG$ || 0.6 || 16 || 6 || 2  || 6 || 4 || $DPS$ || {{Money|N/A}}
+| 4 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || $CDMG$ || 0.6 || 16 || 6 || 2 || 6 || 4 || $DPS$ || {{Money|N/A}}
 |}
 </div>
 </tabber>
