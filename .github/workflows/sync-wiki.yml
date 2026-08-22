@@ -2,7 +2,7 @@ name: Sync Tower Neowtext Files
 
 on:
   schedule:
-    - cron: "0 0 * * 1"
+    - cron: "0 12 * * 6"
   workflow_dispatch:
 
 permissions:
