@@ -31,7 +31,8 @@
 	const isAdmin = $derived(page.url.pathname.startsWith("/admin"));
 	const isStandalone = $derived(isWorkshop || isAdmin);
 	const notFound = $derived(page.status >= 400 || towerStore.missingTower);
-	// Keep title here only — page-level <title> can stick after client nav.
+	// keep title here only
+	// as page-level <title> can stick after client nav
 	const pageTitle = $derived(
 		notFound
 			? `404 Not Found | ${siteName}`

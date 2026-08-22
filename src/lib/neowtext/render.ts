@@ -449,7 +449,7 @@ function renderListBlock(
 			}
 		}
 
-		// ;term: def → <dt> + <dd> on one line
+		// ;term: def -> <dt> + <dd> on one line
 		if (prefix.endsWith(";")) {
 			const split = text.match(/^([^:]*?)\s*:\s*(.*)$/s);
 			if (split?.[1].trim()) {

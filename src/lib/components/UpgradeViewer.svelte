@@ -64,7 +64,7 @@
 	let selectedImageFailed = $state(false);
 	let upgradeDirection = $state(1);
 
-	// Under a path header, strip the redundant letter (5A → 5 under A).
+	// under a path header, strip the redundant letter like 5A -> A
 	function pathTabLabel(index: number, branch?: string): string {
 		const raw = upgradeLevels[index] ?? String(index + 1);
 		if (!branch || settingsStore.compactPathTabs) return raw;

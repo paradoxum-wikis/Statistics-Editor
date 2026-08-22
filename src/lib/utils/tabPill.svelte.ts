@@ -1,4 +1,5 @@
-// offset* ignores ancestor transforms (dialog scale-in skews getBoundingClientRect).
+// offset* ignores ancestor transforms
+// as dialog scale-in skews getBoundingClientRect
 function offsetLeftWithin(
 	el: HTMLElement,
 	container: HTMLElement,

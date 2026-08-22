@@ -67,13 +67,9 @@ export const X_AXIS_OPTIONS: { key: ComparatorXKey; label: string }[] = [
 	{ key: X_COST, label: "Upgrade Cost" },
 ];
 
-// Coprime with 24 → consecutive lines jump ~105° of hue on a 15°-step wheel.
-const CHART_STRIDE = 7;
-
 export function chartColorAt(seriesIndex: number, metricIndex = 0): string {
 	const slot = seriesIndex * MAX_METRICS + metricIndex;
-	const i =
-		(((slot * CHART_STRIDE) % CHART_COLORS) + CHART_COLORS) % CHART_COLORS;
+	const i = (((slot * 7) % CHART_COLORS) + CHART_COLORS) % CHART_COLORS;
 	return `var(--chart-${i + 1})`;
 }
 
@@ -124,7 +120,7 @@ function rowLevel(row: TableRow, i: number): number {
 	);
 }
 
-// N/A / dashes → 0 so sparse cells still plot.
+// N/A / dashes -> 0 so sparse cells still plot
 function chartNumeric(v: unknown): number | null {
 	if (v == null || v === "") return null;
 	if (typeof v === "string") {

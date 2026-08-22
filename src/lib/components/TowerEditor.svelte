@@ -53,7 +53,8 @@
 	const selectedSkinName = $derived(towerStore.selectedSkinName);
 	const modifier = $derived({ entries: modifierStore.entries });
 
-	// Session outlives derived re-runs so skin tabs reuse rows; `id` resets it.
+	// session outlives derived re-runs so skin tabs reuse rows
+	// while the `id` resets it
 	const skinRowsSession: SkinRowsSession = {
 		id: "",
 		display: new Map(),

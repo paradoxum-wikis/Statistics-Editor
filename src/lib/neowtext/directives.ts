@@ -91,7 +91,8 @@ export function stripSeDiff(text: string): string {
 	return extractSeDiff(text).text;
 }
 
-// separate from SE_DIFF_INLINE_RE `g` so lastIndex cannot poison repeated usage.
+// separate from SE_DIFF_INLINE_RE `g`
+// as lastIndex cannot poison repeated usage
 export function hasSeDiff(text: string): boolean {
 	return /<!--\s*@se-diff:/i.test(text);
 }

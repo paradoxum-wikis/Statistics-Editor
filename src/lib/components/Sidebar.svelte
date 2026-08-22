@@ -73,7 +73,7 @@
 		);
 	});
 
-	// split paths: group flat upgrade indices by schema branch (trunk first)
+	// split paths has group flat upgrade indices by schema branch with trunk first
 	let upgradeGroups = $derived.by(() => {
 		towerStore.refreshTrigger;
 		if (!currentSkin?.upgrades) return [];
@@ -204,11 +204,8 @@
 
 			const lines: SummaryLine[] = [];
 
-			// Only diff the upgrade's OWN stats. `skin.levels.attributes` is the global
-			// union across all branch tables, and `levels.getCell` carries values forward
-			// down the flat array, so using that would leak one branch's stats (e.g. Fortify
-			// Radius) into an unrelated branch's summary. The upgrade's own attribute set
-			// only contains the columns of its own branch/table.
+			// own keys only
+			// as the global union / getCell carry-forward leaks other branches
 			const ownAttributes = Object.keys(
 				skin.upgrades?.[upgradeIndex]?.attributes ?? {},
 			);

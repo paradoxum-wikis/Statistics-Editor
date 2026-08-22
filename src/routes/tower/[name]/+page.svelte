@@ -64,7 +64,8 @@
 			}
 		}
 
-		// load() clears sharePreviewId, hence, keep an active share snapshot
+		// load() clears sharePreviewId
+		// hence keep an active share snapshot
 		if (towerStore.sharePreviewId && sameTower) return;
 		await towerStore.load(name);
 	}

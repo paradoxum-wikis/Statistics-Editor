@@ -632,7 +632,7 @@ class TowerStore {
 	 * Forces a reload of the current tower.
 	 */
 	async forceReload(): Promise<boolean> {
-		// If there are any in-memory unsaved changes,
+		// if there are any in-memory unsaved changes,
 		// please don't blow them away by reloading
 		// from base/override sources PLEASE.
 		if (this.isDirty) return true;

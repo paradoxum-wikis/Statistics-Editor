@@ -98,7 +98,7 @@ class SkinData {
 			};
 		}
 
-		// Unwrap inconsistent JSON structures
+		// unwrap inconsistent JSON structures
 		while (
 			Object.keys(this.data).length === 1 &&
 			!this.data.Defaults &&
@@ -472,7 +472,7 @@ class SkinData {
 			this.upgrades[level - 1].set(attribute, value);
 		}
 
-		// Sync the edited value into `rawRows` anj recompute any derived columns
+		// sync the edited value into `rawRows` and recompute any derived columns
 		// such as DPS, then rebuild Levels so dependent cells update
 		if (this.rawRows?.[level] && typeof this.rawRows[level] === "object") {
 			this.rawRows[level][attribute] = value;
@@ -567,7 +567,7 @@ class SkinData {
 		if (startLevel === null) delete gains[b][type];
 		else gains[b][type] = startLevel;
 
-		// Unmapped levels (like wrong letter) are dropped by parseDetectionArray
+		// unmapped levels (like wrong letter) are dropped by parseDetectionArray
 		const flags = parseDetectionArray(
 			gainsToDetectArray(gains, schema).split(";"),
 			schema,

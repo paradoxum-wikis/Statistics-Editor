@@ -137,7 +137,7 @@ export function resolveFNC(
 		);
 	}
 
-	// Formula series can't be split on ';'
+	// formula series can't be split on ';'
 	const numericLevel = parseLevelNumber(level);
 	let total = 0;
 	for (let i = 0; i <= numericLevel; i++) {
