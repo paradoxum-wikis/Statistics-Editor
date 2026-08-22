@@ -359,12 +359,7 @@ class ImageLoaderService {
 	}
 
 	/**
-	 * Loads an image either from a direct URL, a MediaWiki filename, or via Roblox asset delivery.
-	 * Uses Cache API for Roblox asset IDs by fetching the resolved location and storing the image response.
-	 *
-	 * 1) For http(s) URLs we return the URL directly (browser/http cache will handle it).
-	 * 2) For MediaWiki File: syntax we return the computed hashed upload URL.
-	 * 3) For Roblox IDs we return a blob URL.
+	 * Loads an image either from a Fandom URL, a MediaWiki filename, or via Roblox asset delivery.
 	 */
 	async loadImage(
 		towerName: string,
@@ -387,10 +382,11 @@ class ImageLoaderService {
 		try {
 			const imageIdStr = String(imageId);
 
-			// Direct URL
-			if (typeof imageId === "string" && imageId.startsWith("http")) {
-				this.cache.set(requestKey, imageId);
-				return imageId;
+			// Thumblr 404s when Referer isn't Fandom
+			if (typeof imageId === "string" && isAllowedExternalImageUrl(imageId)) {
+				const url = proxyImageUrl(imageId);
+				this.cache.set(requestKey, url);
+				return url;
 			}
 
 			// MediaWiki filename

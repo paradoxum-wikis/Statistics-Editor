@@ -263,7 +263,7 @@
 				<TextInput
 					id="workshop-image-input"
 					class="short"
-					placeholder="File:Place.png · Roblox Asset ID · https://..."
+					placeholder="File:Place.png · Roblox ID · Fandom URL"
 					maxlength="512"
 					bind:value={image}
 				/>

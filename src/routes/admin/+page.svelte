@@ -469,7 +469,7 @@
 						id="admin-edit-image"
 						class="short"
 						maxlength="512"
-						placeholder="File:Place.png · Roblox Asset ID · https://..."
+						placeholder="File:Place.png · Roblox ID · Fandom URL"
 						bind:value={editImage}
 					/>
 				</div>
