@@ -80,7 +80,7 @@
 		z-index: 7;
 		width: 6px;
 		height: 6px;
-		border-radius: 7777px;
+		border-radius: var(--radius-full);
 		pointer-events: none;
 
 		&.error {

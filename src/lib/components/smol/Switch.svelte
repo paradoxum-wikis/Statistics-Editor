@@ -32,7 +32,7 @@
 		flex-shrink: 0;
 		cursor: pointer;
 		align-items: center;
-		border-radius: 9999px;
+		border-radius: var(--radius-full);
 		border: 2px solid transparent;
 		transition: background-color 0.15s;
 
@@ -65,7 +65,7 @@
 		display: block;
 		height: 1.25rem;
 		width: 1.25rem;
-		border-radius: 9999px;
+		border-radius: var(--radius-full);
 		background: white;
 		box-shadow: 0 1px 3px oklch(0% 0 0 / 0.35);
 		transition: transform 0.15s;

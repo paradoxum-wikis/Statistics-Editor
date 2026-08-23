@@ -30,6 +30,7 @@
 	--yellow: oklch(0.832 0.17 87.8);
 	--yellow-dark: color-mix(in oklch, var(--yellow) 90%, black);
 	--radius: 0.45rem;
+	--radius-full: calc(infinity * 1px);
 	--font: "Montserrat Variable", Montserrat, system-ui, sans-serif;
 	--text-stroke-width: 0.16em;
 	--text-stroke-color: oklch(0.2 0.015 250 / 0.2);
@@ -183,9 +184,6 @@
 	--color-chart-22: var(--chart-22);
 	--color-chart-23: var(--chart-23);
 	--color-chart-24: var(--chart-24);
-	--radius-sm: var(--radius);
-	--radius-md: var(--radius);
-	--radius-lg: var(--radius);
 	--font-sans: var(--font);
 }
 
