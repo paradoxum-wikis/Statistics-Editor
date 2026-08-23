@@ -47,13 +47,13 @@ function readRecentTowers(): string[] {
  */
 class TowerStore {
 	manager = $state<TowerManager | undefined>(undefined);
-	names = $state<string[]>([]);
+	names = $state.raw<string[]>([]);
 	selectedName = $state("");
 	selectedData = $state<Tower | null>(null);
 	isLoading = $state(false);
 	isDirty = $state(false);
 	missingTower = $state(false);
-	recentNames = $state<string[]>(readRecentTowers());
+	recentNames = $state.raw<string[]>(readRecentTowers());
 	#lastLoadedName = $state<string | null>(null);
 	#lastTrackedSelect: string | null = null;
 
