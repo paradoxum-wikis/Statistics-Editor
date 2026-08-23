@@ -396,7 +396,7 @@
 								<span class="ms-auto"><Check size={14} /></span>
 							{:else if profile !== "Default"}
 								<button
-									class="ms-2 text-muted-foreground hover:text-destructive opacity-0 transition-opacity"
+									class="ms-2 text-muted-foreground hover:text-destructive"
 									onclick={(e) => openDeleteProfileDialog(profile, e)}
 								>
 									<Trash2 size={14} />
