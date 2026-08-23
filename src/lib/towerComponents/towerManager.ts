@@ -91,6 +91,11 @@ export default class TowerManager {
 		clearProfileWikiOverrides(name);
 	}
 
+	static resetProfile(name: string): void {
+		if (typeof localStorage === "undefined") return;
+		clearProfileWikiOverrides(name);
+	}
+
 	/**
 	 * Generates the wikitext for the given tower without saving it
 	 * to storage or updating the source overrider.

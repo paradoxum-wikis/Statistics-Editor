@@ -76,6 +76,14 @@ class ProfileStore {
 		analytics.track("profile_action", { action: "delete" });
 		return true;
 	}
+
+	reset(): void {
+		if (settingsStore.debugMode) {
+			console.log(`[ProfileStore] Resetting profile: "${this.current}"`);
+		}
+		TowerManager.resetProfile(this.current);
+		analytics.track("profile_action", { action: "reset" });
+	}
 }
 
 export const profileStore = new ProfileStore();

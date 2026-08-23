@@ -52,6 +52,8 @@
 		SunMoon,
 		Store,
 		Megaphone,
+		Factory,
+		Plus,
 	} from "@lucide/svelte";
 
 	let { isClient }: { isClient: boolean } = $props();
@@ -237,6 +239,15 @@
 		}
 		deleteProfileOpen = false;
 	}
+
+	let resetProfileOpen = $state(false);
+
+	async function confirmResetProfile() {
+		profileStore.reset();
+		await towerStore.switchProfile(profileStore.current);
+		resetProfileOpen = false;
+		toast.success("Profile reset.");
+	}
 </script>
 
 <div class="flex h-screen flex-col bg-background">
@@ -398,7 +409,7 @@
 
 				<Modal
 					bind:open={createProfileOpen}
-					title="Create Profile"
+					title="Create profile"
 					description="Enter a name for the new profile."
 					onOpenChange={(v) => {
 						if (v) openCreateProfileDialog();
@@ -407,10 +418,11 @@
 					{#snippet trigger({ props })}
 						<button
 							type="button"
-							class="dropdown-item w-full text-start"
+							class="dropdown-item w-full justify-start!"
 							{...props}
 						>
-							<span>+ Create Profile</span>
+							<Plus size={16} />
+							<span>Create profile</span>
 						</button>
 					{/snippet}
 
@@ -442,6 +454,13 @@
 					{/snippet}
 				</Modal>
 
+				<DropdownMenu.Item
+					class="dropdown-item justify-start! text-destructive hover:bg-destructive/10"
+					onclick={() => (resetProfileOpen = true)}
+				>
+					<Factory size={16} />
+					<span>Reset profile</span>
+				</DropdownMenu.Item>
 				{#if profileStore.current !== "Default"}
 					<DropdownMenu.Item
 						class="dropdown-item text-destructive hover:bg-destructive/10"
@@ -614,4 +633,19 @@
 	confirmClass="btn destructive-fill text-white"
 	onConfirm={confirmDeleteProfile}
 	onCancel={() => (profileToDelete = null)}
+/>
+
+{#snippet resetProfileBody()}
+	This action cannot be undone. This will reset all saved tower data in profile
+	<span class="font-bold text-foreground">{profileStore.current}</span>
+	to its factory defaults.
+{/snippet}
+
+<Alert
+	bind:open={resetProfileOpen}
+	title="Reset this profile?"
+	body={resetProfileBody}
+	confirmLabel="Reset"
+	confirmClass="btn destructive-fill text-white"
+	onConfirm={confirmResetProfile}
 />
