@@ -1,10 +1,12 @@
 <script lang="ts">
 	import { tick } from "svelte";
 	import { FileBraces, Table } from "@lucide/svelte";
+	import { mergeProps } from "bits-ui";
 	import { towerStore } from "$lib/stores/tower.svelte";
 	import { analytics } from "$lib/services/analytics";
 	import { tabPill } from "$lib/utils/tabPill.svelte";
 	import { lintNeowtext } from "$lib/neowtext/codemirror/lint";
+	import Tip from "./Tip.svelte";
 
 	let {
 		mode = $bindable<"cells" | "wiki">("cells"),
@@ -55,21 +57,31 @@
 		<Table size={16} />
 		<span>Visual</span>
 	</button>
-	<button
-		class="tabs-trigger {mode === 'wiki' || disableCells ? 'active' : ''}"
-		onclick={switchToWiki}
-		title={sourceLint === "error"
-			? "Source has errors"
-			: sourceLint === "warning"
-				? "Source has warnings"
-				: undefined}
-	>
-		<FileBraces size={16} />
-		<span>Source</span>
-		{#if sourceLint}
-			<span class="source-lint {sourceLint}" aria-hidden="true"></span>
-		{/if}
-	</button>
+	{#snippet sourceTab(tipProps?: Record<string, unknown>)}
+		<button
+			class="tabs-trigger {mode === 'wiki' || disableCells ? 'active' : ''}"
+			{...mergeProps(tipProps ?? {}, { onclick: switchToWiki })}
+		>
+			<FileBraces size={16} />
+			<span>Source</span>
+			{#if sourceLint}
+				<span class="source-lint {sourceLint}" aria-hidden="true"></span>
+			{/if}
+		</button>
+	{/snippet}
+	{#if sourceLint}
+		<Tip
+			content={sourceLint === "error"
+				? "Source has errors"
+				: "Source has warnings"}
+		>
+			{#snippet children({ props })}
+				{@render sourceTab(props)}
+			{/snippet}
+		</Tip>
+	{:else}
+		{@render sourceTab()}
+	{/if}
 </div>
 
 <style>
