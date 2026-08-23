@@ -66,14 +66,17 @@ export function isDirectImageUrl(url: string): boolean {
 	}
 }
 
-export function isAllowedExternalImageUrl(url: string): boolean {
-	if (!isDirectImageUrl(url)) return false;
+function isWikiaCdnUrl(url: string): boolean {
 	const normalized = url.trim().toLowerCase();
 	return EXTERNAL_IMAGE_PREFIXES.some((prefix) =>
 		normalized.startsWith(
 			prefix.endsWith("/") ? prefix.toLowerCase() : `${prefix.toLowerCase()}/`,
 		),
 	);
+}
+
+export function isAllowedExternalImageUrl(url: string): boolean {
+	return isDirectImageUrl(url) && isWikiaCdnUrl(url);
 }
 
 export function proxyImageUrl(url: string): string {
@@ -383,7 +386,7 @@ class ImageLoaderService {
 			const imageIdStr = String(imageId);
 
 			// Thumblr 404s when Referer isn't Fandom
-			if (typeof imageId === "string" && isAllowedExternalImageUrl(imageId)) {
+			if (typeof imageId === "string" && isWikiaCdnUrl(imageId)) {
 				const url = proxyImageUrl(imageId);
 				this.cache.set(requestKey, url);
 				return url;
