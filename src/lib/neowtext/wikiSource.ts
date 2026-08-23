@@ -40,9 +40,9 @@ export function getWikiOverride(
 	if (!canUseLocalStorage()) return null;
 
 	const key = overrideKey(profileName, towerName);
-	const twins = overrideKeys(profileName, towerName);
 	let value = localStorage.getItem(key);
 	if (!value?.trim()) {
+		const twins = overrideKeys(profileName, towerName);
 		for (const twin of twins) {
 			const legacy = localStorage.getItem(twin);
 			if (!legacy?.trim()) continue;
@@ -50,8 +50,8 @@ export function getWikiOverride(
 			value = legacy;
 			break;
 		}
+		dropKeys(twins, value?.trim() ? key : undefined);
 	}
-	dropKeys(twins, value?.trim() ? key : undefined);
 
 	if (settingsStore.debugMode) {
 		console.log(
