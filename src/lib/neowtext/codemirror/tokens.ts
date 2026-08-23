@@ -44,13 +44,19 @@ function spaces(s: string): string {
 	return s.replace(/[^\n]/g, " ");
 }
 
+let maskedSrc = "";
+let maskedOut = "";
+
 function maskIgnored(text: string): string {
+	if (text === maskedSrc) return maskedOut;
 	let out = text.replace(/<!--[\s\S]*?-->/g, spaces);
 	out = out.replace(/<nowiki\b[^>]*>[\s\S]*?<\/nowiki>/gi, spaces);
 	const comment = out.indexOf("<!--");
 	if (comment >= 0) out = out.slice(0, comment) + spaces(out.slice(comment));
 	const nowiki = out.search(/<nowiki\b/i);
 	if (nowiki >= 0) out = out.slice(0, nowiki) + spaces(out.slice(nowiki));
+	maskedSrc = text;
+	maskedOut = out;
 	return out;
 }
 
