@@ -1,5 +1,3 @@
-import { linter, type Diagnostic } from "@codemirror/lint";
-import type { Extension } from "@codemirror/state";
 import {
 	deprecatedFn,
 	isKnownFn,
@@ -9,17 +7,25 @@ import {
 	scanVarTags,
 } from "./tokens";
 
+export type NeowtextDiagnostic = {
+	from: number;
+	to: number;
+	severity: "error" | "warning" | "info";
+	source: "neowtext";
+	message: string;
+};
+
 function diag(
 	from: number,
 	to: number,
 	message: string,
-	severity: Diagnostic["severity"] = "error",
-): Diagnostic {
+	severity: NeowtextDiagnostic["severity"] = "error",
+): NeowtextDiagnostic {
 	return { from, to, severity, source: "neowtext", message };
 }
 
-export function lintNeowtext(text: string): Diagnostic[] {
-	const diagnostics: Diagnostic[] = [];
+export function lintNeowtext(text: string): NeowtextDiagnostic[] {
+	const diagnostics: NeowtextDiagnostic[] = [];
 
 	for (const { from, to } of scanUnclosedDollars(text)) {
 		diagnostics.push(diag(from, to, "Unclosed $...$."));
@@ -96,7 +102,3 @@ export function lintNeowtext(text: string): Diagnostic[] {
 
 	return diagnostics;
 }
-
-export const neowtextLinter: Extension = linter((view) =>
-	lintNeowtext(view.state.doc.toString()),
-);

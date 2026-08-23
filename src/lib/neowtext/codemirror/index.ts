@@ -1,8 +1,13 @@
+import { linter } from "@codemirror/lint";
 import { EditorView } from "@codemirror/view";
 import type { Extension } from "@codemirror/state";
 import { neowtextHighlight } from "./highlight";
-import { neowtextLinter } from "./lint";
+import { lintNeowtext } from "./lint";
 import { neowtextHover } from "./hover";
+
+const neowtextLinter: Extension = linter((view) =>
+	lintNeowtext(view.state.doc.toString()),
+);
 
 const neowtextTheme = EditorView.theme({
 	".nt-var, .nt-fnc, .nt-fse, .nt-dir, .nt-err": {
