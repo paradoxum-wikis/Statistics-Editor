@@ -188,8 +188,8 @@ function fileLinkHref(link: string): string {
 }
 
 function fandomImgAttrs(url: string, wikiFile = false): string {
-	const wikia = wikiFile || isAllowedExternalImageUrl(url);
-	if (!wikia) return `src="${escapeAttr(url)}"`;
+	const fandom = wikiFile || isAllowedExternalImageUrl(url);
+	if (!fandom) return `src="${escapeAttr(url)}"`;
 	return `src="${escapeAttr(proxyImageUrl(url))}"`;
 }
 
