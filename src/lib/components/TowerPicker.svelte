@@ -38,6 +38,7 @@
 	);
 
 	const metaMap = $derived.by(() => {
+		if (variant !== "home") return new Map();
 		void towerStore.refreshTrigger;
 		return buildMetaMap(profileStore.current, {
 			towerName: towerStore.selectedName,
@@ -45,7 +46,11 @@
 		});
 	});
 
-	const groups = $derived(groupedTowerNames(towerStore.names, query, metaMap));
+	const groups = $derived(
+		variant === "home"
+			? groupedTowerNames(towerStore.names, query, metaMap)
+			: [],
+	);
 	const recent = $derived(
 		towerStore.recentNames.filter((name) => towerStore.names.includes(name)),
 	);
