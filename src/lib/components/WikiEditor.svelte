@@ -3,10 +3,11 @@
 	import { Popover } from "bits-ui";
 	import Btn from "./smol/Btn.svelte";
 	import Tip from "./smol/Tip.svelte";
-	import { Annotation, EditorState } from "@codemirror/state";
+	import { Annotation, Compartment, EditorState } from "@codemirror/state";
 	import { lintGutter } from "@codemirror/lint";
 	import { EditorView, keymap, lineNumbers } from "@codemirror/view";
 	import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
+	import { vim } from "@replit/codemirror-vim";
 	import {
 		defaultHighlightStyle,
 		syntaxHighlighting,
@@ -25,6 +26,7 @@
 	import { toast } from "$lib/toast";
 
 	const syncFromStoreAnnotation = Annotation.define<boolean>();
+	const vimCompartment = new Compartment();
 	const editorTheme = EditorView.theme({
 		"&": {
 			fontSize: ".75rem",
@@ -65,6 +67,14 @@
 				"color-mix(in oklch, var(--muted) 25%, var(--background))",
 			color: "var(--foreground)",
 			fontSize: ".7rem",
+			borderRadius: "0 0 var(--radius) var(--radius)",
+		},
+		".cm-vim-panel": {
+			borderTop: "1px solid var(--border)",
+			backgroundColor:
+				"color-mix(in oklch, var(--muted) 25%, var(--background))",
+			fontSize: ".7rem",
+			padding: "0 .75rem",
 			borderRadius: "0 0 var(--radius) var(--radius)",
 		},
 		".cm-panels": {
@@ -149,6 +159,7 @@
 			state: EditorState.create({
 				doc: towerStore.effectiveWikitext,
 				extensions: [
+					vimCompartment.of(settingsStore.vimMode ? vim({ status: true }) : []),
 					history(),
 					keymap.of([...defaultKeymap, ...historyKeymap]),
 					lineNumbers(),
@@ -267,6 +278,16 @@
 			editorView = undefined;
 			editorReady = false;
 		};
+	});
+
+	$effect(() => {
+		if (!editorReady || !editorView) return;
+
+		editorView.dispatch({
+			effects: vimCompartment.reconfigure(
+				settingsStore.vimMode ? vim({ status: true }) : [],
+			),
+		});
 	});
 
 	$effect(() => {

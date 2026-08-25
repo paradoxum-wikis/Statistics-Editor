@@ -12,6 +12,7 @@ import {
 	SquareDashedBottom,
 	Superscript,
 	Rows3,
+	Keyboard,
 } from "@lucide/svelte";
 import { analytics } from "$lib/services/analytics";
 
@@ -28,6 +29,7 @@ export type BooleanSettingKey =
 	| "hideCellWrapper"
 	| "compactPathTabs"
 	| "hideWikiBanner"
+	| "vimMode"
 	| "debugMode"
 	| "analyticsConsent";
 
@@ -81,6 +83,16 @@ const SETTING_DEFS: Record<BooleanSettingKey, BooleanSettingDef> = {
 		icon: DecimalsArrowRight,
 		label: "Full Precision",
 		description: "Uncaps the 2 decimal limit used in the game and wiki.",
+	},
+	vimMode: {
+		storageKey: "tdse_vim",
+		default: false,
+		id: "vim-mode",
+		tab: "editor",
+		icon: Keyboard,
+		label: "Vim Mode",
+		description:
+			"Enables Vim bindings in the source editor, only for the serious.",
 	},
 	seeValueDifference: {
 		storageKey: "tdse_see_delta",
@@ -248,6 +260,7 @@ class SettingsStore {
 		SETTING_DEFS.restoreRefOnClearEdit.default,
 	);
 	rofBug = $state<boolean>(SETTING_DEFS.rofBug.default);
+	vimMode = $state<boolean>(SETTING_DEFS.vimMode.default);
 	fullPrecision = $state<boolean>(SETTING_DEFS.fullPrecision.default);
 	analyticsConsent = $state<boolean>(SETTING_DEFS.analyticsConsent.default);
 	theme = $state(THEME_SETTING.default);
@@ -263,6 +276,9 @@ class SettingsStore {
 				break;
 			case "rofBug":
 				this.rofBug = value;
+				break;
+			case "vimMode":
+				this.vimMode = value;
 				break;
 			case "fullPrecision":
 				this.fullPrecision = value;
@@ -346,6 +362,8 @@ class SettingsStore {
 				return this.restoreRefOnClearEdit;
 			case "rofBug":
 				return this.rofBug;
+			case "vimMode":
+				return this.vimMode;
 			case "fullPrecision":
 				return this.fullPrecision;
 			case "seeValueDifference":
