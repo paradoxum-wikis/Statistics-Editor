@@ -16,6 +16,7 @@
 	} from "$lib/utils/format";
 	import { schemaIndexToLevel } from "$lib/neowtext/functions/schema";
 	import { untrack } from "svelte";
+	import type SkinData from "$lib/towerComponents/skinData";
 
 	import type { Picture } from "@sveltejs/enhanced-img";
 	import DamageIcon from "$lib/assets/Damage.png?enhanced";
@@ -129,7 +130,7 @@
 		return JSON.stringify(v);
 	}
 
-	function buildUpgradeSummariesForeskin(skin: any): {
+	function buildUpgradeSummariesForeskin(skin: SkinData): {
 		[key: number]: SummaryLine[];
 	} {
 		const result: { [key: number]: SummaryLine[] } = {};
@@ -193,7 +194,7 @@
 		const rofCols = new Set(rofInfo.cols);
 
 		const formulaStats: Record<string, true> = {};
-		for (const rec of Object.values(skin.cellFormulaTokens ?? {})) {
+		for (const rec of Object.values(skin.cellFormulaTokens)) {
 			for (const [k, v] of Object.entries(rec)) {
 				if (isCellFormulaSource(v)) formulaStats[k] = true;
 			}
