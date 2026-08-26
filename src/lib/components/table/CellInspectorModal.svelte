@@ -118,13 +118,14 @@
 		),
 	);
 	const cellHold = $derived(
-		formatCellHold(
-			rawValue,
-			wrap || null,
-			hasRecursion,
-			recursionOnly,
-			recToken,
-		),
+		config.wikiCells?.[rowIdx]?.[header] ??
+			formatCellHold(
+				rawValue,
+				wrap || null,
+				hasRecursion,
+				recursionOnly,
+				recToken,
+			),
 	);
 	const refs = $derived(
 		extractRefEntries(

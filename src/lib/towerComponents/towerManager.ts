@@ -740,6 +740,7 @@ export default class TowerManager {
 					RecursionOnlyCells: tableData.recursionOnlyCells ?? [],
 					RecursionTokens: tableData.recursionTokens ?? [],
 					WrapCells: tableData.wrapCells ?? [],
+					WikiCells: tableData.wikiCells ?? [],
 					ExtraTables: resolvedExtraTables,
 					TableCache: outCache,
 					PrimaryTableIndex: primaryTableIndex,

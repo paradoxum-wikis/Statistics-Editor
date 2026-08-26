@@ -205,15 +205,6 @@ function collectVars(
 	return vars;
 }
 
-export function isRecursionTag(
-	tok: string,
-	tokens?: Record<string, string>,
-): boolean {
-	if (/^\$FNC-RECURSION\$$/i.test(tok)) return true;
-	const def = tokens?.[tok];
-	return typeof def === "string" && stripRefs(def).trim() === "$FNC-RECURSION$";
-}
-
 export function formatCellHold(
 	raw: string | number | undefined,
 	wrap: string | null,
@@ -226,54 +217,6 @@ export function formatCellHold(
 	if (wrap) inner = `{{${wrap}|${inner}}}`;
 	if (recursion && recToken && !inner.includes(recToken)) inner += recToken;
 	return inner;
-}
-
-export function parseCellHold(
-	text: string,
-	tokens?: Record<string, string>,
-): {
-	inner: string;
-	wrap: string | null;
-	recursion: boolean;
-	recursionOnly: boolean;
-	recToken: string | null;
-} {
-	let s = text.trim();
-	const lone = s.match(/^(\$[A-Za-z0-9_-]+\$)$/);
-	if (lone && isRecursionTag(lone[1], tokens))
-		return {
-			inner: lone[1],
-			wrap: null,
-			recursion: false,
-			recursionOnly: true,
-			recToken: lone[1],
-		};
-	let recursion = false;
-	let recToken: string | null = null;
-	s = s
-		.replace(/(\$[A-Za-z0-9_-]+\$)\s*$/, (m, tok: string, offset: number) => {
-			if (offset === 0 || !isRecursionTag(tok, tokens)) return m;
-			recursion = true;
-			recToken = tok;
-			return "";
-		})
-		.trim();
-	const wrap = s.match(/^\{\{\s*([^|{}]+)\s*\|\s*([\s\S]*?)\s*\}\}$/);
-	if (wrap)
-		return {
-			inner: wrap[2].trim(),
-			wrap: wrap[1].trim(),
-			recursion,
-			recursionOnly: false,
-			recToken,
-		};
-	return {
-		inner: s,
-		wrap: null,
-		recursion,
-		recursionOnly: false,
-		recToken,
-	};
 }
 
 const QUALIFIED_NAME_RE = /\b[A-Za-z][A-Za-z0-9_ ]*\.[A-Za-z0-9_ ]+/g;

@@ -12,6 +12,7 @@ export interface TableData {
 	recursionOnlyCells: string[][];
 	recursionTokens: Record<string, string>[];
 	wrapCells: Record<string, string>[];
+	wikiCells: Record<string, string>[];
 	readOnlyColumns: string[];
 	cellFormulaTokens?: Record<string, Record<string, string>>;
 	branchSuffix?: string;
@@ -25,7 +26,7 @@ export interface ParsedWikitext {
 /**
  * Factory that precompiles a single regex to replace all vars in one pass.
  */
-function createVariableReplacer(variables: Record<string, string>) {
+export function createVariableReplacer(variables: Record<string, string>) {
 	const keys = Object.keys(variables).sort((a, b) => b.length - a.length);
 	if (keys.length === 0) return (text: string) => text;
 
@@ -276,7 +277,7 @@ function parseTables(
 /**
  * Parses a single table block (from {| to |}) into headers and rows.
  */
-function parseTable(
+export function parseTable(
 	tableContent: string,
 	applyVariables: (text: string) => string,
 ): TableData | null {
@@ -300,6 +301,8 @@ function parseTable(
 	let currentRecursionTokens: Record<string, string> = {};
 	const wrapCells: Record<string, string>[] = [];
 	let currentWrap: Record<string, string> = {};
+	const wikiCells: Record<string, string>[] = [];
+	let currentWiki: Record<string, string> = {};
 
 	const cleanCell = (val: string, header?: string): string | number => {
 		val = val.trim();
@@ -345,6 +348,7 @@ function parseTable(
 				recursionOnlyCells.push(currentRecursionOnly);
 				recursionTokens.push(currentRecursionTokens);
 				wrapCells.push(currentWrap);
+				wikiCells.push(currentWiki);
 			}
 			currentRow = {};
 			currentMoney = [];
@@ -352,6 +356,7 @@ function parseTable(
 			currentRecursionOnly = [];
 			currentRecursionTokens = {};
 			currentWrap = {};
+			currentWiki = {};
 			colIdx = 0;
 			continue;
 		}
@@ -370,6 +375,7 @@ function parseTable(
 			for (let part of line.substring(1).split("||")) {
 				const header = headers[colIdx];
 				if (header) {
+					currentWiki[header] = part.trim();
 					let hasRecursion = false;
 					let isOnlyRecursion = false;
 					let recTok = "";
@@ -414,6 +420,7 @@ function parseTable(
 		recursionOnlyCells.push(currentRecursionOnly);
 		recursionTokens.push(currentRecursionTokens);
 		wrapCells.push(currentWrap);
+		wikiCells.push(currentWiki);
 	}
 	if (headers.length === 0) return null;
 
@@ -427,6 +434,7 @@ function parseTable(
 		recursionOnlyCells,
 		recursionTokens,
 		wrapCells,
+		wikiCells,
 		readOnlyColumns: [],
 	};
 }

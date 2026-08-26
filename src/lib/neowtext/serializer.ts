@@ -13,6 +13,7 @@ interface SkinDataJSON {
 	RecursionOnlyCells?: string[][];
 	RecursionTokens?: Record<string, string>[];
 	WrapCells?: Record<string, string>[];
+	WikiCells?: Record<string, string>[];
 	Name?: string;
 }
 
@@ -33,10 +34,15 @@ function serializeRow(
 	recursionOnlyHeaders: string[],
 	recursionTokens: Record<string, string>,
 	wraps: Record<string, string>,
+	wiki: Record<string, string>,
 ): string {
 	const parts: string[] = [];
 
 	for (const header of headers) {
+		if (wiki[header] !== undefined) {
+			parts.push(normalizeCellLineBreaks(wiki[header]));
+			continue;
+		}
 		let val = row[header];
 
 		if (val === undefined || val === null) {
@@ -90,6 +96,7 @@ export function serializeTable(data: SkinDataJSON): string {
 		RecursionOnlyCells = [],
 		RecursionTokens = [],
 		WrapCells = [],
+		WikiCells = [],
 		Name = "",
 	} = data;
 	if (!Headers || !RawRows) return "";
@@ -111,6 +118,7 @@ export function serializeTable(data: SkinDataJSON): string {
 		recursionOnly: RecursionOnlyCells[i] ?? [],
 		tokens: RecursionTokens[i] ?? {},
 		wraps: WrapCells[i] ?? {},
+		wiki: WikiCells[i] ?? {},
 	}));
 	const sorted = rowsAreLevelSorted(RawRows)
 		? paired
@@ -118,10 +126,10 @@ export function serializeTable(data: SkinDataJSON): string {
 				(a, b) => Number(a.row["Level"]) - Number(b.row["Level"]),
 			);
 
-	for (const { row, recursion, recursionOnly, tokens, wraps } of sorted) {
+	for (const { row, recursion, recursionOnly, tokens, wraps, wiki } of sorted) {
 		lines.push("|-");
 		lines.push(
-			serializeRow(row, Headers, recursion, recursionOnly, tokens, wraps),
+			serializeRow(row, Headers, recursion, recursionOnly, tokens, wraps, wiki),
 		);
 	}
 

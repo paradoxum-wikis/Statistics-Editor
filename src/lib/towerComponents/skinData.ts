@@ -53,6 +53,7 @@ class SkinData {
 	recursionOnlyCells: string[][] = [];
 	recursionTokens: Record<string, string>[] = [];
 	wrapCells: Record<string, string>[] = [];
+	wikiCells: Record<string, string>[] = [];
 	extraTables: TableData[] = [];
 	tableCache: TableCache = {};
 	primaryTableIndex: number = 0;
@@ -171,6 +172,10 @@ class SkinData {
 
 		if (this.data.WrapCells && Array.isArray(this.data.WrapCells)) {
 			this.wrapCells = this.data.WrapCells;
+		}
+
+		if (this.data.WikiCells && Array.isArray(this.data.WikiCells)) {
+			this.wikiCells = this.data.WikiCells;
 		}
 
 		if (this.data.ExtraTables && Array.isArray(this.data.ExtraTables)) {
@@ -495,11 +500,10 @@ class SkinData {
 			this.upgrades[level - 1].set(attribute, value);
 		}
 
-		// sync the edited value into `rawRows` and recompute any derived columns
-		// such as DPS, then rebuild Levels so dependent cells update
 		if (this.rawRows?.[level] && typeof this.rawRows[level] === "object") {
 			this.rawRows[level][attribute] = value;
 		}
+		if (this.wikiCells[level]) delete this.wikiCells[level][attribute];
 		this.refreshDerivedData();
 	}
 

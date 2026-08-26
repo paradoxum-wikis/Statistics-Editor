@@ -28,8 +28,7 @@
 		toDisplayNumber,
 	} from "$lib/utils/format";
 	import { getTargetSkins } from "$lib/utils/towah";
-	import { parseCellHold } from "$lib/cellInspect";
-	import { wikiTemplateKey } from "$lib/wikiTemplates";
+	import { cftFromRows, rewriteCell } from "$lib/neowtext/tableCell";
 	import TowerDataTable from "./table/TowerDataTable.svelte";
 	import {
 		buildSkinRefState,
@@ -160,6 +159,8 @@
 		}
 
 		row[header] = stored as string | number;
+		if (extraTable.wikiCells?.[rowIdx])
+			delete extraTable.wikiCells[rowIdx][header];
 
 		const level = skinData.upgradeLevelForExtraTableCell(
 			extraTableIndex,
@@ -213,60 +214,45 @@
 		});
 	}
 
-	function setRowFlag(
-		rows: string[][],
-		rowIdx: number,
-		header: string,
-		on: boolean,
-	) {
-		while (rows.length <= rowIdx) rows.push([]);
-		const row = rows[rowIdx];
-		const i = row.indexOf(header);
-		if (on && i < 0) row.push(header);
-		if (!on && i >= 0) row.splice(i, 1);
-	}
-
 	function flagLists(skin: SkinData, config: TableConfig) {
 		const extraIdx = config.sourceExtraTableIndex ?? -1;
 		if (extraIdx >= 0) {
 			const table = skin.extraTables[extraIdx];
-			if (table) {
-				table.moneyCells ??= [];
-				table.recursionCells ??= [];
-				table.recursionOnlyCells ??= [];
-				table.recursionTokens ??= [];
-				table.wrapCells ??= [];
-				return {
-					money: table.moneyCells,
-					recursion: table.recursionCells,
-					recursionOnly: table.recursionOnlyCells,
-					tokens: table.recursionTokens,
-					wraps: table.wrapCells,
-				};
-			}
+			if (!table) return null;
+			table.moneyCells ??= [];
+			table.recursionCells ??= [];
+			table.recursionOnlyCells ??= [];
+			table.recursionTokens ??= [];
+			table.wrapCells ??= [];
+			table.wikiCells ??= [];
+			table.cellFormulaTokens ??= {};
+			return {
+				money: table.moneyCells,
+				recursion: table.recursionCells,
+				recursionOnly: table.recursionOnlyCells,
+				tokens: table.recursionTokens,
+				wraps: table.wrapCells,
+				wiki: table.wikiCells,
+				cft: table.cellFormulaTokens,
+				rows: table.rows,
+			};
 		}
 		skin.recursionCells ??= [];
 		skin.recursionOnlyCells ??= [];
 		skin.recursionTokens ??= [];
 		skin.wrapCells ??= [];
+		skin.wikiCells ??= [];
+		skin.cellFormulaTokens ??= {};
 		return {
 			money: skin.moneyCells,
 			recursion: skin.recursionCells,
 			recursionOnly: skin.recursionOnlyCells,
 			tokens: skin.recursionTokens,
 			wraps: skin.wrapCells,
+			wiki: skin.wikiCells,
+			cft: skin.cellFormulaTokens,
+			rows: skin.rawRows,
 		};
-	}
-
-	function setRowToken(
-		rows: Record<string, string>[],
-		rowIdx: number,
-		header: string,
-		tok: string | null,
-	) {
-		while (rows.length <= rowIdx) rows.push({});
-		if (tok) rows[rowIdx][header] = tok;
-		else delete rows[rowIdx][header];
 	}
 
 	function writeCellHold(
@@ -275,37 +261,47 @@
 		header: string,
 		text: string,
 	) {
-		if (disabled) return;
+		if (disabled || !tower) return;
 		const skin = activeSkinData?.skin;
-		const parsed = parseCellHold(text, skin?.formulaTokens);
-		if (tower && skin) {
-			for (const target of getTargetSkins(tower, skin)) {
-				const { money, recursion, recursionOnly, tokens, wraps } = flagLists(
-					target,
-					config,
-				);
-				setRowFlag(
-					money,
-					rowIdx,
-					header,
-					wikiTemplateKey(parsed.wrap) === "Money",
-				);
-				setRowFlag(
-					recursion,
-					rowIdx,
-					header,
-					parsed.recursion || parsed.recursionOnly,
-				);
-				setRowFlag(recursionOnly, rowIdx, header, parsed.recursionOnly);
-				setRowToken(tokens, rowIdx, header, parsed.recToken);
-				setRowToken(wraps, rowIdx, header, parsed.wrap);
-			}
+		if (!skin) return;
+		const extraIdx = config.sourceExtraTableIndex ?? -1;
+		const put = <T,>(dst: T[], src: T[]) => {
+			dst.length = 0;
+			dst.push(...src);
+		};
+		for (const target of getTargetSkins(tower, skin)) {
+			const lists = flagLists(target, config);
+			if (!lists) continue;
+			const parsed = rewriteCell(
+				{
+					name: extraIdx >= 0 ? config.tableName : target.tableName,
+					headers: extraIdx >= 0 ? config.headers : target.headers,
+					rawHeaders: extraIdx >= 0 ? config.rawHeaders : target.rawHeaders,
+					rows: lists.rows,
+					wrapCells: lists.wraps,
+					wikiCells: lists.wiki,
+					recursionCells: lists.recursion,
+					recursionOnlyCells: lists.recursionOnly,
+					recursionTokens: lists.tokens,
+					cellFormulaTokens: lists.cft,
+				},
+				rowIdx,
+				header,
+				text,
+				target.formulaTokens,
+			);
+			put(lists.rows, parsed.rows);
+			put(lists.wraps, parsed.wrapCells);
+			put(lists.recursion, parsed.recursionCells);
+			put(lists.recursionOnly, parsed.recursionOnlyCells);
+			put(lists.tokens, parsed.recursionTokens);
+			put(lists.money, parsed.moneyCells);
+			put(lists.wiki, parsed.wikiCells);
+			for (const k of Object.keys(lists.cft)) delete lists.cft[k];
+			Object.assign(lists.cft, cftFromRows(parsed.rows));
+			target.refreshDerivedData();
 		}
-		if (parsed.recursionOnly) {
-			towerStore.markDirty();
-			return;
-		}
-		commitEdit(config, rowIdx, header, parsed.inner);
+		towerStore.markDirty();
 	}
 
 	function writeArraySlot(key: string, idx: number, value: string) {

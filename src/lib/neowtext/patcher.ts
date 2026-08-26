@@ -43,6 +43,7 @@ export function patchWikitext(sourceWikitext: string, tower: Tower): string {
 			RecursionOnlyCells: skin.recursionOnlyCells,
 			RecursionTokens: skin.recursionTokens,
 			WrapCells: skin.wrapCells,
+			WikiCells: skin.wikiCells,
 			Name: skin.tableName || "",
 		});
 
@@ -245,6 +246,7 @@ function serializeExtraTable(
 			RecursionOnlyCells: table.recursionOnlyCells,
 			RecursionTokens: table.recursionTokens,
 			WrapCells: table.wrapCells,
+			WikiCells: table.wikiCells,
 			Name: table.name || "",
 		});
 	}
@@ -261,6 +263,10 @@ function serializeExtraTable(
 		RawRows: rows,
 		MoneyCells: table.moneyCells,
 		RecursionCells: table.recursionCells,
+		RecursionOnlyCells: table.recursionOnlyCells,
+		RecursionTokens: table.recursionTokens,
+		WrapCells: table.wrapCells,
+		WikiCells: table.wikiCells,
 		Name: table.name || "",
 	});
 }
