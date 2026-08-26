@@ -10,6 +10,7 @@ import {
 	formatNumber,
 	formatReadOnly,
 	getRofBugVer,
+	isCellFormulaSource,
 	isEditableRefSuffixCell,
 	stripRefOnlyVarSuffix,
 	stripRefs,
@@ -619,8 +620,7 @@ export function isCellEditable(
 	if (typeof formula !== "string") return true;
 	const tokens = formulaTokens(config);
 	if (isEditableRefSuffixCell(formula, tokens)) return true;
-	const stripped = stripRefs(formula).trim();
-	return !/\$[^$]+\$/.test(stripped) && !/^{{#expr:/i.test(stripped);
+	return !isCellFormulaSource(formula);
 }
 
 export function extractRefEntries(

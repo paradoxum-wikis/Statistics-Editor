@@ -8,7 +8,12 @@
 	import Separator from "./smol/Separator.svelte";
 	import { towerStore } from "$lib/stores/tower.svelte";
 	import { settingsStore } from "$lib/stores/settings.svelte";
-	import { applyRofBug, toNumericValue, getRofBugVer } from "$lib/utils/format";
+	import {
+		applyRofBug,
+		getRofBugVer,
+		isCellFormulaSource,
+		toNumericValue,
+	} from "$lib/utils/format";
 	import { schemaIndexToLevel } from "$lib/neowtext/functions/schema";
 	import { untrack } from "svelte";
 
@@ -190,7 +195,7 @@
 		const formulaStats: Record<string, true> = {};
 		for (const rec of Object.values(skin.cellFormulaTokens ?? {})) {
 			for (const [k, v] of Object.entries(rec)) {
-				if (/\$[^$]+\$/.test(v) || /^{{#expr:/i.test(v)) formulaStats[k] = true;
+				if (isCellFormulaSource(v)) formulaStats[k] = true;
 			}
 		}
 

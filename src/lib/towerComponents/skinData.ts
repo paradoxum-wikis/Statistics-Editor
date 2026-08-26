@@ -26,6 +26,7 @@ import type { TableData } from "$lib/neowtext/parser";
 import { settingsStore } from "$lib/stores/settings.svelte";
 import {
 	applyRefSuffixEdit,
+	isCellFormulaSource,
 	normalizeColumnKey,
 	stripRefs,
 } from "$lib/utils/format";
@@ -478,14 +479,22 @@ class SkinData {
 				this.formulaTokens,
 				!settingsStore.clearOnEdit || settingsStore.restoreRefOnClearEdit,
 			);
+			this.cellFormulaTokens[levelKey] ??= {};
+			if (this.data.CellFormulaTokens)
+				this.data.CellFormulaTokens[levelKey] ??= {};
 			if (applied) {
-				this.cellFormulaTokens[levelKey] ??= {};
 				this.cellFormulaTokens[levelKey][attribute] = applied.formula;
-				if (this.data.CellFormulaTokens) {
-					this.data.CellFormulaTokens[levelKey] ??= {};
+				if (this.data.CellFormulaTokens)
 					this.data.CellFormulaTokens[levelKey][attribute] = applied.formula;
-				}
 				value = applied.head;
+			} else if (isCellFormulaSource(newValue)) {
+				this.cellFormulaTokens[levelKey][attribute] = newValue;
+				if (this.data.CellFormulaTokens)
+					this.data.CellFormulaTokens[levelKey][attribute] = newValue;
+			} else {
+				delete this.cellFormulaTokens[levelKey][attribute];
+				if (this.data.CellFormulaTokens)
+					delete this.data.CellFormulaTokens[levelKey][attribute];
 			}
 		}
 

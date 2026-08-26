@@ -56,6 +56,12 @@ export function isEditableRefSuffixCell(
 	return parseEditableRefSuffix(value, tokens) !== null;
 }
 
+export function isCellFormulaSource(value: unknown): value is string {
+	if (typeof value !== "string") return false;
+	const s = stripRefs(value).trim();
+	return /\$[^$]+\$/.test(s) || /^{{#expr:/i.test(s);
+}
+
 function refSuffixSource(
 	formulaToken: unknown,
 	previous: unknown,

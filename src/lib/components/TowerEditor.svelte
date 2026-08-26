@@ -24,6 +24,7 @@
 	import { hasSeDiff, mkCellKey } from "$lib/neowtext/directives";
 	import {
 		applyRefSuffixEdit,
+		isCellFormulaSource,
 		stripRefs,
 		toDisplayNumber,
 	} from "$lib/utils/format";
@@ -142,19 +143,24 @@
 
 		const parsedValue = parseEditValue(value);
 		let stored: string | number | boolean = parsedValue;
+		const rowKey = String(rowIdx);
+		extraTable.cellFormulaTokens ??= {};
+		extraTable.cellFormulaTokens[rowKey] ??= {};
 		if (typeof parsedValue !== "boolean") {
 			const applied = applyRefSuffixEdit(
-				extraTable?.cellFormulaTokens?.[String(rowIdx)]?.[header],
+				extraTable.cellFormulaTokens[rowKey][header],
 				row[header],
 				parsedValue,
 				skinData.formulaTokens,
 				!settingsStore.clearOnEdit || settingsStore.restoreRefOnClearEdit,
 			);
 			if (applied) {
-				extraTable.cellFormulaTokens ??= {};
-				extraTable.cellFormulaTokens[String(rowIdx)] ??= {};
-				extraTable.cellFormulaTokens[String(rowIdx)][header] = applied.formula;
+				extraTable.cellFormulaTokens[rowKey][header] = applied.formula;
 				stored = applied.head;
+			} else if (isCellFormulaSource(parsedValue)) {
+				extraTable.cellFormulaTokens[rowKey][header] = parsedValue;
+			} else {
+				delete extraTable.cellFormulaTokens[rowKey][header];
 			}
 		}
 

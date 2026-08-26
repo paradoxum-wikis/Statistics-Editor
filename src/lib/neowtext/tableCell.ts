@@ -1,4 +1,5 @@
 import { formatCellHold } from "$lib/cellInspect";
+import { isCellFormulaSource } from "$lib/utils/format";
 import { createVariableReplacer, parseTable, type TableData } from "./parser";
 import { serializeTable } from "./serializer";
 
@@ -22,8 +23,7 @@ export function cftFromRows(
 	for (let i = 0; i < rows.length; i++) {
 		const rec: Record<string, string> = {};
 		for (const [k, v] of Object.entries(rows[i])) {
-			if (typeof v !== "string") continue;
-			if (/\$[^$]+\$/.test(v) || /^{{#expr:/i.test(v)) rec[k] = v;
+			if (isCellFormulaSource(v)) rec[k] = v;
 		}
 		if (Object.keys(rec).length) cft[String(i)] = rec;
 	}
