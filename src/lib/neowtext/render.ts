@@ -6,6 +6,12 @@ import {
 	isDirectImageUrl,
 	resolveWikiFileUrl,
 } from "$lib/services/imageLoader";
+import { settingsStore } from "$lib/stores/settings.svelte";
+import {
+	formatWikiTemplateNumber,
+	wikiTemplate,
+	wikiTemplateRe,
+} from "$lib/wikiTemplates";
 
 const FANDOM_BASE = "https://tds.fandom.com/wiki/";
 const RE_CHAR_HEX = /(?:&amp;)?&#x([0-9a-fA-F]+);/g;
@@ -347,8 +353,31 @@ function extLinkToAnchor(url: string, label?: string): string {
 	return `<a href="${escapeAttr(url)}" target="_blank" rel="noopener" class="wiki-link">${text}</a>`;
 }
 
+function renderWikiTemplate(name: string, arg: string): string | null {
+	const t = wikiTemplate(name);
+	if (!t) return null;
+
+	let body = arg.trim();
+	if (t.formatNumber && /^-?[\d.,]+$/.test(body)) {
+		const n = Number(body.replace(/,/g, ""));
+		if (Number.isFinite(n)) {
+			body = formatWikiTemplateNumber(n, settingsStore.fullPrecision);
+		}
+	}
+	body = renderInlineWikitext(body);
+	return `<span class="wiki-template" style="--template-color:${escapeAttr(t.color)}"><img class="wiki-template-icon" src="${escapeAttr(t.iconUrl)}" alt="" />${body}${t.suffix ?? ""}</span>`;
+}
+
 function renderInlineWikitext(s: string): string {
-	let out = s
+	let out = s.includes("{{")
+		? s.replace(
+				wikiTemplateRe("g"),
+				(full, name: string, arg: string) =>
+					renderWikiTemplate(name, arg) ?? full,
+			)
+		: s;
+
+	out = out
 		.replace(/'''([^']+?)'''/g, '<span class="font-bold">$1</span>')
 		.replace(/''([^']+?)''/g, '<span class="italic">$1</span>');
 

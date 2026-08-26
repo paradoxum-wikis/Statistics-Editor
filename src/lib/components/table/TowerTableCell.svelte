@@ -72,7 +72,7 @@
 
 {#snippet templatedValue(readOnly: boolean)}
 	<span
-		class={template ? "template-value" : "cell-multiline"}
+		class={template ? "wiki-template" : "cell-multiline"}
 		style:--template-color={template?.color}
 	>
 		{@render cellRefs(readOnly)}{template?.suffix}
@@ -84,7 +84,7 @@
 		<enhanced:img
 			src={icon}
 			alt=""
-			class={["template-icon", editable && "input"]}
+			class={["wiki-template-icon", editable && "input"]}
 		/>
 	{/if}
 
@@ -232,25 +232,7 @@
 		white-space: nowrap;
 	}
 
-	.template-icon {
-		width: 1.1em;
-		height: 1.1em;
-		object-fit: contain;
-		vertical-align: middle;
-		flex-shrink: 0;
-
-		&.input {
-			opacity: 0.75;
-		}
-	}
-
-	.template-value {
-		color: var(--template-color);
-		text-shadow:
-			0 0 0.09375em black,
-			0 0 0.09375em black,
-			0 0 0.09375em black,
-			0 0 0.09375em black,
-			0 0 0.09375em black;
+	.input {
+		opacity: 0.75;
 	}
 </style>

@@ -1,6 +1,8 @@
 import { settingsStore } from "$lib/stores/settings.svelte";
-import { formatNumber } from "$lib/utils/format";
-import { formatsWikiNumber } from "$lib/wikiTemplates";
+import {
+	formatsWikiNumber,
+	formatWikiTemplateNumber,
+} from "$lib/wikiTemplates";
 
 interface TableRow extends Record<string, string | number | boolean | object> {}
 
@@ -15,12 +17,6 @@ interface SkinDataJSON {
 	WrapCells?: Record<string, string>[];
 	WikiCells?: Record<string, string>[];
 	Name?: string;
-}
-
-function formatTemplateNumber(n: number): string {
-	if (settingsStore.fullPrecision) return formatNumber(n);
-	const s = Number.isInteger(n) ? n.toString() : n.toFixed(2);
-	return s.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
 function normalizeCellLineBreaks(value: string): string {
@@ -64,15 +60,16 @@ function serializeRow(
 		if (wrap) {
 			if (formatsWikiNumber(wrap)) {
 				const s = String(val).trim();
+				const full = settingsStore.fullPrecision;
 				const formatted =
 					typeof val === "number"
-						? formatTemplateNumber(val)
+						? formatWikiTemplateNumber(val, full)
 						: s === ""
 							? ""
 							: /[.,]/.test(s)
 								? s
 								: Number.isFinite(+s)
-									? formatTemplateNumber(+s)
+									? formatWikiTemplateNumber(+s, full)
 									: s;
 				strVal = normalizeCellLineBreaks(formatted);
 			}

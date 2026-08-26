@@ -6,8 +6,13 @@ export type WikiTemplate = {
 	color: string;
 	formatNumber: boolean;
 	suffix?: string;
-	icon?: Picture;
+	icon: Picture;
+	iconUrl: string;
 };
+
+export function wikiTemplateRe(flags = "") {
+	return new RegExp(String.raw`{{([^|{}]+)\|([^}]+)}}`, flags);
+}
 
 export const wikiTemplates: Record<string, WikiTemplate> = {
 	Money,
@@ -31,5 +36,16 @@ export function wikiTemplate(name: string | undefined | null) {
 }
 
 export function formatsWikiNumber(name: string | undefined | null) {
-	return wikiTemplate(name)?.formatNumber === true;
+	return !!wikiTemplate(name)?.formatNumber;
+}
+
+export function formatWikiTemplateNumber(
+	n: number,
+	fullPrecision = false,
+): string {
+	if (fullPrecision) {
+		return n.toLocaleString("en-US", { maximumFractionDigits: 10 });
+	}
+	const s = Number.isInteger(n) ? n.toString() : n.toFixed(2);
+	return s.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }

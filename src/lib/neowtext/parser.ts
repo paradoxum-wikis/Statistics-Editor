@@ -1,5 +1,5 @@
 import { stripRefs } from "$lib/utils/format";
-import { wikiTemplateKey } from "$lib/wikiTemplates";
+import { wikiTemplateKey, wikiTemplateRe } from "$lib/wikiTemplates";
 import { stripDirectives } from "./directives";
 
 export interface TableData {
@@ -306,7 +306,7 @@ export function parseTable(
 	const cleanCell = (val: string, header?: string): string | number => {
 		val = val.trim();
 		val = val.replace(/<br\s*\/?>/gi, "\n");
-		const templateMatch = val.match(/{{([^|{}]+)\|([^}]+)}}/);
+		const templateMatch = wikiTemplateRe().exec(val);
 		if (templateMatch) {
 			const name = templateMatch[1].trim();
 			const key = wikiTemplateKey(name);
