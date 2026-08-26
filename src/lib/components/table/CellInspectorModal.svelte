@@ -21,7 +21,6 @@
 
 	let {
 		open = $bindable(false),
-		onOpenChange,
 		config,
 		rowIdx,
 		header,
@@ -36,7 +35,6 @@
 		refTokenRegistry,
 	}: {
 		open?: boolean;
-		onOpenChange?: (open: boolean) => void;
 		config: TableConfig;
 		rowIdx: number;
 		header: string;
@@ -159,7 +157,7 @@
 	const noDelta = { delta: null, className: "", cellClass: "" };
 </script>
 
-<Modal bind:open {onOpenChange} title="Inspector">
+<Modal bind:open title="Inspector">
 	<div class="inspect">
 		<div class="inspect-meta">
 			<table>

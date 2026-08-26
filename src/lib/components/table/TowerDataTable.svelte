@@ -68,10 +68,6 @@
 		inspectOpen = true;
 	}
 
-	function closeInspect(open: boolean) {
-		if (!open) inspected = null;
-	}
-
 	let hoveredCol = $state<number | null>(null);
 
 	const fTokens = $derived(
@@ -224,7 +220,6 @@
 	{@const row = displayRows[inspected.rowIdx]}
 	<CellInspectorModal
 		bind:open={inspectOpen}
-		onOpenChange={closeInspect}
 		{config}
 		rowIdx={inspected.rowIdx}
 		header={inspected.header}
