@@ -26,6 +26,49 @@ export function isNumericArrayBody(raw: string): boolean {
 	return true;
 }
 
+/** Which series indices TOTAL-* includes at `level` with respect to schema. */
+export function seriesIndicesThroughLevel(
+	length: number,
+	level: number | string,
+	tokens: Record<string, string>,
+	branchOverride?: string,
+	branchMap?: Record<string, string>,
+): boolean[] {
+	const out = Array<boolean>(length).fill(false);
+	const numericLevel = parseLevelNumber(level);
+	const branch = branchOverride || parseLevelBranch(level);
+	const resolvedBranch =
+		branch && branchMap ? resolveBranchSpec(branch, branchMap) : branch;
+	const schemaStr = getFncValue(tokens, "SCHEMA");
+
+	if (!schemaStr) {
+		for (let i = 0; i <= numericLevel && i < length; i++) out[i] = true;
+		return out;
+	}
+
+	const schema = schemaStr
+		.split(";")
+		.map((s) => s.trim())
+		.filter(Boolean);
+	const trunkLetter = schema[0] || "N";
+	const targetBranch = resolvedBranch || trunkLetter;
+	let trunkLevel = 0;
+	const branchLevels: Record<string, number> = {};
+
+	for (let i = 0; i < length; i++) {
+		const letter = schema[i] || trunkLetter;
+		if (letter === trunkLetter) {
+			out[i] = targetBranch === trunkLetter ? trunkLevel <= numericLevel : true;
+			trunkLevel++;
+		} else {
+			if (branchLevels[letter] === undefined) branchLevels[letter] = trunkLevel;
+			out[i] = targetBranch === letter && branchLevels[letter] <= numericLevel;
+			branchLevels[letter]++;
+		}
+	}
+	return out;
+}
+
 function sumSeriesThroughLevel(
 	series: string[],
 	level: number | string,
@@ -33,60 +76,19 @@ function sumSeriesThroughLevel(
 	branchOverride?: string,
 	branchMap?: Record<string, string>,
 ): number {
-	const numericLevel = parseLevelNumber(level);
-	const branch = branchOverride || parseLevelBranch(level);
-	const resolvedBranch =
-		branch && branchMap ? resolveBranchSpec(branch, branchMap) : branch;
-
+	const used = seriesIndicesThroughLevel(
+		series.length,
+		level,
+		tokens,
+		branchOverride,
+		branchMap,
+	);
 	let total = 0;
-	const schemaStr = getFncValue(tokens, "SCHEMA");
-
-	if (schemaStr) {
-		const schema = schemaStr
-			.split(";")
-			.map((s) => s.trim())
-			.filter(Boolean);
-		const trunkLetter = schema[0] || "N";
-		const targetBranch = resolvedBranch || trunkLetter;
-
-		let trunkLevel = 0;
-		const branchLevels: Record<string, number> = {};
-
-		for (let i = 0; i < series.length; i++) {
-			const letter = schema[i] || trunkLetter;
-
-			if (letter === trunkLetter) {
-				if (targetBranch === trunkLetter) {
-					if (trunkLevel <= numericLevel) {
-						const num = parseNumeric(series[i]);
-						total += isNaN(num) ? 0 : num;
-					}
-				} else {
-					const num = parseNumeric(series[i]);
-					total += isNaN(num) ? 0 : num;
-				}
-				trunkLevel++;
-			} else {
-				if (branchLevels[letter] === undefined) {
-					branchLevels[letter] = trunkLevel;
-				}
-
-				if (targetBranch === letter) {
-					if (branchLevels[letter] <= numericLevel) {
-						const num = parseNumeric(series[i]);
-						total += isNaN(num) ? 0 : num;
-					}
-				}
-				branchLevels[letter]++;
-			}
-		}
-	} else {
-		for (let i = 0; i <= numericLevel && i < series.length; i++) {
-			const num = parseNumeric(series[i]);
-			total += isNaN(num) ? 0 : num;
-		}
+	for (let i = 0; i < series.length; i++) {
+		if (!used[i]) continue;
+		const num = parseNumeric(series[i]);
+		total += isNaN(num) ? 0 : num;
 	}
-
 	return total;
 }
 

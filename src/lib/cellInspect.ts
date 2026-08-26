@@ -10,7 +10,10 @@ import {
 	resolveBranchSpec,
 	schemaIndexToLevel,
 } from "$lib/neowtext/functions/schema";
-import { isNumericArrayBody } from "$lib/neowtext/functions/total";
+import {
+	isNumericArrayBody,
+	seriesIndicesThroughLevel,
+} from "$lib/neowtext/functions/total";
 import { stripRefs } from "$lib/utils/format";
 
 export type CellVarKind = "array" | "scalar" | "formula" | "ref";
@@ -23,6 +26,7 @@ export type CellVar = {
 	slotLabels?: string[];
 	slot?: number;
 	pin?: string;
+	viaTotal?: boolean;
 	used?: boolean[];
 };
 
@@ -117,6 +121,20 @@ export function tokenInCell(raw: string, token: string): boolean {
 	return new RegExp(`\\$${escapeRe(base)}(?:@[^$]*)?\\$`).test(raw);
 }
 
+function cellUsesArrayToken(
+	raw: string,
+	arrayToken: string,
+	tokens: Record<string, string>,
+): boolean {
+	if (tokenInCell(raw, arrayToken)) return true;
+	for (const m of raw.matchAll(VAR_RE)) {
+		const tok = `$${m[1].split("@")[0]}$`;
+		const def = tokens[tok];
+		if (typeof def === "string" && tokenInCell(def, arrayToken)) return true;
+	}
+	return false;
+}
+
 export function arraySlotUse(
 	v: CellVar,
 	tokens: Record<string, string>,
@@ -134,7 +152,7 @@ export function arraySlotUse(
 		if (slotBranch !== tableBranch) return false;
 		const rowIdx = rowLevels.findIndex((lv) => lv === level);
 		if (rowIdx < 0) return false;
-		return tokenInCell(columnRaws[rowIdx] ?? "", v.token);
+		return cellUsesArrayToken(columnRaws[rowIdx] ?? "", v.token, tokens);
 	});
 }
 
@@ -195,8 +213,10 @@ function collectVars(
 				variantPrefix,
 			);
 			if (pin) v.pin = pin;
-			if (v.kind === "array" && followed && !tokenInCell(text, token))
+			if (v.kind === "array" && followed && !tokenInCell(text, token)) {
 				v.slot = undefined;
+				v.viaTotal = true;
+			}
 			vars.push(v);
 			if (v.kind === "formula") visit(v.def, depth + 1, false);
 		}
@@ -266,9 +286,17 @@ export function inspectCell(
 
 	const expanded = formulaSourceTip(rawValue, tokens);
 	const vars = collectVars(rawValue, tokens, levelVal, variantPrefix);
-	if (ctx?.columnRaws && ctx.rowLevels) {
-		for (const v of vars) {
-			if (v.kind !== "array" || !v.parts) continue;
+	for (const v of vars) {
+		if (v.kind !== "array" || !v.parts) continue;
+		if (v.viaTotal) {
+			v.used = seriesIndicesThroughLevel(
+				v.parts.length,
+				levelVal,
+				tokens,
+				ctx?.branchSuffix || parseLevelBranch(levelVal) || undefined,
+				buildBranchMap(tokens, variantPrefix),
+			);
+		} else if (ctx?.columnRaws && ctx.rowLevels) {
 			v.used = arraySlotUse(
 				v,
 				tokens,

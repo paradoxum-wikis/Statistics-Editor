@@ -7,7 +7,7 @@ export {
 	getCostValue,
 	getEffectiveCostKey,
 } from "./keys";
-export { resolveFNC } from "./total";
+export { resolveFNC, seriesIndicesThroughLevel } from "./total";
 export { resolveToken, type TableCache } from "../resolve";
 export {
 	DETECTION_TYPES,
