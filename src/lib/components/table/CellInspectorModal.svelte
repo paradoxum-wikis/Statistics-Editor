@@ -109,7 +109,8 @@
 	);
 	const inputs = $derived(
 		(inspection?.inputs ?? []).filter(
-			(h) => isCellEditable(config, h) && stripRefs(h) !== stripRefs(header),
+			(h) =>
+				isCellEditable(config, h, rowIdx) && stripRefs(h) !== stripRefs(header),
 		),
 	);
 	const formulas = $derived(

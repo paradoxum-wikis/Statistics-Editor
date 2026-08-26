@@ -10,6 +10,7 @@ import {
 	formatNumber,
 	formatReadOnly,
 	getRofBugVer,
+	isEditableRefSuffixCell,
 	stripRefOnlyVarSuffix,
 	stripRefs,
 	toDisplayNumber,
@@ -35,7 +36,6 @@ export interface TableConfig {
 	recursionTokens?: Record<string, string>[];
 	wrapCells?: Record<string, string>[];
 	wikiCells?: Record<string, string>[];
-	readOnlyColumns: string[];
 	skinData: SkinData | null;
 	formulaTokens?: Record<string, string>;
 	cellFormulaTokens?: Record<string, Record<string, string>>;
@@ -177,7 +177,6 @@ export function buildTableConfigForSkin(
 			recursionTokens: skin.recursionTokens,
 			wrapCells: skin.wrapCells,
 			wikiCells: skin.wikiCells,
-			readOnlyColumns: [],
 			skinData: skin,
 			branchSuffix: undefined,
 			tableCache: skin.tableCache,
@@ -201,7 +200,6 @@ export function buildTableConfigForSkin(
 		recursionTokens: extra.recursionTokens,
 		wrapCells: extra.wrapCells,
 		wikiCells: extra.wikiCells,
-		readOnlyColumns: extra.readOnlyColumns,
 		skinData: null,
 		cellFormulaTokens: extra.cellFormulaTokens,
 		formulaTokens: skin.formulaTokens,
@@ -612,12 +610,17 @@ export function getDeltaForCell(
 	};
 }
 
-export function isCellEditable(config: TableConfig, header: string): boolean {
-	const clean = stripRefs(header);
-	return config.skinData
-		? !config.skinData.readOnlyAttributes.includes(clean) &&
-				(clean !== "Cost" || config.skinData.locator.hasLocation(header))
-		: !config.readOnlyColumns.includes(clean);
+export function isCellEditable(
+	config: TableConfig,
+	header: string,
+	rowIdx: number,
+): boolean {
+	const formula = getCellFormulaToken(config, rowIdx, header);
+	if (typeof formula !== "string") return true;
+	const tokens = formulaTokens(config);
+	if (isEditableRefSuffixCell(formula, tokens)) return true;
+	const stripped = stripRefs(formula).trim();
+	return !/\$[^$]+\$/.test(stripped) && !/^{{#expr:/i.test(stripped);
 }
 
 export function extractRefEntries(

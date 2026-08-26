@@ -46,7 +46,6 @@ class SkinData {
 	rawHeaders: string[] = [];
 	tableName: string = "";
 	rawRows: any[] = [];
-	readOnlyAttributes: string[] = [];
 	isPvp: boolean = false;
 	moneyCells: string[][] = [];
 	recursionCells: string[][] = [];
@@ -130,10 +129,6 @@ class SkinData {
 		}
 		if (this.data.RawRows) {
 			this.rawRows = this.data.RawRows;
-		}
-
-		if (this.data.ReadOnly) {
-			this.readOnlyAttributes = this.data.ReadOnly;
 		}
 
 		if (

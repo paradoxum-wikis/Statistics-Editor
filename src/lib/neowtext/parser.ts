@@ -13,7 +13,6 @@ export interface TableData {
 	recursionTokens: Record<string, string>[];
 	wrapCells: Record<string, string>[];
 	wikiCells: Record<string, string>[];
-	readOnlyColumns: string[];
 	cellFormulaTokens?: Record<string, Record<string, string>>;
 	branchSuffix?: string;
 }
@@ -435,6 +434,5 @@ export function parseTable(
 		recursionTokens,
 		wrapCells,
 		wikiCells,
-		readOnlyColumns: [],
 	};
 }

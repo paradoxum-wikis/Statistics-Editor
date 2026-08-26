@@ -315,7 +315,6 @@ export default class TowerManager {
 			) => {
 				const defaults: any = {};
 				const upgrades: any[] = [];
-				const readOnly = new Set<string>();
 
 				const expandPrimaryRows = (
 					sourceRows: Record<string, string | number>[],
@@ -487,14 +486,6 @@ export default class TowerManager {
 							if (result !== undefined) {
 								cellFormulaTokens[levelKey][key] = ogVal;
 								row[key] = result;
-								const stripped = stripRefs(ogVal).trim();
-								if (
-									!isEditableRefSuffixCell(ogVal, formulaTokens) &&
-									(/\$[^$]+\$/.test(stripped) ||
-										/^{{#expr:.*}}$/i.test(stripped))
-								) {
-									readOnly.add(key);
-								}
 							} else if (isEditableRefSuffixCell(ogVal, formulaTokens)) {
 								cellFormulaTokens[levelKey][key] = ogVal;
 							}
@@ -570,33 +561,11 @@ export default class TowerManager {
 				}
 
 				const resolvedExtraTables = extraTables.map((extra) => {
-					const extraReadOnly = new Set<string>();
-					for (const r of extra.rows) {
-						for (const [k, val] of Object.entries(r)) {
-							if (typeof val !== "string") continue;
-							const stripped = stripRefs(val).trim();
-							if (
-								!isEditableRefSuffixCell(val, formulaTokens) &&
-								(/\$[^$]+\$/.test(stripped) || /^{{#expr:.*}}$/i.test(stripped))
-							) {
-								extraReadOnly.add(k);
-							}
-						}
-					}
-
-					if (extra.headers.includes("Total Price")) {
-						extraReadOnly.add("Total Price");
-					}
-					if (extra.headers.includes("Total Cost")) {
-						extraReadOnly.add("Total Cost");
-					}
-
 					const cellFormulaTokens: Record<string, Record<string, string>> = {};
 					const bSuffix = branchMapping[extra.name.trim()] || "";
 
 					return {
 						...extra,
-						readOnlyColumns: Array.from(extraReadOnly),
 						branchSuffix: bSuffix,
 						cellFormulaTokens,
 						rows: extra.rows.map((row, extraIdx) => {
@@ -731,7 +700,6 @@ export default class TowerManager {
 					RawHeaders: tableData.rawHeaders,
 					TableName: tableData.name || "",
 					RawRows: rows,
-					ReadOnly: Array.from(readOnly),
 					FormulaTokens: formulaTokens,
 					CellFormulaTokens: cellFormulaTokens,
 					IsPvp: isPvp,

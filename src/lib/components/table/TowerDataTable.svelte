@@ -151,7 +151,7 @@
 								{row[header] ?? rowIdx}
 							</td>
 						{:else}
-							{@const editable = isCellEditable(config, header)}
+							{@const editable = isCellEditable(config, header, rowIdx)}
 							{@const wrap = config.wrapCells?.[rowIdx]?.[header] ?? ""}
 							{@const rawValue = getEditableCellRawValue(
 								config,

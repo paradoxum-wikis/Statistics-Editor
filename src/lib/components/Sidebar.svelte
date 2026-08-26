@@ -187,12 +187,12 @@
 		const rofInfo = getRofBugVer(skin?.formulaTokens);
 		const rofCols = new Set(rofInfo.cols);
 
-		const extraReadOnly =
-			skin.extraTables?.flatMap((t: any) => t.readOnlyColumns || []) ?? [];
-		const allReadOnly = new Set([
-			...(skin.readOnlyAttributes || []),
-			...extraReadOnly,
-		]);
+		const formulaStats: Record<string, true> = {};
+		for (const rec of Object.values(skin.cellFormulaTokens ?? {})) {
+			for (const [k, v] of Object.entries(rec)) {
+				if (/\$[^$]+\$/.test(v) || /^{{#expr:/i.test(v)) formulaStats[k] = true;
+			}
+		}
 
 		for (
 			let upgradeIndex = 0;
@@ -213,7 +213,7 @@
 			for (const stat of ownAttributes) {
 				if (["Hidden", "Flying", "Lead"].includes(stat)) continue;
 				if (excludedSummaryStats.has(stat)) continue;
-				if (allReadOnly.has(stat)) continue;
+				if (formulaStats[stat]) continue;
 
 				const fromVal = skin.levels.getCell(fromLevel, stat);
 				const toVal = skin.levels.getCell(toLevel, stat);
