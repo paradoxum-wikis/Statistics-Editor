@@ -7,6 +7,10 @@ export interface TableData {
 	rawHeaders: string[];
 	rows: Record<string, string | number>[];
 	moneyCells: string[][];
+	recursionCells: string[][];
+	recursionOnlyCells: string[][];
+	recursionTokens: Record<string, string>[];
+	wrapCells: Record<string, string>[];
 	readOnlyColumns: string[];
 	cellFormulaTokens?: Record<string, Record<string, string>>;
 	branchSuffix?: string;
@@ -287,14 +291,25 @@ function parseTable(
 
 	const moneyCells: string[][] = [];
 	let currentMoney: string[] = [];
+	const recursionCells: string[][] = [];
+	let currentRecursion: string[] = [];
+	const recursionOnlyCells: string[][] = [];
+	let currentRecursionOnly: string[] = [];
+	const recursionTokens: Record<string, string>[] = [];
+	let currentRecursionTokens: Record<string, string> = {};
+	const wrapCells: Record<string, string>[] = [];
+	let currentWrap: Record<string, string> = {};
 
 	const cleanCell = (val: string, header?: string): string | number => {
 		val = val.trim();
 		val = val.replace(/<br\s*\/?>/gi, "\n");
 		const templateMatch = val.match(/{{([^|{}]+)\|([^}]+)}}/);
 		if (templateMatch) {
-			if (templateMatch[1].trim() === "Money" && header)
-				currentMoney.push(header);
+			const name = templateMatch[1].trim();
+			if (header) {
+				currentWrap[header] = name;
+				if (name === "Money") currentMoney.push(header);
+			}
 			val = templateMatch[2].trim();
 		}
 
@@ -322,9 +337,17 @@ function parseTable(
 			if (Object.keys(currentRow).length > 0) {
 				rows.push(currentRow);
 				moneyCells.push(currentMoney);
+				recursionCells.push(currentRecursion);
+				recursionOnlyCells.push(currentRecursionOnly);
+				recursionTokens.push(currentRecursionTokens);
+				wrapCells.push(currentWrap);
 			}
 			currentRow = {};
 			currentMoney = [];
+			currentRecursion = [];
+			currentRecursionOnly = [];
+			currentRecursionTokens = {};
+			currentWrap = {};
 			colIdx = 0;
 			continue;
 		}
@@ -345,19 +368,24 @@ function parseTable(
 				if (header) {
 					let hasRecursion = false;
 					let isOnlyRecursion = false;
+					let recTok = "";
 					let cleanPart = part;
 
 					const tokens = part.match(/\$[^$\s]+\$/g) || [];
 					for (const t of tokens) {
 						if (applyVariables(t).trim() === "$FNC-RECURSION$") {
 							hasRecursion = true;
+							recTok = t;
 							if (part.trim() === t) isOnlyRecursion = true;
 							cleanPart = cleanPart.replace(t, "");
 						}
 					}
 
 					if (hasRecursion) {
+						currentRecursion.push(header);
+						currentRecursionTokens[header] = recTok;
 						if (isOnlyRecursion && recursionState[colIdx] !== undefined) {
+							currentRecursionOnly.push(header);
 							part = recursionState[colIdx];
 						} else {
 							recursionState[colIdx] = cleanPart;
@@ -378,6 +406,10 @@ function parseTable(
 	if (Object.keys(currentRow).length > 0) {
 		rows.push(currentRow);
 		moneyCells.push(currentMoney);
+		recursionCells.push(currentRecursion);
+		recursionOnlyCells.push(currentRecursionOnly);
+		recursionTokens.push(currentRecursionTokens);
+		wrapCells.push(currentWrap);
 	}
 	if (headers.length === 0) return null;
 
@@ -387,6 +419,10 @@ function parseTable(
 		rawHeaders,
 		rows,
 		moneyCells,
+		recursionCells,
+		recursionOnlyCells,
+		recursionTokens,
+		wrapCells,
 		readOnlyColumns: [],
 	};
 }

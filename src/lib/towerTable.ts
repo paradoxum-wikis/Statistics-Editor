@@ -30,6 +30,10 @@ export interface TableConfig {
 	rawHeaders?: string[];
 	rows: TableRow[];
 	moneyCells: string[][];
+	recursionCells?: string[][];
+	recursionOnlyCells?: string[][];
+	recursionTokens?: Record<string, string>[];
+	wrapCells?: Record<string, string>[];
 	readOnlyColumns: string[];
 	skinData: SkinData | null;
 	formulaTokens?: Record<string, string>;
@@ -167,6 +171,10 @@ export function buildTableConfigForSkin(
 			rawHeaders,
 			rows: skin.levels.levels.slice(0, skin.rawRows.length),
 			moneyCells: skin.moneyCells,
+			recursionCells: skin.recursionCells,
+			recursionOnlyCells: skin.recursionOnlyCells,
+			recursionTokens: skin.recursionTokens,
+			wrapCells: skin.wrapCells,
 			readOnlyColumns: [],
 			skinData: skin,
 			branchSuffix: undefined,
@@ -186,6 +194,10 @@ export function buildTableConfigForSkin(
 		rawHeaders: extra.rawHeaders,
 		rows: [...extra.rows],
 		moneyCells: extra.moneyCells,
+		recursionCells: extra.recursionCells,
+		recursionOnlyCells: extra.recursionOnlyCells,
+		recursionTokens: extra.recursionTokens,
+		wrapCells: extra.wrapCells,
 		readOnlyColumns: extra.readOnlyColumns,
 		skinData: null,
 		cellFormulaTokens: extra.cellFormulaTokens,

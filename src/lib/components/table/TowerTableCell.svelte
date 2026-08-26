@@ -25,6 +25,7 @@
 		resolveContent,
 		refTokenRegistry,
 		commit,
+		onInspect,
 	}: {
 		value: string | number | null | undefined;
 		rawValue: string | number | null | undefined;
@@ -39,6 +40,7 @@
 		resolveContent?: (content: string) => string;
 		refTokenRegistry?: RefTokenRegistry;
 		commit: (value: string) => void;
+		onInspect?: () => void;
 	} = $props();
 
 	let editing = $state(false);
@@ -118,6 +120,18 @@
 				{@render cellRefs(true)}
 			</button>
 		{/if}
+	{:else if onInspect}
+		<button
+			type="button"
+			class="cell-display inspect"
+			{disabled}
+			aria-haspopup="dialog"
+			onclick={onInspect}
+		>
+			<span class={isMoney ? "money-value" : "cell-multiline"}>
+				{@render cellRefs(true)}
+			</span>
+		</button>
 	{:else if isMoney}
 		<span class="money-value">
 			{@render cellRefs(readOnlyValue)}
@@ -194,6 +208,10 @@
 		font: inherit;
 		color: inherit;
 
+		&.inspect {
+			cursor: pointer;
+		}
+
 		&:disabled {
 			cursor: default;
 		}
@@ -205,6 +223,10 @@
 
 	.formula-tip {
 		cursor: help;
+
+		&:has(.inspect) {
+			cursor: pointer;
+		}
 	}
 
 	.delta-text {

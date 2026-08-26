@@ -8,6 +8,10 @@ interface SkinDataJSON {
 	RawHeaders?: string[];
 	RawRows: TableRow[];
 	MoneyCells?: string[][];
+	RecursionCells?: string[][];
+	RecursionOnlyCells?: string[][];
+	RecursionTokens?: Record<string, string>[];
+	WrapCells?: Record<string, string>[];
 	Name?: string;
 }
 
@@ -24,7 +28,10 @@ function normalizeCellLineBreaks(value: string): string {
 function serializeRow(
 	row: TableRow,
 	headers: string[],
-	moneyHeaders: string[],
+	recursionHeaders: string[],
+	recursionOnlyHeaders: string[],
+	recursionTokens: Record<string, string>,
+	wraps: Record<string, string>,
 ): string {
 	const parts: string[] = [];
 
@@ -41,7 +48,13 @@ function serializeRow(
 
 		let strVal = normalizeCellLineBreaks(String(val));
 
-		if (moneyHeaders.includes(header)) {
+		if (recursionOnlyHeaders.includes(header)) {
+			parts.push(recursionTokens[header]);
+			continue;
+		}
+
+		const wrap = wraps[header];
+		if (wrap === "Money") {
 			const s = String(val).trim();
 			const formatted =
 				typeof val === "number"
@@ -54,7 +67,11 @@ function serializeRow(
 								? formatMoneyNumber(+s)
 								: s;
 			strVal = `{{Money|${normalizeCellLineBreaks(formatted)}}}`;
+		} else if (wrap) {
+			strVal = `{{${wrap}|${strVal}}}`;
 		}
+
+		if (recursionHeaders.includes(header)) strVal += recursionTokens[header];
 
 		parts.push(strVal);
 	}
@@ -63,7 +80,16 @@ function serializeRow(
 }
 
 export function serializeTable(data: SkinDataJSON): string {
-	const { Headers, RawHeaders, RawRows, MoneyCells = [], Name = "" } = data;
+	const {
+		Headers,
+		RawHeaders,
+		RawRows,
+		RecursionCells = [],
+		RecursionOnlyCells = [],
+		RecursionTokens = [],
+		WrapCells = [],
+		Name = "",
+	} = data;
 	if (!Headers || !RawRows) return "";
 
 	const lines: string[] = [];
@@ -79,7 +105,10 @@ export function serializeTable(data: SkinDataJSON): string {
 
 	const paired = RawRows.map((row, i) => ({
 		row,
-		money: MoneyCells[i] ?? [],
+		recursion: RecursionCells[i] ?? [],
+		recursionOnly: RecursionOnlyCells[i] ?? [],
+		tokens: RecursionTokens[i] ?? {},
+		wraps: WrapCells[i] ?? {},
 	}));
 	const sorted = rowsAreLevelSorted(RawRows)
 		? paired
@@ -87,9 +116,11 @@ export function serializeTable(data: SkinDataJSON): string {
 				(a, b) => Number(a.row["Level"]) - Number(b.row["Level"]),
 			);
 
-	for (const { row, money } of sorted) {
+	for (const { row, recursion, recursionOnly, tokens, wraps } of sorted) {
 		lines.push("|-");
-		lines.push(serializeRow(row, Headers, money));
+		lines.push(
+			serializeRow(row, Headers, recursion, recursionOnly, tokens, wraps),
+		);
 	}
 
 	lines.push("|}");

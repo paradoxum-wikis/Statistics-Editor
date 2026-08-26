@@ -27,6 +27,8 @@
 		stripRefs,
 		toDisplayNumber,
 	} from "$lib/utils/format";
+	import { getTargetSkins } from "$lib/utils/towah";
+	import { parseCellHold } from "$lib/cellInspect";
 	import TowerDataTable from "./table/TowerDataTable.svelte";
 	import {
 		buildSkinRefState,
@@ -189,6 +191,130 @@
 				key,
 				header === "Level" ? rowIdx : row[header],
 			);
+	}
+
+	function applyVarWrite(apply: (skin: SkinData) => void) {
+		const skin = activeSkinData?.skin;
+		if (!tower || disabled || !skin) return;
+		for (const target of getTargetSkins(tower, skin)) {
+			apply(target);
+			target.refreshDerivedData();
+		}
+		towerStore.markDirty();
+	}
+
+	function writeVar(key: string, value: string) {
+		const v = value.trim();
+		if (!v) return;
+		applyVarWrite((skin) => {
+			skin.formulaTokens[key] = v;
+			if (skin.data?.FormulaTokens) skin.data.FormulaTokens[key] = v;
+		});
+	}
+
+	function setRowFlag(
+		rows: string[][],
+		rowIdx: number,
+		header: string,
+		on: boolean,
+	) {
+		while (rows.length <= rowIdx) rows.push([]);
+		const row = rows[rowIdx];
+		const i = row.indexOf(header);
+		if (on && i < 0) row.push(header);
+		if (!on && i >= 0) row.splice(i, 1);
+	}
+
+	function flagLists(skin: SkinData, config: TableConfig) {
+		const extraIdx = config.sourceExtraTableIndex ?? -1;
+		if (extraIdx >= 0) {
+			const table = skin.extraTables[extraIdx];
+			if (table) {
+				table.moneyCells ??= [];
+				table.recursionCells ??= [];
+				table.recursionOnlyCells ??= [];
+				table.recursionTokens ??= [];
+				table.wrapCells ??= [];
+				return {
+					money: table.moneyCells,
+					recursion: table.recursionCells,
+					recursionOnly: table.recursionOnlyCells,
+					tokens: table.recursionTokens,
+					wraps: table.wrapCells,
+				};
+			}
+		}
+		skin.recursionCells ??= [];
+		skin.recursionOnlyCells ??= [];
+		skin.recursionTokens ??= [];
+		skin.wrapCells ??= [];
+		return {
+			money: skin.moneyCells,
+			recursion: skin.recursionCells,
+			recursionOnly: skin.recursionOnlyCells,
+			tokens: skin.recursionTokens,
+			wraps: skin.wrapCells,
+		};
+	}
+
+	function setRowToken(
+		rows: Record<string, string>[],
+		rowIdx: number,
+		header: string,
+		tok: string | null,
+	) {
+		while (rows.length <= rowIdx) rows.push({});
+		if (tok) rows[rowIdx][header] = tok;
+		else delete rows[rowIdx][header];
+	}
+
+	function writeCellHold(
+		config: TableConfig,
+		rowIdx: number,
+		header: string,
+		text: string,
+	) {
+		if (disabled) return;
+		const skin = activeSkinData?.skin;
+		const parsed = parseCellHold(text, skin?.formulaTokens);
+		if (tower && skin) {
+			for (const target of getTargetSkins(tower, skin)) {
+				const { money, recursion, recursionOnly, tokens, wraps } = flagLists(
+					target,
+					config,
+				);
+				setRowFlag(money, rowIdx, header, parsed.wrap === "Money");
+				setRowFlag(
+					recursion,
+					rowIdx,
+					header,
+					parsed.recursion || parsed.recursionOnly,
+				);
+				setRowFlag(recursionOnly, rowIdx, header, parsed.recursionOnly);
+				setRowToken(tokens, rowIdx, header, parsed.recToken);
+				setRowToken(wraps, rowIdx, header, parsed.wrap);
+			}
+		}
+		if (parsed.recursionOnly) {
+			towerStore.markDirty();
+			return;
+		}
+		commitEdit(config, rowIdx, header, parsed.inner);
+	}
+
+	function writeArraySlot(key: string, idx: number, value: string) {
+		const v = value.trim();
+		if (!v) return;
+		applyVarWrite((skin) => {
+			const parts = (skin.formulaTokens[key] ?? "")
+				.split(";")
+				.map((p) => p.trim());
+			while (parts.length <= idx) parts.push("");
+			parts[idx] = v;
+			const next = parts.join("; ");
+			skin.formulaTokens[key] = next;
+			if (skin.data?.FormulaTokens) skin.data.FormulaTokens[key] = next;
+		});
 	}
 
 	function commitEdit(
@@ -463,6 +589,9 @@
 							refTokenRegistry={skinRefs.registry}
 							getRefNum={getSkinRefNum}
 							commit={commitEdit}
+							{writeVar}
+							{writeArraySlot}
+							writeCell={writeCellHold}
 						/>
 					{/each}
 				{:else}

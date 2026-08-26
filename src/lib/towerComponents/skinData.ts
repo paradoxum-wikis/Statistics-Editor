@@ -49,6 +49,10 @@ class SkinData {
 	readOnlyAttributes: string[] = [];
 	isPvp: boolean = false;
 	moneyCells: string[][] = [];
+	recursionCells: string[][] = [];
+	recursionOnlyCells: string[][] = [];
+	recursionTokens: Record<string, string>[] = [];
+	wrapCells: Record<string, string>[] = [];
 	extraTables: TableData[] = [];
 	tableCache: TableCache = {};
 	primaryTableIndex: number = 0;
@@ -148,6 +152,25 @@ class SkinData {
 
 		if (this.data.MoneyCells && Array.isArray(this.data.MoneyCells)) {
 			this.moneyCells = this.data.MoneyCells;
+		}
+
+		if (this.data.RecursionCells && Array.isArray(this.data.RecursionCells)) {
+			this.recursionCells = this.data.RecursionCells;
+		}
+
+		if (
+			this.data.RecursionOnlyCells &&
+			Array.isArray(this.data.RecursionOnlyCells)
+		) {
+			this.recursionOnlyCells = this.data.RecursionOnlyCells;
+		}
+
+		if (this.data.RecursionTokens && Array.isArray(this.data.RecursionTokens)) {
+			this.recursionTokens = this.data.RecursionTokens;
+		}
+
+		if (this.data.WrapCells && Array.isArray(this.data.WrapCells)) {
+			this.wrapCells = this.data.WrapCells;
 		}
 
 		if (this.data.ExtraTables && Array.isArray(this.data.ExtraTables)) {

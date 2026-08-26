@@ -16,6 +16,7 @@
 	import { settingsStore } from "$lib/stores/settings.svelte";
 	import CellRefs from "./CellRefs.svelte";
 	import TowerTableCell from "./TowerTableCell.svelte";
+	import CellInspectorModal from "./CellInspectorModal.svelte";
 
 	let {
 		config,
@@ -29,6 +30,9 @@
 		refTokenRegistry,
 		getRefNum,
 		commit,
+		writeVar,
+		writeArraySlot,
+		writeCell,
 	}: {
 		config: TableConfig;
 		displayRows: TableRow[];
@@ -46,7 +50,27 @@
 			header: string,
 			value: string,
 		) => void;
+		writeVar: (key: string, value: string) => void;
+		writeArraySlot: (key: string, idx: number, value: string) => void;
+		writeCell: (
+			config: TableConfig,
+			rowIdx: number,
+			header: string,
+			value: string,
+		) => void;
 	} = $props();
+
+	let inspected = $state<{ rowIdx: number; header: string } | null>(null);
+	let inspectOpen = $state(false);
+
+	function openInspect(rowIdx: number, header: string) {
+		inspected = { rowIdx, header };
+		inspectOpen = true;
+	}
+
+	function closeInspect(open: boolean) {
+		if (!open) inspected = null;
+	}
 
 	let hoveredCol = $state<number | null>(null);
 
@@ -184,6 +208,9 @@
 									{resolveContent}
 									{refTokenRegistry}
 									commit={(value) => commit(config, rowIdx, header, value)}
+									onInspect={!editable && formulaSource
+										? () => openInspect(rowIdx, header)
+										: undefined}
 								/>
 							</td>
 						{/if}
@@ -193,6 +220,30 @@
 		</tbody>
 	</table>
 </div>
+
+{#if inspected}
+	{@const row = displayRows[inspected.rowIdx]}
+	<CellInspectorModal
+		bind:open={inspectOpen}
+		onOpenChange={closeInspect}
+		{config}
+		rowIdx={inspected.rowIdx}
+		header={inspected.header}
+		displayRow={row ?? {}}
+		{globalModifier}
+		{disabled}
+		commit={(header, value) => {
+			if (inspected) commit(config, inspected.rowIdx, header, value);
+		}}
+		writeCell={(header, value) => {
+			if (inspected) writeCell(config, inspected.rowIdx, header, value);
+		}}
+		{writeVar}
+		{writeArraySlot}
+		{getRefNum}
+		{refTokenRegistry}
+	/>
+{/if}
 
 <style>
 	.table-container {
@@ -316,7 +367,6 @@
 	.readonly-cell {
 		color: var(--muted-foreground);
 		font-style: italic;
-		cursor: not-allowed;
 	}
 
 	.diff-positive {
