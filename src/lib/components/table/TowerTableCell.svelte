@@ -159,15 +159,9 @@
 		sideOffset={6}
 	>
 		{#snippet children({ props })}
-			{#if template}
-				<div class="cell-flex formula-tip" {...props}>
-					{@render body()}
-				</div>
-			{:else}
-				<span class="formula-tip" {...props}>
-					{@render body()}
-				</span>
-			{/if}
+			<span class="cell-flex formula-tip" {...props}>
+				{@render body()}
+			</span>
 		{/snippet}
 	</Tip>
 {:else if editable || template}
