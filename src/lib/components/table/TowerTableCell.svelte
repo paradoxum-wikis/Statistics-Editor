@@ -1,10 +1,8 @@
 <script lang="ts">
 	import type { Attachment } from "svelte/attachments";
-	import MoneyIcon from "$lib/assets/Income.png?enhanced";
-	import ExpIcon from "$lib/assets/Exp.png?enhanced";
 	import { settingsStore } from "$lib/stores/settings.svelte";
 	import { formatNumber } from "$lib/utils/format";
-	import { wikiTemplate, wikiTemplateKey } from "$lib/wikiTemplates";
+	import { wikiTemplate } from "$lib/wikiTemplates";
 	import {
 		formatDelta,
 		type DeltaInfo,
@@ -12,11 +10,6 @@
 	} from "$lib/towerTable";
 	import CellRefs from "./CellRefs.svelte";
 	import Tip from "../smol/Tip.svelte";
-
-	const templateIcons: Record<string, typeof MoneyIcon> = {
-		Money: MoneyIcon,
-		Exp: ExpIcon,
-	};
 
 	let {
 		value,
@@ -61,7 +54,7 @@
 	);
 
 	const template = $derived(wikiTemplate(wrap));
-	const icon = $derived(templateIcons[wikiTemplateKey(wrap)]);
+	const icon = $derived(template?.icon);
 	const showFormulaTip = $derived(!editable && !!formulaSource);
 	const focusOnMount: Attachment<HTMLElement> = (node) => node.focus();
 </script>
