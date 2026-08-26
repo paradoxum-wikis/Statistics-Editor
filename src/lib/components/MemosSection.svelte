@@ -72,7 +72,7 @@
 				}}
 			>
 				{#if towerStore.editorMemo.trim()}
-					<RenderedHtml html={rendered} block />
+					<RenderedHtml wiki={rendered} block />
 				{:else}
 					<p class="text-sm text-muted-foreground">
 						Have further comments about this tower that you'd like to make

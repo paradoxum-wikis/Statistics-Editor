@@ -806,15 +806,6 @@ h4,
 	}
 }
 
-.wiki-template-icon {
-	display: inline-block;
-	width: 1.1em;
-	height: 1.1em;
-	object-fit: contain;
-	vertical-align: middle;
-	flex-shrink: 0;
-}
-
 .wiki-template {
 	color: var(--template-color);
 	text-shadow:
@@ -824,8 +815,19 @@ h4,
 		0 0 0.09375em black,
 		0 0 0.09375em black;
 
-	> .wiki-template-icon {
+	picture {
+		display: inline-block;
+		width: 1.1em;
+		height: 1.1em;
+		vertical-align: middle;
 		margin-right: 0.15em;
+	}
+
+	.wiki-template-icon {
+		width: 1.1em;
+		height: 1.1em;
+		object-fit: contain;
+		vertical-align: middle;
 	}
 }
 

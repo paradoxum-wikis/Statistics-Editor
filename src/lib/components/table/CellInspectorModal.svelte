@@ -199,7 +199,7 @@
 			<div class="inspect-refs">
 				{#each refs as ref (ref.name ?? ref.content)}
 					<p class="inspect-ref">
-						<RenderedHtml html={renderCellHtml(ref.content, true)} />
+						<RenderedHtml wiki={renderCellHtml(ref.content, true)} />
 					</p>
 				{/each}
 			</div>

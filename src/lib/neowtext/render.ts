@@ -11,6 +11,7 @@ import {
 	formatWikiTemplateNumber,
 	wikiTemplate,
 	wikiTemplateRe,
+	type WikiTemplate,
 } from "$lib/wikiTemplates";
 
 const FANDOM_BASE = "https://tds.fandom.com/wiki/";
@@ -353,6 +354,16 @@ function extLinkToAnchor(url: string, label?: string): string {
 	return `<a href="${escapeAttr(url)}" target="_blank" rel="noopener" class="wiki-link">${text}</a>`;
 }
 
+export type WikiTplSlot = { t: WikiTemplate; body: string };
+
+let tplSlots: WikiTplSlot[] = [];
+
+function collectHtml(fn: () => string): { html: string; slots: WikiTplSlot[] } {
+	tplSlots = [];
+	const html = fn();
+	return { html, slots: tplSlots };
+}
+
 function renderWikiTemplate(name: string, arg: string): string | null {
 	const t = wikiTemplate(name);
 	if (!t) return null;
@@ -365,7 +376,9 @@ function renderWikiTemplate(name: string, arg: string): string | null {
 		}
 	}
 	body = renderInlineWikitext(body);
-	return `<span class="wiki-template" style="--template-color:${escapeAttr(t.color)}"><img class="wiki-template-icon" src="${escapeAttr(t.iconUrl)}" alt="" />${body}${t.suffix ?? ""}</span>`;
+	const i = tplSlots.length;
+	tplSlots.push({ t, body });
+	return `<span data-wiki-tpl="${i}"></span>`;
 }
 
 function renderInlineWikitext(s: string): string {
@@ -684,16 +697,22 @@ function renderPreviewTable(block: string): string {
 export function renderCellHtml(
 	val: string | number | null | undefined,
 	readOnly: boolean,
-): string {
-	return renderInlineWikitext(
-		readOnly ? formatReadOnly(val as any) : formatValue(val as any),
+) {
+	return collectHtml(() =>
+		renderInlineWikitext(
+			readOnly ? formatReadOnly(val as any) : formatValue(val as any),
+		),
 	);
 }
 
 /**
  * Render our current implementation of wikitext.
  */
-export function renderWikitextHtml(text: string): string {
+export function renderWikitextHtml(text: string) {
+	return collectHtml(() => renderWikitextHtmlInner(text));
+}
+
+function renderWikitextHtmlInner(text: string): string {
 	if (!text) return "";
 
 	const source = stripRefs(text);

@@ -7,7 +7,6 @@ export type WikiTemplate = {
 	formatNumber: boolean;
 	suffix?: string;
 	icon: Picture;
-	iconUrl: string;
 };
 
 export function wikiTemplateRe(flags = "") {

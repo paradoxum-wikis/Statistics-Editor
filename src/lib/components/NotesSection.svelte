@@ -19,7 +19,7 @@
 					<span class="text-[0.75em] text-muted-foreground">
 						[{note.num}]
 					</span>
-					<RenderedHtml html={renderCellHtml(note.entry.content, true)} />
+					<RenderedHtml wiki={renderCellHtml(note.entry.content, true)} />
 				</li>
 			{/each}
 		</ol>

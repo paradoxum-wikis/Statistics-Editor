@@ -5,6 +5,7 @@
 	import type { Picture } from "@sveltejs/enhanced-img";
 	import { stripRefs } from "$lib/utils/format";
 	import { renderCellHtml } from "$lib/neowtext/render";
+	import RenderedHtml from "./table/RenderedHtml.svelte";
 	import { towerStore } from "$lib/stores/tower.svelte";
 	import { imageLoader } from "$lib/services/imageLoader";
 	import { settingsStore } from "$lib/stores/settings.svelte";
@@ -200,7 +201,7 @@
 
 					{#if upgradeNames[index]}
 						<div class="upgrade-name">
-							{@html renderCellHtml(upgradeNames[index], true)}
+							<RenderedHtml wiki={renderCellHtml(upgradeNames[index], true)} />
 						</div>
 					{/if}
 
@@ -227,12 +228,11 @@
 
 										<span class="upgrade-summary-text">
 											{#if line.kind === "change"}
-												{@html renderCellHtml(line.stat, true)}: {@html renderCellHtml(
-													line.from,
-													false,
-												)} → {@html renderCellHtml(line.to, false)}
+												<RenderedHtml wiki={renderCellHtml(line.stat, true)} />:
+												<RenderedHtml wiki={renderCellHtml(line.from, false)} /> →
+												<RenderedHtml wiki={renderCellHtml(line.to, false)} />
 											{:else}
-												{@html renderCellHtml(line.stat, true)}
+												<RenderedHtml wiki={renderCellHtml(line.stat, true)} />
 											{/if}
 										</span>
 									</div>

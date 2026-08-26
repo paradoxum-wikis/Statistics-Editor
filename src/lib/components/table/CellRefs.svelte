@@ -85,7 +85,7 @@
 {#each parts as part, i (`${i}:${part.kind}`)}
 	{#if part.kind === "text"}
 		{#if part.text}
-			<RenderedHtml html={renderCellHtml(part.text, readOnly)} />
+			<RenderedHtml wiki={renderCellHtml(part.text, readOnly)} />
 		{/if}
 	{:else}
 		{@const body = part.content.trim()}
@@ -93,7 +93,7 @@
 		{@const n = getRefNum(tip, part.name)}
 		<Tip class="max-w-72!" sideOffset={6}>
 			{#snippet content()}
-				<RenderedHtml html={renderCellHtml(tip, true)} />
+				<RenderedHtml wiki={renderCellHtml(tip, true)} />
 			{/snippet}
 			{#snippet children({ props })}
 				<sup class="ref-sup" {...props}>[{n}]</sup>

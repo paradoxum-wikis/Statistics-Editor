@@ -10,6 +10,7 @@
 	} from "$lib/towerTable";
 	import CellRefs from "./CellRefs.svelte";
 	import Tip from "../smol/Tip.svelte";
+	import WikiTemplate from "$lib/wikiTemplates/WikiTemplate.svelte";
 
 	let {
 		value,
@@ -54,7 +55,6 @@
 	);
 
 	const template = $derived(wikiTemplate(wrap));
-	const icon = $derived(template?.icon);
 	const showFormulaTip = $derived(!editable && !!formulaSource);
 	const focusOnMount: Attachment<HTMLElement> = (node) => node.focus();
 </script>
@@ -70,55 +70,56 @@
 	/>
 {/snippet}
 
+{#snippet editInput()}
+	<input
+		{@attach focusOnMount}
+		type="text"
+		size="1"
+		class="table-input"
+		value={editText}
+		{disabled}
+		onfocus={(e) => {
+			e.currentTarget.dataset.original = e.currentTarget.value;
+			if (settingsStore.clearOnEdit) e.currentTarget.value = "";
+		}}
+		onblur={(e) => {
+			editing = false;
+			const next = e.currentTarget.value;
+			const original = e.currentTarget.dataset.original ?? "";
+			if (next === "") {
+				e.currentTarget.value = original;
+			} else if (next !== original) {
+				commit(next);
+			}
+		}}
+		onkeydown={(e) => {
+			if (e.key === "Enter") e.currentTarget.blur();
+			if (e.key === "Escape") {
+				e.currentTarget.value = e.currentTarget.dataset.original ?? "";
+				editing = false;
+			}
+		}}
+	/>
+{/snippet}
+
 {#snippet templatedValue(readOnly: boolean)}
-	<span
-		class={template ? "wiki-template" : "cell-multiline"}
-		style:--template-color={template?.color}
-	>
-		{@render cellRefs(readOnly)}{template?.suffix}
-	</span>
+	{#if template}
+		<WikiTemplate t={template} faded={editable}>
+			{@render cellRefs(readOnly)}
+		</WikiTemplate>
+	{:else}
+		<span class="cell-multiline">{@render cellRefs(readOnly)}</span>
+	{/if}
 {/snippet}
 
 {#snippet body()}
-	{#if icon}
-		<enhanced:img
-			src={icon}
-			alt=""
-			class={["wiki-template-icon", editable && "input"]}
-		/>
-	{/if}
-
 	{#if editable}
 		{#if editing}
-			<input
-				{@attach focusOnMount}
-				type="text"
-				size="1"
-				class="table-input"
-				value={editText}
-				{disabled}
-				onfocus={(e) => {
-					e.currentTarget.dataset.original = e.currentTarget.value;
-					if (settingsStore.clearOnEdit) e.currentTarget.value = "";
-				}}
-				onblur={(e) => {
-					editing = false;
-					const next = e.currentTarget.value;
-					const original = e.currentTarget.dataset.original ?? "";
-					if (next === "") {
-						e.currentTarget.value = original;
-					} else if (next !== original) {
-						commit(next);
-					}
-				}}
-				onkeydown={(e) => {
-					if (e.key === "Enter") e.currentTarget.blur();
-					if (e.key === "Escape") {
-						e.currentTarget.value = e.currentTarget.dataset.original ?? "";
-						editing = false;
-					}
-				}}
-			/>
+			{#if template}
+				<WikiTemplate t={template} faded>{@render editInput()}</WikiTemplate>
+			{:else}
+				{@render editInput()}
+			{/if}
 		{:else}
 			<button
 				type="button"
@@ -128,7 +129,7 @@
 					editing = true;
 				}}
 			>
-				{@render cellRefs(true)}
+				{@render templatedValue(true)}
 			</button>
 		{/if}
 	{:else if onInspect}
@@ -230,9 +231,5 @@
 		font-size: 0.75rem;
 		line-height: 1rem;
 		white-space: nowrap;
-	}
-
-	.input {
-		opacity: 0.75;
 	}
 </style>
