@@ -1,4 +1,5 @@
 import { stripRefs } from "$lib/utils/format";
+import { wikiTemplateKey } from "$lib/wikiTemplates";
 import { stripDirectives } from "./directives";
 
 export interface TableData {
@@ -306,11 +307,14 @@ function parseTable(
 		const templateMatch = val.match(/{{([^|{}]+)\|([^}]+)}}/);
 		if (templateMatch) {
 			const name = templateMatch[1].trim();
-			if (header) {
-				currentWrap[header] = name;
-				if (name === "Money") currentMoney.push(header);
+			const key = wikiTemplateKey(name);
+			if (key) {
+				if (header) {
+					currentWrap[header] = name;
+					if (key === "Money") currentMoney.push(header);
+				}
+				val = templateMatch[2].trim();
 			}
-			val = templateMatch[2].trim();
 		}
 
 		if (!/\$[^$]+\$/.test(stripRefs(val).trim())) {

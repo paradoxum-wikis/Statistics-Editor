@@ -74,7 +74,6 @@
 		}),
 	);
 	const wrap = $derived(config.wrapCells?.[rowIdx]?.[header] ?? "");
-	const isMoney = $derived(wrap === "Money");
 	const hasRecursion = $derived(
 		config.recursionCells?.[rowIdx]?.includes(header) === true,
 	);
@@ -181,7 +180,7 @@
 								{rawValue}
 								editable={false}
 								{disabled}
-								{isMoney}
+								{wrap}
 								readOnlyValue={true}
 								tokens={fTokens}
 								deltaInfo={noDelta}

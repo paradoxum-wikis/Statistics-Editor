@@ -29,6 +29,7 @@
 	} from "$lib/utils/format";
 	import { getTargetSkins } from "$lib/utils/towah";
 	import { parseCellHold } from "$lib/cellInspect";
+	import { wikiTemplateKey } from "$lib/wikiTemplates";
 	import TowerDataTable from "./table/TowerDataTable.svelte";
 	import {
 		buildSkinRefState,
@@ -283,7 +284,12 @@
 					target,
 					config,
 				);
-				setRowFlag(money, rowIdx, header, parsed.wrap === "Money");
+				setRowFlag(
+					money,
+					rowIdx,
+					header,
+					wikiTemplateKey(parsed.wrap) === "Money",
+				);
 				setRowFlag(
 					recursion,
 					rowIdx,

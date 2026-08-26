@@ -1,8 +1,10 @@
 <script lang="ts">
 	import type { Attachment } from "svelte/attachments";
 	import MoneyIcon from "$lib/assets/Income.png?enhanced";
+	import ExpIcon from "$lib/assets/Exp.png?enhanced";
 	import { settingsStore } from "$lib/stores/settings.svelte";
 	import { formatNumber } from "$lib/utils/format";
+	import { wikiTemplate, wikiTemplateKey } from "$lib/wikiTemplates";
 	import {
 		formatDelta,
 		type DeltaInfo,
@@ -11,12 +13,17 @@
 	import CellRefs from "./CellRefs.svelte";
 	import Tip from "../smol/Tip.svelte";
 
+	const templateIcons: Record<string, typeof MoneyIcon> = {
+		Money: MoneyIcon,
+		Exp: ExpIcon,
+	};
+
 	let {
 		value,
 		rawValue,
 		editable,
 		disabled,
-		isMoney,
+		wrap = "",
 		readOnlyValue,
 		formulaSource = null,
 		tokens = {},
@@ -31,7 +38,7 @@
 		rawValue: string | number | null | undefined;
 		editable: boolean;
 		disabled: boolean;
-		isMoney: boolean;
+		wrap?: string;
 		readOnlyValue: boolean;
 		formulaSource?: string | null;
 		tokens?: Record<string, string>;
@@ -53,6 +60,8 @@
 				: String(rawValue),
 	);
 
+	const template = $derived(wikiTemplate(wrap));
+	const icon = $derived(templateIcons[wikiTemplateKey(wrap)]);
 	const showFormulaTip = $derived(!editable && !!formulaSource);
 	const focusOnMount: Attachment<HTMLElement> = (node) => node.focus();
 </script>
@@ -68,12 +77,21 @@
 	/>
 {/snippet}
 
+{#snippet templatedValue(readOnly: boolean)}
+	<span
+		class={template ? "template-value" : "cell-multiline"}
+		style:--template-color={template?.color}
+	>
+		{@render cellRefs(readOnly)}{template?.suffix}
+	</span>
+{/snippet}
+
 {#snippet body()}
-	{#if isMoney}
+	{#if icon}
 		<enhanced:img
-			src={MoneyIcon}
+			src={icon}
 			alt=""
-			class="money-icon {editable ? 'money-icon-input' : ''}"
+			class={["template-icon", editable && "input"]}
 		/>
 	{/if}
 
@@ -128,18 +146,10 @@
 			aria-haspopup="dialog"
 			onclick={onInspect}
 		>
-			<span class={isMoney ? "money-value" : "cell-multiline"}>
-				{@render cellRefs(true)}
-			</span>
+			{@render templatedValue(true)}
 		</button>
-	{:else if isMoney}
-		<span class="money-value">
-			{@render cellRefs(readOnlyValue)}
-		</span>
 	{:else}
-		<span class="cell-multiline">
-			{@render cellRefs(readOnlyValue)}
-		</span>
+		{@render templatedValue(readOnlyValue)}
 	{/if}
 
 	{#if deltaInfo.delta !== null && deltaInfo.delta !== 0}
@@ -156,7 +166,7 @@
 		sideOffset={6}
 	>
 		{#snippet children({ props })}
-			{#if isMoney}
+			{#if template}
 				<div class="cell-flex formula-tip" {...props}>
 					{@render body()}
 				</div>
@@ -167,7 +177,7 @@
 			{/if}
 		{/snippet}
 	</Tip>
-{:else if editable || isMoney}
+{:else if editable || template}
 	<div class="cell-flex">
 		{@render body()}
 	</div>
@@ -235,21 +245,20 @@
 		white-space: nowrap;
 	}
 
-	.money-icon {
+	.template-icon {
 		width: 1.1em;
 		height: 1.1em;
 		object-fit: contain;
 		vertical-align: middle;
-		display: inline;
 		flex-shrink: 0;
+
+		&.input {
+			opacity: 0.75;
+		}
 	}
 
-	.money-icon-input {
-		opacity: 0.75;
-	}
-
-	.money-value {
-		color: #44e500;
+	.template-value {
+		color: var(--template-color);
 		text-shadow:
 			0 0 0.09375em black,
 			0 0 0.09375em black,

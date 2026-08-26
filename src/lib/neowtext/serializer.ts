@@ -1,5 +1,6 @@
 import { settingsStore } from "$lib/stores/settings.svelte";
 import { formatNumber } from "$lib/utils/format";
+import { formatsWikiNumber } from "$lib/wikiTemplates";
 
 interface TableRow extends Record<string, string | number | boolean | object> {}
 
@@ -15,7 +16,7 @@ interface SkinDataJSON {
 	Name?: string;
 }
 
-function formatMoneyNumber(n: number): string {
+function formatTemplateNumber(n: number): string {
 	if (settingsStore.fullPrecision) return formatNumber(n);
 	const s = Number.isInteger(n) ? n.toString() : n.toFixed(2);
 	return s.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -54,20 +55,21 @@ function serializeRow(
 		}
 
 		const wrap = wraps[header];
-		if (wrap === "Money") {
-			const s = String(val).trim();
-			const formatted =
-				typeof val === "number"
-					? formatMoneyNumber(val)
-					: s === ""
-						? ""
-						: /[.,]/.test(s)
-							? s
-							: Number.isFinite(+s)
-								? formatMoneyNumber(+s)
-								: s;
-			strVal = `{{Money|${normalizeCellLineBreaks(formatted)}}}`;
-		} else if (wrap) {
+		if (wrap) {
+			if (formatsWikiNumber(wrap)) {
+				const s = String(val).trim();
+				const formatted =
+					typeof val === "number"
+						? formatTemplateNumber(val)
+						: s === ""
+							? ""
+							: /[.,]/.test(s)
+								? s
+								: Number.isFinite(+s)
+									? formatTemplateNumber(+s)
+									: s;
+				strVal = normalizeCellLineBreaks(formatted);
+			}
 			strVal = `{{${wrap}|${strVal}}}`;
 		}
 

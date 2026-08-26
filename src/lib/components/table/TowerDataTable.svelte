@@ -156,8 +156,7 @@
 							</td>
 						{:else}
 							{@const editable = isCellEditable(config, header)}
-							{@const isMoney =
-								config.moneyCells?.[rowIdx]?.includes(header) === true}
+							{@const wrap = config.wrapCells?.[rowIdx]?.[header] ?? ""}
 							{@const rawValue = getEditableCellRawValue(
 								config,
 								rowIdx,
@@ -199,7 +198,7 @@
 									{rawValue}
 									{editable}
 									{disabled}
-									{isMoney}
+									{wrap}
 									readOnlyValue={!editable}
 									{formulaSource}
 									tokens={fTokens}
