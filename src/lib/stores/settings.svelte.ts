@@ -10,7 +10,7 @@ import {
 	DecimalsArrowRight,
 	Skull,
 	SquareDashedBottom,
-	Superscript,
+	MopSparkles,
 	Rows3,
 	Keyboard,
 } from "@lucide/svelte";
@@ -60,10 +60,10 @@ const SETTING_DEFS: Record<BooleanSettingKey, BooleanSettingDef> = {
 		default: true,
 		id: "restore-ref-on-clear-edit",
 		tab: "editor",
-		icon: Superscript,
-		label: "Restore Reference Suffixes",
+		icon: MopSparkles,
+		label: "Smart Cell Edit",
 		description:
-			"Re-appends cell references automatically when you save a cleared cell.",
+			"Puts templates and references back when you save a cleared cell.",
 		dependsOn: "clearOnEdit",
 	},
 	rofBug: {

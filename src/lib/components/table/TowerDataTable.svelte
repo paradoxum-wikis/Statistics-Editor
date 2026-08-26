@@ -14,6 +14,7 @@
 		type TableRow,
 	} from "$lib/towerTable";
 	import { settingsStore } from "$lib/stores/settings.svelte";
+	import { formatCellHold } from "$lib/cellInspect";
 	import CellRefs from "./CellRefs.svelte";
 	import TowerTableCell from "./TowerTableCell.svelte";
 	import CellInspectorModal from "./CellInspectorModal.svelte";
@@ -158,6 +159,18 @@
 								rowIdx,
 								header,
 							)}
+							{@const rec =
+								config.recursionCells?.[rowIdx]?.includes(header) === true}
+							{@const recOnly =
+								config.recursionOnlyCells?.[rowIdx]?.includes(header) === true}
+							{@const recTok = config.recursionTokens?.[rowIdx]?.[header] ?? ""}
+							{@const hold = formatCellHold(
+								rawValue,
+								wrap || null,
+								rec,
+								recOnly,
+								recTok,
+							)}
 							{@const formulaSource = editable
 								? null
 								: formulaSourceTip(rawValue, fTokens)}
@@ -192,6 +205,7 @@
 										fTokens,
 									)}
 									{rawValue}
+									{hold}
 									{editable}
 									{disabled}
 									{wrap}

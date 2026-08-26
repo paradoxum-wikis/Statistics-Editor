@@ -15,6 +15,7 @@ import {
 	seriesIndicesThroughLevel,
 } from "$lib/neowtext/functions/total";
 import { stripRefs } from "$lib/utils/format";
+import { wikiTemplateKey, wikiTemplateRe } from "$lib/wikiTemplates";
 
 export type CellVarKind = "array" | "scalar" | "formula" | "ref";
 
@@ -236,6 +237,48 @@ export function formatCellHold(
 	if (wrap) inner = `{{${wrap}|${inner}}}`;
 	if (recursion && recToken && !inner.includes(recToken)) inner += recToken;
 	return inner;
+}
+
+export function parseCellHold(text: string): {
+	wrap: string | null;
+	inner: string;
+} {
+	const s = text.trim();
+	const m = wikiTemplateRe().exec(s);
+	if (!m || m.index !== 0) return { wrap: null, inner: s };
+	const name = m[1].trim();
+	if (!wikiTemplateKey(name)) return { wrap: null, inner: s };
+	return { wrap: name, inner: m[2].trim() + s.slice(m[0].length) };
+}
+
+export function resolveEditHold(
+	text: string,
+	prevWrap: string | null | undefined,
+	restoreWrap: boolean,
+): { wrap: string | null; inner: string } {
+	const parsed = parseCellHold(text);
+	if (parsed.wrap || !restoreWrap || !prevWrap) return parsed;
+	return { wrap: prevWrap, inner: parsed.inner };
+}
+
+export function applyCellWrap(
+	wrapCells: Record<string, string>[],
+	moneyCells: string[][] | undefined,
+	rowIdx: number,
+	header: string,
+	wrap: string | null,
+) {
+	while (wrapCells.length <= rowIdx) wrapCells.push({});
+	if (wrap) wrapCells[rowIdx][header] = wrap;
+	else delete wrapCells[rowIdx][header];
+
+	if (!moneyCells) return;
+	while (moneyCells.length <= rowIdx) moneyCells.push([]);
+	const list = moneyCells[rowIdx];
+	const i = list.indexOf(header);
+	if (wikiTemplateKey(wrap) === "Money") {
+		if (i < 0) list.push(header);
+	} else if (i >= 0) list.splice(i, 1);
 }
 
 const QUALIFIED_NAME_RE = /\b[A-Za-z][A-Za-z0-9_ ]*\.[A-Za-z0-9_ ]+/g;

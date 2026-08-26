@@ -15,6 +15,7 @@
 	let {
 		value,
 		rawValue,
+		hold,
 		editable,
 		disabled,
 		wrap = "",
@@ -30,6 +31,7 @@
 	}: {
 		value: string | number | null | undefined;
 		rawValue: string | number | null | undefined;
+		hold?: string;
 		editable: boolean;
 		disabled: boolean;
 		wrap?: string;
@@ -47,11 +49,13 @@
 	let editing = $state(false);
 
 	const editText = $derived(
-		rawValue === undefined || rawValue === null
-			? ""
-			: typeof rawValue === "number"
-				? formatNumber(rawValue)
-				: String(rawValue),
+		hold != null
+			? hold
+			: rawValue === undefined || rawValue === null
+				? ""
+				: typeof rawValue === "number"
+					? formatNumber(rawValue)
+					: String(rawValue),
 	);
 
 	const template = $derived(wikiTemplate(wrap));
@@ -116,10 +120,13 @@
 	{#if editable}
 		{#if editing}
 			{#if template}
-				<WikiTemplate t={template} faded>{@render editInput()}</WikiTemplate>
-			{:else}
-				{@render editInput()}
+				<enhanced:img
+					src={template.icon}
+					alt=""
+					class="wiki-template-icon opacity-75"
+				/>
 			{/if}
+			{@render editInput()}
 		{:else}
 			<button
 				type="button"

@@ -30,6 +30,7 @@
 	} from "$lib/utils/format";
 	import { getTargetSkins } from "$lib/utils/towah";
 	import { cftFromRows, rewriteCell } from "$lib/neowtext/tableCell";
+	import { applyCellWrap, resolveEditHold } from "$lib/cellInspect";
 	import TowerDataTable from "./table/TowerDataTable.svelte";
 	import {
 		buildSkinRefState,
@@ -112,6 +113,23 @@
 		return value.trim() !== "" && !isNaN(Number(value)) ? Number(value) : value;
 	}
 
+	function restoreClearedWrap() {
+		return settingsStore.clearOnEdit && settingsStore.restoreRefOnClearEdit;
+	}
+
+	function commitHold(
+		wrapCells: Record<string, string>[] | undefined,
+		moneyCells: string[][] | undefined,
+		rowIdx: number,
+		header: string,
+		text: string,
+	) {
+		const prev = wrapCells?.[rowIdx]?.[header];
+		const { wrap, inner } = resolveEditHold(text, prev, restoreClearedWrap());
+		if (wrapCells) applyCellWrap(wrapCells, moneyCells, rowIdx, header, wrap);
+		return inner;
+	}
+
 	function updateStatForSkin(
 		skinData: SkinData,
 		levelIndex: number,
@@ -119,7 +137,14 @@
 		value: string,
 	) {
 		if (disabled) return;
-		const parsedValue = parseEditValue(value);
+		const inner = commitHold(
+			skinData.wrapCells,
+			skinData.moneyCells,
+			levelIndex,
+			attribute,
+			value,
+		);
+		const parsedValue = parseEditValue(inner);
 		if (settingsStore.debugMode) {
 			console.log(
 				`[TowerEditor] updateStat: Level ${levelIndex}, ${attribute} = ${parsedValue}`,
@@ -140,8 +165,17 @@
 		const extraTable = skinData.extraTables?.[extraTableIndex];
 		const row = extraTable?.rows?.[rowIdx];
 		if (!row) return;
+		extraTable.wrapCells ??= [];
+		extraTable.moneyCells ??= [];
 
-		const parsedValue = parseEditValue(value);
+		const inner = commitHold(
+			extraTable.wrapCells,
+			extraTable.moneyCells,
+			rowIdx,
+			header,
+			value,
+		);
+		const parsedValue = parseEditValue(inner);
 		let stored: string | number | boolean = parsedValue;
 		const rowKey = String(rowIdx);
 		extraTable.cellFormulaTokens ??= {};
