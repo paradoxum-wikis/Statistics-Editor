@@ -246,15 +246,7 @@
 				{#each arrays as v (v.token)}
 					<div class="inspect-group">{varLabel(v.token, v.pin)}</div>
 					{#each v.parts ?? [] as part, i (`${v.token}:${i}`)}
-						{@const mute =
-							v.used?.some(Boolean) && v.used[i] === false && i !== v.slot}
-						<label
-							class={[
-								"inspect-row",
-								i === v.slot && "current",
-								mute && "foreign",
-							]}
-						>
+						<label class={["inspect-row", i === v.slot && "current"]}>
 							<span
 								class="inspect-label"
 								title={v.slotLabels?.[i] ?? String(i)}
@@ -389,16 +381,12 @@
 		background: var(--card);
 
 		&.current {
-			background: var(--secondary);
+			border-color: var(--primary);
 
 			.inspect-label {
 				font-weight: 600;
 				color: var(--foreground);
 			}
-		}
-
-		&.foreign {
-			opacity: 0.5;
 		}
 	}
 

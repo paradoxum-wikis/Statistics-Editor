@@ -214,7 +214,6 @@ function collectVars(
 			);
 			if (pin) v.pin = pin;
 			if (v.kind === "array" && followed && !tokenInCell(text, token)) {
-				v.slot = undefined;
 				v.viaTotal = true;
 			}
 			vars.push(v);
