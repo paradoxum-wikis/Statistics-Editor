@@ -5,7 +5,9 @@ import Levels from "./levels";
 import Locator from "./locator";
 import {
 	getDefaultFncKey,
+	getEffectiveCostKey,
 	getEffectiveFncKey,
+	getCostValue,
 	getFncValue,
 	resolveToken,
 	type TableCache,
@@ -446,10 +448,8 @@ class SkinData {
 	}
 
 	setCost(level: number, value: number): void {
-		const costKey = getDefaultFncKey("COST", this.variantPrefix);
-		const costs = (
-			getFncValue(this.formulaTokens, "COST", this.variantPrefix) || ""
-		)
+		const costKey = getEffectiveCostKey(this.formulaTokens, this.variantPrefix);
+		const costs = (getCostValue(this.formulaTokens, this.variantPrefix) || "")
 			.split(";")
 			.map((s) => s.trim());
 		costs[level] = String(value);

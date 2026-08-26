@@ -29,6 +29,7 @@
 		toDisplayNumber,
 	} from "$lib/utils/format";
 	import { getTargetSkins } from "$lib/utils/towah";
+	import { getCostKeys } from "$lib/neowtext/functions";
 	import { cftFromRows, rewriteCell } from "$lib/neowtext/tableCell";
 	import { applyCellWrap, resolveEditHold } from "$lib/cellInspect";
 	import TowerDataTable from "./table/TowerDataTable.svelte";
@@ -356,6 +357,14 @@
 			const next = parts.join("; ");
 			skin.formulaTokens[key] = next;
 			if (skin.data?.FormulaTokens) skin.data.FormulaTokens[key] = next;
+			if (!getCostKeys(skin.variantPrefix).includes(key)) return;
+			const n = Number(v.replace(/,/g, ""));
+			if (!Number.isFinite(n)) return;
+			if (idx === 0) {
+				if (skin.data.Defaults) skin.data.Defaults.Price = n;
+			} else if (skin.data.Upgrades?.[idx - 1]) {
+				skin.data.Upgrades[idx - 1].Cost = n;
+			}
 		});
 	}
 

@@ -97,7 +97,7 @@ function buildVariablesMap(tower: Tower): Record<string, string> {
 		if (!skin?.formulaTokens) return;
 		for (const [key, val] of Object.entries(skin.formulaTokens)) {
 			if (
-				/^\$(?:FNC|FSE)-(?:[A-Z0-9]+-)?(?:COST|DETECTION|UPGRADE|UPGRADEICON)(?:-[A-Z])?\$$/.test(
+				/^\$(?:FNC|FSE)-(?:[A-Z0-9]+-)?(?:DETECTION|UPGRADE|UPGRADEICON)(?:-[A-Z])?\$$/.test(
 					key,
 				)
 			)
@@ -150,8 +150,9 @@ function buildVariablesMap(tower: Tower): Record<string, string> {
 
 	const baseFnc = baseSkinJson ? extractFncArrays(baseSkinJson) : null;
 	if (baseFnc) {
-		if (baseFnc.costStr)
-			variables[getEffectiveCostKey(tokens)] = baseFnc.costStr;
+		const costKey = getEffectiveCostKey(tokens);
+		if (baseFnc.costStr && variables[costKey] === undefined)
+			variables[costKey] = baseFnc.costStr;
 		if (hasDetections(baseFnc.detStr))
 			variables[getDefaultFncKey("DETECTION")] = baseFnc.detStr;
 		if (baseFnc.upgradeStr)
@@ -176,9 +177,9 @@ function buildVariablesMap(tower: Tower): Record<string, string> {
 			skin.variantPrefix || skinName.trim().replace(/[^a-zA-Z0-9]+/g, "");
 		if (!prefix || !baseFnc) continue;
 
-		if (variant.costStr !== baseFnc.costStr)
-			variables[getEffectiveCostKey(skin.formulaTokens, prefix)] =
-				variant.costStr;
+		const costKey = getEffectiveCostKey(skin.formulaTokens, prefix);
+		if (variant.costStr !== baseFnc.costStr && variables[costKey] === undefined)
+			variables[costKey] = variant.costStr;
 
 		if (variant.detStr !== baseFnc.detStr && hasDetections(variant.detStr))
 			variables[getDefaultFncKey("DETECTION", prefix)] = variant.detStr;
