@@ -14,8 +14,6 @@ class Upgrade extends BaseStats {
 		super(data.Stats, locator);
 		this.upgradeData = data;
 
-		this.addAttributeValue("Cost", data.Cost);
-
 		if (
 			data.Stats.Extras !== undefined &&
 			!(data.Stats.Extras instanceof Array)
@@ -24,9 +22,6 @@ class Upgrade extends BaseStats {
 		}
 	}
 
-	/**
-	 * Updates an attribute. Handles "Detections" specially and keeps `upgradeData` in sync.
-	 */
 	set(attribute: string, value: any): void {
 		if (attribute === "Detections") {
 			this.data.Detections = value;
@@ -34,10 +29,6 @@ class Upgrade extends BaseStats {
 		}
 
 		super.set(attribute, value);
-
-		if (this.upgradeData && this.upgradeData[attribute] !== undefined) {
-			this.upgradeData[attribute] = value;
-		}
 	}
 
 	/**

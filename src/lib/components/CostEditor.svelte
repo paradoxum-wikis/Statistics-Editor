@@ -71,13 +71,6 @@
 		for (const skin of getTargetSkins(tower, currentSkin)) {
 			const headers =
 				skin.headers.length > 0 ? skin.headers : skin.levels.attributes;
-			const costHeader = headers.find((h) => stripRefs(h) === "Cost");
-			if (costHeader) {
-				towerStore.captureBaselineCell(
-					mkCellKey(skin.name, 0, level, costHeader),
-					costAt(skin, level),
-				);
-			}
 			const totalHeader = headers.find((h) => {
 				const n = stripRefs(h);
 				return n === "Total Cost" || n === "Total Price";
@@ -86,7 +79,8 @@
 				for (let i = level; i < skin.levels.levels.length; i++) {
 					towerStore.captureBaselineCell(
 						mkCellKey(skin.name, 0, i, totalHeader),
-						skin.levels.getCell(i, totalHeader),
+						skin.rawRows[i]?.[totalHeader] ??
+							skin.levels.getCell(i, totalHeader),
 					);
 				}
 			}

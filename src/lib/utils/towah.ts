@@ -27,10 +27,10 @@ export function collectCompareValues(tower: Tower): Record<string, unknown> {
 		if (!skin) continue;
 		const headers =
 			skin.headers.length > 0 ? skin.headers : skin.levels.attributes;
-		for (let i = 0; i < skin.levels.levels.length; i++) {
+		for (let i = 0; i < skin.rawRows.length; i++) {
 			for (const header of headers) {
 				out[mkCellKey(skinName, 0, i, header)] =
-					header === "Level" ? i : skin.levels.getCell(i, header);
+					header === "Level" ? i : skin.rawRows[i]?.[header];
 			}
 		}
 		skin.extraTables?.forEach((ext, idx) => {
