@@ -25,13 +25,21 @@
 		towerStore.refreshTrigger;
 		return (
 			skinData != null &&
-			getCostValue(skinData.formulaTokens, skinData.variantPrefix) !== undefined
+			getCostValue(
+				skinData.formulaTokens,
+				skinData.isPvp ? skinData.variantPrefix : undefined,
+			) !== undefined
 		);
 	});
 
 	function costAt(skin: SkinData, level: number): number {
 		const num = parseNumeric(
-			(getCostValue(skin.formulaTokens, skin.variantPrefix) || "")
+			(
+				getCostValue(
+					skin.formulaTokens,
+					skin.isPvp ? skin.variantPrefix : undefined,
+				) || ""
+			)
 				.split(";")
 				[level]?.trim() || "0",
 		);

@@ -78,12 +78,10 @@ export function patchWikitext(sourceWikitext: string, tower: Tower): string {
 }
 
 /**
- * Reconstructs the variables map from:
- * - Existing formula tokens (preserved from original parse)
- * - Funcs (Cost, Detection, Upgrades, Icons)
+ * Reconstructs the variables map from formula tokens and some funcs.
  *
- * Automatically diffs PVP against Regular and writes $FNC-PVP-* / $FSE-PVP-* arrays
- * if the PVP skin deviates from the base tower.
+ * Non-base tabs must not copy unprefixed keys as every tab holds a full `<var>`
+ * clone, and later tabs would otherwise overwrite `$COST$`.
  */
 function buildVariablesMap(tower: Tower): Record<string, string> {
 	const variables: Record<string, string> = {};
@@ -93,8 +91,9 @@ function buildVariablesMap(tower: Tower): Record<string, string> {
 	const baseSkin = tower.getSkin(baseSkinName);
 	const baseSkinJson = tower.json[tower.name]?.[baseSkinName];
 
-	const preserveTokens = (skin: any) => {
+	const preserveTokens = (skin: any, variantOnly = false) => {
 		if (!skin?.formulaTokens) return;
+		const p = skin.variantPrefix?.toUpperCase();
 		for (const [key, val] of Object.entries(skin.formulaTokens)) {
 			if (
 				/^\$(?:FNC|FSE)-(?:[A-Z0-9]+-)?(?:DETECTION|UPGRADE|UPGRADEICON)(?:-[A-Z])?\$$/.test(
@@ -102,6 +101,17 @@ function buildVariablesMap(tower: Tower): Record<string, string> {
 				)
 			)
 				continue;
+			if (variantOnly) {
+				if (!p) continue;
+				const inner = key.slice(1, -1).toUpperCase();
+				if (
+					inner !== p &&
+					!inner.startsWith(`${p}-`) &&
+					!inner.startsWith(`FNC-${p}-`) &&
+					!inner.startsWith(`FSE-${p}-`)
+				)
+					continue;
+			}
 			variables[key] = val as string;
 		}
 	};
@@ -167,7 +177,7 @@ function buildVariablesMap(tower: Tower): Record<string, string> {
 		const skin = tower.getSkin(skinName);
 		if (!skin) continue;
 
-		preserveTokens(skin);
+		preserveTokens(skin, true);
 
 		const skinJson = tower.json[tower.name]?.[skinName];
 		if (!skinJson) continue;
@@ -177,9 +187,14 @@ function buildVariablesMap(tower: Tower): Record<string, string> {
 			skin.variantPrefix || skinName.trim().replace(/[^a-zA-Z0-9]+/g, "");
 		if (!prefix || !baseFnc) continue;
 
-		const costKey = getEffectiveCostKey(skin.formulaTokens, prefix);
-		if (variant.costStr !== baseFnc.costStr && variables[costKey] === undefined)
-			variables[costKey] = variant.costStr;
+		if (skin.isPvp) {
+			const costKey = getEffectiveCostKey(skin.formulaTokens, prefix);
+			if (
+				variant.costStr !== baseFnc.costStr &&
+				variables[costKey] === undefined
+			)
+				variables[costKey] = variant.costStr;
+		}
 
 		if (variant.detStr !== baseFnc.detStr && hasDetections(variant.detStr))
 			variables[getDefaultFncKey("DETECTION", prefix)] = variant.detStr;

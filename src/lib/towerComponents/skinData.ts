@@ -448,8 +448,9 @@ class SkinData {
 	}
 
 	setCost(level: number, value: number): void {
-		const costKey = getEffectiveCostKey(this.formulaTokens, this.variantPrefix);
-		const costs = (getCostValue(this.formulaTokens, this.variantPrefix) || "")
+		const prefix = this.isPvp ? this.variantPrefix : undefined;
+		const costKey = getEffectiveCostKey(this.formulaTokens, prefix);
+		const costs = (getCostValue(this.formulaTokens, prefix) || "")
 			.split(";")
 			.map((s) => s.trim());
 		costs[level] = String(value);

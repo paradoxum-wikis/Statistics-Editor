@@ -29,7 +29,11 @@
 		toDisplayNumber,
 	} from "$lib/utils/format";
 	import { getTargetSkins } from "$lib/utils/towah";
-	import { getCostKeys } from "$lib/neowtext/functions";
+	import {
+		getCostKeys,
+		getCostValue,
+		getEffectiveCostKey,
+	} from "$lib/neowtext/functions";
 	import { cftFromRows, rewriteCell } from "$lib/neowtext/tableCell";
 	import { applyCellWrap, resolveEditHold } from "$lib/cellInspect";
 	import TowerDataTable from "./table/TowerDataTable.svelte";
@@ -246,12 +250,19 @@
 		towerStore.markDirty();
 	}
 
+	function writeKeyFor(skin: SkinData, key: string): string {
+		if (!skin.isPvp || !getCostKeys(skin.variantPrefix).includes(key))
+			return key;
+		return getEffectiveCostKey(skin.formulaTokens, skin.variantPrefix);
+	}
+
 	function writeVar(key: string, value: string) {
 		const v = value.trim();
 		if (!v) return;
 		applyVarWrite((skin) => {
-			skin.formulaTokens[key] = v;
-			if (skin.data?.FormulaTokens) skin.data.FormulaTokens[key] = v;
+			const writeKey = writeKeyFor(skin, key);
+			skin.formulaTokens[writeKey] = v;
+			if (skin.data?.FormulaTokens) skin.data.FormulaTokens[writeKey] = v;
 		});
 	}
 
@@ -349,15 +360,23 @@
 		const v = value.trim();
 		if (!v) return;
 		applyVarWrite((skin) => {
-			const parts = (skin.formulaTokens[key] ?? "")
+			const writeKey = writeKeyFor(skin, key);
+			const parts = (
+				skin.formulaTokens[writeKey] ??
+				getCostValue(
+					skin.formulaTokens,
+					skin.isPvp ? skin.variantPrefix : undefined,
+				) ??
+				""
+			)
 				.split(";")
 				.map((p) => p.trim());
 			while (parts.length <= idx) parts.push("");
 			parts[idx] = v;
 			const next = parts.join("; ");
-			skin.formulaTokens[key] = next;
-			if (skin.data?.FormulaTokens) skin.data.FormulaTokens[key] = next;
-			if (!getCostKeys(skin.variantPrefix).includes(key)) return;
+			skin.formulaTokens[writeKey] = next;
+			if (skin.data?.FormulaTokens) skin.data.FormulaTokens[writeKey] = next;
+			if (!getCostKeys(skin.variantPrefix).includes(writeKey)) return;
 			const n = Number(v.replace(/,/g, ""));
 			if (!Number.isFinite(n)) return;
 			if (idx === 0) {
