@@ -4,9 +4,9 @@ $DPS2$ = (Damage * (Whirlwind Hit - 1) + Whirlwind Damage) / (Swingrate * Whirlw
 $DPS4$ = (Damage Threshold + Knife Damage * Knife Count) / (Damage Threshold / ((Damage * (Whirlwind Hit - 1) + Whirlwind Damage) / Whirlwind Hit) * Swingrate + Knife Cooldown)
 $CE$ = Total Cost / DPS
 $TP$ = $FNC-TOTAL-COST$
-$COST$ = 300; 450; 750; 2400; 6350
+$COST$ = 300; 450; 625; 2000; 6800
 $PVP-COST$ = 300; 150; 600; 1700; 4750
-$FSE-DETECTION$ = 2; ;
+$FSE-DETECTION$ = 2; 2;
 $FSE-UPGRADE$ = CQC Training; Umbral Tempest; Ascended Shadows; Death Arms Ninja
 $FSE-PVP-UPGRADE$ = CQC Training; Advanced Hand to Hand Training; Upgraded Blades; Black Ops
 $FSE-UPGRADEICON$ = 111493227843909; 92894447316956; 71356771597575; 88526006090438
@@ -24,9 +24,9 @@ $R$ = $FNC-RECURSION$
 |-
 | 1 || $R$ || $R$ || 6 || 0.5 || 6 || N/A || N/A || N/A || N/A || N/A || N/A || N/A || N/A || N/A || $DPS$ || {{Money|$CE$}}
 |-
-| 2 || $R$ || $R$ || 6 || 0.5 || 6 || 3 || 12 || 6 || N/A || N/A || N/A || N/A || N/A || N/A || $DPS2$ || {{Money|$CE$}}
+| 2 || $R$ || $R$ || 9 || 0.5 || 6 || 3 || 9 || 6 || N/A || N/A || N/A || N/A || N/A || N/A || $DPS2$ || {{Money|$CE$}}
 |-
-| 3 || $R$ || $R$ || 14 || 0.35 || 6 || 3 || 21 || 6 || N/A || N/A || N/A || N/A || N/A || N/A || $DPS2$ || {{Money|$CE$}}
+| 3 || $R$ || $R$ || 16 || 0.35 || 6 || 3 || 21 || 6 || N/A || N/A || N/A || N/A || N/A || N/A || $DPS2$ || {{Money|$CE$}}
 |-
 | 4 || $R$ || $R$ || 35 || 0.35 || 6.5 || 3 || 35 || 6.5 || 500 || 60 || 3 || 0.5 || 3 || 10 || $DPS4$ || {{Money|$CE$}}
 |}

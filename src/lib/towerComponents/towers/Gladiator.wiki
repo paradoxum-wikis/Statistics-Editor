@@ -21,11 +21,11 @@ $FSE-UPGRADE$ = Arena Conditioning; Warrior's Call; Champion's Flame; Centurion;
 $FSE-UPGRADEICON$ = 3356186535; 141745478; 4118882122; 16620737; 16868189
 $FSE-DETECTION$ = 0; 3;
 $FSE-META$ = Exclusive; File:GladiatorIconn.png
-$DREF$ = <ref>DPS assumes that only one enemy is hit per swing.<br />Ability is not taken into account.</ref>
-$D2REF$ = <ref>DPS assumes that only one enemy is hit per swing.</ref>
-$MDREF$ = <ref>DPS assumes that the maximum number of enemies are hit per swing.<br/>Ability is not taken into account.</ref>
-$M2DREF$ = <ref>DPS assumes that the maximum number of enemies are hit per swing.</ref>
-$TREF$ = <ref>Total Elapsed Damage is calculated as Burn Damage × (Burn Duration ÷ Burn  Tick).</ref>
+$DREF$ = <ref>DPS assumes that only one enemy is hit per swing and it is set on fire.<br/>Ability is not taken into account.<br/>Burn DPS is calculated as (Burn Damage * (Burn Duration / Burn Tick)) / Burn Cooldown.</ref>
+$D2REF$ = <ref>DPS assumes that only one enemy is hit per swing and it is set on fire.<br/>Burn DPS is calculated as (Burn Damage * (Burn Duration / Burn Tick)) / Burn Cooldown.</ref>
+$MDREF$ = <ref>DPS assumes that the maximum number of enemies are hit per swing. For burn, it only accounts for the number of enemies hit in a swing.<br/>Ability is not taken into account.<br/>Burn DPS is calculated as (Burn Damage * (Burn Duration / Burn Tick)) / Burn Cooldown.</ref>
+$M2DREF$ = <ref>DPS assumes that the maximum number of enemies are hit per swing. For burn, it only accounts for the number of enemies hit in a swing.<br/>Burn DPS is calculated as (Burn Damage × (Burn Duration ÷ Burn Tick)) ÷ Burn Cooldown.</ref>
+$TREF$ = <ref>Total Elapsed Damage is calculated as Burn Damage × (Burn Duration ÷ Burn Tick).</ref>
 $R$ = $FNC-RECURSION$
 </var>
 <div class="overflow-box">
