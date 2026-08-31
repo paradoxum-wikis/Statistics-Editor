@@ -6,7 +6,7 @@
 	import Tip from "./smol/Tip.svelte";
 	import { CircleDollarSign } from "@lucide/svelte";
 	import { parseNumeric, stripRefs } from "$lib/utils/format";
-	import { getCostValue } from "$lib/neowtext/functions";
+	import { getFncValue } from "$lib/neowtext/functions";
 	import { mkCellKey } from "$lib/neowtext/directives";
 	import type SkinData from "$lib/towerComponents/skinData";
 
@@ -23,10 +23,11 @@
 
 	let hasFncCost = $derived.by(() => {
 		towerStore.refreshTrigger;
+		if (!skinData) return false;
 		return (
-			skinData != null &&
-			getCostValue(
+			getFncValue(
 				skinData.formulaTokens,
+				"COST",
 				skinData.isPvp ? skinData.variantPrefix : undefined,
 			) !== undefined
 		);
@@ -35,8 +36,9 @@
 	function costAt(skin: SkinData, level: number): number {
 		const num = parseNumeric(
 			(
-				getCostValue(
+				getFncValue(
 					skin.formulaTokens,
+					"COST",
 					skin.isPvp ? skin.variantPrefix : undefined,
 				) || ""
 			)
