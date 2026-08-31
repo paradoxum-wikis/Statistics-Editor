@@ -534,36 +534,9 @@
 
 	async function handleFetchWiki() {
 		if (!tower) return;
-
 		isFetching = true;
 		try {
-			const { fetchTowerWiki } = await import("$lib/services/fetchTowerWiki");
-			const { setWikiOverride } = await import("$lib/neowtext/wikiSource");
-			const wikitext = await fetchTowerWiki(tower.name, true);
-			if (wikitext) {
-				setWikiOverride(profileStore.current, tower.name, wikitext);
-				towerStore.isDirty = false;
-				await towerStore.forceReload();
-
-				analytics.track("wiki_fetch", {
-					tower_name: tower.name,
-					success: true,
-				});
-				toast.success("Fetched latest from the Wiki!");
-			} else {
-				analytics.track("wiki_fetch", {
-					tower_name: tower.name,
-					success: false,
-				});
-				toast.error("Failed to fetch Neowtext from the Wiki.");
-			}
-		} catch (e) {
-			console.error(e);
-			analytics.track("wiki_fetch", {
-				tower_name: tower.name,
-				success: false,
-			});
-			toast.error("Error fetching from the Wiki.");
+			await towerStore.fetchLatestWiki(tower.name);
 		} finally {
 			isFetching = false;
 		}

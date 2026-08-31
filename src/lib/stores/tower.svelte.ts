@@ -23,7 +23,8 @@ import {
 	getFactoryHash,
 	setFactoryAck,
 } from "$lib/neowtext/factorySync";
-import { clearWikiOverride } from "$lib/neowtext/wikiSource";
+import { setWikiOverride } from "$lib/neowtext/wikiSource";
+import { fetchTowerWiki } from "$lib/services/fetchTowerWiki";
 import {
 	fetchShare,
 	parseShareRef,
@@ -619,36 +620,46 @@ class TowerStore {
 		analytics.track("factory_sync", { action: "toast", tower_name: name });
 		toast.warning(`${name}: official stats updated`, {
 			description:
-				"Your saved edits are on older data. Would you like to reset this tower to update it to the latest revision?",
+				"Your saved edits are on older data. Would you like to fetch the latest revision from the Wiki to replace them?",
 			duration: 0,
 			action: {
-				label: "Reset",
+				label: "Fetch",
 				onClick: () => {
-					void this.#applyFactoryReset(name, profile);
+					void this.fetchLatestWiki(name);
 				},
 			},
 			onDismiss: () => setFactoryAck(profile, name, hash),
 		});
 	}
 
-	async #applyFactoryReset(name: string, profile: string): Promise<void> {
-		clearWikiOverride(profile, name);
-		if (this.manager?.dataKey === profile) this.manager.clearCache(name);
-		if (
-			this.manager?.dataKey === profile &&
-			this.selectedName.toLowerCase() === name.toLowerCase()
-		) {
-			this.#lastLoadedName = null;
-			this.isLoading = true;
-			this.selectedData = null;
-			this.baseline = {};
-			this.baselineTowerId = null;
-			this.baselineSkinName = null;
-			this.baselineLocked = false;
-			if (!(await this.load(name))) return;
+	async fetchLatestWiki(name: string): Promise<boolean> {
+		const profile = this.manager?.dataKey;
+		if (!profile || !name.trim()) return false;
+
+		try {
+			const wikitext = await fetchTowerWiki(name, true);
+			if (!wikitext) {
+				analytics.track("wiki_fetch", { tower_name: name, success: false });
+				toast.error("Failed to fetch Neowtext from the Wiki.");
+				return false;
+			}
+
+			setWikiOverride(profile, name, wikitext);
+			this.manager?.clearCache(name);
+			if (this.selectedName.toLowerCase() === name.toLowerCase()) {
+				this.isDirty = false;
+				await this.forceReload();
+			}
+
+			analytics.track("wiki_fetch", { tower_name: name, success: true });
+			toast.success("Fetched latest from the Wiki!");
+			return true;
+		} catch (e) {
+			console.error(e);
+			analytics.track("wiki_fetch", { tower_name: name, success: false });
+			toast.error("Error fetching from the Wiki.");
+			return false;
 		}
-		analytics.track("factory_sync", { action: "reset", tower_name: name });
-		toast.success(`${name} has been reset.`);
 	}
 
 	/**
