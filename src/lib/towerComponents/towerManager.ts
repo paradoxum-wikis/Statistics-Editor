@@ -122,7 +122,8 @@ export default class TowerManager {
 	): string | null {
 		if (this.debug())
 			console.log(`[TowerManager] saveTower called for ${tower.name}`);
-		if (!this.dataKey) return null;
+		const profile = this.dataKey;
+		if (!profile) return null;
 
 		const src = (tower as { sourceWikitext?: string }).sourceWikitext;
 		if (!src) return null;
@@ -138,7 +139,7 @@ export default class TowerManager {
 			console.log(
 				`[TowerManager] Patched wikitext length: ${withDirectives.length}`,
 			);
-		setWikiOverride(this.dataKey ?? "Default", tower.name, withDirectives);
+		setWikiOverride(profile, tower.name, withDirectives);
 		Object.assign(tower, {
 			sourceWikitext: withDirectives,
 			wikitextSource: "override",
@@ -200,6 +201,7 @@ export default class TowerManager {
 
 		let currentSource = "";
 		let currentText = "";
+		let factoryDrift = false;
 
 		const countVarBlocks = (source: string): number =>
 			(source.match(/<var\b[^>]*>[\s\S]*?<\/var>/gi) || []).length;
@@ -240,13 +242,14 @@ export default class TowerManager {
 				currentSource = "override";
 				currentText = opts.wikitext;
 			} else {
-				const { source, text } = await loadEffectiveWikitext(
+				const loaded = await loadEffectiveWikitext(
 					this.dataKey ?? "Default",
 					name,
 					loadBase,
 				);
-				currentSource = source;
-				currentText = text;
+				currentSource = loaded.source;
+				currentText = loaded.text;
+				factoryDrift = loaded.factoryDrift === true;
 			}
 			const {
 				text: parseText,
@@ -743,6 +746,7 @@ export default class TowerManager {
 			Object.assign(towerData, {
 				sourceWikitext: currentText,
 				wikitextSource: currentSource,
+				factoryDrift,
 				diffBaseline,
 				editorMemo: memo,
 			});
@@ -756,6 +760,7 @@ export default class TowerManager {
 			Object.assign(towerData, {
 				sourceWikitext: currentText,
 				wikitextSource: currentSource,
+				factoryDrift,
 				diffBaseline,
 				editorMemo: memo,
 			});

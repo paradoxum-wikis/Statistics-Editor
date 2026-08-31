@@ -19,11 +19,18 @@ import {
 	stripSeDiff,
 } from "$lib/neowtext/directives";
 import {
+	getFactoryAck,
+	getFactoryHash,
+	setFactoryAck,
+} from "$lib/neowtext/factorySync";
+import { clearWikiOverride } from "$lib/neowtext/wikiSource";
+import {
 	fetchShare,
 	parseShareRef,
 	type ShareOwner,
 } from "$lib/services/shareTower";
 import { analytics } from "$lib/services/analytics";
+import { toast } from "$lib/toast";
 
 const RECENT_KEY = "tdse_recent_towers";
 const RECENT_MAX = 12;
@@ -56,6 +63,7 @@ class TowerStore {
 	recentNames = $state.raw<string[]>(readRecentTowers());
 	#lastLoadedName = $state<string | null>(null);
 	#lastTrackedSelect: string | null = null;
+	#factoryToastKey = "";
 
 	selectedSkinName = $state<string>("Regular");
 
@@ -192,12 +200,14 @@ class TowerStore {
 				const anyTower = tower as unknown as {
 					sourceWikitext?: string;
 					wikitextSource?: "override" | "base";
+					factoryDrift?: boolean;
 				};
 				this.effectiveWikitext = anyTower.sourceWikitext ?? "";
 				this.effectiveWikitextSource = anyTower.wikitextSource ?? "";
 				this.originalWikitext = this.effectiveWikitext;
 				this.isDirty = false;
 				this.#wikitextStale = false;
+				if (anyTower.factoryDrift) this.#notifyFactoryDrift(tower.name);
 
 				const loadedMemo =
 					(tower as unknown as { editorMemo?: string }).editorMemo ?? "";
@@ -596,6 +606,49 @@ class TowerStore {
 		if (!(await this.deleteTower())) return false;
 		goto(resolve("/"), { keepFocus: true, noScroll: true });
 		return true;
+	}
+
+	#notifyFactoryDrift(name: string): void {
+		const hash = getFactoryHash(name);
+		const profile = this.manager?.dataKey;
+		if (!hash || !profile) return;
+		const key = `${profile}::${name}::${hash}`;
+		if (this.#factoryToastKey === key) return;
+		if (getFactoryAck(profile, name) === hash) return;
+		this.#factoryToastKey = key;
+		analytics.track("factory_sync", { action: "toast", tower_name: name });
+		toast.warning(`${name}: official stats updated`, {
+			description:
+				"Your saved edits are on older data. Would you like to reset this tower to update it to the latest revision?",
+			duration: 0,
+			action: {
+				label: "Reset",
+				onClick: () => {
+					void this.#applyFactoryReset(name, profile);
+				},
+			},
+			onDismiss: () => setFactoryAck(profile, name, hash),
+		});
+	}
+
+	async #applyFactoryReset(name: string, profile: string): Promise<void> {
+		clearWikiOverride(profile, name);
+		if (this.manager?.dataKey === profile) this.manager.clearCache(name);
+		if (
+			this.manager?.dataKey === profile &&
+			this.selectedName.toLowerCase() === name.toLowerCase()
+		) {
+			this.#lastLoadedName = null;
+			this.isLoading = true;
+			this.selectedData = null;
+			this.baseline = {};
+			this.baselineTowerId = null;
+			this.baselineSkinName = null;
+			this.baselineLocked = false;
+			if (!(await this.load(name))) return;
+		}
+		analytics.track("factory_sync", { action: "reset", tower_name: name });
+		toast.success(`${name} has been reset.`);
 	}
 
 	/**

@@ -1,6 +1,7 @@
 /** @import { Plugin } from "vite" */
 /** @import { TowerMeta } from "./parse.js" */
 import { parseTowerMeta } from "./parse.js";
+import { hashFactoryText } from "./hash.js";
 
 const TOWERS_DIR = `${process.cwd()}/src/lib/towerComponents/towers`;
 const VIRTUAL_ID = "virtual:towers";
@@ -8,24 +9,20 @@ const RESOLVED_ID = `\0${VIRTUAL_ID}`;
 
 /**
  * @param {string} file
- * @returns {Promise<[string, TowerMeta | null]>}
+ * @returns {Promise<{ name: string, meta: TowerMeta | null, hash: string }>}
  */
 async function readTowerEntry(file) {
-	const towerName = file.slice(0, -5);
+	const name = file.slice(0, -5);
 	const content = await Bun.file(`${TOWERS_DIR}/${file}`).text();
-	return [towerName, parseTowerMeta(content)];
+	return {
+		name,
+		meta: parseTowerMeta(content),
+		hash: hashFactoryText(content),
+	};
 }
 
 /**
- * @param {[string, TowerMeta | null]} entry
- * @returns {entry is [string, TowerMeta]}
- */
-function hasMeta(entry) {
-	return entry[1] !== null;
-}
-
-/**
- * @returns {Promise<{ towerNames: string[], metaEntries: [string, TowerMeta][] }>}
+ * @returns {Promise<{ towerNames: string[], metaEntries: [string, TowerMeta][], towerHashes: Record<string, string> }>}
  */
 async function scanTowers() {
 	const glob = new Bun.Glob("*.wiki");
@@ -34,19 +31,27 @@ async function scanTowers() {
 	const scanned = await Promise.all(wikiFiles.map(readTowerEntry));
 
 	const towerNames = scanned
-		.map(([name]) => name)
+		.map((entry) => entry.name)
 		.sort((a, b) => a.localeCompare(b));
-	const metaEntries = scanned.filter(hasMeta);
+	/** @type {[string, TowerMeta][]} */
+	const metaEntries = [];
+	/** @type {Record<string, string>} */
+	const towerHashes = {};
+	for (const entry of scanned) {
+		towerHashes[entry.name.toLowerCase()] = entry.hash;
+		if (entry.meta) metaEntries.push([entry.name, entry.meta]);
+	}
 
-	return { towerNames, metaEntries };
+	return { towerNames, metaEntries, towerHashes };
 }
 
 /**
- * @param {{ towerNames: string[], metaEntries: [string, TowerMeta][] }} data
+ * @param {{ towerNames: string[], metaEntries: [string, TowerMeta][], towerHashes: Record<string, string> }} data
  */
 function serializeModule(data) {
 	return `export const towerNames = ${JSON.stringify(data.towerNames)};
-export const metaEntries = ${JSON.stringify(data.metaEntries)};`;
+export const metaEntries = ${JSON.stringify(data.metaEntries)};
+export const towerHashes = ${JSON.stringify(data.towerHashes)};`;
 }
 
 /**

@@ -1,4 +1,14 @@
 import { settingsStore } from "$lib/stores/settings.svelte";
+import {
+	clearFactoryMeta,
+	clearProfileFactoryMeta,
+	clearTowerFactoryMeta,
+	getFactoryBase,
+	getFactoryHash,
+	inspectOverride,
+	sameFactoryBody,
+	setFactoryBase,
+} from "./factorySync";
 
 const WIKI_OVERRIDE_PREFIX = "tds_wiki_override::";
 
@@ -104,10 +114,12 @@ export function setWikiOverride(
 			console.log(`[wikiSource] Clearing override for ${key}`);
 		}
 		dropKeys(twins);
+		clearFactoryMeta(profileName, towerName);
 		return;
 	}
 
 	localStorage.setItem(key, content);
+	setFactoryBase(profileName, towerName, getFactoryHash(towerName) ?? null);
 	dropKeys(twins, key);
 }
 
@@ -135,6 +147,7 @@ export function clearProfileWikiOverrides(profileName: string): void {
 		if (key?.startsWith(prefix)) keys.push(key);
 	}
 	dropKeys(keys);
+	clearProfileFactoryMeta(profileName);
 }
 
 export function clearTowerWikiOverrides(towerName: string): void {
@@ -147,15 +160,45 @@ export function clearTowerWikiOverrides(towerName: string): void {
 		if (key.slice(key.lastIndexOf("::") + 2).toLowerCase() === wanted)
 			localStorage.removeItem(key);
 	}
+	clearTowerFactoryMeta(towerName);
 }
 
 export async function loadEffectiveWikitext(
 	profileName: string,
 	towerName: string,
 	loadBase: () => Promise<string>,
-): Promise<{ source: "override" | "base"; text: string }> {
+): Promise<{
+	source: "override" | "base";
+	text: string;
+	factoryDrift?: boolean;
+}> {
 	const override = getWikiOverride(profileName, towerName);
 	if (override != null) {
+		const action = inspectOverride(
+			override,
+			getFactoryHash(towerName),
+			getFactoryBase(profileName, towerName),
+		);
+		if (action === "compare") {
+			const base = await loadBase();
+			if (sameFactoryBody(override, base)) {
+				clearWikiOverride(profileName, towerName);
+				if (settingsStore.debugMode) {
+					console.log(
+						`[wikiSource] loadEffectiveWikitext: dropped redundant override for ${towerName}`,
+					);
+				}
+				return { source: "base", text: base };
+			}
+			setWikiOverride(profileName, towerName, override);
+		} else if (action === "drift") {
+			if (settingsStore.debugMode) {
+				console.log(
+					`[wikiSource] loadEffectiveWikitext: factory drift for ${towerName}`,
+				);
+			}
+			return { source: "override", text: override, factoryDrift: true };
+		}
 		if (settingsStore.debugMode) {
 			console.log(
 				`[wikiSource] loadEffectiveWikitext: returning override for ${towerName}`,
