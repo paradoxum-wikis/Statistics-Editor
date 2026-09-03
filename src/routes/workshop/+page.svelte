@@ -210,10 +210,6 @@
 	}
 </script>
 
-<svelte:head>
-	<title>Workshop · TDS Statistics Editor</title>
-</svelte:head>
-
 <div class="flex h-screen flex-col bg-background" in:fade={{ duration: 140 }}>
 	<header
 		class="sticky top-0 z-7 flex items-center justify-between gap-3 border-b bg-card p-2 px-3"
