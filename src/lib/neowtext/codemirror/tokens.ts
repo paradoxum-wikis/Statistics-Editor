@@ -8,7 +8,7 @@ export interface DollarRef {
 	kind: RefKind;
 	prefix?: "FNC" | "FSE";
 	name?: string;
-	pvp: boolean;
+	tab?: string;
 	pinLevel?: number;
 	pinBranch?: string;
 	pinError?: string;
@@ -39,6 +39,13 @@ export const FSE_NAMES = new Set([
 const COMPAT_FSE = new Set(["DETECTION", "UPGRADE", "UPGRADEICON"]);
 const TOTAL_NAME = /^TOTAL-[A-Z0-9]+(?:-[A-Z0-9]+)*$/;
 const PIN = /^(.*)@(\d+)(?:@(.+))?$/;
+
+export function isKnownFn(prefix: "FNC" | "FSE", name: string): boolean {
+	const upper = name.toUpperCase();
+	if (prefix === "FSE") return FSE_NAMES.has(upper);
+	if (FNC_NAMES.has(upper) || TOTAL_NAME.test(upper)) return true;
+	return COMPAT_FSE.has(upper);
+}
 
 function spaces(s: string): string {
 	return s.replace(/[^\n]/g, " ");
@@ -81,15 +88,24 @@ export function parseRef(from: number, to: number, inner: string): DollarRef {
 	let kind: RefKind = "var";
 	let prefix: "FNC" | "FSE" | undefined;
 	let name: string | undefined;
-	let pvp = false;
+	let tab: string | undefined;
 
 	const fn = /^(FNC|FSE)-(.+)$/i.exec(base);
 	if (fn) {
 		prefix = fn[1].toUpperCase() as "FNC" | "FSE";
 		let rest = fn[2];
-		if (/^PVP-/i.test(rest)) {
-			pvp = true;
-			rest = rest.slice(4);
+		if (!isKnownFn(prefix, rest)) {
+			const split = rest.indexOf("-");
+			if (split > 0) {
+				const maybe = rest.slice(0, split);
+				if (
+					/^[A-Za-z0-9]+$/.test(maybe) &&
+					isKnownFn(prefix, rest.slice(split + 1))
+				) {
+					tab = maybe;
+					rest = rest.slice(split + 1);
+				}
+			}
 		}
 		name = rest;
 		kind = prefix === "FSE" ? "fse" : "fnc";
@@ -103,7 +119,7 @@ export function parseRef(from: number, to: number, inner: string): DollarRef {
 		kind,
 		prefix,
 		name,
-		pvp,
+		tab,
 		pinLevel,
 		pinBranch,
 		pinError,
@@ -111,28 +127,21 @@ export function parseRef(from: number, to: number, inner: string): DollarRef {
 	};
 }
 
-export function isKnownFn(prefix: "FNC" | "FSE", name: string): boolean {
-	const upper = name.toUpperCase();
-	if (prefix === "FSE") return FSE_NAMES.has(upper);
-	if (FNC_NAMES.has(upper) || TOTAL_NAME.test(upper)) return true;
-	return COMPAT_FSE.has(upper);
-}
-
 export function deprecatedFn(ref: DollarRef): string | undefined {
 	if (ref.kind !== "fnc" && ref.kind !== "fse") return;
 	const n = ref.name!.toUpperCase();
-	const pvp = ref.pvp ? "PVP-" : "";
+	const tab = ref.tab ? `${ref.tab}-` : "";
 	if (ref.kind === "fse" && n === "CATEGORY") {
-		return `$FSE-${pvp}CATEGORY$ is deprecated; use $FSE-${pvp}META$.`;
+		return `$FSE-${tab}CATEGORY$ is deprecated; use $FSE-${tab}META$.`;
 	}
 	if (ref.kind === "fnc" && n === "COST") {
-		return `$FNC-${pvp}COST$ is deprecated; use array variables such as $${pvp}COST$.`;
+		return `$FNC-${tab}COST$ is deprecated; use array variables such as $${tab}COST$.`;
 	}
 	if (ref.kind === "fnc" && n === "TOTALPRICE") {
-		return `$FNC-TOTALPRICE$ is deprecated; use the generic TOTAL function such as $FNC-TOTAL-${pvp}COST$.`;
+		return `$FNC-TOTALPRICE$ is deprecated; use the generic TOTAL function such as $FNC-TOTAL-${tab}COST$.`;
 	}
 	if (ref.kind === "fnc" && COMPAT_FSE.has(n)) {
-		return `$FNC-${pvp}${n}$ is deprecated; use $FSE-${pvp}${n}$.`;
+		return `$FNC-${tab}${n}$ is deprecated; use $FSE-${tab}${n}$.`;
 	}
 }
 

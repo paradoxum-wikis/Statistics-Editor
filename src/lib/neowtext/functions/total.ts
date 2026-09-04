@@ -94,7 +94,7 @@ function sumSeriesThroughLevel(
 
 /**
  * $FNC-TOTALPRICE$ links with $FNC-COST$.
- * $FNC-TOTAL-X$ links with any array $VAR$ / $PVP-VAR$.
+ * $FNC-TOTAL-X$ links with any array $VAR$ or the tab-prefixed copy.
  */
 export function resolveFNC(
 	name: string,

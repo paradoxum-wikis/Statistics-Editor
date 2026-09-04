@@ -1,4 +1,5 @@
 import { formulaSourceTip } from "$lib/towerTable";
+import { parseRef } from "$lib/neowtext/codemirror/tokens";
 import { getFncValue } from "$lib/neowtext/functions";
 import { getCostKeys } from "$lib/neowtext/functions/keys";
 import {
@@ -162,9 +163,9 @@ function followSpecial(
 	tokens: Record<string, string>,
 	variantPrefix?: string,
 ): string | undefined {
-	const m = token.slice(1, -1).match(/^(?:FNC|FSE)-(?:PVP-)?(.+)$/i);
-	if (!m) return;
-	const rest = m[1];
+	const ref = parseRef(0, token.length, token.slice(1, -1));
+	if (ref.kind !== "fnc" && ref.kind !== "fse") return;
+	const rest = ref.name!;
 	if (/^TOTALPRICE$/i.test(rest) || /^TOTAL-COST$/i.test(rest))
 		return getCostKeys(variantPrefix).find((k) => tokens[k] !== undefined);
 	const total = rest.match(/^TOTAL-(.+)$/i);

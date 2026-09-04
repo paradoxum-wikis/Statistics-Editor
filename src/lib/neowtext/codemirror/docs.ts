@@ -86,7 +86,7 @@ export function describeRef(ref: DollarRef): string {
 				? FSE[upper]
 				: (FNC[upper] ?? (deprecatedFn(ref) ? FSE[upper] : undefined));
 		if (!text) return `Unknown ${ref.prefix}.`;
-		return ref.pvp
+		return ref.tab
 			? `${text}\nTab-scoped; inherits the unprefixed value if unset.`
 			: text;
 	}
@@ -95,19 +95,15 @@ export function describeRef(ref: DollarRef): string {
 }
 
 export function kindLabel(ref: DollarRef): string {
-	const pin =
-		ref.pinLevel !== undefined
+	const extra =
+		(ref.tab ? ` · ${ref.tab}` : "") +
+		(ref.pinLevel !== undefined
 			? ` · @${ref.pinLevel}${ref.pinBranch ? `@${ref.pinBranch}` : ""}`
-			: "";
-	if (ref.kind === "fnc")
-		return (ref.pvp ? "Function · tab" : "Function") + pin;
-	if (ref.kind === "fse")
-		return (
-			(ref.pvp
-				? "Function Statistics Editor · tab"
-				: "Function Statistics Editor") + pin
-		);
-	if (ref.kind === "var" && ref.base.includes(".")) return "Dot Notation" + pin;
+			: "");
+	if (ref.kind === "fnc") return "Function" + extra;
+	if (ref.kind === "fse") return "Function Statistics Editor" + extra;
+	if (ref.kind === "var" && ref.base.includes("."))
+		return "Dot Notation" + extra;
 	return "Variable";
 }
 

@@ -9,8 +9,7 @@ const FSE_BASES = ["DETECTION", "UPGRADE", "UPGRADEICON", "CATEGORY", "META"];
 const COMPATIBILITY_FSE = ["DETECTION", "UPGRADE", "UPGRADEICON"];
 
 function isFseSuffix(suffix: string): boolean {
-	const clean = suffix.replace(/^PVP-/, "").toUpperCase();
-	return FSE_BASES.includes(clean);
+	return FSE_BASES.includes(suffix.toUpperCase());
 }
 
 function getDefaultPrefix(suffix: string): "FNC" | "FSE" {
@@ -26,8 +25,7 @@ export function getFncKeys(suffix: string, variantPrefix?: string): string[] {
 	for (const base of bases) {
 		keys.push(`$${defaultPre}-${base}$`);
 	}
-	const clean = suffix.replace(/^PVP-/, "").toUpperCase();
-	if (COMPATIBILITY_FSE.includes(clean)) {
+	if (COMPATIBILITY_FSE.includes(suffix.toUpperCase())) {
 		const otherPre = defaultPre === "FSE" ? "FNC" : "FSE";
 		for (const base of bases) {
 			keys.push(`$${otherPre}-${base}$`);

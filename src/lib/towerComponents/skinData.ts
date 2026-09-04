@@ -565,7 +565,7 @@ class SkinData {
 		const schema = this.getSchema();
 		const detStr = serializeDetectionFlags(this.detectionFlags(), schema);
 		const key = this.isPvp
-			? getDefaultFncKey("DETECTION", this.variantPrefix || "PVP")
+			? getDefaultFncKey("DETECTION", this.variantPrefix)
 			: getEffectiveFncKey(
 					this.formulaTokens,
 					"DETECTION",

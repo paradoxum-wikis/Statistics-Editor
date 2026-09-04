@@ -380,10 +380,8 @@ export default class TowerManager {
 					indexOverrides,
 				);
 				const branchMapping: Record<string, string> = {};
-				const branchNames = (
-					isPvp && getFncValue(v, "PVP-BRANCH")
-						? getArr(getFncValue(v, "PVP-BRANCH"))
-						: getArr(getFncValue(v, "BRANCH"))
+				const branchNames = getArr(
+					getFncValue(v, "BRANCH", variantPrefix),
 				).filter(Boolean);
 
 				const schemaStr = getFncValue(v, "SCHEMA");
