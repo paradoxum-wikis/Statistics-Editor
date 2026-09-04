@@ -117,13 +117,56 @@ function parseAttrSegment(attrStr: string) {
 	};
 }
 
+function tableBarIndex(s: string): number {
+	if (!/[{\[<]/.test(s)) return s.indexOf("|");
+	let wiki = 0;
+	let tpl = 0;
+	for (let i = 0; i < s.length; i++) {
+		const a = s[i];
+		const b = s[i + 1];
+		if (a === "[" && b === "[") {
+			wiki++;
+			i++;
+			continue;
+		}
+		if (a === "]" && b === "]" && wiki) {
+			wiki--;
+			i++;
+			continue;
+		}
+		if (a === "{" && b === "{") {
+			tpl++;
+			i++;
+			continue;
+		}
+		if (a === "}" && b === "}" && tpl) {
+			tpl--;
+			i++;
+			continue;
+		}
+		if (a === "<") {
+			const gt = s.indexOf(">", i + 1);
+			if (gt < 0) break;
+			i = gt;
+			continue;
+		}
+		if (!wiki && !tpl && a === "|") return i;
+	}
+	return -1;
+}
+
 function parseCellPart(raw: string, tag: "th" | "td"): PreviewCell {
-	let content = raw.trim();
-	const split = content.match(/^(.+?)\s*\|\s*(.*)$/s);
-	if (split && /=/.test(split[1])) {
-		const attrs = parseAttrSegment(split[1]);
-		content = split[2];
-		return { tag, content, ...attrs };
+	const content = raw.trim();
+	const bar = tableBarIndex(content);
+	if (bar > 0) {
+		const left = content.slice(0, bar).trim();
+		if (/=/.test(left)) {
+			return {
+				tag,
+				content: content.slice(bar + 1),
+				...parseAttrSegment(left),
+			};
+		}
 	}
 	return { tag, content };
 }
