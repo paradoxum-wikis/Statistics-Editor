@@ -23,12 +23,10 @@
 
 {#if variant === "menu"}
 	<button
-		class="dropdown-item w-full justify-start! {active
-			? 'text-amber-600! dark:text-amber-400!'
-			: ''}"
+		class="dropdown-item {active ? 'text-amber-600! dark:text-amber-400!' : ''}"
 		onclick={() => onOpen?.()}
 	>
-		<Zap class="me-2 h-4 w-4" />
+		<Zap />
 		<span>Global Modifier</span>
 	</button>
 {:else}

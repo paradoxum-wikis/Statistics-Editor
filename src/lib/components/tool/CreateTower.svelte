@@ -50,8 +50,8 @@
 	}}
 >
 	{#if variant === "menu"}
-		<Popover.Trigger class="dropdown-item w-full justify-start!">
-			<FilePlus class="me-2 h-4 w-4" />
+		<Popover.Trigger class="dropdown-item">
+			<FilePlus />
 			<span>Create Tower</span>
 		</Popover.Trigger>
 	{:else}

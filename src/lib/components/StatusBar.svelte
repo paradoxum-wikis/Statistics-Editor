@@ -76,42 +76,42 @@
 					<h4 class="mb-1 px-2 pt-1 text-sm font-medium">Theme</h4>
 					<div class="grid gap-0.5">
 						<button
-							class="dropdown-item w-full justify-start!"
+							class="dropdown-item"
 							onclick={() => {
 								settingsStore.setTheme("light");
 								themeOpen = false;
 							}}
 						>
-							<Sun class="me-2 h-4 w-4" />
+							<Sun />
 							<span>Light</span>
 							{#if settingsStore.theme === "light"}
-								<Check class="ms-auto h-4 w-4" />
+								<Check class="ms-auto" />
 							{/if}
 						</button>
 						<button
-							class="dropdown-item w-full justify-start!"
+							class="dropdown-item"
 							onclick={() => {
 								settingsStore.setTheme("dark");
 								themeOpen = false;
 							}}
 						>
-							<Moon class="me-2 h-4 w-4" />
+							<Moon />
 							<span>Dark</span>
 							{#if settingsStore.theme === "dark"}
-								<Check class="ms-auto h-4 w-4" />
+								<Check class="ms-auto" />
 							{/if}
 						</button>
 						<button
-							class="dropdown-item w-full justify-start!"
+							class="dropdown-item"
 							onclick={() => {
 								settingsStore.setTheme("system");
 								themeOpen = false;
 							}}
 						>
-							<SunMoon class="me-2 h-4 w-4" />
+							<SunMoon />
 							<span>System</span>
 							{#if settingsStore.theme === "system"}
-								<Check class="ms-auto h-4 w-4" />
+								<Check class="ms-auto" />
 							{/if}
 						</button>
 					</div>

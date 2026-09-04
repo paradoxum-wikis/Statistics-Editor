@@ -393,13 +393,13 @@
 						>
 							<span>{profile}</span>
 							{#if profile === profileStore.current}
-								<span class="ms-auto"><Check size={14} /></span>
+								<Check class="ms-auto" />
 							{:else if profile !== "Default"}
 								<button
-									class="ms-2 text-muted-foreground hover:text-destructive"
+									class="ms-auto text-muted-foreground hover:text-destructive"
 									onclick={(e) => openDeleteProfileDialog(profile, e)}
 								>
-									<Trash2 size={14} />
+									<Trash2 />
 								</button>
 							{/if}
 						</DropdownMenu.Item>
@@ -416,12 +416,8 @@
 					}}
 				>
 					{#snippet trigger({ props })}
-						<button
-							type="button"
-							class="dropdown-item w-full justify-start!"
-							{...props}
-						>
-							<Plus size={16} />
+						<button type="button" class="dropdown-item" {...props}>
+							<Plus />
 							<span>Create profile</span>
 						</button>
 					{/snippet}
@@ -455,10 +451,10 @@
 				</Modal>
 
 				<DropdownMenu.Item
-					class="dropdown-item justify-start! text-destructive hover:bg-destructive/10"
+					class="dropdown-item text-destructive hover:bg-destructive/10"
 					onclick={() => (resetProfileOpen = true)}
 				>
-					<Factory size={16} />
+					<Factory />
 					<span>Reset profile</span>
 				</DropdownMenu.Item>
 				{#if profileStore.current !== "Default"}
@@ -489,19 +485,19 @@
 			>
 				<h4 class="font-medium text-sm mb-2">Tools</h4>
 				<div class="grid gap-0.5">
-					<button class="dropdown-item w-full justify-start!" onclick={goHome}>
-						<House class="me-2 h-4 w-4" />
+					<button class="dropdown-item" onclick={goHome}>
+						<House />
 						<span>Home</span>
 					</button>
 
 					<Popover.Root>
-						<Popover.Trigger class="dropdown-item w-full justify-start!">
+						<Popover.Trigger class="dropdown-item">
 							{#if settingsStore.theme === "light"}
-								<Sun class="me-2 h-4 w-4" />
+								<Sun />
 							{:else if settingsStore.theme === "dark"}
-								<Moon class="me-2 h-4 w-4" />
+								<Moon />
 							{:else}
-								<SunMoon class="me-2 h-4 w-4" />
+								<SunMoon />
 							{/if}
 							<span>Theme</span>
 						</Popover.Trigger>
@@ -514,55 +510,52 @@
 							<h4 class="font-medium text-sm mb-1">Theme</h4>
 							<div class="grid gap-0.5">
 								<button
-									class="dropdown-item w-full justify-start!"
+									class="dropdown-item"
 									onclick={() => settingsStore.setTheme("light")}
 								>
-									<Sun class="me-2 h-4 w-4" />
+									<Sun />
 									<span>Light</span>
 									{#if settingsStore.theme === "light"}
-										<Check class="ms-2 h-4 w-4" />
+										<Check class="ms-auto" />
 									{/if}
 								</button>
 								<button
-									class="dropdown-item w-full justify-start!"
+									class="dropdown-item"
 									onclick={() => settingsStore.setTheme("dark")}
 								>
-									<Moon class="me-2 h-4 w-4" />
+									<Moon />
 									<span>Dark</span>
 									{#if settingsStore.theme === "dark"}
-										<Check class="ms-2 h-4 w-4" />
+										<Check class="ms-auto" />
 									{/if}
 								</button>
 								<button
-									class="dropdown-item w-full justify-start!"
+									class="dropdown-item"
 									onclick={() => settingsStore.setTheme("system")}
 								>
-									<SunMoon class="me-2 h-4 w-4" />
+									<SunMoon />
 									<span>System</span>
 									{#if settingsStore.theme === "system"}
-										<Check class="ms-2 h-4 w-4" />
+										<Check class="ms-auto" />
 									{/if}
 								</button>
 							</div>
 						</Popover.Content>
 					</Popover.Root>
 
-					<button
-						class="dropdown-item w-full justify-start!"
-						onclick={() => (settingsOpen = true)}
-					>
-						<Settings class="me-2 h-4 w-4" />
+					<button class="dropdown-item" onclick={() => (settingsOpen = true)}>
+						<Settings />
 						<span>Settings</span>
 					</button>
 
 					<button
-						class="dropdown-item w-full justify-start!"
+						class="dropdown-item"
 						onclick={() => {
 							toolsOpen = false;
 							announcementsStore.openList();
 						}}
 					>
-						<Megaphone class="me-2 h-4 w-4" />
+						<Megaphone />
 						<span>Announcements</span>
 					</button>
 

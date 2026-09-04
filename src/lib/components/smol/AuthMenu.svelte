@@ -77,20 +77,16 @@
 				<Separator class="my-2" />
 				<div class="grid gap-0.5">
 					<a
-						class="dropdown-item w-full justify-start!"
+						class="dropdown-item"
 						href={fandomUserPage(user.fandom_username)}
 						target="_blank"
 						rel="noopener noreferrer"
 					>
-						<BookOpenText class="me-2 h-4 w-4" />
+						<BookOpenText />
 						<span>Wiki profile</span>
 					</a>
-					<button
-						type="button"
-						class="dropdown-item w-full justify-start!"
-						onclick={requestLogout}
-					>
-						<LogOut class="me-2 h-4 w-4" />
+					<button type="button" class="dropdown-item" onclick={requestLogout}>
+						<LogOut />
 						<span>Sign out</span>
 					</button>
 				</div>

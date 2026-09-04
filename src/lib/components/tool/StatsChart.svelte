@@ -18,13 +18,13 @@
 
 {#if variant === "menu"}
 	<button
-		class="dropdown-item w-full justify-start!"
+		class="dropdown-item"
 		onclick={() => {
 			analytics.track("stats_comparator", { action: "open", source: "mobile" });
 			onOpen?.();
 		}}
 	>
-		<ChartNoAxesCombined class="me-2 h-4 w-4" />
+		<ChartNoAxesCombined />
 		<span>Statistics Comparator</span>
 	</button>
 {:else}

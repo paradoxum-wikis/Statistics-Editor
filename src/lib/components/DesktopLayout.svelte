@@ -258,15 +258,13 @@
 										>
 											<span>{profile}</span>
 											{#if profile === profileStore.current}
-												<span class="ms-auto">
-													<Check size={14} />
-												</span>
+												<Check class="ms-auto" />
 											{:else if profile !== "Default"}
 												<button
-													class="ms-2 text-muted-foreground hover:text-destructive opacity-0 transition-opacity"
+													class="ms-auto text-muted-foreground hover:text-destructive opacity-0 transition-opacity"
 													onclick={(e) => openDeleteProfileDialog(profile, e)}
 												>
-													<Trash2 size={14} />
+													<Trash2 />
 												</button>
 											{/if}
 										</DropdownMenu.Item>
@@ -283,12 +281,8 @@
 									}}
 								>
 									{#snippet trigger({ props })}
-										<button
-											type="button"
-											class="dropdown-item w-full justify-start!"
-											{...props}
-										>
-											<Plus size={16} />
+										<button type="button" class="dropdown-item" {...props}>
+											<Plus />
 											<span>Create profile</span>
 										</button>
 									{/snippet}
@@ -322,10 +316,10 @@
 								</Modal>
 
 								<DropdownMenu.Item
-									class="dropdown-item justify-start! text-destructive hover:bg-destructive/10"
+									class="dropdown-item text-destructive hover:bg-destructive/10"
 									onclick={() => (resetProfileOpen = true)}
 								>
-									<Factory size={16} />
+									<Factory />
 									<span>Reset profile</span>
 								</DropdownMenu.Item>
 								{#if profileStore.current !== "Default"}
