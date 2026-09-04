@@ -1,6 +1,7 @@
 <script lang="ts">
-	import { goto } from "$app/navigation";
+	import { goto, replaceState } from "$app/navigation";
 	import { resolve } from "$app/paths";
+	import { page as nav } from "$app/state";
 	import { fade } from "svelte/transition";
 	import { Select } from "bits-ui";
 	import {
@@ -186,6 +187,21 @@
 	function openDetail(listing: WorkshopListing) {
 		detailId = listing.id;
 		detailOpen = true;
+	}
+
+	$effect(() => {
+		const id = nav.url.searchParams.get("listing");
+		if (!id) return;
+		detailId = id;
+		detailOpen = true;
+	});
+
+	function onDetailOpenChange(open: boolean) {
+		if (open) return;
+		if (!nav.url.searchParams.has("listing")) return;
+		const next = new URL(nav.url.href);
+		next.searchParams.delete("listing");
+		replaceState(`${next.pathname}${next.search}${next.hash}`, {});
 	}
 
 	function openEdit(listing: WorkshopListing) {
@@ -445,6 +461,7 @@
 	bind:open={detailOpen}
 	bind:listingId={detailId}
 	onChanged={onDetailChanged}
+	onOpenChange={onDetailOpenChange}
 />
 
 <WorkshopFormModal mode="create" bind:open={publishOpen} onSaved={load} />

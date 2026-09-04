@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { Popover } from "bits-ui";
-	import { BookOpenText, LogOut } from "@lucide/svelte";
+	import { BookOpenText, Inbox, LogOut } from "@lucide/svelte";
 	import { authStore } from "$lib/stores/auth.svelte";
+	import { inboxStore } from "$lib/stores/inbox.svelte";
 	import { fandomUserPage, formatProfileStats } from "$lib/services/fandomAuth";
 	import Alert from "./Alert.svelte";
 	import Modal from "./Modal.svelte";
@@ -11,7 +12,7 @@
 	import { toast } from "$lib/toast";
 
 	const avatarBtn =
-		"inline-flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-muted transition-colors hover:bg-muted/80";
+		"relative inline-flex size-8 shrink-0 items-center justify-center rounded-full border border-border bg-muted transition-colors hover:bg-muted/80";
 
 	let loginOpen = $state(false);
 	let accountOpen = $state(false);
@@ -36,6 +37,7 @@
 		username = "";
 		const name = authStore.user?.fandom_username;
 		toast.success(name ? `Signed in as ${name}.` : "Signed in.");
+		void inboxStore.refresh();
 	}
 
 	function requestLogout() {
@@ -51,18 +53,30 @@
 			return;
 		}
 		toast.success("Signed out.");
+		inboxStore.reset();
+	}
+
+	function openInbox() {
+		accountOpen = false;
+		inboxStore.openInbox();
 	}
 </script>
 
 {#if authStore.user}
 	{@const user = authStore.user}
 	<Popover.Root bind:open={accountOpen}>
-		<Popover.Trigger class={avatarBtn} aria-label="Account">
+		<Popover.Trigger
+			class={avatarBtn}
+			aria-label={inboxStore.unread ? "Account, unread inbox" : "Account"}
+		>
 			<img
 				src={avatarSrc}
 				alt={user.fandom_username}
-				class="size-full object-cover"
+				class="size-full rounded-full object-cover"
 			/>
+			{#if inboxStore.unread}
+				<span class="status-dot abs" aria-hidden="true"></span>
+			{/if}
 		</Popover.Trigger>
 		<Popover.Portal>
 			<Popover.Content
@@ -85,6 +99,13 @@
 						<BookOpenText />
 						<span>Wiki profile</span>
 					</a>
+					<button type="button" class="dropdown-item" onclick={openInbox}>
+						<Inbox />
+						<span>Inbox</span>
+						{#if inboxStore.unread}
+							<span class="status-dot ms-auto" aria-hidden="true"></span>
+						{/if}
+					</button>
 					<button type="button" class="dropdown-item" onclick={requestLogout}>
 						<LogOut />
 						<span>Sign out</span>
@@ -212,3 +233,20 @@
 		{/snippet}
 	</Modal>
 {/if}
+
+<style>
+	.status-dot {
+		width: 6px;
+		height: 6px;
+		border-radius: var(--radius-full);
+		background: var(--destructive);
+		pointer-events: none;
+
+		&.abs {
+			position: absolute;
+			top: 1px;
+			right: 1px;
+			z-index: 7;
+		}
+	}
+</style>

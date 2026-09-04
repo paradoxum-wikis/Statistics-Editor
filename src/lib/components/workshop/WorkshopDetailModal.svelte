@@ -22,6 +22,7 @@
 		type WorkshopComment,
 		type WorkshopListing,
 	} from "$lib/services/workshop";
+	import { inboxStore } from "$lib/stores/inbox.svelte";
 	import { settingsStore } from "$lib/stores/settings.svelte";
 	import { timeAgo } from "$lib/utils/workshop";
 	import { toast } from "$lib/toast";
@@ -34,10 +35,12 @@
 		open = $bindable(false),
 		listingId = $bindable<string | null>(null),
 		onChanged,
+		onOpenChange,
 	}: {
 		open?: boolean;
 		listingId?: string | null;
 		onChanged?: (listing: WorkshopListing) => void;
+		onOpenChange?: (open: boolean) => void;
 	} = $props();
 
 	let listing = $state<WorkshopListing | null>(null);
@@ -84,6 +87,8 @@
 			const item = await getWorkshopListing(id);
 			listing = item;
 			onChanged?.(item);
+			if (item.mine && inboxStore.unread)
+				void inboxStore.markListingRead(item.id);
 			const ref = item.image?.trim();
 			if (ref) {
 				imageUrl =
@@ -217,6 +222,7 @@
 
 <Modal
 	bind:open
+	{onOpenChange}
 	class="flex! max-h-[92dvh] max-w-6xl! flex-col gap-0 overflow-hidden p-0! md:h-[min(92dvh,56rem)]"
 >
 	<div

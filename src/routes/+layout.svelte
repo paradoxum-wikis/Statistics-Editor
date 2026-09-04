@@ -11,6 +11,7 @@
 	import MobileLayout from "$lib/components/MobileLayout.svelte";
 	import Toaster from "$lib/components/smol/Toaster.svelte";
 	import AnnouncementsModal from "$lib/components/AnnouncementsModal.svelte";
+	import InboxModal from "$lib/components/InboxModal.svelte";
 	import "./layout.css";
 	import "@fontsource-variable/montserrat/wght.css";
 
@@ -141,4 +142,5 @@
 	{/if}
 </Tooltip.Provider>
 <AnnouncementsModal />
+<InboxModal />
 <Toaster />

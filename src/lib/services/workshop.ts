@@ -147,3 +147,33 @@ export function deleteWorkshopComment(listingId: string, commentId: string) {
 		{ method: "DELETE" },
 	);
 }
+
+export type InboxKind = "comment" | "featured" | "likes";
+
+type InboxBase = {
+	id: string;
+	created_at: string;
+	listing_id: string;
+	listing_title: string;
+};
+
+export type InboxItem =
+	| (InboxBase & {
+			kind: "comment";
+			body: string;
+			author: WorkshopAuthor;
+	  })
+	| (InboxBase & { kind: "featured" })
+	| (InboxBase & { kind: "likes"; count: number });
+
+export function listInbox() {
+	return api<{ items: InboxItem[]; unread: number }>("/aapi/inbox");
+}
+
+export function markInboxRead(listingId: string) {
+	return api<void>("/aapi/inbox/read", json("POST", { listing_id: listingId }));
+}
+
+export function markInboxReadAll() {
+	return api<void>("/aapi/inbox/read", json("POST", { all: true }));
+}
