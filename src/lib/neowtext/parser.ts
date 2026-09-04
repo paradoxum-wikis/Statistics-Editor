@@ -1,4 +1,4 @@
-import { stripRefs } from "$lib/utils/format";
+import { stripRefs, normalizeColumnKey } from "$lib/utils/format";
 import { wikiTemplateKey, wikiTemplateRe } from "$lib/wikiTemplates";
 import { stripDirectives } from "./directives";
 
@@ -329,10 +329,8 @@ export function parseTable(
 	};
 
 	const cleanHeader = (val: string): string => {
-		const expanded = applyVariables(val);
-		return stripRefs(
-			String(cleanCell(expanded, undefined)).replace(/\$[A-Z0-9_-]+\$/gi, ""),
-		).trim();
+		const expanded = String(cleanCell(applyVariables(val), undefined));
+		return normalizeColumnKey(expanded);
 	};
 
 	for (let i = 0; i < lines.length; i++) {

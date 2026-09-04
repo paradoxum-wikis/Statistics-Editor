@@ -19,6 +19,8 @@
 	import TowerTableCell from "./TowerTableCell.svelte";
 	import CellInspectorModal from "./CellInspectorModal.svelte";
 
+	const BLOCK_HEADER = /<(?:div|p|table)\b/i;
+
 	let {
 		config,
 		displayRows,
@@ -120,7 +122,10 @@
 						scope="col"
 						class={header === "Level"
 							? "table-header-sticky px-2"
-							: "table-header whitespace-nowrap"}
+							: [
+									"table-header",
+									!BLOCK_HEADER.test(headerDisplays[hIdx]) && "nowrap",
+								]}
 						class:hovered-col={hoveredCol === hIdx}
 						onmouseenter={() => (hoveredCol = hIdx)}
 						onmouseleave={() => (hoveredCol = null)}
@@ -338,6 +343,10 @@
 		text-align: left;
 		font-weight: 600;
 		color: var(--foreground);
+
+		&.nowrap {
+			white-space: nowrap;
+		}
 	}
 
 	.table-header-sticky {

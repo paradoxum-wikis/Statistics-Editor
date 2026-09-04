@@ -11,13 +11,18 @@ export function stripRefs(s: unknown): string {
 }
 
 /**
- * Normalizes a column key by stripping refs and wikilinks, and removing $refs$.
+ * Remove unwanted characters from a column key.
  */
 export function normalizeColumnKey(s: unknown): string {
-	if (s === undefined || s === null) return "";
-	return stripRefs(String(s))
-		.replace(/\[\[([^|\]]+)(?:\|[^\]]+)?\]\]/g, "$1")
-		.replace(/\$[A-Z0-9_-]+\$/gi, "")
+	const t = stripRefs(s);
+	if (!/[<$[]/.test(t)) return t.trim();
+	return t
+		.replace(/<[^>]+>/g, "")
+		.replace(/\[\[([^|\]]+)(?:\|[^\]]*)?\]\]/gi, (_, name: string) =>
+			/^(?:file|image)\s*:/i.test(name) ? "" : name,
+		)
+		.replace(/\[\[|\]\]/g, "")
+		.replace(/\$[^$]+\$/g, "")
 		.trim();
 }
 
