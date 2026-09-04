@@ -102,7 +102,7 @@ export default class TowerManager {
 	 * Useful for "unsaved changes" previews.
 	 */
 	generateWikitext(tower: Tower): string | null {
-		const src = (tower as any).sourceWikitext;
+		const src = tower.sourceWikitext;
 		if (!src) return null;
 		try {
 			return patchWikitext(stripSeMeta(src), tower);
@@ -125,7 +125,7 @@ export default class TowerManager {
 		const profile = this.dataKey;
 		if (!profile) return null;
 
-		const src = (tower as { sourceWikitext?: string }).sourceWikitext;
+		const src = tower.sourceWikitext;
 		if (!src) return null;
 
 		const patched = patchWikitext(stripSeMeta(src), tower);

@@ -22,11 +22,18 @@ export async function fetchTowerWiki(
 		const queryRes = await fetch(
 			`https://tds.fandom.com/api.php?action=query&prop=revisions&rvprop=content&rvsection=${statsSection.index}&titles=${encodeURIComponent(towerName)}&format=json&rvslots=main&origin=*`,
 		);
-		const queryData = await queryRes.json();
-		const pages = queryData?.query?.pages;
+		const queryData: {
+			query?: {
+				pages?: Record<
+					string,
+					{ revisions?: { slots?: { main?: { "*": string } } }[] }
+				>;
+			};
+		} = await queryRes.json();
+		const pages = queryData.query?.pages;
 		if (!pages) return null;
 
-		const page = Object.values(pages)[0] as any;
+		const page = Object.values(pages)[0];
 		const content = page?.revisions?.[0]?.slots?.main?.["*"];
 		if (!content) return null;
 

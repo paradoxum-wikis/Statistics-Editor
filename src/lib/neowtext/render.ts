@@ -742,9 +742,7 @@ export function renderCellHtml(
 	readOnly: boolean,
 ) {
 	return collectHtml(() =>
-		renderInlineWikitext(
-			readOnly ? formatReadOnly(val as any) : formatValue(val as any),
-		),
+		renderInlineWikitext(readOnly ? formatReadOnly(val) : formatValue(val)),
 	);
 }
 

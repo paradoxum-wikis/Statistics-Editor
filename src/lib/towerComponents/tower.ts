@@ -6,6 +6,7 @@ class Tower {
 	skinNames: string[];
 	skins: { [skinName: string]: SkinData };
 	isMalformed: boolean;
+	sourceWikitext?: string;
 
 	constructor(name: string, data: any) {
 		this.json = {

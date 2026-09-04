@@ -193,7 +193,11 @@ class SkinData {
 		this.createData();
 	}
 
-	private setDerivedValueAtLevel(level: number, column: string, value: number) {
+	private setDerivedValueAtLevel(
+		level: number,
+		column: string,
+		value: number | string,
+	) {
 		if (level === 0) {
 			if (this.data?.Defaults) this.data.Defaults[column] = value;
 		} else {
@@ -379,7 +383,7 @@ class SkinData {
 						if (typeof result === "number" && Number.isFinite(result)) {
 							this.setDerivedValueAtLevel(level, col, result);
 						} else if (typeof result === "string") {
-							this.setDerivedValueAtLevel(level, col, result as any);
+							this.setDerivedValueAtLevel(level, col, result);
 						}
 					}
 				}
