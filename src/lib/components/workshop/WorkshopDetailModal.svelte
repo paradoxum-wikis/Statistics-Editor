@@ -409,7 +409,7 @@
 								</Toggle.Root>
 							{/snippet}
 						</Tip>
-						<Tip content="View this build’s stats in the editor">
+						<Tip content="View this tower's stats in the editor">
 							{#snippet children({ props })}
 								<a {...props} class="btn secondary" href={openHref}>
 									View tower in Editor

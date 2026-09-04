@@ -699,7 +699,7 @@
 									</Btn>
 								{:else}
 									<Tip
-										content="Sign in with Fandom to publish this build to the Workshop."
+										content="Sign in with Fandom to publish this tower to the Workshop."
 									>
 										{#snippet children({ props })}
 											<span class="inline-flex" {...props}>
