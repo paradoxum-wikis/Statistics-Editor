@@ -163,14 +163,24 @@
 	}
 
 	async function goBack() {
-		if (towerStore.selectedName) {
-			await goto(resolve("/tower/[name]", { name: towerStore.selectedName }), {
-				keepFocus: true,
-				noScroll: true,
-			});
+		const name = towerStore.selectedName;
+		const opts = { keepFocus: true, noScroll: true };
+		if (!name) {
+			await goto(resolve("/"), opts);
 			return;
 		}
-		await goto(resolve("/"), { keepFocus: true, noScroll: true });
+		const share = towerStore.sharePreviewId;
+		if (share) {
+			const path = resolve("/tower/[name]", { name });
+			await goto(
+				resolve(
+					`${path}?share=${encodeURIComponent(share)}` as `/tower/${string}`,
+				),
+				opts,
+			);
+			return;
+		}
+		await goto(resolve("/tower/[name]", { name }), opts);
 	}
 
 	function openDetail(listing: WorkshopListing) {
