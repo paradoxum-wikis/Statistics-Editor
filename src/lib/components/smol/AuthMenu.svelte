@@ -19,9 +19,6 @@
 	let logoutOpen = $state(false);
 	let username = $state("");
 
-	const profileStats = $derived(
-		authStore.user ? formatProfileStats(authStore.user) : "",
-	);
 	const avatarSrc = $derived(authStore.user?.avatar || avatarPlaceholder);
 
 	async function onStart() {
@@ -62,6 +59,14 @@
 	}
 </script>
 
+{#snippet avatarImg()}
+	<img
+		src={avatarSrc}
+		alt={authStore.user?.fandom_username ?? ""}
+		class="size-full rounded-full object-cover"
+	/>
+{/snippet}
+
 {#if authStore.user}
 	{@const user = authStore.user}
 	<Popover.Root bind:open={accountOpen}>
@@ -69,11 +74,7 @@
 			class={avatarBtn}
 			aria-label={inboxStore.unread ? "Account, unread inbox" : "Account"}
 		>
-			<img
-				src={avatarSrc}
-				alt={user.fandom_username}
-				class="size-full rounded-full object-cover"
-			/>
+			{@render avatarImg()}
 			{#if inboxStore.unread}
 				<span class="status-dot abs" aria-hidden="true"></span>
 			{/if}
@@ -87,7 +88,9 @@
 				<h4 class="mb-1 px-2 pt-1 text-sm font-medium">
 					{user.fandom_username}
 				</h4>
-				<p class="mb-1 px-2 text-xs text-muted-foreground">{profileStats}</p>
+				<p class="mb-1 px-2 text-xs text-muted-foreground">
+					{formatProfileStats(user)}
+				</p>
 				<Separator class="my-2" />
 				<div class="grid gap-0.5">
 					<a
@@ -146,7 +149,7 @@
 				aria-label="Sign in with Fandom"
 				{...props}
 			>
-				<img src={avatarPlaceholder} alt="" class="size-full object-cover" />
+				{@render avatarImg()}
 			</button>
 		{/snippet}
 
