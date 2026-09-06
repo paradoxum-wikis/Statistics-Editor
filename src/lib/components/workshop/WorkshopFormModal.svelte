@@ -12,6 +12,7 @@
 		type WorkshopListing,
 		type WorkshopTag,
 	} from "$lib/services/workshop";
+	import { SHORT_ORIGIN } from "$lib/services/api";
 	import { analytics } from "$lib/services/analytics";
 	import { settingsStore } from "$lib/stores/settings.svelte";
 	import { toast } from "$lib/toast";
@@ -199,7 +200,7 @@
 						<TextInput
 							id="workshop-share-input"
 							class="short"
-							placeholder="https://tds.wiki/s/..."
+							placeholder={`${SHORT_ORIGIN}/s/...`}
 							bind:value={shareInput}
 							onkeydown={(e: KeyboardEvent) => {
 								if (e.key === "Enter") {

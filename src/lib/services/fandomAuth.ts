@@ -1,3 +1,4 @@
+import { api } from "$lib/services/api";
 import { proxyImageUrl } from "$lib/services/imageLoader";
 import { settingsStore } from "$lib/stores/settings.svelte";
 
@@ -25,25 +26,6 @@ export type FandomProfile = {
 	edits?: number;
 	posts?: number;
 };
-
-async function parseError(res: Response): Promise<string> {
-	const text = (await res.text()).trim();
-	if (!text) return `Request failed (${res.status})`;
-	if (text.startsWith("{")) {
-		const j = JSON.parse(text) as { error?: string };
-		if (j.error) return j.error;
-	}
-	return text;
-}
-
-async function api<T>(path: string, init?: RequestInit): Promise<T> {
-	const res = await fetch(`https://tds.wiki${path}`, {
-		credentials: "include",
-		...init,
-	});
-	if (!res.ok) throw new Error(await parseError(res));
-	return (await res.json()) as T;
-}
 
 export async function fetchFandomProfile(
 	userId: number,

@@ -1,7 +1,7 @@
+import { API_ORIGIN, SHORT_ORIGIN } from "$lib/services/api";
 import { settingsStore } from "$lib/stores/settings.svelte";
 import { authStore } from "$lib/stores/auth.svelte";
 
-const SHARE_ORIGIN = "https://tds.wiki";
 const SHARE_CACHE_KEY = "tdse_share_cache";
 const OWNED_SHARE_KEY = "tdse_owned_shares";
 const SHARE_CACHE_MAX = 32;
@@ -24,7 +24,7 @@ const memoryCache = new Map<string, string>();
 const inflight = new Map<string, Promise<string>>();
 
 export function sharePageUrl(id: string): string {
-	return `${SHARE_ORIGIN}/s/${id}`;
+	return `${SHORT_ORIGIN}/s/${id}`;
 }
 
 export function parseShareRef(input: string): string | null {
@@ -134,7 +134,7 @@ export async function createShare(
 	const replaceId = own && towerName ? ownedShareId(towerName) : null;
 
 	const promise = (async (): Promise<string> => {
-		const res = await fetch(`${SHARE_ORIGIN}/aapi/shares`, {
+		const res = await fetch(`${API_ORIGIN}/aapi/shares`, {
 			method: "POST",
 			credentials: "include",
 			headers: { "Content-Type": "application/json" },
@@ -166,7 +166,7 @@ export async function fetchShare(id: string): Promise<ShareRecord> {
 	const shareId = parseShareRef(id);
 	if (!shareId) throw new Error("Invalid share id");
 
-	const res = await fetch(`${SHARE_ORIGIN}/aapi/shares/${shareId}`, {
+	const res = await fetch(`${API_ORIGIN}/aapi/shares/${shareId}`, {
 		credentials: "include",
 	});
 	if (!res.ok) {

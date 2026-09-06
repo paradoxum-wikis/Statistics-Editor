@@ -1,3 +1,5 @@
+import { api, json } from "$lib/services/api";
+
 export const WORKSHOP_TAGS = ["rework", "rebalance", "new"] as const;
 export type WorkshopTag = (typeof WORKSHOP_TAGS)[number];
 export const WORKSHOP_TAG_FEATURED = "featured" as const;
@@ -49,31 +51,6 @@ export type WorkshopWriteInput = {
 	tags: WorkshopTag[];
 	image?: string;
 };
-
-async function api<T>(path: string, init?: RequestInit): Promise<T> {
-	const res = await fetch(`https://tds.wiki${path}`, {
-		credentials: "include",
-		...init,
-	});
-	if (!res.ok) {
-		const text = (await res.text()).trim();
-		if (text.startsWith("{")) {
-			const j = JSON.parse(text) as { error?: string };
-			if (j.error) throw new Error(j.error);
-		}
-		throw new Error(text || `Request failed (${res.status})`);
-	}
-	if (res.status === 204) return undefined as T;
-	return (await res.json()) as T;
-}
-
-function json(method: string, body: unknown): RequestInit {
-	return {
-		method,
-		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify(body),
-	};
-}
 
 export async function listWorkshop(params: WorkshopListParams = {}) {
 	const qs = new URLSearchParams();

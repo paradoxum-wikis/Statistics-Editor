@@ -1,3 +1,4 @@
+import { api } from "$lib/services/api";
 import {
 	type WorkshopListing,
 	type WorkshopListingTag,
@@ -10,23 +11,6 @@ export function isAdminUser(
 }
 
 export type AdminListing = WorkshopListing & { published: boolean };
-
-async function api<T>(path: string, init?: RequestInit): Promise<T> {
-	const res = await fetch(`https://tds.wiki${path}`, {
-		credentials: "include",
-		...init,
-	});
-	if (!res.ok) {
-		const text = (await res.text()).trim();
-		if (text.startsWith("{")) {
-			const j = JSON.parse(text) as { error?: string };
-			if (j.error) throw new Error(j.error);
-		}
-		throw new Error(text || `Request failed (${res.status})`);
-	}
-	if (res.status === 204) return undefined as T;
-	return (await res.json()) as T;
-}
 
 export async function listAdminWorkshop(
 	params: {
