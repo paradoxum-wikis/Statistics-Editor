@@ -42,7 +42,7 @@
 			accent: "oklch(0.5915 0.2276 27.11)",
 		},
 		{
-			href: "https://tds.fandom.com",
+			href: "https://tds.wiki",
 			label: "Tower Defense Simulator Wiki",
 			icon: tdswLogo,
 			accent: "var(--link)",

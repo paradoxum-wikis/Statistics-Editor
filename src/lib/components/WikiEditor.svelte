@@ -439,7 +439,7 @@
 			The source editor uses Neowtext, which includes features such as variables
 			and is likely to be unfamiliar to most people. Refer to the
 			<a
-				href="https://tds.fandom.com/wiki/Help:Neowtext"
+				href="https://tds.wiki/w/Help:Neowtext"
 				target="_blank"
 				rel="noopener"
 				class="text-blue-500 underline">help page</a

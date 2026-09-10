@@ -1,6 +1,6 @@
 <div class="mb-3 px-2">
 	<a
-		href="https://tds.fandom.com/wiki/"
+		href="https://tds.wiki/w/"
 		target="_blank"
 		rel="noopener"
 		aria-label="Tower Defense Simulator Wiki Logo"
