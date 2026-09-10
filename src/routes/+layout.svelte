@@ -36,13 +36,13 @@
 	// as page-level <title> can stick after client nav
 	const pageTitle = $derived(
 		notFound
-			? `404 Not Found | ${siteName}`
+			? `404 Not Found - ${siteName}`
 			: isAdmin
-				? `Admin | ${siteName}`
+				? `Admin - ${siteName}`
 				: isWorkshop
-					? `Workshop | ${siteName}`
+					? `Workshop - ${siteName}`
 					: towerName
-						? `${towerName} | ${siteName}`
+						? `${towerName} - ${siteName}`
 						: siteName,
 	);
 	const description = $derived(
