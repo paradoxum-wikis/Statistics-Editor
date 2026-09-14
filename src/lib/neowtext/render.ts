@@ -1,7 +1,6 @@
 import { formatValue, formatReadOnly, stripRefs } from "$lib/utils/format";
 import {
 	IMAGE_EXT,
-	proxyImageUrl,
 	isAllowedExternalImageUrl,
 	isDirectImageUrl,
 	resolveWikiFileUrl,
@@ -14,7 +13,7 @@ import {
 	type WikiTemplate,
 } from "$lib/wikiTemplates";
 
-const FANDOM_BASE = "https://tds.fandom.com/wiki/";
+const WIKI_BASE = "https://tds.wiki/w/";
 const RE_CHAR_HEX = /(?:&amp;)?&#x([0-9a-fA-F]+);/g;
 const RE_CHAR_DEC = /(?:&amp;)?&#([0-9]+);/g;
 const RE_LBRACK = /&lbrack;|&lsqb;/g;
@@ -234,13 +233,11 @@ function fileAlignCls(align?: ParsedFileOpts["align"]): string {
 
 function fileLinkHref(link: string): string {
 	if (/^https?:\/\//i.test(link)) return link;
-	return `${FANDOM_BASE}${link.trim().replace(/ /g, "_")}`;
+	return `${WIKI_BASE}${link.trim().replace(/ /g, "_")}`;
 }
 
-function fandomImgAttrs(url: string, wikiFile = false): string {
-	const fandom = wikiFile || isAllowedExternalImageUrl(url);
-	if (!fandom) return `src="${escapeAttr(url)}"`;
-	return `src="${escapeAttr(proxyImageUrl(url))}"`;
+function wikiImgAttrs(url: string): string {
+	return `src="${escapeAttr(url)}"`;
 }
 
 function renderWikiFileHtml(
@@ -279,7 +276,7 @@ function renderWikiFileHtml(
 		.join(" ");
 
 	const imgAttrs = [
-		fandomImgAttrs(src, true),
+		wikiImgAttrs(src),
 		`alt="${alt}"`,
 		`class="${escapeAttr(imgCls)}"`,
 		'loading="lazy"',
@@ -294,7 +291,7 @@ function renderWikiFileHtml(
 	if (!opts.noLink) {
 		const href = opts.link
 			? fileLinkHref(opts.link)
-			: `${FANDOM_BASE}${fileRef.trim().replace(/ /g, "_")}`;
+			: `${WIKI_BASE}${fileRef.trim().replace(/ /g, "_")}`;
 		const external = /^https?:\/\//i.test(href);
 		inner = `<a href="${escapeAttr(href)}" target="_blank" rel="noopener"${external ? "" : ' class="wiki-link"'}>${inner}</a>`;
 	}
@@ -320,7 +317,7 @@ function wikiFileToHtml(fileRef: string, optionStr?: string): string {
 
 	if (!url) {
 		const name = ref.replace(/^(?:File|Image):\s*/i, "");
-		return `<a href="${FANDOM_BASE}${ref.replace(/ /g, "_")}" target="_blank" rel="noopener" class="wiki-link">${name}</a>`;
+		return `<a href="${WIKI_BASE}${ref.replace(/ /g, "_")}" target="_blank" rel="noopener" class="wiki-link">${name}</a>`;
 	}
 
 	return renderWikiFileHtml(ref, url, opts);
@@ -328,12 +325,12 @@ function wikiFileToHtml(fileRef: string, optionStr?: string): string {
 
 function wikilinkToAnchor(link: string, text: string): string {
 	const slug = link.trim().replace(/ /g, "_");
-	return `<a href="${FANDOM_BASE}${slug}" target="_blank" rel="noopener" class="wiki-link">${text.trim()}</a>`;
+	return `<a href="${WIKI_BASE}${slug}" target="_blank" rel="noopener" class="wiki-link">${text.trim()}</a>`;
 }
 
 function externalImageToHtml(src: string, href?: string): string {
 	const srcAttr = isAllowedExternalImageUrl(src)
-		? fandomImgAttrs(src)
+		? wikiImgAttrs(src)
 		: `src="${escapeAttr(src)}"`;
 	const img = `<img ${srcAttr} alt="" class="inline-block max-w-full h-auto align-middle" loading="lazy" />`;
 	if (!href) return img;

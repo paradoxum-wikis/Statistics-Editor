@@ -1,5 +1,7 @@
 export const noFetchTowers = new Set<string>();
 
+const WIKI_API = "https://tds.wiki/api.php";
+
 export async function fetchTowerWiki(
 	towerName: string,
 	force: boolean = false,
@@ -8,7 +10,7 @@ export async function fetchTowerWiki(
 
 	try {
 		const parseRes = await fetch(
-			`https://tds.fandom.com/api.php?action=parse&page=${encodeURIComponent(towerName)}&prop=sections&format=json&origin=*`,
+			`${WIKI_API}?action=parse&page=${encodeURIComponent(towerName)}&prop=sections&format=json&origin=*`,
 		);
 		const parseData = await parseRes.json();
 		const sections = parseData?.parse?.sections;
@@ -20,7 +22,7 @@ export async function fetchTowerWiki(
 		if (!statsSection) return null;
 
 		const queryRes = await fetch(
-			`https://tds.fandom.com/api.php?action=query&prop=revisions&rvprop=content&rvsection=${statsSection.index}&titles=${encodeURIComponent(towerName)}&format=json&rvslots=main&origin=*`,
+			`${WIKI_API}?action=query&prop=revisions&rvprop=content&rvsection=${statsSection.index}&titles=${encodeURIComponent(towerName)}&format=json&rvslots=main&origin=*`,
 		);
 		const queryData: {
 			query?: {

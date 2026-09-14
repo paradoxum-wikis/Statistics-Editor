@@ -9,6 +9,7 @@ export type AuthUser = {
 	fandom_username: string;
 	avatar?: string;
 	edits?: number;
+	posts?: number;
 	linked_at?: string;
 };
 
@@ -32,9 +33,10 @@ export function wikiUserPage(username: string): string {
 }
 
 export function formatProfileStats(user: AuthUser): string {
-	return user.edits != null
-		? `${user.edits.toLocaleString()} edits`
-		: "Wiki account";
+	const parts: string[] = [];
+	if (user.edits != null) parts.push(`${user.edits.toLocaleString()} edits`);
+	if (user.posts != null) parts.push(`${user.posts.toLocaleString()} posts`);
+	return parts.join(" · ") || "Wiki account";
 }
 
 async function wikiQuery<T>(params: Record<string, string>): Promise<T> {
@@ -131,18 +133,27 @@ export function rememberWikiAvatar(id: number, url: string | null) {
 	avatarByUser.set(id, url);
 }
 
+type WikiProfileCard = {
+	avatar_url?: string;
+	edit_count?: number;
+	meta_items?: { id: string; label: string; value: string }[];
+};
+
 export async function fetchWikiProfile(
 	username: string,
-): Promise<{ avatar?: string; edits?: number }> {
+): Promise<{ avatar?: string; edits?: number; posts?: number }> {
 	const data = await wikiQuery<{
-		query?: {
-			integratedprofile?: { avatar_url?: string; edit_count?: number };
-		};
+		query?: { integratedprofilecard?: WikiProfileCard[] };
 	}>({
 		action: "query",
-		list: "integratedprofile",
-		ipuser: username,
+		list: "integratedprofilecard",
+		ipcuser: username,
 	});
-	const p = data.query?.integratedprofile;
-	return { avatar: absoluteWikiUrl(p?.avatar_url), edits: p?.edit_count };
+	const card = data.query?.integratedprofilecard?.[0];
+	const posts = card?.meta_items?.find((m) => m.id === "discuss-posts")?.value;
+	return {
+		avatar: absoluteWikiUrl(card?.avatar_url),
+		edits: card?.edit_count,
+		posts: posts != null && posts !== "" ? Number(posts) : undefined,
+	};
 }

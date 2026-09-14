@@ -6,7 +6,7 @@ import {
 	type SeDirective,
 } from "./tokens";
 
-const HELP_PAGE = "https://tds.fandom.com/wiki/Help:Neowtext";
+const HELP_PAGE = "https://tds.wiki/w/Help:Neowtext";
 
 const FNC: Record<string, string> = {
 	COST: "An array of upgrade costs for each level starting from Level 0 (e.g., 8250; 3250; 7500). Declaring this shows the Costs sidebar in the Statistics Editor. $FNC-TOTALPRICE$ sums it.",

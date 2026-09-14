@@ -9,35 +9,16 @@
 import { mwWikiFileUrl, mwSetBaseUrl } from "mediawiki-file-url";
 import { settingsStore } from "$lib/stores/settings.svelte";
 
-mwSetBaseUrl("https://static.wikia.nocookie.net/tower-defense-sim/images/");
+mwSetBaseUrl("https://tds.wiki/images");
 
 export const IMAGE_EXT = "jpe?g|png|gif|webp|svg|bmp|avif";
 const RE_IMAGE_EXT = new RegExp(`\\.(${IMAGE_EXT})([/?#]|$)`, "i");
 
-// $wgAllowExternalImagesFrom
-const EXTERNAL_IMAGE_PREFIXES = [
-	"https://images.wikia.com",
-	"https://static.wikia.com",
-	"https://static.wikia.nocookie.net",
-	"https://img.wikia.nocookie.net",
-	"https://img1.wikia.nocookie.net",
-	"https://img2.wikia.nocookie.net",
-	"https://img3.wikia.nocookie.net",
-	"https://img4.wikia.nocookie.net",
-	"https://img5.wikia.nocookie.net",
-	"https://images.wikia.nocookie.net",
-	"https://images1.wikia.nocookie.net",
-	"https://images2.wikia.nocookie.net",
-	"https://images3.wikia.nocookie.net",
-	"https://images4.wikia.nocookie.net",
-	"https://images5.wikia.nocookie.net",
-	"https://vignette.wikia.nocookie.net",
-	"https://vignette1.wikia.nocookie.net",
-	"https://vignette2.wikia.nocookie.net",
-	"https://vignette3.wikia.nocookie.net",
-	"https://vignette4.wikia.nocookie.net",
-	"https://vignette5.wikia.nocookie.net",
-];
+const WIKI_IMAGE_BASE = "https://tds.wiki/images/";
+
+export function isWikiImageUrl(url: string): boolean {
+	return url.trim().toLowerCase().startsWith(WIKI_IMAGE_BASE);
+}
 
 export function resolveWikiFileUrl(imageIdStr: string): string | null {
 	const s = imageIdStr
@@ -66,17 +47,8 @@ export function isDirectImageUrl(url: string): boolean {
 	}
 }
 
-function isFandomCdnUrl(url: string): boolean {
-	const normalized = url.trim().toLowerCase();
-	return EXTERNAL_IMAGE_PREFIXES.some((prefix) =>
-		normalized.startsWith(
-			prefix.endsWith("/") ? prefix.toLowerCase() : `${prefix.toLowerCase()}/`,
-		),
-	);
-}
-
 export function isAllowedExternalImageUrl(url: string): boolean {
-	return isDirectImageUrl(url) && isFandomCdnUrl(url);
+	return isDirectImageUrl(url) && isWikiImageUrl(url);
 }
 
 export function proxyImageUrl(url: string): string {
@@ -362,7 +334,7 @@ class ImageLoaderService {
 	}
 
 	/**
-	 * Loads an image either from a Fandom URL, a MediaWiki filename, or via Roblox asset delivery.
+	 * Loads an image either from tds.wiki, a MediaWiki filename, or via Roblox asset delivery.
 	 */
 	async loadImage(
 		towerName: string,
@@ -385,20 +357,17 @@ class ImageLoaderService {
 		try {
 			const imageIdStr = String(imageId);
 
-			// Thumblr 404s when Referer isn't Fandom
-			if (typeof imageId === "string" && isFandomCdnUrl(imageId)) {
-				const url = proxyImageUrl(imageId);
-				this.cache.set(requestKey, url);
-				return url;
+			if (typeof imageId === "string" && isWikiImageUrl(imageId)) {
+				this.cache.set(requestKey, imageId);
+				return imageId;
 			}
 
 			// MediaWiki filename
 			if (typeof imageId === "string") {
 				const mwUrl = resolveWikiFileUrl(imageIdStr);
 				if (mwUrl) {
-					const proxied = proxyImageUrl(mwUrl);
-					this.cache.set(requestKey, proxied);
-					return proxied;
+					this.cache.set(requestKey, mwUrl);
+					return mwUrl;
 				}
 			}
 
