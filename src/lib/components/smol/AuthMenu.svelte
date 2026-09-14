@@ -3,10 +3,9 @@
 	import { BookOpenText, Inbox, LogOut } from "@lucide/svelte";
 	import { authStore } from "$lib/stores/auth.svelte";
 	import { inboxStore } from "$lib/stores/inbox.svelte";
-	import { fandomUserPage, formatProfileStats } from "$lib/services/fandomAuth";
+	import { wikiUserPage, formatProfileStats } from "$lib/services/wikiAuth";
 	import Alert from "./Alert.svelte";
 	import Modal from "./Modal.svelte";
-	import TextInput from "./TextInput.svelte";
 	import Separator from "./Separator.svelte";
 	import avatarPlaceholder from "$lib/assets/Avatar.png";
 	import { toast } from "$lib/toast";
@@ -14,27 +13,15 @@
 	const avatarBtn =
 		"relative inline-flex size-8 shrink-0 items-center justify-center rounded-full border border-border bg-muted transition-colors hover:bg-muted/80";
 
-	let loginOpen = $state(false);
 	let accountOpen = $state(false);
 	let logoutOpen = $state(false);
-	let username = $state("");
+	let loginOpen = $state(false);
 
 	const avatarSrc = $derived(authStore.user?.avatar || avatarPlaceholder);
 
-	async function onStart() {
-		const name = username.trim();
-		if (!name) return;
-		await authStore.start(name);
-	}
-
-	async function onComplete() {
-		await authStore.complete();
-		if (authStore.error) return;
+	function requestLogin() {
 		loginOpen = false;
-		username = "";
-		const name = authStore.user?.fandom_username;
-		toast.success(name ? `Signed in as ${name}.` : "Signed in.");
-		void inboxStore.refresh();
+		authStore.login();
 	}
 
 	function requestLogout() {
@@ -95,7 +82,7 @@
 				<div class="grid gap-0.5">
 					<a
 						class="dropdown-item"
-						href={fandomUserPage(user.fandom_username)}
+						href={wikiUserPage(user.fandom_username)}
 						target="_blank"
 						rel="noopener noreferrer"
 					>
@@ -119,9 +106,9 @@
 	</Popover.Root>
 
 	{#snippet logoutBody()}
-		Sign out of Fandom account
+		Sign out of your wiki account
 		<span class="font-bold">{user.fandom_username}</span>? You can sign back in
-		anytime by verifying on the wiki again.
+		anytime with the wiki.
 	{/snippet}
 
 	<Alert
@@ -135,103 +122,58 @@
 {:else}
 	<Modal
 		bind:open={loginOpen}
-		title="Sign in with Fandom"
-		description="Prove you are who you are by saving a verification page on the Tower Defense Simulator Wiki."
+		title="Sign in with the Wiki"
+		description="Authorize the Statistics Editor with your Tower Defense Simulator Wiki account."
 		class="max-w-md"
 		onOpenChange={(next) => {
-			if (!next) authStore.clearChallenge();
+			if (!next) authStore.error = null;
 		}}
 	>
 		{#snippet trigger({ props })}
 			<button
 				type="button"
 				class={avatarBtn}
-				aria-label="Sign in with Fandom"
+				aria-label="Sign in with your wiki account"
 				{...props}
 			>
 				{@render avatarImg()}
 			</button>
 		{/snippet}
 
-		{#if !authStore.challenge}
-			<div class="space-y-2">
-				<label class="text-sm font-medium" for="fandom-username">
-					Username
-				</label>
-				<TextInput
-					id="fandom-username"
-					type="text"
-					placeholder="C'mon, put it here..."
-					bind:value={username}
-					onkeydown={(e: KeyboardEvent) => {
-						if (e.key === "Enter") void onStart();
-					}}
-				/>
-			</div>
-		{:else}
-			<div class="space-y-3 text-sm">
-				<p>
-					Signed in as wikiling
-					<strong>{authStore.challenge.fandom_username}</strong>? Open the
-					editor, save (Alt+Shift+S), then confirm here.
-				</p>
-				<a
-					class="btn primary inline-flex w-full justify-center"
-					href={authStore.challenge.edit_url}
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					Open Fandom editor
-				</a>
-				<p class="text-xs text-muted-foreground break-all">
-					Summary must be:
-					<code class="rounded bg-muted px-1"
-						>{authStore.challenge.summary}</code
-					>
-				</p>
-			</div>
-		{/if}
+		<div class="space-y-3 text-sm">
+			<p>
+				You'll be sent to <span class="font-medium">tds.wiki</span> to approve access,
+				then brought right back here.
+			</p>
+			<ul class="list-disc space-y-1 ps-5 text-muted-foreground">
+				<li>Publish towers to the Workshop</li>
+				<li>Upvote and comment on people's creations</li>
+				<li>Own the share links you create</li>
+				<li>And more..!</li>
+			</ul>
+			<p class="text-xs text-muted-foreground">
+				The editor only receives your wiki username and ID, never sensitive info
+				such as passwords. You can revoke access anytime from your wiki
+				preferences.
+			</p>
+		</div>
 
 		{#if authStore.error}
-			<p class="text-sm text-destructive">{authStore.error}</p>
+			<p class="mt-3 text-sm text-destructive">{authStore.error}</p>
 		{/if}
 
 		{#snippet footer()}
-			<div class="flex justify-end gap-2">
-				{#if !authStore.challenge}
-					<button
-						type="button"
-						class="btn outline"
-						onclick={() => (loginOpen = false)}
-					>
-						Cancel
-					</button>
-					<button
-						type="button"
-						class="btn primary"
-						disabled={authStore.busy || !username.trim()}
-						onclick={onStart}
-					>
-						{authStore.busy ? "Checking..." : "Continue"}
-					</button>
-				{:else}
-					<button
-						type="button"
-						class="btn outline"
-						disabled={authStore.busy}
-						onclick={() => authStore.clearChallenge()}
-					>
-						Back
-					</button>
-					<button
-						type="button"
-						class="btn primary"
-						disabled={authStore.busy}
-						onclick={onComplete}
-					>
-						{authStore.busy ? "Verifying..." : "I've saved"}
-					</button>
-				{/if}
+			<div class="mt-4 flex justify-end gap-2">
+				<button
+					type="button"
+					class="btn outline"
+					onclick={() => (loginOpen = false)}
+				>
+					Cancel
+				</button>
+				<button type="button" class="btn primary" onclick={requestLogin}>
+					Continue
+				</button>
 			</div>
 		{/snippet}
 	</Modal>

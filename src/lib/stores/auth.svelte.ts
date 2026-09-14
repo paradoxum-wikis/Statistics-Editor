@@ -1,23 +1,22 @@
 import {
-	completeFandomAuth,
-	fetchFandomProfile,
 	fetchMe,
+	fetchWikiProfile,
+	loginWithWiki,
 	logoutAuth,
-	rememberFandomAvatar,
-	startFandomAuth,
+	rememberWikiAvatar,
 	type AuthUser,
-	type FandomStart,
-} from "$lib/services/fandomAuth";
+} from "$lib/services/wikiAuth";
 import { settingsStore } from "$lib/stores/settings.svelte";
+import { toast } from "$lib/toast";
 
 class AuthStore {
 	user = $state.raw<AuthUser | null>(null);
 	ready = $state(false);
 	busy = $state(false);
 	error = $state<string | null>(null);
-	challenge = $state.raw<FandomStart | null>(null);
 
 	async init() {
+		this.reportAuthError();
 		try {
 			this.user = await withProfile(await fetchMe());
 		} catch (e) {
@@ -28,38 +27,9 @@ class AuthStore {
 		}
 	}
 
-	async start(username: string) {
-		this.busy = true;
+	login() {
 		this.error = null;
-		this.challenge = null;
-		try {
-			this.challenge = await startFandomAuth(username);
-		} catch (e) {
-			this.error = e instanceof Error ? e.message : String(e);
-			if (settingsStore.debugMode) console.error("[auth] start", e);
-		} finally {
-			this.busy = false;
-		}
-	}
-
-	async complete() {
-		if (!this.challenge) {
-			this.error = "No active challenge";
-			return;
-		}
-		this.busy = true;
-		this.error = null;
-		try {
-			this.user = await withProfile(
-				await completeFandomAuth(this.challenge.challenge_id),
-			);
-			this.challenge = null;
-		} catch (e) {
-			this.error = e instanceof Error ? e.message : String(e);
-			if (settingsStore.debugMode) console.error("[auth] complete", e);
-		} finally {
-			this.busy = false;
-		}
+		loginWithWiki(window.location.pathname + window.location.search);
 	}
 
 	async logout() {
@@ -68,7 +38,6 @@ class AuthStore {
 		try {
 			await logoutAuth();
 			this.user = null;
-			this.challenge = null;
 		} catch (e) {
 			this.error = e instanceof Error ? e.message : String(e);
 			if (settingsStore.debugMode) console.error("[auth] logout", e);
@@ -77,18 +46,23 @@ class AuthStore {
 		}
 	}
 
-	clearChallenge() {
-		this.challenge = null;
-		this.error = null;
+	private reportAuthError() {
+		if (typeof window === "undefined") return;
+		const url = new URL(window.location.href);
+		const authError = url.searchParams.get("auth_error");
+		if (!authError) return;
+		url.searchParams.delete("auth_error");
+		window.history.replaceState({}, "", url.pathname + url.search + url.hash);
+		toast.error(`Sign-in failed: ${authError}`);
 	}
 }
 
 async function withProfile(user: AuthUser | null): Promise<AuthUser | null> {
 	if (!user) return null;
 	try {
-		const profile = await fetchFandomProfile(user.fandom_userid);
+		const profile = await fetchWikiProfile(user.fandom_username);
 		const merged = { ...user, ...profile };
-		rememberFandomAvatar(user.fandom_userid, merged.avatar ?? null);
+		rememberWikiAvatar(user.fandom_userid, merged.avatar ?? null);
 		return merged;
 	} catch (e) {
 		if (settingsStore.debugMode) console.error("[auth] profile", e);

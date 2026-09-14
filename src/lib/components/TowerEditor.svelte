@@ -698,9 +698,7 @@
 										Publish to Workshop
 									</Btn>
 								{:else}
-									<Tip
-										content="Sign in with Fandom to publish this tower to the Workshop."
-									>
+									<Tip content="Sign in to publish this tower to the Workshop.">
 										{#snippet children({ props })}
 											<span class="inline-flex" {...props}>
 												<Btn variant="secondary" disabled>

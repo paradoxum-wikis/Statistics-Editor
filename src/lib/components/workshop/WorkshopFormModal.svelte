@@ -167,8 +167,8 @@
 >
 	{#if !authStore.user}
 		<p class="text-sm text-muted-foreground">
-			Sign in with Fandom first, you can find the login prompt in the top bar as
-			an avatar icon.
+			Sign in first, you can find the login prompt in the top bar as an avatar
+			icon.
 		</p>
 	{:else}
 		<div class="space-y-3">

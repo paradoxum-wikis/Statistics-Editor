@@ -10,7 +10,7 @@
 	} from "@lucide/svelte";
 	import avatarPlaceholder from "$lib/assets/Avatar.png";
 	import { authStore } from "$lib/stores/auth.svelte";
-	import { fandomUserPage, fetchFandomAvatar } from "$lib/services/fandomAuth";
+	import { wikiUserPage, fetchWikiAvatar } from "$lib/services/wikiAuth";
 	import { imageLoader } from "$lib/services/imageLoader";
 	import {
 		createWorkshopComment,
@@ -67,7 +67,7 @@
 		listing?.tags.includes(WORKSHOP_TAG_FEATURED) ?? false,
 	);
 	const authorPage = $derived(
-		listing ? fandomUserPage(listing.author.fandom_username) : "#",
+		listing ? wikiUserPage(listing.author.fandom_username) : "#",
 	);
 
 	function rememberAvatar(userId: number, url: string) {
@@ -95,7 +95,7 @@
 					imageLoader.getCachedUrl(item.id, 0, ref) ??
 					(await imageLoader.loadImage(item.id, 0, ref));
 			}
-			fetchFandomAvatar(item.author.fandom_userid)
+			fetchWikiAvatar(item.author.fandom_userid, item.author.fandom_username)
 				.then((url) => {
 					if (url) {
 						authorAvatar = url;
@@ -124,7 +124,7 @@
 			for (const c of res.items) {
 				const uid = c.author.fandom_userid;
 				if (avatars.has(uid)) continue;
-				fetchFandomAvatar(uid)
+				fetchWikiAvatar(uid, c.author.fandom_username)
 					.then((url) => {
 						if (url) rememberAvatar(uid, url);
 					})
@@ -158,7 +158,7 @@
 	async function onVote() {
 		if (!listing || voteBusy) return;
 		if (!authStore.user) {
-			toast.warning("Sign in with Fandom to upvote.");
+			toast.warning("Sign in to upvote.");
 			return;
 		}
 		voteBusy = true;
@@ -183,7 +183,7 @@
 			const c = await createWorkshopComment(listing.id, body);
 			comments = [...comments, c];
 			commentBody = "";
-			fetchFandomAvatar(c.author.fandom_userid)
+			fetchWikiAvatar(c.author.fandom_userid, c.author.fandom_username)
 				.then((url) => {
 					if (url) rememberAvatar(c.author.fandom_userid, url);
 				})
@@ -453,7 +453,7 @@
 										{#snippet children({ props })}
 											<a
 												{...props}
-												href={fandomUserPage(c.author.fandom_username)}
+												href={wikiUserPage(c.author.fandom_username)}
 												target="_blank"
 												rel="noopener noreferrer"
 												class="mt-0.5 shrink-0 rounded-full outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring"
@@ -481,7 +481,7 @@
 											class="flex items-baseline justify-between gap-2 text-xs"
 										>
 											<a
-												href={fandomUserPage(c.author.fandom_username)}
+												href={wikiUserPage(c.author.fandom_username)}
 												target="_blank"
 												rel="noopener noreferrer"
 												class="font-medium text-link hover:underline"
@@ -532,7 +532,7 @@
 						</div>
 					{:else}
 						<p class="text-xs text-muted-foreground text-center">
-							Sign in with Fandom to upvote or comment.
+							Sign in to upvote or comment.
 						</p>
 					{/if}
 				</div>

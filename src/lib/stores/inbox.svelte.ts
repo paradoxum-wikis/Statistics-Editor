@@ -4,7 +4,7 @@ import {
 	markInboxReadAll,
 	type InboxItem,
 } from "$lib/services/workshop";
-import { fetchFandomAvatars } from "$lib/services/fandomAuth";
+import { fetchWikiAvatars } from "$lib/services/wikiAuth";
 import { settingsStore } from "$lib/stores/settings.svelte";
 
 class InboxStore {
@@ -36,12 +36,19 @@ class InboxStore {
 	}
 
 	private async fillAvatars(seq: number, items: InboxItem[]) {
-		const ids = items.flatMap((i) =>
-			i.kind === "comment" ? [i.author.fandom_userid] : [],
+		const users = items.flatMap((i) =>
+			i.kind === "comment"
+				? [
+						{
+							id: i.author.fandom_userid,
+							name: i.author.fandom_username,
+						},
+					]
+				: [],
 		);
-		if (!ids.length) return;
+		if (!users.length) return;
 		try {
-			const m = await fetchFandomAvatars(ids);
+			const m = await fetchWikiAvatars(users);
 			if (seq !== this.seq) return;
 			const next = new Map(this.avatars);
 			for (const [id, url] of m) if (url) next.set(id, url);

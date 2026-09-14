@@ -33,7 +33,7 @@
 	import WorkshopFormModal from "$lib/components/workshop/WorkshopFormModal.svelte";
 	import WorkshopSpotlight from "$lib/components/workshop/WorkshopSpotlight.svelte";
 	import { isAdminUser } from "$lib/services/admin";
-	import { fetchFandomAvatars } from "$lib/services/fandomAuth";
+	import { fetchWikiAvatars } from "$lib/services/wikiAuth";
 	import { settingsStore } from "$lib/stores/settings.svelte";
 	import {
 		deleteWorkshopListing,
@@ -96,11 +96,14 @@
 	async function loadSpotlight() {
 		const res = await listWorkshop({ spotlight: true });
 		spotlight = res.items;
-		void fetchFandomAvatars(res.items.map((i) => i.author.fandom_userid)).catch(
-			(e) => {
-				if (settingsStore.debugMode) console.error("[workshop] avatars", e);
-			},
-		);
+		void fetchWikiAvatars(
+			res.items.map((i) => ({
+				id: i.author.fandom_userid,
+				name: i.author.fandom_username,
+			})),
+		).catch((e) => {
+			if (settingsStore.debugMode) console.error("[workshop] avatars", e);
+		});
 	}
 
 	async function load() {
@@ -119,8 +122,11 @@
 			items = res.items;
 			total = res.total;
 			pageSize = res.page_size;
-			void fetchFandomAvatars(
-				res.items.map((item) => item.author.fandom_userid),
+			void fetchWikiAvatars(
+				res.items.map((item) => ({
+					id: item.author.fandom_userid,
+					name: item.author.fandom_username,
+				})),
 			).catch((e) => {
 				if (settingsStore.debugMode) console.error("[workshop] avatars", e);
 			});

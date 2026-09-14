@@ -2,7 +2,7 @@
 	import { Avatar } from "bits-ui";
 	import { CalendarClock, Eye, Pencil, ThumbsUp, Trash2 } from "@lucide/svelte";
 	import avatarPlaceholder from "$lib/assets/Avatar.png";
-	import { fetchFandomAvatar } from "$lib/services/fandomAuth";
+	import { fetchWikiAvatar } from "$lib/services/wikiAuth";
 	import { imageLoader } from "$lib/services/imageLoader";
 	import { settingsStore } from "$lib/stores/settings.svelte";
 	import {
@@ -60,9 +60,10 @@
 
 	$effect(() => {
 		const userId = listing.author.fandom_userid;
+		const userName = listing.author.fandom_username;
 		avatarSrc = null;
 		let cancelled = false;
-		fetchFandomAvatar(userId)
+		fetchWikiAvatar(userId, userName)
 			.then((url) => {
 				if (!cancelled && url) avatarSrc = url;
 			})
