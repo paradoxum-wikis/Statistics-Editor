@@ -3,6 +3,8 @@ import {
 	IMAGE_EXT,
 	isAllowedExternalImageUrl,
 	isDirectImageUrl,
+	isFandomCdnUrl,
+	proxyImageUrl,
 	resolveWikiFileUrl,
 } from "$lib/services/imageLoader";
 import { settingsStore } from "$lib/stores/settings.svelte";
@@ -237,7 +239,8 @@ function fileLinkHref(link: string): string {
 }
 
 function wikiImgAttrs(url: string): string {
-	return `src="${escapeAttr(url)}"`;
+	const src = isFandomCdnUrl(url) ? proxyImageUrl(url) : url;
+	return `src="${escapeAttr(src)}"`;
 }
 
 function renderWikiFileHtml(

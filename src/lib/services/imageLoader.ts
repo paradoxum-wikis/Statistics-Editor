@@ -20,6 +20,38 @@ export function isWikiImageUrl(url: string): boolean {
 	return url.trim().toLowerCase().startsWith(WIKI_IMAGE_BASE);
 }
 
+// $wgAllowExternalImagesFrom
+const EXTERNAL_IMAGE_PREFIXES = [
+	"https://images.wikia.com",
+	"https://static.wikia.com",
+	"https://static.wikia.nocookie.net",
+	"https://img.wikia.nocookie.net",
+	"https://img1.wikia.nocookie.net",
+	"https://img2.wikia.nocookie.net",
+	"https://img3.wikia.nocookie.net",
+	"https://img4.wikia.nocookie.net",
+	"https://img5.wikia.nocookie.net",
+	"https://images.wikia.nocookie.net",
+	"https://images1.wikia.nocookie.net",
+	"https://images2.wikia.nocookie.net",
+	"https://images3.wikia.nocookie.net",
+	"https://images4.wikia.nocookie.net",
+	"https://images5.wikia.nocookie.net",
+	"https://vignette.wikia.nocookie.net",
+	"https://vignette1.wikia.nocookie.net",
+	"https://vignette2.wikia.nocookie.net",
+	"https://vignette3.wikia.nocookie.net",
+	"https://vignette4.wikia.nocookie.net",
+	"https://vignette5.wikia.nocookie.net",
+];
+
+export function isFandomCdnUrl(url: string): boolean {
+	const normalized = url.trim().toLowerCase();
+	return EXTERNAL_IMAGE_PREFIXES.some((prefix) =>
+		normalized.startsWith(prefix.endsWith("/") ? prefix : `${prefix}/`),
+	);
+}
+
 export function resolveWikiFileUrl(imageIdStr: string): string | null {
 	const s = imageIdStr
 		.trim()
@@ -48,7 +80,8 @@ export function isDirectImageUrl(url: string): boolean {
 }
 
 export function isAllowedExternalImageUrl(url: string): boolean {
-	return isDirectImageUrl(url) && isWikiImageUrl(url);
+	if (!isDirectImageUrl(url)) return false;
+	return isWikiImageUrl(url) || isFandomCdnUrl(url);
 }
 
 export function proxyImageUrl(url: string): string {
@@ -360,6 +393,13 @@ class ImageLoaderService {
 			if (typeof imageId === "string" && isWikiImageUrl(imageId)) {
 				this.cache.set(requestKey, imageId);
 				return imageId;
+			}
+
+			// Thumblr 404s when Referer isn't Fandom
+			if (typeof imageId === "string" && isFandomCdnUrl(imageId)) {
+				const url = proxyImageUrl(imageId);
+				this.cache.set(requestKey, url);
+				return url;
 			}
 
 			// MediaWiki filename
