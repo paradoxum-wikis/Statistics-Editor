@@ -150,10 +150,12 @@ export async function fetchWikiProfile(
 		ipcuser: username,
 	});
 	const card = data.query?.integratedprofilecard?.[0];
-	const posts = card?.meta_items?.find((m) => m.id === "discuss-posts")?.value;
+	const postDigits = card?.meta_items
+		?.find((m) => m.id === "discuss-posts")
+		?.value?.replace(/[^\d]/g, "");
 	return {
 		avatar: absoluteWikiUrl(card?.avatar_url),
 		edits: card?.edit_count,
-		posts: posts != null && posts !== "" ? Number(posts) : undefined,
+		posts: postDigits ? Number(postDigits) : undefined,
 	};
 }
