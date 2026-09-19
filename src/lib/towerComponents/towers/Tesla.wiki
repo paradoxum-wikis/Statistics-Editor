@@ -6,7 +6,7 @@ $MDPS2$ = {{#expr:(Damage * Max Hits * ceil((Smite Meter / Max Hits)) + Smite Da
 $CE$ = Total Cost / DPS
 $MCE$ = Total Cost / Max DPS
 $TP$ = $FNC-TOTAL-COST$
-$COST$ = 2000; 1856; 8888; 18450; 44001
+$COST$ = 5750; 4314; 10007; 24000; 55000
 $FSE-DETECTION$ = ; 0; 0
 $FSE-UPGRADE$ = Kite in the Wind; Self-Sustaining Battery; Auric Quantum Cooling Cell; Kimat's Bite
 $FSE-UPGRADEICON$ = 91355001385794; 75051178841119; 106313416363708; 109247042334349
@@ -19,14 +19,14 @@ $R$ = $FNC-RECURSION$
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Smite Damage !! Firerate !! Range !! Smite Radius !! Smite Meter !! Shock Time !! Chain Range !! Max Hits !! DPS$DREF$ !! Max DPS$MREF$ !! Cost Efficiency !! Max Cost Efficiency
 |-
-| 0 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 15 || N/A || 2 || 17 || N/A || N/A || 0.15 || 12 || 3 || $DPS0$ || $MDPS0$ || {{Money|$CE$}} || {{Money|$MCE$}}
+| 0 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 55 || N/A || 2 || 17 || N/A || N/A || 0.3 || 12 || 2 || $DPS0$ || $MDPS0$ || {{Money|$CE$}} || {{Money|$MCE$}}
 |-
-| 1 || $R$ || $R$ || 20 || N/A || 2 || 17 || N/A || N/A || 0.25 || 12 || 5 || $DPS0$ || $MDPS0$ || {{Money|$CE$}} || {{Money|$MCE$}}
+| 1 || $R$ || $R$ || 70 || N/A || 2 || 17 || N/A || N/A || 0.45 || 12 || 3 || $DPS0$ || $MDPS0$ || {{Money|$CE$}} || {{Money|$MCE$}}
 |-
-| 2 || $R$ || $R$ || 20 || 70 || 1.8 || 18.5 || 5 || 5 || 0.25 || 16 || 5 || $DPS2$ || $MDPS2$ || {{Money|$CE$}} || {{Money|$MCE$}}
+| 2 || $R$ || $R$ || 70 || 200 || 1.6 || 18.5 || 5 || 9 || 0.45 || 16 || 3 || $DPS0$ || $MDPS2$ || {{Money|$CE$}} || {{Money|$MCE$}}
 |-
-| 3 || $R$ || $R$ || 20 || 85 || 1.4 || 18.5 || 5.5 || 4 || 0.25 || 16 || 6 || $DPS2$ || $MDPS2$ || {{Money|$CE$}} || {{Money|$MCE$}}
+| 3 || $R$ || $R$ || 90 || 475 || 1.6 || 20 || 5.5 || 12 || 0.6 || 16 || 3 || $DPS0$ || $MDPS2$ || {{Money|$CE$}} || {{Money|$MCE$}}
 |-
-| 4 || $R$ || $R$ || 20 || 140 || 1.2 || 20 || 7 || 3 || 0.3 || 20 || 8 || $DPS2$ || $MDPS2$ || {{Money|$CE$}} || {{Money|$MCE$}}
+| 4 || $R$ || $R$ || 125 || 650 || 1.4 || 20 || 7.5 || 15 || 0.85 || 20 || 3 || $DPS0$ || $MDPS2$ || {{Money|$CE$}} || {{Money|$MCE$}}
 |}
 </div>
