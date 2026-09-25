@@ -2,7 +2,7 @@
 	import { Popover } from "bits-ui";
 	import { ChartNoAxesCombined } from "@lucide/svelte";
 	import IconBtn from "../smol/IconBtn.svelte";
-	import StatsChartPanel from "./StatsChartPanel.svelte";
+	import LazyStatsChartPanel from "./LazyStatsChartPanel.svelte";
 	import { analytics } from "$lib/services/analytics";
 
 	let {
@@ -56,7 +56,7 @@
 				align="start"
 				sideOffset={6}
 			>
-				<StatsChartPanel />
+				<LazyStatsChartPanel {open} />
 			</Popover.Content>
 		</Popover.Portal>
 	</Popover.Root>
