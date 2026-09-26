@@ -1,30 +1,33 @@
 <var>
-$DPS$ = Damage / Firerate
+$MDPS$ = Damage / (Firerate + Windup + Catch Time + Max Flight Time + Max Return Time)
+$DPS$ = (Bounces * (2 * Damage + (Bounces - 1) * Added Damage) / 2) / (Firerate + Windup + Catch Time + Max Flight Time * Bounces + Max Return Time)
+$MCE$ = Total Cost / Min DPS
 $CE$ = Total Cost / DPS
 $TP$ = $FNC-TOTAL-COST$
-$COST$ = 750; 250; 750; 1900; 4500; 12500
-$FSE-DETECTION$ = 2; ;
-$FSE-UPGRADE$ = Improved Throwing; Double Head Axe; Blood Seeking; Tactical Ops; Head Chopping
-$FSE-UPGRADEICON$ = 129697807; 542098553; 6426220009; 27386833; 143769378
-$FSE-META$ = Exclusive; File:DefaultExecutioner2.png
+$COST$ = 1800; 450; 1777; 3750; 6750; 13500
+$FSE-DETECTION$ = 3; ; 0
+$FSE-UPGRADE$ = Quick Chopping; Double-Headed Axe; Cloaked Revenant; Ghoul Shreddin'; The Judge & The Jury
+$FSE-UPGRADEICON$ = 94311490799022; 125594742597786; 88160736854274; 105063766778640; 121607739944705
+$FSE-META$ = Exclusive; File:DefaultExecutionerIconIGSep26.png
 $FREF$ = <ref>The firerate assumes that the axe returns on time.</ref>
-$DREF$ = <ref>DPS assumes that only one enemy is hit per throw.<br/>DPS also assumes that the axe returns on time.</ref>
+$DREF$ = <ref>DPS assumes that only one enemy is hit per throw and also assumes that the axe takes the longest time possible to return and move between targets.<br/>DPS is calculated as Damage ÷ (Firerate + Windup + Catch Time + Max Flight Time + Max Return Time)</ref>
+$MDREF$ = <ref>DPS assumes that it can hit as many times as its Bounces stat, bouncing among up to Max Targets enemies, and that the axe takes the longest time possible to return and move between targets.<br/>Throw damage is the series Damage, Damage + Added Damage, … for Bounces hits.<br/>DPS is calculated as (Bounces × (2 × Damage + (Bounces − 1) × Added Damage) ÷ 2) ÷ (Firerate + Windup + Catch Time + Max Flight Time × Bounces + Max Return Time)</ref>
 $R$ = $FNC-RECURSION$
 </var>
 <div class="overflow-box">
 {| class="wikitable stats-table"
-! Level !! Cost !! Total Cost !! Damage !! Firerate$FREF$ !! Tick !! Bounces !! Max Hits !! Range !! DPS$DREF$ !! Cost Efficiency
+! Level !! Cost !! Total Cost !! Damage !! Added Damage !! Firerate$FREF$ !! Windup !! Catch Time !! Max Flight Time !! Max Return Time !! Bounces !! Max Targets !! Range !! Min DPS$DREF$ !! DPS$MDREF$ !! Min Cost Efficiency !! Cost Efficiency
 |-
-| 0 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 5 || 3 || 0.15 || 3 || 3 || 14 || $DPS$ || {{Money|$CE$}}
+| 0 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 7 || 6 || 1 || 1 || 0.1 || 0.4 || 0.55 || 5 || 3 || 15 || $MDPS$ || $DPS$ || {{Money|$MCE$}} || {{Money|$CE$}}
 |-
-| 1 || $R$ || $R$ || 5 || 2 || 0.15 || 3 || 3 || 14 || $DPS$ || {{Money|$CE$}}
+| 1 || $R$ || $R$ || 7 || 6 || 0.75 || 1 || 0.1 || 0.4 || 0.55 || 5 || 3 || 17 || $MDPS$ || $DPS$ || {{Money|$MCE$}} || {{Money|$CE$}}
 |-
-| 2 || $R$ || $R$ || 10 || 2 || 0.15 || 3 || 3 || 14 || $DPS$ || {{Money|$CE$}}
+| 2 || $R$ || $R$ || 14 || 6 || 0.75 || 1 || 0.1 || 0.4 || 0.55 || 6 || 4 || 17 || $MDPS$ || $DPS$ || {{Money|$MCE$}} || {{Money|$CE$}}
 |-
-| 3 || $R$ || $R$ || 18 || 2 || 0.15 || 4 || 3 || 18 || $DPS$ || {{Money|$CE$}}
+| 3 || $R$ || $R$ || 20 || 12 || 0.75 || 1 || 0.1 || 0.4 || 0.55 || 7 || 4 || 17 || $MDPS$ || $DPS$ || {{Money|$MCE$}} || {{Money|$CE$}}
 |-
-| 4 || $R$ || $R$ || 35 || 2 || 0.15 || 4 || 3 || 18 || $DPS$ || {{Money|$CE$}}
+| 4 || $R$ || $R$ || 40 || 13 || 0.75 || 1 || 0.1 || 0.4 || 0.55 || 9 || 6 || 17 || $MDPS$ || $DPS$ || {{Money|$MCE$}} || {{Money|$CE$}}
 |-
-| 5 || $R$ || $R$ || 80 || 2 || 0.15 || 7 || 3 || 18 || $DPS$ || {{Money|$CE$}}
+| 5 || $R$ || $R$ || 50 || 15 || 0.5 || 1 || 0.1 || 0.4 || 0.55 || 12 || 7 || 19 || $MDPS$ || $DPS$ || {{Money|$MCE$}} || {{Money|$CE$}}
 |}
 </div>

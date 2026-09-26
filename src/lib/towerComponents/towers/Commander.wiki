@@ -30,7 +30,9 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$ || 20% || 20% || 50 || 0.6 || 17 || $CDPS$$SREF$ || $SDPS$ || {{Money|$CE$}}
 |}
+</div>
 
+<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="8" | Support Caravan Units Stats
 |-
