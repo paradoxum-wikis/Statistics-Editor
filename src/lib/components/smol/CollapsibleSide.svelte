@@ -4,7 +4,7 @@
 	import { slide } from "svelte/transition";
 	import Separator from "./Separator.svelte";
 	import type { Snippet } from "svelte";
-	import type { Icon } from "@lucide/svelte";
+	import type { LucideIcon } from "@lucide/svelte";
 
 	let {
 		title,
@@ -14,7 +14,7 @@
 		children,
 	}: {
 		title: string;
-		icon?: typeof Icon;
+		icon?: LucideIcon;
 		open?: boolean;
 		isPvp?: boolean;
 		children: Snippet;
