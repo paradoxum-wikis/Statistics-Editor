@@ -39,6 +39,7 @@
 	}
 
 	const sourceLint = $derived.by(() => {
+		if (towerStore.selectedData?.sourceIssues.length) return "error";
 		let warning = false;
 		for (const d of lintNeowtext(towerStore.effectiveWikitext)) {
 			if (d.severity === "error") return "error";

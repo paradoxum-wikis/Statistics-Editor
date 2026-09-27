@@ -305,6 +305,8 @@
 			!!towerName &&
 			towerStore.effectiveWikitext.trim().length > 0,
 	);
+
+	const sourceIssues = $derived(towerStore.selectedData?.sourceIssues ?? []);
 </script>
 
 {#if open}
@@ -429,6 +431,24 @@
 			<div class="text-xs text-red-600/90 wrap-break-word mt-1">
 				{errorMessage}
 			</div>
+		</div>
+	{/if}
+
+	{#if sourceIssues.length}
+		<div class="rounded-md border border-amber-500/30 bg-amber-500/10 p-3">
+			<div class="text-sm font-medium text-amber-600 dark:text-amber-400">
+				Whoops! The visual editor cannot open this source...
+			</div>
+			<ul
+				class="mt-1 list-disc pl-5 text-xs text-amber-600/90 dark:text-amber-400/90"
+			>
+				{#each sourceIssues as issue, i (i)}
+					<li>{issue}</li>
+				{/each}
+			</ul>
+			<p class="mt-1 text-xs text-amber-600/90 dark:text-amber-400/90">
+				Give each column a unique header, then save the override.
+			</p>
 		</div>
 	{/if}
 

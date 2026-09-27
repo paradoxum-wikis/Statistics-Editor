@@ -16,7 +16,11 @@ import {
 	indexRowsByLevelKeys,
 	type TableRowCache,
 } from "$lib/neowtext/tableCache";
-import { parseWikitext, type TableData } from "$lib/neowtext/parser";
+import {
+	parseWikitext,
+	duplicateTableHeaders,
+	type TableData,
+} from "$lib/neowtext/parser";
 import { patchWikitext } from "$lib/neowtext/patcher";
 import {
 	clearProfileWikiOverrides,
@@ -740,7 +744,25 @@ export default class TowerManager {
 				);
 			}
 
+			const sourceIssues = Object.entries(parsed.tabs).flatMap(
+				([tabName, tables]) =>
+					tables.flatMap((table) => {
+						const duplicates = duplicateTableHeaders(table.headers);
+						if (!duplicates.length) return [];
+						const where = table.name ? `${tabName} / ${table.name}` : tabName;
+						return [
+							`Duplicate column header${duplicates.length > 1 ? "s" : ""} in ${where}: ${duplicates
+								.map((h) => `"${h}"`)
+								.join(", ")}`,
+						];
+					}),
+			);
+
 			const towerData = new Tower(name, towerJson);
+			if (sourceIssues.length) {
+				towerData.isMalformed = true;
+				towerData.sourceIssues = sourceIssues;
+			}
 			Object.assign(towerData, {
 				sourceWikitext: currentText,
 				wikitextSource: currentSource,

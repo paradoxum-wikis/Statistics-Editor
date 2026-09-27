@@ -434,3 +434,13 @@ export function parseTable(
 		wikiCells,
 	};
 }
+
+export function duplicateTableHeaders(headers: readonly string[]): string[] {
+	const seen = new Set<string>();
+	const duplicates = new Set<string>();
+	for (const header of headers) {
+		if (seen.has(header)) duplicates.add(header);
+		else seen.add(header);
+	}
+	return [...duplicates];
+}
