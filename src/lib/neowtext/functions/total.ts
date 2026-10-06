@@ -1,4 +1,4 @@
-import { parseNumeric, stripRefs } from "$lib/utils/format";
+import { parseNumeric, stripRefs } from "#lib/utils/format.js";
 import { getFncValue, getVariantFncKey } from "./keys";
 import {
 	parseLevelBranch,

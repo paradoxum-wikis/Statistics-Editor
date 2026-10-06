@@ -9,13 +9,13 @@
 	} from "layerchart";
 	import { Select } from "bits-ui";
 	import { Check, ChevronDown, Plus, X } from "@lucide/svelte";
-	import { towerStore } from "$lib/stores/tower.svelte";
-	import { modifierStore } from "$lib/stores/modifier.svelte";
-	import { settingsStore } from "$lib/stores/settings.svelte";
-	import { comparatorStore } from "$lib/stores/comparator.svelte";
-	import { analytics } from "$lib/services/analytics";
-	import { getRofBugVer } from "$lib/utils/format";
-	import type Tower from "$lib/towerComponents/tower";
+	import { towerStore } from "#lib/stores/tower.svelte.js";
+	import { modifierStore } from "#lib/stores/modifier.svelte.js";
+	import { settingsStore } from "#lib/stores/settings.svelte.js";
+	import { comparatorStore } from "#lib/stores/comparator.svelte.js";
+	import { analytics } from "#lib/services/analytics.js";
+	import { getRofBugVer } from "#lib/utils/format.js";
+	import type Tower from "#lib/towerComponents/tower.js";
 	import {
 		buildComparatorChart,
 		listMetrics,
@@ -29,7 +29,7 @@
 		X_COST,
 		X_LEVEL,
 		type ComparatorSeriesDef,
-	} from "$lib/utils/statsChart";
+	} from "#lib/utils/statsChart.js";
 	import StatsChartYRange from "./StatsChartYRange.svelte";
 
 	let loadingTower = $state("");

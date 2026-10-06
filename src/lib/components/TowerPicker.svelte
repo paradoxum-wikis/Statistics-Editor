@@ -3,10 +3,13 @@
 	import { Check, ChevronsUpDown, X } from "@lucide/svelte";
 	import { slide } from "svelte/transition";
 	import { cubicOut } from "svelte/easing";
-	import { buildMetaMap, groupedTowerNames } from "$lib/towerComponents/towers";
-	import { towerStore } from "$lib/stores/tower.svelte";
-	import { profileStore } from "$lib/stores/profile.svelte";
-	import { analytics } from "$lib/services/analytics";
+	import {
+		buildMetaMap,
+		groupedTowerNames,
+	} from "#lib/towerComponents/towers/index.js";
+	import { towerStore } from "#lib/stores/tower.svelte.js";
+	import { profileStore } from "#lib/stores/profile.svelte.js";
+	import { analytics } from "#lib/services/analytics.js";
 	import TextInput from "./smol/TextInput.svelte";
 	import TowerCard from "./TowerCard.svelte";
 

@@ -1,16 +1,16 @@
 <script lang="ts">
 	import type { Attachment } from "svelte/attachments";
-	import { settingsStore } from "$lib/stores/settings.svelte";
-	import { formatNumber } from "$lib/utils/format";
-	import { wikiTemplate } from "$lib/wikiTemplates";
+	import { settingsStore } from "#lib/stores/settings.svelte.js";
+	import { formatNumber } from "#lib/utils/format.js";
+	import { wikiTemplate } from "#lib/wikiTemplates/index.js";
 	import {
 		formatDelta,
 		type DeltaInfo,
 		type RefTokenRegistry,
-	} from "$lib/towerTable";
+	} from "#lib/towerTable.js";
 	import CellRefs from "./CellRefs.svelte";
 	import Tip from "../smol/Tip.svelte";
-	import WikiTemplate from "$lib/wikiTemplates/WikiTemplate.svelte";
+	import WikiTemplate from "#lib/wikiTemplates/WikiTemplate.svelte";
 
 	let {
 		value,

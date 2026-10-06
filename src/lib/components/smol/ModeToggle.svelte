@@ -2,10 +2,10 @@
 	import { tick } from "svelte";
 	import { FileBraces, Table } from "@lucide/svelte";
 	import { mergeProps } from "bits-ui";
-	import { towerStore } from "$lib/stores/tower.svelte";
-	import { analytics } from "$lib/services/analytics";
-	import { tabPill } from "$lib/utils/tabPill.svelte";
-	import { lintNeowtext } from "$lib/neowtext/codemirror/lint";
+	import { towerStore } from "#lib/stores/tower.svelte.js";
+	import { analytics } from "#lib/services/analytics.js";
+	import { tabPill } from "#lib/utils/tabPill.svelte.js";
+	import { lintNeowtext } from "#lib/neowtext/codemirror/lint.js";
 	import Tip from "./Tip.svelte";
 
 	let {

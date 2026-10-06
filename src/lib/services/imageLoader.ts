@@ -7,7 +7,7 @@
  * This was ported from the old Statistics Editor
  */
 import { mwWikiFileUrl, mwSetBaseUrl } from "mediawiki-file-url";
-import { settingsStore } from "$lib/stores/settings.svelte";
+import { settingsStore } from "#lib/stores/settings.svelte.js";
 
 mwSetBaseUrl("https://tds.wiki/images");
 

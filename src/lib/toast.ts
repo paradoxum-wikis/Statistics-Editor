@@ -1,5 +1,5 @@
-import { toastStore } from "$lib/stores/toast.svelte";
-import type { ToastColor, ToastOptions } from "$lib/stores/toast.svelte";
+import { toastStore } from "#lib/stores/toast.svelte.js";
+import type { ToastColor, ToastOptions } from "#lib/stores/toast.svelte.js";
 
 export const toast = {
 	show: (message: string, color: ToastColor = "info", options?: ToastOptions) =>

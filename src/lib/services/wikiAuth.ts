@@ -1,5 +1,5 @@
-import { api, API_ORIGIN } from "$lib/services/api";
-import { settingsStore } from "$lib/stores/settings.svelte";
+import { api, API_ORIGIN } from "#lib/services/api.js";
+import { settingsStore } from "#lib/stores/settings.svelte.js";
 
 export const WIKI_ORIGIN = "https://tds.wiki";
 

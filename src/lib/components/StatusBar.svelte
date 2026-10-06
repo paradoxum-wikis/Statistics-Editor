@@ -6,9 +6,12 @@
 	import GlobalModifier from "./tool/GlobalModifier.svelte";
 	import StatsChart from "./tool/StatsChart.svelte";
 	import CreateTower from "./tool/CreateTower.svelte";
-	import { settingsStore, BOOLEAN_SETTINGS } from "$lib/stores/settings.svelte";
-	import { announcementsStore } from "$lib/stores/announcements.svelte";
-	import { towerStore } from "$lib/stores/tower.svelte";
+	import {
+		settingsStore,
+		BOOLEAN_SETTINGS,
+	} from "#lib/stores/settings.svelte.js";
+	import { announcementsStore } from "#lib/stores/announcements.svelte.js";
+	import { towerStore } from "#lib/stores/tower.svelte.js";
 	import {
 		House,
 		Settings,

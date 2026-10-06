@@ -1,7 +1,7 @@
-import { formulaSourceTip } from "$lib/towerTable";
-import { parseRef } from "$lib/neowtext/codemirror/tokens";
-import { getFncValue } from "$lib/neowtext/functions";
-import { getCostKeys } from "$lib/neowtext/functions/keys";
+import { formulaSourceTip } from "#lib/towerTable.js";
+import { parseRef } from "#lib/neowtext/codemirror/tokens.js";
+import { getFncValue } from "#lib/neowtext/functions/index.js";
+import { getCostKeys } from "#lib/neowtext/functions/keys.js";
 import {
 	buildBranchMap,
 	getSchemaIndex,
@@ -10,13 +10,13 @@ import {
 	parseSchema,
 	resolveBranchSpec,
 	schemaIndexToLevel,
-} from "$lib/neowtext/functions/schema";
+} from "#lib/neowtext/functions/schema.js";
 import {
 	isNumericArrayBody,
 	seriesIndicesThroughLevel,
-} from "$lib/neowtext/functions/total";
-import { stripRefs } from "$lib/utils/format";
-import { wikiTemplateKey, wikiTemplateRe } from "$lib/wikiTemplates";
+} from "#lib/neowtext/functions/total.js";
+import { stripRefs } from "#lib/utils/format.js";
+import { wikiTemplateKey, wikiTemplateRe } from "#lib/wikiTemplates/index.js";
 
 export type CellVarKind = "array" | "scalar" | "formula" | "ref";
 

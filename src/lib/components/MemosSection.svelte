@@ -2,8 +2,8 @@
 	import type { Attachment } from "svelte/attachments";
 	import CollaspibleMain from "./smol/CollaspibleMain.svelte";
 	import RenderedHtml from "./table/RenderedHtml.svelte";
-	import { renderWikitextHtml } from "$lib/neowtext/render";
-	import { towerStore } from "$lib/stores/tower.svelte";
+	import { renderWikitextHtml } from "#lib/neowtext/render.js";
+	import { towerStore } from "#lib/stores/tower.svelte.js";
 
 	let sectionValue = $state("editor-memos");
 	let editing = $state(false);

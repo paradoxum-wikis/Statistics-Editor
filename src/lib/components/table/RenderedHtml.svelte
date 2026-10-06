@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type { Attachment } from "svelte/attachments";
 	import { mount, unmount } from "svelte";
-	import WikiTemplate from "$lib/wikiTemplates/WikiTemplate.svelte";
-	import type { WikiTplSlot } from "$lib/neowtext/render";
+	import WikiTemplate from "#lib/wikiTemplates/WikiTemplate.svelte";
+	import type { WikiTplSlot } from "#lib/neowtext/render.js";
 
 	let {
 		wiki,

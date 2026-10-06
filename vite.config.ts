@@ -1,3 +1,4 @@
+import adapter from "@sveltejs/adapter-static";
 import tailwindcss from "@tailwindcss/vite";
 import { sveltekit } from "@sveltejs/kit/vite";
 import { enhancedImages } from "@sveltejs/enhanced-img";
@@ -10,7 +11,7 @@ export default defineConfig({
 		lucidePreprocess(),
 		enhancedImages(),
 		tailwindcss(),
-		sveltekit(),
+		sveltekit({ adapter: adapter({ fallback: "404.html" }) }),
 		towersPlugin(),
 	],
 	server: {

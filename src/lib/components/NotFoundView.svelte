@@ -15,7 +15,7 @@
 >
 	<div class="flex items-center justify-center gap-4 sm:gap-6">
 		<enhanced:img
-			src="$lib/assets/404.png"
+			src="#lib/assets/404.png"
 			alt=""
 			class="w-[min(22vw,11rem)] shrink-0 select-none"
 		/>

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Slider } from "bits-ui";
-	import { formatChartNumber, yRangeStep } from "$lib/utils/statsChart";
+	import { formatChartNumber, yRangeStep } from "#lib/utils/statsChart.js";
 
 	let {
 		min,

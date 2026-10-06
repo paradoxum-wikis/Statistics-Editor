@@ -1,6 +1,6 @@
-import { API_ORIGIN, SHORT_ORIGIN } from "$lib/services/api";
-import { settingsStore } from "$lib/stores/settings.svelte";
-import { authStore } from "$lib/stores/auth.svelte";
+import { API_ORIGIN, SHORT_ORIGIN } from "#lib/services/api.js";
+import { settingsStore } from "#lib/stores/settings.svelte.js";
+import { authStore } from "#lib/stores/auth.svelte.js";
 
 const SHARE_CACHE_KEY = "tdse_share_cache";
 const OWNED_SHARE_KEY = "tdse_owned_shares";

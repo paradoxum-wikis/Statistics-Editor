@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { fly } from "svelte/transition";
 	import { CircleCheck, CircleX, Info, TriangleAlert, X } from "@lucide/svelte";
-	import { toastStore } from "$lib/stores/toast.svelte";
+	import { toastStore } from "#lib/stores/toast.svelte.js";
 
 	const iconByColor = {
 		info: Info,

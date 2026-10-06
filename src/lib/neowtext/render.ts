@@ -1,4 +1,4 @@
-import { formatValue, formatReadOnly, stripRefs } from "$lib/utils/format";
+import { formatValue, formatReadOnly, stripRefs } from "#lib/utils/format.js";
 import {
 	IMAGE_EXT,
 	isAllowedExternalImageUrl,
@@ -6,14 +6,14 @@ import {
 	isFandomCdnUrl,
 	proxyImageUrl,
 	resolveWikiFileUrl,
-} from "$lib/services/imageLoader";
-import { settingsStore } from "$lib/stores/settings.svelte";
+} from "#lib/services/imageLoader.js";
+import { settingsStore } from "#lib/stores/settings.svelte.js";
 import {
 	formatWikiTemplateNumber,
 	wikiTemplate,
 	wikiTemplateRe,
 	type WikiTemplate,
-} from "$lib/wikiTemplates";
+} from "#lib/wikiTemplates/index.js";
 
 const WIKI_BASE = "https://tds.wiki/w/";
 const RE_CHAR_HEX = /(?:&amp;)?&#x([0-9a-fA-F]+);/g;

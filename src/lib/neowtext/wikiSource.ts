@@ -1,4 +1,4 @@
-import { settingsStore } from "$lib/stores/settings.svelte";
+import { settingsStore } from "#lib/stores/settings.svelte.js";
 import {
 	clearFactoryMeta,
 	clearProfileFactoryMeta,

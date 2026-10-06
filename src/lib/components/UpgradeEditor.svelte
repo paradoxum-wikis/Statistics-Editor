@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { towerStore } from "$lib/stores/tower.svelte";
-	import { imageLoader } from "$lib/services/imageLoader";
-	import { getTargetSkins } from "$lib/utils/towah";
+	import { towerStore } from "#lib/stores/tower.svelte.js";
+	import { imageLoader } from "#lib/services/imageLoader.js";
+	import { getTargetSkins } from "#lib/utils/towah.js";
 	import CollapsibleSide from "./smol/CollapsibleSide.svelte";
 	import { Layers } from "@lucide/svelte";
 

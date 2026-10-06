@@ -6,12 +6,12 @@
 		CalendarPlus,
 		Eye,
 		ThumbsUp,
-		Trash2,
+		Trash,
 	} from "@lucide/svelte";
-	import avatarPlaceholder from "$lib/assets/Avatar.png";
-	import { authStore } from "$lib/stores/auth.svelte";
-	import { wikiUserPage, fetchWikiAvatar } from "$lib/services/wikiAuth";
-	import { imageLoader } from "$lib/services/imageLoader";
+	import avatarPlaceholder from "#lib/assets/Avatar.png";
+	import { authStore } from "#lib/stores/auth.svelte.js";
+	import { wikiUserPage, fetchWikiAvatar } from "#lib/services/wikiAuth.js";
+	import { imageLoader } from "#lib/services/imageLoader.js";
 	import {
 		createWorkshopComment,
 		deleteWorkshopComment,
@@ -21,11 +21,11 @@
 		WORKSHOP_TAG_FEATURED,
 		type WorkshopComment,
 		type WorkshopListing,
-	} from "$lib/services/workshop";
-	import { inboxStore } from "$lib/stores/inbox.svelte";
-	import { settingsStore } from "$lib/stores/settings.svelte";
-	import { timeAgo } from "$lib/utils/workshop";
-	import { toast } from "$lib/toast";
+	} from "#lib/services/workshop.js";
+	import { inboxStore } from "#lib/stores/inbox.svelte.js";
+	import { settingsStore } from "#lib/stores/settings.svelte.js";
+	import { timeAgo } from "#lib/utils/workshop.js";
+	import { toast } from "#lib/toast.js";
 	import Alert from "../smol/Alert.svelte";
 	import Modal from "../smol/Modal.svelte";
 	import Btn from "../smol/Btn.svelte";
@@ -279,7 +279,7 @@
 						<img src={imageUrl} alt="" class="h-full w-full object-cover" />
 					{:else}
 						<enhanced:img
-							src="$lib/assets/PlaceholderWide.png"
+							src="#lib/assets/PlaceholderWide.png"
 							alt=""
 							class="h-full w-full object-cover"
 						/>
@@ -502,7 +502,7 @@
 												class="mt-1 inline-flex items-center gap-1 text-xs text-destructive hover:underline"
 												onclick={() => askDeleteComment(c)}
 											>
-												<Trash2 size={11} />
+												<Trash size={11} />
 												Delete
 											</button>
 										{/if}

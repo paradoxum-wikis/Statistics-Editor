@@ -1,4 +1,4 @@
-import icon from "$lib/assets/Income.png?enhanced";
+import icon from "#lib/assets/Income.png?enhanced";
 
 export default {
 	color: "#44e500",

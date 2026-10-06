@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { Popover } from "bits-ui";
 	import { BookOpenText, Inbox, LogOut } from "@lucide/svelte";
-	import { authStore } from "$lib/stores/auth.svelte";
-	import { inboxStore } from "$lib/stores/inbox.svelte";
-	import { wikiUserPage, formatProfileStats } from "$lib/services/wikiAuth";
+	import { authStore } from "#lib/stores/auth.svelte.js";
+	import { inboxStore } from "#lib/stores/inbox.svelte.js";
+	import { wikiUserPage, formatProfileStats } from "#lib/services/wikiAuth.js";
 	import Alert from "./Alert.svelte";
 	import Modal from "./Modal.svelte";
 	import Separator from "./Separator.svelte";
-	import avatarPlaceholder from "$lib/assets/Avatar.png";
-	import { toast } from "$lib/toast";
+	import avatarPlaceholder from "#lib/assets/Avatar.png";
+	import { toast } from "#lib/toast.js";
 
 	const avatarBtn =
 		"relative inline-flex size-8 shrink-0 items-center justify-center rounded-full border border-border bg-muted transition-colors hover:bg-muted/80";

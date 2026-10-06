@@ -1,7 +1,7 @@
-import type Tower from "$lib/towerComponents/tower";
-import type SkinData from "$lib/towerComponents/skinData";
-import { mkCellKey } from "$lib/neowtext/directives";
-import { toDisplayNumber } from "$lib/utils/format";
+import type Tower from "#lib/towerComponents/tower.js";
+import type SkinData from "#lib/towerComponents/skinData.js";
+import { mkCellKey } from "#lib/neowtext/directives.js";
+import { toDisplayNumber } from "#lib/utils/format.js";
 
 /**
  * Returns the skins that should be updated when the user edits a value.

@@ -3,8 +3,8 @@
 	import { Zap } from "@lucide/svelte";
 	import IconBtn from "../smol/IconBtn.svelte";
 	import GlobalModifierPanel from "./GlobalModifierPanel.svelte";
-	import { modifierStore } from "$lib/stores/modifier.svelte";
-	import { isGlobalModifierActive } from "$lib/utils/globalModifier";
+	import { modifierStore } from "#lib/stores/modifier.svelte.js";
+	import { isGlobalModifierActive } from "#lib/utils/globalModifier.js";
 
 	let {
 		variant = "icon",

@@ -1,4 +1,4 @@
-import type Tower from "$lib/towerComponents/tower";
+import type Tower from "#lib/towerComponents/tower.js";
 import type { TableData } from "./parser";
 import { serializeTable, serializeVariables } from "./serializer";
 import {

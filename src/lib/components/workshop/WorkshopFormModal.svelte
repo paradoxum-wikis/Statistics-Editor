@@ -1,21 +1,21 @@
 <script lang="ts">
-	import { authStore } from "$lib/stores/auth.svelte";
+	import { authStore } from "#lib/stores/auth.svelte.js";
 	import {
 		fetchShare,
 		parseShareRef,
 		sharePageUrl,
-	} from "$lib/services/shareTower";
+	} from "#lib/services/shareTower.js";
 	import {
 		createWorkshopListing,
 		updateWorkshopListing,
 		WORKSHOP_TAGS,
 		type WorkshopListing,
 		type WorkshopTag,
-	} from "$lib/services/workshop";
-	import { SHORT_ORIGIN } from "$lib/services/api";
-	import { analytics } from "$lib/services/analytics";
-	import { settingsStore } from "$lib/stores/settings.svelte";
-	import { toast } from "$lib/toast";
+	} from "#lib/services/workshop.js";
+	import { SHORT_ORIGIN } from "#lib/services/api.js";
+	import { analytics } from "#lib/services/analytics.js";
+	import { settingsStore } from "#lib/stores/settings.svelte.js";
+	import { toast } from "#lib/toast.js";
 	import Modal from "../smol/Modal.svelte";
 	import TextInput from "../smol/TextInput.svelte";
 	import Btn from "../smol/Btn.svelte";

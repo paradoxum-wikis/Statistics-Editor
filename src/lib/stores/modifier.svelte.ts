@@ -1,6 +1,6 @@
-import type { GlobalModifier } from "$lib/utils/globalModifier";
-import { columnKeysEqual, parseNumeric } from "$lib/utils/format";
-import { analytics } from "$lib/services/analytics";
+import type { GlobalModifier } from "#lib/utils/globalModifier.js";
+import { columnKeysEqual, parseNumeric } from "#lib/utils/format.js";
+import { analytics } from "#lib/services/analytics.js";
 
 class ModifierStore {
 	entries = $state<GlobalModifier["entries"]>([]);

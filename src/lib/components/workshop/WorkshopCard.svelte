@@ -1,15 +1,15 @@
 <script lang="ts">
 	import { Avatar } from "bits-ui";
-	import { CalendarClock, Eye, Pencil, ThumbsUp, Trash2 } from "@lucide/svelte";
-	import avatarPlaceholder from "$lib/assets/Avatar.png";
-	import { fetchWikiAvatar } from "$lib/services/wikiAuth";
-	import { imageLoader } from "$lib/services/imageLoader";
-	import { settingsStore } from "$lib/stores/settings.svelte";
+	import { CalendarClock, Eye, Pencil, ThumbsUp, Trash } from "@lucide/svelte";
+	import avatarPlaceholder from "#lib/assets/Avatar.png";
+	import { fetchWikiAvatar } from "#lib/services/wikiAuth.js";
+	import { imageLoader } from "#lib/services/imageLoader.js";
+	import { settingsStore } from "#lib/stores/settings.svelte.js";
 	import {
 		WORKSHOP_TAG_FEATURED,
 		type WorkshopListing,
-	} from "$lib/services/workshop";
-	import { timeAgo } from "$lib/utils/workshop";
+	} from "#lib/services/workshop.js";
+	import { timeAgo } from "#lib/utils/workshop.js";
 	import IconBtn from "../smol/IconBtn.svelte";
 	import Tip from "../smol/Tip.svelte";
 
@@ -88,7 +88,7 @@
 		{#if imageUrl}
 			<img src={imageUrl} alt="" loading="lazy" />
 		{:else}
-			<enhanced:img src="$lib/assets/PlaceholderWide.png" alt="" />
+			<enhanced:img src="#lib/assets/PlaceholderWide.png" alt="" />
 		{/if}
 		<div class="media-shade"></div>
 
@@ -140,7 +140,7 @@
 								onUnpublish(listing);
 							}}
 						>
-							<Trash2 size={14} />
+							<Trash size={14} />
 						</IconBtn>
 					{/if}
 				</div>

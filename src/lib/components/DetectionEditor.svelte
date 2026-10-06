@@ -1,24 +1,24 @@
 <script lang="ts">
-	import { towerStore } from "$lib/stores/tower.svelte";
-	import { getTargetSkins } from "$lib/utils/towah";
-	import HiddenIcon from "$lib/assets/HiddenDetection.png?enhanced";
-	import LeadIcon from "$lib/assets/LeadDetection.png?enhanced";
-	import FlyingIcon from "$lib/assets/FlyingDetection.png?enhanced";
+	import { towerStore } from "#lib/stores/tower.svelte.js";
+	import { getTargetSkins } from "#lib/utils/towah.js";
+	import HiddenIcon from "#lib/assets/HiddenDetection.png?enhanced";
+	import LeadIcon from "#lib/assets/LeadDetection.png?enhanced";
+	import FlyingIcon from "#lib/assets/FlyingDetection.png?enhanced";
 	import { Select } from "bits-ui";
 	import { Check, ChevronDown, ScanEye } from "@lucide/svelte";
 	import CollapsibleSide from "./smol/CollapsibleSide.svelte";
 	import SubtleRow from "./smol/SubtleRow.svelte";
 	import Tip from "./smol/Tip.svelte";
-	import { stripRefs } from "$lib/utils/format";
-	import { mkCellKey } from "$lib/neowtext/directives";
+	import { stripRefs } from "#lib/utils/format.js";
+	import { mkCellKey } from "#lib/neowtext/directives.js";
 	import {
 		DETECTION_TYPES,
 		type DetectionType,
 		levelsOnBranch,
 		schemaBranches,
 		getFncValue,
-	} from "$lib/neowtext/functions";
-	import type SkinData from "$lib/towerComponents/skinData";
+	} from "#lib/neowtext/functions/index.js";
+	import type SkinData from "#lib/towerComponents/skinData.js";
 
 	let open = $state(true);
 	let skinData = $derived(

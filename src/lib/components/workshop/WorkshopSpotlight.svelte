@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { WorkshopListing } from "$lib/services/workshop";
+	import type { WorkshopListing } from "#lib/services/workshop.js";
 	import WorkshopCard from "./WorkshopCard.svelte";
 
 	let {

@@ -2,10 +2,10 @@
 	import { afterNavigate, goto } from "$app/navigation";
 	import { resolve } from "$app/paths";
 	import { page } from "$app/state";
-	import { bootstrap } from "$lib/bootstrap";
-	import { towerStore } from "$lib/stores/tower.svelte";
-	import { parseShareRef } from "$lib/services/shareTower";
-	import { analytics } from "$lib/services/analytics";
+	import { bootstrap } from "#lib/bootstrap.js";
+	import { towerStore } from "#lib/stores/tower.svelte.js";
+	import { parseShareRef } from "#lib/services/shareTower.js";
+	import { analytics } from "#lib/services/analytics.js";
 
 	let handling = false;
 
@@ -21,14 +21,11 @@
 				try {
 					const ok = await towerStore.importFromShare(shareId);
 					if (ok) {
-						const path = resolve("/tower/[name]", {
-							name: towerStore.selectedName,
-						});
 						await goto(
-							resolve(
-								`${path}?share=${encodeURIComponent(shareId)}` as `/tower/${string}`,
-							),
-							{ replaceState: true, keepFocus: true, noScroll: true },
+							resolve(`/tower/[name]?share=${encodeURIComponent(shareId)}`, {
+								name: towerStore.selectedName,
+							}),
+							{ replace: true, reset: false },
 						);
 						return;
 					}
@@ -47,9 +44,8 @@
 					);
 				}
 				await goto(resolve("/"), {
-					replaceState: true,
-					keepFocus: true,
-					noScroll: true,
+					replace: true,
+					reset: false,
 				});
 				return;
 			}
@@ -58,9 +54,8 @@
 			const towerParam = page.url.searchParams.get("tower");
 			if (towerParam) {
 				await goto(resolve("/tower/[name]", { name: towerParam }), {
-					replaceState: true,
-					keepFocus: true,
-					noScroll: true,
+					replace: true,
+					reset: false,
 				});
 				return;
 			}
@@ -71,7 +66,9 @@
 		}
 	}
 
-	afterNavigate(() => {
+	afterNavigate(({ shallow, type }) => {
+		if (shallow && type === "goto") return;
+
 		void syncHomeRoute();
 	});
 </script>

@@ -2,14 +2,14 @@
 	import { cubicOut } from "svelte/easing";
 	import { fly } from "svelte/transition";
 	import { Tabs } from "bits-ui";
-	import Modal from "$lib/components/smol/Modal.svelte";
+	import Modal from "#lib/components/smol/Modal.svelte";
 	import {
 		settingsStore,
 		settingGroupsForTab,
 		type BooleanSetting,
 		type SettingTab,
-	} from "$lib/stores/settings.svelte";
-	import { tabPill } from "$lib/utils/tabPill.svelte";
+	} from "#lib/stores/settings.svelte.js";
+	import { tabPill } from "#lib/utils/tabPill.svelte.js";
 
 	const SETTING_TABS: { value: SettingTab; label: string }[] = [
 		{ value: "editor", label: "Editor" },

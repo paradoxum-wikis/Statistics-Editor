@@ -2,10 +2,10 @@
 	import TowerPicker from "./TowerPicker.svelte";
 	import Supporters from "./smol/Supporters.svelte";
 	import SubtleRow from "./smol/SubtleRow.svelte";
-	import { authStore } from "$lib/stores/auth.svelte";
-	import ghLogo from "$lib/assets/GitHub.svg?raw";
-	import aewLogo from "$lib/assets/AEW.svg?raw";
-	import tdswLogo from "$lib/assets/TDSW.svg?raw";
+	import { authStore } from "#lib/stores/auth.svelte.js";
+	import ghLogo from "#lib/assets/GitHub.svg?raw";
+	import aewLogo from "#lib/assets/AEW.svg?raw";
+	import tdswLogo from "#lib/assets/TDSW.svg?raw";
 
 	let { onSelect }: { onSelect: (name: string) => void } = $props();
 

@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { ExternalLink } from "@lucide/svelte";
-	import Modal from "$lib/components/smol/Modal.svelte";
-	import CollapsibleSide from "$lib/components/smol/CollapsibleSide.svelte";
-	import { announcementsStore } from "$lib/stores/announcements.svelte";
+	import Modal from "#lib/components/smol/Modal.svelte";
+	import CollapsibleSide from "#lib/components/smol/CollapsibleSide.svelte";
+	import { announcementsStore } from "#lib/stores/announcements.svelte.js";
 	import {
 		formatAnnouncementDate,
 		type Announcement,
-	} from "$lib/services/announcements";
+	} from "#lib/services/announcements.js";
 
 	const current = $derived(announcementsStore.items.filter((a) => !a.legacy));
 	const legacy = $derived(announcementsStore.items.filter((a) => a.legacy));

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { GlobalModifier } from "$lib/utils/globalModifier";
+	import type { GlobalModifier } from "#lib/utils/globalModifier.js";
 	import {
 		cellDisplaySource,
 		displayCellValue,
@@ -12,9 +12,9 @@
 		type RefTokenRegistry,
 		type TableConfig,
 		type TableRow,
-	} from "$lib/towerTable";
-	import { settingsStore } from "$lib/stores/settings.svelte";
-	import { formatCellHold } from "$lib/cellInspect";
+	} from "#lib/towerTable.js";
+	import { settingsStore } from "#lib/stores/settings.svelte.js";
+	import { formatCellHold } from "#lib/cellInspect.js";
 	import CellRefs from "./CellRefs.svelte";
 	import TowerTableCell from "./TowerTableCell.svelte";
 	import CellInspectorModal from "./CellInspectorModal.svelte";

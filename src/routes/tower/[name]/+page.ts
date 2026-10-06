@@ -1,7 +1,7 @@
 import { error } from "@sveltejs/kit";
-import { towerStore } from "$lib/stores/tower.svelte";
-import { isCustomTower } from "$lib/towerComponents/customTowers";
-import { towerNames } from "$lib/towerComponents/towers";
+import { towerStore } from "#lib/stores/tower.svelte.js";
+import { isCustomTower } from "#lib/towerComponents/customTowers.js";
+import { towerNames } from "#lib/towerComponents/towers/index.js";
 import type { EntryGenerator, PageLoad } from "./$types";
 
 export const prerender = true;

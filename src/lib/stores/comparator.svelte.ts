@@ -1,9 +1,9 @@
-import type Tower from "$lib/towerComponents/tower";
+import type Tower from "#lib/towerComponents/tower.js";
 import {
 	X_LEVEL,
 	type ComparatorSeriesDef,
 	type ComparatorXKey,
-} from "$lib/utils/statsChart";
+} from "#lib/utils/statsChart.js";
 
 class ComparatorStore {
 	seriesDefs = $state<ComparatorSeriesDef[]>([]);

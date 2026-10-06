@@ -3,7 +3,7 @@ import {
 	parseNumeric,
 	stripRefs,
 	toNumericValue,
-} from "$lib/utils/format";
+} from "#lib/utils/format.js";
 import {
 	buildActiveSkinTables,
 	buildDisplayRowsCache,
@@ -11,16 +11,16 @@ import {
 	type RofInfo,
 	type TableConfig,
 	type TableRow,
-} from "$lib/towerTable";
+} from "#lib/towerTable.js";
 import {
 	parseSchema,
 	schemaBranches,
 	schemaIndexToLevel,
-} from "$lib/neowtext/functions/schema";
-import { getCostValue, getFncValue } from "$lib/neowtext/functions/keys";
-import type SkinData from "$lib/towerComponents/skinData";
-import type Tower from "$lib/towerComponents/tower";
-import type { GlobalModifier } from "$lib/utils/globalModifier";
+} from "#lib/neowtext/functions/schema.js";
+import { getCostValue, getFncValue } from "#lib/neowtext/functions/keys.js";
+import type SkinData from "#lib/towerComponents/skinData.js";
+import type Tower from "#lib/towerComponents/tower.js";
+import type { GlobalModifier } from "#lib/utils/globalModifier.js";
 
 export type StatsChartPoint = { x: number; y: number };
 

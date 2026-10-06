@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { goto, replaceState } from "$app/navigation";
+	import { goto } from "$app/navigation";
 	import { resolve } from "$app/paths";
 	import { page as nav } from "$app/state";
 	import { fade } from "svelte/transition";
@@ -18,31 +18,31 @@
 		UserRound,
 		Wrench,
 	} from "@lucide/svelte";
-	import { authStore } from "$lib/stores/auth.svelte";
-	import { towerStore } from "$lib/stores/tower.svelte";
-	import AuthMenu from "$lib/components/smol/AuthMenu.svelte";
-	import Alert from "$lib/components/smol/Alert.svelte";
-	import Btn from "$lib/components/smol/Btn.svelte";
-	import Card from "$lib/components/smol/Card.svelte";
-	import IconBtn from "$lib/components/smol/IconBtn.svelte";
-	import LoadingCard from "$lib/components/smol/LoadingCard.svelte";
-	import Separator from "$lib/components/smol/Separator.svelte";
-	import TextInput from "$lib/components/smol/TextInput.svelte";
-	import WorkshopCard from "$lib/components/workshop/WorkshopCard.svelte";
-	import WorkshopDetailModal from "$lib/components/workshop/WorkshopDetailModal.svelte";
-	import WorkshopFormModal from "$lib/components/workshop/WorkshopFormModal.svelte";
-	import WorkshopSpotlight from "$lib/components/workshop/WorkshopSpotlight.svelte";
-	import { isAdminUser } from "$lib/services/admin";
-	import { fetchWikiAvatars } from "$lib/services/wikiAuth";
-	import { settingsStore } from "$lib/stores/settings.svelte";
+	import { authStore } from "#lib/stores/auth.svelte.js";
+	import { towerStore } from "#lib/stores/tower.svelte.js";
+	import AuthMenu from "#lib/components/smol/AuthMenu.svelte";
+	import Alert from "#lib/components/smol/Alert.svelte";
+	import Btn from "#lib/components/smol/Btn.svelte";
+	import Card from "#lib/components/smol/Card.svelte";
+	import IconBtn from "#lib/components/smol/IconBtn.svelte";
+	import LoadingCard from "#lib/components/smol/LoadingCard.svelte";
+	import Separator from "#lib/components/smol/Separator.svelte";
+	import TextInput from "#lib/components/smol/TextInput.svelte";
+	import WorkshopCard from "#lib/components/workshop/WorkshopCard.svelte";
+	import WorkshopDetailModal from "#lib/components/workshop/WorkshopDetailModal.svelte";
+	import WorkshopFormModal from "#lib/components/workshop/WorkshopFormModal.svelte";
+	import WorkshopSpotlight from "#lib/components/workshop/WorkshopSpotlight.svelte";
+	import { isAdminUser } from "#lib/services/admin.js";
+	import { fetchWikiAvatars } from "#lib/services/wikiAuth.js";
+	import { settingsStore } from "#lib/stores/settings.svelte.js";
 	import {
 		deleteWorkshopListing,
 		listWorkshop,
 		WORKSHOP_TAG_FEATURED,
 		type WorkshopListing,
 		type WorkshopListingTag,
-	} from "$lib/services/workshop";
-	import { toast } from "$lib/toast";
+	} from "#lib/services/workshop.js";
+	import { toast } from "#lib/toast.js";
 
 	const SORT_OPTIONS = [
 		{ value: "new", label: "Newest" },
@@ -63,11 +63,11 @@
 	let tags = $state<WorkshopListingTag[]>([]);
 	let sort = $state<"new" | "views" | "votes">("new");
 	let mineOnly = $state(false);
-
 	const sortLabel = $derived(SORT_OPTIONS.find((o) => o.value === sort)!.label);
 	const activeBrowse = $derived(
 		mineOnly ? "mine" : tags.length === 1 ? tags[0] : "all",
 	);
+
 	const sectionTitle = $derived(
 		activeBrowse === "mine"
 			? "Your Towers"
@@ -171,18 +171,15 @@
 
 	async function goBack() {
 		const name = towerStore.selectedName;
-		const opts = { keepFocus: true, noScroll: true };
+		const opts = { reset: false };
 		if (!name) {
 			await goto(resolve("/"), opts);
 			return;
 		}
 		const share = towerStore.sharePreviewId;
 		if (share) {
-			const path = resolve("/tower/[name]", { name });
 			await goto(
-				resolve(
-					`${path}?share=${encodeURIComponent(share)}` as `/tower/${string}`,
-				),
+				resolve(`/tower/[name]?share=${encodeURIComponent(share)}`, { name }),
 				opts,
 			);
 			return;
@@ -207,7 +204,10 @@
 		if (!nav.url.searchParams.has("listing")) return;
 		const next = new URL(nav.url.href);
 		next.searchParams.delete("listing");
-		replaceState(`${next.pathname}${next.search}${next.hash}`, {});
+		goto(`${next.pathname}${next.search}${next.hash}`, {
+			shallow: true,
+			replace: true,
+		});
 	}
 
 	function openEdit(listing: WorkshopListing) {
@@ -256,10 +256,10 @@
 		</div>
 		<div class="flex shrink-0 items-center space-x-2">
 			{#if isAdminUser(authStore.user)}
-				<Btn variant="outline" onclick={() => goto(resolve("/admin"))}>
-					Admin
-				</Btn>
+				<Btn variant="outline" onclick={() => goto(resolve("admin"))}>Admin</Btn
+				>
 			{/if}
+
 			<Btn variant="secondary" onclick={() => (publishOpen = true)}>
 				<span class="inline-flex items-center gap-1.5">
 					<Plus size={14} />

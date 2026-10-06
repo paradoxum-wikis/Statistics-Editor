@@ -3,9 +3,9 @@ import {
 	markInboxRead,
 	markInboxReadAll,
 	type InboxItem,
-} from "$lib/services/workshop";
-import { fetchWikiAvatars } from "$lib/services/wikiAuth";
-import { settingsStore } from "$lib/stores/settings.svelte";
+} from "#lib/services/workshop.js";
+import { fetchWikiAvatars } from "#lib/services/wikiAuth.js";
+import { settingsStore } from "#lib/stores/settings.svelte.js";
 
 class InboxStore {
 	items = $state.raw<InboxItem[]>([]);

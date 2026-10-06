@@ -4,7 +4,7 @@
 	import IconBtn from "../smol/IconBtn.svelte";
 	import Switch from "../smol/Switch.svelte";
 	import TextInput from "../smol/TextInput.svelte";
-	import { modifierStore } from "$lib/stores/modifier.svelte";
+	import { modifierStore } from "#lib/stores/modifier.svelte.js";
 	import { X } from "@lucide/svelte";
 
 	let modifierColumn = $state("");

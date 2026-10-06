@@ -6,26 +6,26 @@
 	import UpdateLog from "./UpdateLog.svelte";
 	import WikiBanner from "./smol/WikiBanner.svelte";
 	import Separator from "./smol/Separator.svelte";
-	import { towerStore } from "$lib/stores/tower.svelte";
-	import { settingsStore } from "$lib/stores/settings.svelte";
+	import { towerStore } from "#lib/stores/tower.svelte.js";
+	import { settingsStore } from "#lib/stores/settings.svelte.js";
 	import {
 		applyRofBug,
 		getRofBugVer,
 		isCellFormulaSource,
 		toNumericValue,
-	} from "$lib/utils/format";
-	import { schemaIndexToLevel } from "$lib/neowtext/functions/schema";
+	} from "#lib/utils/format.js";
+	import { schemaIndexToLevel } from "#lib/neowtext/functions/schema.js";
 	import { untrack } from "svelte";
-	import type SkinData from "$lib/towerComponents/skinData";
+	import type SkinData from "#lib/towerComponents/skinData.js";
 
 	import type { Picture } from "@sveltejs/enhanced-img";
-	import DamageIcon from "$lib/assets/Damage.png?enhanced";
-	import CooldownIcon from "$lib/assets/Cooldown.png?enhanced";
-	import IncomeIcon from "$lib/assets/Income.png?enhanced";
-	import RangeIcon from "$lib/assets/Range.png?enhanced";
-	import HiddenIcon from "$lib/assets/HiddenDetection.png?enhanced";
-	import FlyingIcon from "$lib/assets/FlyingDetection.png?enhanced";
-	import LeadIcon from "$lib/assets/LeadDetection.png?enhanced";
+	import DamageIcon from "#lib/assets/Damage.png?enhanced";
+	import CooldownIcon from "#lib/assets/Cooldown.png?enhanced";
+	import IncomeIcon from "#lib/assets/Income.png?enhanced";
+	import RangeIcon from "#lib/assets/Range.png?enhanced";
+	import HiddenIcon from "#lib/assets/HiddenDetection.png?enhanced";
+	import FlyingIcon from "#lib/assets/FlyingDetection.png?enhanced";
+	import LeadIcon from "#lib/assets/LeadDetection.png?enhanced";
 
 	type SummaryLine = {
 		kind: "change" | "grant";

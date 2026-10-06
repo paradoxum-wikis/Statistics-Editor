@@ -5,9 +5,9 @@
 	import { cubicOut } from "svelte/easing";
 	import { fly } from "svelte/transition";
 
-	import { towerStore } from "$lib/stores/tower.svelte";
-	import { profileStore } from "$lib/stores/profile.svelte";
-	import { toast } from "$lib/toast";
+	import { towerStore } from "#lib/stores/tower.svelte.js";
+	import { profileStore } from "#lib/stores/profile.svelte.js";
+	import { toast } from "#lib/toast.js";
 
 	import Sidebar from "./Sidebar.svelte";
 	import TowerEditor from "./TowerEditor.svelte";
@@ -30,7 +30,7 @@
 	import DiscardMessage, {
 		type PendingDiscardAction,
 	} from "./smol/DiscardMessage.svelte";
-	import { Trash2, Check, Store, Factory, Plus } from "@lucide/svelte";
+	import { Trash, Check, Store, Factory, Plus } from "@lucide/svelte";
 
 	let { isClient }: { isClient: boolean } = $props();
 
@@ -72,15 +72,14 @@
 	async function performGoHome() {
 		towerStore.unload();
 		editorMode = "cells";
-		await goto(resolve("/"), { keepFocus: true, noScroll: true });
+		await goto(resolve("/"), { reset: false });
 	}
 
 	async function performTowerSelect(tower: string) {
 		const success = await towerStore.load(tower);
 		if (success) {
 			await goto(resolve("/tower/[name]", { name: towerStore.selectedName }), {
-				keepFocus: true,
-				noScroll: true,
+				reset: false,
 			});
 		}
 	}
@@ -264,7 +263,7 @@
 													class="ms-auto text-muted-foreground hover:text-destructive opacity-0 transition-opacity"
 													onclick={(e) => openDeleteProfileDialog(profile, e)}
 												>
-													<Trash2 />
+													<Trash />
 												</button>
 											{/if}
 										</DropdownMenu.Item>
@@ -300,10 +299,9 @@
 										<div class="flex justify-end gap-2">
 											<Btn
 												variant="outline"
-												onclick={() => (createProfileOpen = false)}
+												onclick={() => (createProfileOpen = false)}>Cancel</Btn
 											>
-												Cancel
-											</Btn>
+
 											<Btn
 												variant="primary"
 												onclick={confirmCreateProfile}
@@ -318,10 +316,9 @@
 								<DropdownMenu.Item
 									class="dropdown-item text-destructive hover:bg-destructive/10"
 									onclick={() => (resetProfileOpen = true)}
+									><Factory /><span>Reset profile</span></DropdownMenu.Item
 								>
-									<Factory />
-									<span>Reset profile</span>
-								</DropdownMenu.Item>
+
 								{#if profileStore.current !== "Default"}
 									<DropdownMenu.Item
 										class="dropdown-item text-destructive hover:bg-destructive/10"
@@ -340,8 +337,7 @@
 					{#if isClient}
 						<IconBtn
 							class="h-8 p-1!"
-							onclick={() =>
-								goto(resolve("/workshop"), { keepFocus: true, noScroll: true })}
+							onclick={() => goto(resolve("workshop"), { reset: false })}
 							title="Workshop"
 						>
 							<Store size={20} />

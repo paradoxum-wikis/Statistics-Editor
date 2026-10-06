@@ -20,16 +20,16 @@ import {
 	parseSchema,
 	schemaBranches,
 	serializeDetectionFlags,
-} from "$lib/neowtext/functions";
-import { indexRowsByLevelKeys } from "$lib/neowtext/tableCache";
-import type { TableData } from "$lib/neowtext/parser";
-import { settingsStore } from "$lib/stores/settings.svelte";
+} from "#lib/neowtext/functions/index.js";
+import { indexRowsByLevelKeys } from "#lib/neowtext/tableCache.js";
+import type { TableData } from "#lib/neowtext/parser.js";
+import { settingsStore } from "#lib/stores/settings.svelte.js";
 import {
 	applyRefSuffixEdit,
 	isCellFormulaSource,
 	normalizeColumnKey,
 	stripRefs,
-} from "$lib/utils/format";
+} from "#lib/utils/format.js";
 
 type FormulaToken = string; // e.g. "$DPS$", "$DPS2$"
 type FormulaTokenMap = Record<string, string>; // token -> expression

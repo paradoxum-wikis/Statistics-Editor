@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Modal from "$lib/components/smol/Modal.svelte";
+	import Modal from "#lib/components/smol/Modal.svelte";
 	import GlobalModifierPanel from "./GlobalModifierPanel.svelte";
 
 	let { open = $bindable(false) } = $props();

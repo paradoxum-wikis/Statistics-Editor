@@ -4,38 +4,38 @@
 	import Btn from "./smol/Btn.svelte";
 	import Switch from "./smol/Switch.svelte";
 	import Tip from "./smol/Tip.svelte";
-	import { tabPill } from "$lib/utils/tabPill.svelte";
-	import type Tower from "$lib/towerComponents/tower";
-	import type SkinData from "$lib/towerComponents/skinData";
-	import { settingsStore } from "$lib/stores/settings.svelte";
-	import { towerStore } from "$lib/stores/tower.svelte";
-	import { modifierStore } from "$lib/stores/modifier.svelte";
-	import { noFetchTowers } from "$lib/services/fetchTowerWiki";
+	import { tabPill } from "#lib/utils/tabPill.svelte.js";
+	import type Tower from "#lib/towerComponents/tower.js";
+	import type SkinData from "#lib/towerComponents/skinData.js";
+	import { settingsStore } from "#lib/stores/settings.svelte.js";
+	import { towerStore } from "#lib/stores/tower.svelte.js";
+	import { modifierStore } from "#lib/stores/modifier.svelte.js";
+	import { noFetchTowers } from "#lib/services/fetchTowerWiki.js";
 	import {
 		createShare,
 		parseShareRef,
 		sharePageUrl,
-	} from "$lib/services/shareTower";
-	import { authStore } from "$lib/stores/auth.svelte";
+	} from "#lib/services/shareTower.js";
+	import { authStore } from "#lib/stores/auth.svelte.js";
 	import WorkshopFormModal from "./workshop/WorkshopFormModal.svelte";
-	import { analytics } from "$lib/services/analytics";
-	import { toast } from "$lib/toast";
-	import { isCustomTower } from "$lib/towerComponents/customTowers";
-	import { hasSeDiff, mkCellKey } from "$lib/neowtext/directives";
+	import { analytics } from "#lib/services/analytics.js";
+	import { toast } from "#lib/toast.js";
+	import { isCustomTower } from "#lib/towerComponents/customTowers.js";
+	import { hasSeDiff, mkCellKey } from "#lib/neowtext/directives.js";
 	import {
 		applyRefSuffixEdit,
 		isCellFormulaSource,
 		stripRefs,
 		toDisplayNumber,
-	} from "$lib/utils/format";
-	import { getTargetSkins } from "$lib/utils/towah";
+	} from "#lib/utils/format.js";
+	import { getTargetSkins } from "#lib/utils/towah.js";
 	import {
 		getCostKeys,
 		getCostValue,
 		getEffectiveCostKey,
-	} from "$lib/neowtext/functions";
-	import { cftFromRows, rewriteCell } from "$lib/neowtext/tableCell";
-	import { applyCellWrap, resolveEditHold } from "$lib/cellInspect";
+	} from "#lib/neowtext/functions/index.js";
+	import { cftFromRows, rewriteCell } from "#lib/neowtext/tableCell.js";
+	import { applyCellWrap, resolveEditHold } from "#lib/cellInspect.js";
 	import TowerDataTable from "./table/TowerDataTable.svelte";
 	import {
 		buildSkinRefState,
@@ -45,10 +45,10 @@
 		tableCacheKey,
 		type SkinRowsSession,
 		type TableConfig,
-	} from "$lib/towerTable";
+	} from "#lib/towerTable.js";
 	import NotesSection from "./NotesSection.svelte";
 	import MemosSection from "./MemosSection.svelte";
-	import { profileStore } from "$lib/stores/profile.svelte";
+	import { profileStore } from "#lib/stores/profile.svelte.js";
 
 	let {
 		tower = null,

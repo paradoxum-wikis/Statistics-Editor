@@ -1,8 +1,8 @@
-import { settingsStore } from "$lib/stores/settings.svelte";
+import { settingsStore } from "#lib/stores/settings.svelte.js";
 import {
 	formatsWikiNumber,
 	formatWikiTemplateNumber,
-} from "$lib/wikiTemplates";
+} from "#lib/wikiTemplates/index.js";
 
 interface TableRow extends Record<string, string | number | boolean | object> {}
 

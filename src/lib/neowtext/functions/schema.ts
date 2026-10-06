@@ -1,4 +1,4 @@
-import { stripRefs } from "$lib/utils/format";
+import { stripRefs } from "#lib/utils/format.js";
 import { getFncValue, getVariantFncKey } from "./keys";
 
 export function parseSchema(schemaStr: string | undefined): string[] | null {

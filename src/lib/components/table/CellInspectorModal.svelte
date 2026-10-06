@@ -9,11 +9,15 @@
 		type RefTokenRegistry,
 		type TableConfig,
 		type TableRow,
-	} from "$lib/towerTable";
-	import { formatCellHold, inspectCell, levelValFor } from "$lib/cellInspect";
-	import { renderCellHtml } from "$lib/neowtext/render";
-	import type { GlobalModifier } from "$lib/utils/globalModifier";
-	import { stripRefs } from "$lib/utils/format";
+	} from "#lib/towerTable.js";
+	import {
+		formatCellHold,
+		inspectCell,
+		levelValFor,
+	} from "#lib/cellInspect.js";
+	import { renderCellHtml } from "#lib/neowtext/render.js";
+	import type { GlobalModifier } from "#lib/utils/globalModifier.js";
+	import { stripRefs } from "#lib/utils/format.js";
 	import Modal from "../smol/Modal.svelte";
 	import Separator from "../smol/Separator.svelte";
 	import RenderedHtml from "./RenderedHtml.svelte";

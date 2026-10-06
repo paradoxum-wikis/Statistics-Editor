@@ -15,15 +15,15 @@
 	import { mediawiki } from "@bhsd/codemirror-wikitext";
 	import parserConfig from "wikiparser-node/config/default.json" with { type: "json" };
 	import type { ConfigData } from "wikiparser-node";
-	import { neowtextSupport } from "$lib/neowtext/codemirror";
-	import { towerStore } from "$lib/stores/tower.svelte";
-	import { profileStore } from "$lib/stores/profile.svelte";
-	import { settingsStore } from "$lib/stores/settings.svelte";
-	import { setWikiOverride } from "$lib/neowtext/wikiSource";
-	import { noFetchTowers } from "$lib/services/fetchTowerWiki";
-	import { isCustomTower } from "$lib/towerComponents/customTowers";
-	import { analytics } from "$lib/services/analytics";
-	import { toast } from "$lib/toast";
+	import { neowtextSupport } from "#lib/neowtext/codemirror/index.js";
+	import { towerStore } from "#lib/stores/tower.svelte.js";
+	import { profileStore } from "#lib/stores/profile.svelte.js";
+	import { settingsStore } from "#lib/stores/settings.svelte.js";
+	import { setWikiOverride } from "#lib/neowtext/wikiSource.js";
+	import { noFetchTowers } from "#lib/services/fetchTowerWiki.js";
+	import { isCustomTower } from "#lib/towerComponents/customTowers.js";
+	import { analytics } from "#lib/services/analytics.js";
+	import { toast } from "#lib/toast.js";
 
 	const syncFromStoreAnnotation = Annotation.define<boolean>();
 	const vimCompartment = new Compartment();
@@ -236,8 +236,9 @@
 
 		isFetching = true;
 		try {
-			const { fetchTowerWiki } = await import("$lib/services/fetchTowerWiki");
-			const { setWikiOverride } = await import("$lib/neowtext/wikiSource");
+			const { fetchTowerWiki } =
+				await import("#lib/services/fetchTowerWiki.js");
+			const { setWikiOverride } = await import("#lib/neowtext/wikiSource.js");
 			const wikitext = await fetchTowerWiki(towerName, true);
 			if (wikitext) {
 				setWikiOverride(profileStore.current, towerName, wikitext);

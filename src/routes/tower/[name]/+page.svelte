@@ -2,10 +2,10 @@
 	import { afterNavigate, goto } from "$app/navigation";
 	import { resolve } from "$app/paths";
 	import { page } from "$app/state";
-	import { bootstrap } from "$lib/bootstrap";
-	import { towerStore } from "$lib/stores/tower.svelte";
-	import { parseShareRef } from "$lib/services/shareTower";
-	import { analytics } from "$lib/services/analytics";
+	import { bootstrap } from "#lib/bootstrap.js";
+	import { towerStore } from "#lib/stores/tower.svelte.js";
+	import { parseShareRef } from "#lib/services/shareTower.js";
+	import { analytics } from "#lib/services/analytics.js";
 
 	async function syncTowerFromRoute() {
 		await bootstrap();
@@ -30,20 +30,18 @@
 					});
 					alert("Failed to import shared tower.");
 					await goto(resolve("/"), {
-						replaceState: true,
-						keepFocus: true,
-						noScroll: true,
+						replace: true,
+						reset: false,
 					});
 					return;
 				}
 				const imported = towerStore.selectedName;
 				if (imported.toLowerCase() !== name.trim().toLowerCase()) {
-					const path = resolve("/tower/[name]", { name: imported });
 					await goto(
-						resolve(
-							`${path}?share=${encodeURIComponent(shareId)}` as `/tower/${string}`,
-						),
-						{ replaceState: true, keepFocus: true, noScroll: true },
+						resolve(`/tower/[name]?share=${encodeURIComponent(shareId)}`, {
+							name: imported,
+						}),
+						{ replace: true, reset: false },
 					);
 				}
 				return;
@@ -56,9 +54,8 @@
 					e instanceof Error ? e.message : "Failed to import shared tower.",
 				);
 				await goto(resolve("/"), {
-					replaceState: true,
-					keepFocus: true,
-					noScroll: true,
+					replace: true,
+					reset: false,
 				});
 				return;
 			}
@@ -70,7 +67,9 @@
 		await towerStore.load(name);
 	}
 
-	afterNavigate(() => {
+	afterNavigate(({ shallow, type }) => {
+		if (shallow && type === "goto") return;
+
 		void syncTowerFromRoute();
 	});
 </script>

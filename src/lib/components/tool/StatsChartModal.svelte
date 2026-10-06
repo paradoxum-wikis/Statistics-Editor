@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Modal from "$lib/components/smol/Modal.svelte";
+	import Modal from "#lib/components/smol/Modal.svelte";
 	import LazyStatsChartPanel from "./LazyStatsChartPanel.svelte";
 
 	let { open = $bindable(false) } = $props();

@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { resolve } from "$app/paths";
 	import { PencilSparkles, ThumbsUp } from "@lucide/svelte";
-	import Modal from "$lib/components/smol/Modal.svelte";
-	import { inboxStore } from "$lib/stores/inbox.svelte";
-	import { timeAgo } from "$lib/utils/workshop";
-	import avatarPlaceholder from "$lib/assets/Avatar.png";
+	import Modal from "#lib/components/smol/Modal.svelte";
+	import { inboxStore } from "#lib/stores/inbox.svelte.js";
+	import { timeAgo } from "#lib/utils/workshop.js";
+	import avatarPlaceholder from "#lib/assets/Avatar.png";
 
 	function onOpenItem() {
 		inboxStore.open = false;
@@ -34,7 +34,7 @@
 			{#each inboxStore.items as item (item.id)}
 				<a
 					class="inbox-item"
-					href="{resolve('/workshop')}?listing={encodeURIComponent(
+					href="{resolve('workshop')}?listing={encodeURIComponent(
 						item.listing_id,
 					)}"
 					onclick={onOpenItem}

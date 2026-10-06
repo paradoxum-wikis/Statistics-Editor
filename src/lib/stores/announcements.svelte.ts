@@ -5,8 +5,8 @@ import {
 	latestAnnouncement,
 	setSeenAnnouncementId,
 	type Announcement,
-} from "$lib/services/announcements";
-import { toast } from "$lib/toast";
+} from "#lib/services/announcements.js";
+import { toast } from "#lib/toast.js";
 
 class AnnouncementsStore {
 	items = $state.raw<Announcement[]>([]);

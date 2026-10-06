@@ -3,31 +3,31 @@
 	import { resolve } from "$app/paths";
 	import { fade } from "svelte/transition";
 	import { Select } from "bits-ui";
-	import { ArrowLeft, Check, ChevronDown, Trash2 } from "@lucide/svelte";
-	import { authStore } from "$lib/stores/auth.svelte";
-	import AuthMenu from "$lib/components/smol/AuthMenu.svelte";
-	import Alert from "$lib/components/smol/Alert.svelte";
-	import Btn from "$lib/components/smol/Btn.svelte";
-	import Card from "$lib/components/smol/Card.svelte";
-	import IconBtn from "$lib/components/smol/IconBtn.svelte";
-	import LoadingCard from "$lib/components/smol/LoadingCard.svelte";
-	import Modal from "$lib/components/smol/Modal.svelte";
-	import NotFoundView from "$lib/components/NotFoundView.svelte";
-	import TextInput from "$lib/components/smol/TextInput.svelte";
+	import { ArrowLeft, Check, ChevronDown, Trash } from "@lucide/svelte";
+	import { authStore } from "#lib/stores/auth.svelte.js";
+	import AuthMenu from "#lib/components/smol/AuthMenu.svelte";
+	import Alert from "#lib/components/smol/Alert.svelte";
+	import Btn from "#lib/components/smol/Btn.svelte";
+	import Card from "#lib/components/smol/Card.svelte";
+	import IconBtn from "#lib/components/smol/IconBtn.svelte";
+	import LoadingCard from "#lib/components/smol/LoadingCard.svelte";
+	import Modal from "#lib/components/smol/Modal.svelte";
+	import NotFoundView from "#lib/components/NotFoundView.svelte";
+	import TextInput from "#lib/components/smol/TextInput.svelte";
 	import {
 		hardDeleteAdminListing,
 		isAdminUser,
 		listAdminWorkshop,
 		patchAdminListing,
 		type AdminListing,
-	} from "$lib/services/admin";
+	} from "#lib/services/admin.js";
 	import {
 		WORKSHOP_TAG_FEATURED,
 		WORKSHOP_TAGS,
 		type WorkshopListingTag,
-	} from "$lib/services/workshop";
-	import { settingsStore } from "$lib/stores/settings.svelte";
-	import { toast } from "$lib/toast";
+	} from "#lib/services/workshop.js";
+	import { settingsStore } from "#lib/stores/settings.svelte.js";
+	import { toast } from "#lib/toast.js";
 
 	const STATUS_OPTIONS = [
 		{ value: "all", label: "All" },
@@ -178,7 +178,7 @@
 	}
 
 	async function goHome() {
-		await goto(resolve("/"), { keepFocus: true, noScroll: true });
+		await goto(resolve("/"), { reset: false });
 	}
 </script>
 
@@ -206,7 +206,7 @@
 		>
 			<div class="flex min-w-0 items-center gap-3">
 				<IconBtn
-					onclick={() => goto(resolve("/workshop"))}
+					onclick={() => goto(resolve("workshop"))}
 					title="Back to Workshop"
 				>
 					<ArrowLeft size={18} />
@@ -367,7 +367,7 @@
 												class="text-destructive"
 												onclick={() => askHardDelete(item)}
 											>
-												<Trash2 size={14} />
+												<Trash size={14} />
 												Delete
 											</Btn>
 										</div>
@@ -393,9 +393,11 @@
 							disabled={page <= 1}
 							onclick={() => (page -= 1)}>Previous</Btn
 						>
-						<span class="text-sm text-muted-foreground">
-							Page {page} of {totalPages}
-						</span>
+
+						<span class="text-sm text-muted-foreground"
+							>Page {page} of {totalPages}</span
+						>
+
 						<Btn
 							variant="outline"
 							disabled={page >= totalPages}

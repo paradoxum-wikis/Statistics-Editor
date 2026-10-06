@@ -14,7 +14,7 @@ import {
 	Rows3,
 	Keyboard,
 } from "@lucide/svelte";
-import { analytics } from "$lib/services/analytics";
+import { analytics } from "#lib/services/analytics.js";
 
 export type SettingTab = "editor" | "appearance" | "advanced";
 

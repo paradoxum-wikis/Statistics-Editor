@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { renderCellHtml } from "$lib/neowtext/render";
-	import { stripRefs } from "$lib/utils/format";
-	import type { RefTokenRegistry } from "$lib/towerTable";
+	import { renderCellHtml } from "#lib/neowtext/render.js";
+	import { stripRefs } from "#lib/utils/format.js";
+	import type { RefTokenRegistry } from "#lib/towerTable.js";
 	import Tip from "../smol/Tip.svelte";
 	import RenderedHtml from "./RenderedHtml.svelte";
 

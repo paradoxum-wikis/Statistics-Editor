@@ -3,7 +3,7 @@
 	import { ChartNoAxesCombined } from "@lucide/svelte";
 	import IconBtn from "../smol/IconBtn.svelte";
 	import LazyStatsChartPanel from "./LazyStatsChartPanel.svelte";
-	import { analytics } from "$lib/services/analytics";
+	import { analytics } from "#lib/services/analytics.js";
 
 	let {
 		variant = "icon",

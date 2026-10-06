@@ -5,9 +5,9 @@ import {
 	logoutAuth,
 	rememberWikiAvatar,
 	type AuthUser,
-} from "$lib/services/wikiAuth";
-import { settingsStore } from "$lib/stores/settings.svelte";
-import { toast } from "$lib/toast";
+} from "#lib/services/wikiAuth.js";
+import { settingsStore } from "#lib/stores/settings.svelte.js";
+import { toast } from "#lib/toast.js";
 
 class AuthStore {
 	user = $state.raw<AuthUser | null>(null);

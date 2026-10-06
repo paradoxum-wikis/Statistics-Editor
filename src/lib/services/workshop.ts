@@ -1,4 +1,4 @@
-import { api, json } from "$lib/services/api";
+import { api, json } from "#lib/services/api.js";
 
 export const WORKSHOP_TAGS = ["rework", "rebalance", "new"] as const;
 export type WorkshopTag = (typeof WORKSHOP_TAGS)[number];

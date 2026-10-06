@@ -1,37 +1,37 @@
 import { goto } from "$app/navigation";
 import { resolve } from "$app/paths";
-import TowerManager from "$lib/towerComponents/towerManager";
-import type Tower from "$lib/towerComponents/tower";
-import { settingsStore } from "$lib/stores/settings.svelte";
+import TowerManager from "#lib/towerComponents/towerManager.js";
+import type Tower from "#lib/towerComponents/tower.js";
+import { settingsStore } from "#lib/stores/settings.svelte.js";
 import {
 	addCustomTower,
 	guaraCustomTower,
 	isCustomTower,
-} from "$lib/towerComponents/customTowers";
+} from "#lib/towerComponents/customTowers.js";
 import {
 	collectCompareValues,
 	mergeBaselineOnTowerDiff,
-} from "$lib/utils/towah";
+} from "#lib/utils/towah.js";
 import {
 	embedSeDirectives,
 	extractSeMemo,
 	hasSeDiff,
 	stripSeDiff,
-} from "$lib/neowtext/directives";
+} from "#lib/neowtext/directives.js";
 import {
 	getFactoryAck,
 	getFactoryHash,
 	setFactoryAck,
-} from "$lib/neowtext/factorySync";
-import { setWikiOverride } from "$lib/neowtext/wikiSource";
-import { fetchTowerWiki } from "$lib/services/fetchTowerWiki";
+} from "#lib/neowtext/factorySync.js";
+import { setWikiOverride } from "#lib/neowtext/wikiSource.js";
+import { fetchTowerWiki } from "#lib/services/fetchTowerWiki.js";
 import {
 	fetchShare,
 	parseShareRef,
 	type ShareOwner,
-} from "$lib/services/shareTower";
-import { analytics } from "$lib/services/analytics";
-import { toast } from "$lib/toast";
+} from "#lib/services/shareTower.js";
+import { analytics } from "#lib/services/analytics.js";
+import { toast } from "#lib/toast.js";
 
 const RECENT_KEY = "tdse_recent_towers";
 const RECENT_MAX = 12;
@@ -438,18 +438,16 @@ class TowerStore {
 			this.names.some((n) => n.toLowerCase() === name.toLowerCase())
 		) {
 			await goto(resolve("/tower/[name]", { name }), {
-				replaceState: true,
-				keepFocus: true,
-				noScroll: true,
+				replace: true,
+				reset: false,
 			});
 			return true;
 		}
 
 		this.unload();
 		await goto(resolve("/"), {
-			replaceState: true,
-			keepFocus: true,
-			noScroll: true,
+			replace: true,
+			reset: false,
 		});
 		return true;
 	}
@@ -529,9 +527,8 @@ class TowerStore {
 					this.#lastLoadedName = this.selectedName;
 					// so reload does not re-import over the applied profile data
 					goto(resolve("/tower/[name]", { name: this.selectedName }), {
-						replaceState: true,
-						keepFocus: true,
-						noScroll: true,
+						replace: true,
+						reset: false,
 					});
 				}
 
@@ -605,7 +602,7 @@ class TowerStore {
 
 	async confirmDeleteTower(): Promise<boolean> {
 		if (!(await this.deleteTower())) return false;
-		goto(resolve("/"), { keepFocus: true, noScroll: true });
+		goto(resolve("/"), { reset: false });
 		return true;
 	}
 

@@ -1,6 +1,6 @@
-import TowerManager from "$lib/towerComponents/towerManager";
-import { settingsStore } from "$lib/stores/settings.svelte";
-import { analytics } from "$lib/services/analytics";
+import TowerManager from "#lib/towerComponents/towerManager.js";
+import { settingsStore } from "#lib/stores/settings.svelte.js";
+import { analytics } from "#lib/services/analytics.js";
 
 const CURRENT_PROFILE_KEY = "tds_current_profile";
 

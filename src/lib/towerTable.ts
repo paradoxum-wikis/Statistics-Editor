@@ -1,10 +1,13 @@
-import { mkCellKey, parseCellKey } from "$lib/neowtext/directives";
-import { resolveToken, type TableCache } from "$lib/neowtext/functions";
-import type { GlobalModifier } from "$lib/utils/globalModifier";
+import { mkCellKey, parseCellKey } from "#lib/neowtext/directives.js";
+import {
+	resolveToken,
+	type TableCache,
+} from "#lib/neowtext/functions/index.js";
+import type { GlobalModifier } from "#lib/utils/globalModifier.js";
 import {
 	applyGlobalModifierToRow,
 	applyGlobalModifierDisplay,
-} from "$lib/utils/globalModifier";
+} from "#lib/utils/globalModifier.js";
 import {
 	applyRofBug,
 	formatNumber,
@@ -15,9 +18,9 @@ import {
 	stripRefOnlyVarSuffix,
 	stripRefs,
 	toDisplayNumber,
-} from "$lib/utils/format";
-import type SkinData from "$lib/towerComponents/skinData";
-import type Tower from "$lib/towerComponents/tower";
+} from "#lib/utils/format.js";
+import type SkinData from "#lib/towerComponents/skinData.js";
+import type Tower from "#lib/towerComponents/tower.js";
 
 export type TableRow = Record<string, string | number>;
 export type RefEntry = { content: string; name: string | null };
@@ -51,7 +54,7 @@ export type ActiveSkinTables = {
 };
 
 export type RofInfo = {
-	type: ReturnType<typeof import("$lib/utils/format").getRofBugVer>["type"];
+	type: ReturnType<typeof import("#lib/utils/format.js").getRofBugVer>["type"];
 	cols: Set<string>;
 	enabled: boolean;
 };

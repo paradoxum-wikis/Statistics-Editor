@@ -1,14 +1,14 @@
 <script lang="ts">
-	import { towerStore } from "$lib/stores/tower.svelte";
-	import { getTargetSkins } from "$lib/utils/towah";
+	import { towerStore } from "#lib/stores/tower.svelte.js";
+	import { getTargetSkins } from "#lib/utils/towah.js";
 	import CollapsibleSide from "./smol/CollapsibleSide.svelte";
 	import SubtleRow from "./smol/SubtleRow.svelte";
 	import Tip from "./smol/Tip.svelte";
 	import { CircleDollarSign } from "@lucide/svelte";
-	import { parseNumeric, stripRefs } from "$lib/utils/format";
-	import { getFncValue } from "$lib/neowtext/functions";
-	import { mkCellKey } from "$lib/neowtext/directives";
-	import type SkinData from "$lib/towerComponents/skinData";
+	import { parseNumeric, stripRefs } from "#lib/utils/format.js";
+	import { getFncValue } from "#lib/neowtext/functions/index.js";
+	import { mkCellKey } from "#lib/neowtext/directives.js";
+	import type SkinData from "#lib/towerComponents/skinData.js";
 
 	type CostRow = {
 		level: number;

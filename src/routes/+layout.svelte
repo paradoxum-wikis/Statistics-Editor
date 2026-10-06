@@ -4,14 +4,14 @@
 	import { page } from "$app/state";
 	import { MediaQuery } from "svelte/reactivity";
 	import { Tooltip } from "bits-ui";
-	import { analytics } from "$lib/services/analytics";
-	import { bootstrap } from "$lib/bootstrap";
-	import { towerStore } from "$lib/stores/tower.svelte";
-	import DesktopLayout from "$lib/components/DesktopLayout.svelte";
-	import MobileLayout from "$lib/components/MobileLayout.svelte";
-	import Toaster from "$lib/components/smol/Toaster.svelte";
-	import AnnouncementsModal from "$lib/components/AnnouncementsModal.svelte";
-	import InboxModal from "$lib/components/InboxModal.svelte";
+	import { analytics } from "#lib/services/analytics.js";
+	import { bootstrap } from "#lib/bootstrap.js";
+	import { towerStore } from "#lib/stores/tower.svelte.js";
+	import DesktopLayout from "#lib/components/DesktopLayout.svelte";
+	import MobileLayout from "#lib/components/MobileLayout.svelte";
+	import Toaster from "#lib/components/smol/Toaster.svelte";
+	import AnnouncementsModal from "#lib/components/AnnouncementsModal.svelte";
+	import InboxModal from "#lib/components/InboxModal.svelte";
 	import "./layout.css";
 	import "@fontsource-variable/montserrat/wght.css";
 

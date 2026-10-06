@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from "svelte";
-	import { loadSupporters, type SupportersData } from "$lib/supporters";
+	import { loadSupporters, type SupportersData } from "#lib/supporters.js";
 	import Marquee from "./Marquee.svelte";
 
 	let { class: className }: { class?: string } = $props();

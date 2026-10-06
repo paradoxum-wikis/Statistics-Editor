@@ -1,6 +1,6 @@
 import Tower from "./tower";
 import { towerNames } from "./towers";
-import { fetchTowerWiki } from "$lib/services/fetchTowerWiki";
+import { fetchTowerWiki } from "#lib/services/fetchTowerWiki.js";
 import {
 	getDefaultFncKey,
 	getFncValue,
@@ -11,25 +11,25 @@ import {
 	getSchemaIndex,
 	getSchemaParent,
 	parseDetectionArray,
-} from "$lib/neowtext/functions";
+} from "#lib/neowtext/functions/index.js";
 import {
 	indexRowsByLevelKeys,
 	type TableRowCache,
-} from "$lib/neowtext/tableCache";
+} from "#lib/neowtext/tableCache.js";
 import {
 	parseWikitext,
 	duplicateTableHeaders,
 	type TableData,
-} from "$lib/neowtext/parser";
-import { patchWikitext } from "$lib/neowtext/patcher";
+} from "#lib/neowtext/parser.js";
+import { patchWikitext } from "#lib/neowtext/patcher.js";
 import {
 	clearProfileWikiOverrides,
 	clearTowerWikiOverrides,
 	clearWikiOverride,
 	loadEffectiveWikitext,
 	setWikiOverride,
-} from "$lib/neowtext/wikiSource";
-import { settingsStore } from "$lib/stores/settings.svelte";
+} from "#lib/neowtext/wikiSource.js";
+import { settingsStore } from "#lib/stores/settings.svelte.js";
 import {
 	getCustomTowers,
 	isCustomTower,
@@ -39,12 +39,12 @@ import {
 	isEditableRefSuffixCell,
 	normalizeColumnKey,
 	stripRefs,
-} from "$lib/utils/format";
+} from "#lib/utils/format.js";
 import {
 	embedSeDirectives,
 	extractDirectives,
 	stripSeMeta,
-} from "$lib/neowtext/directives";
+} from "#lib/neowtext/directives.js";
 
 const wikitextFiles = import.meta.glob("./towers/*.wiki", {
 	query: "?raw",

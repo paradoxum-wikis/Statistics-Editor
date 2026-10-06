@@ -1,4 +1,4 @@
-import { columnKeysEqual, toNumericValue } from "$lib/utils/format";
+import { columnKeysEqual, toNumericValue } from "#lib/utils/format.js";
 
 export type GlobalModifierEntry = {
 	column: string;

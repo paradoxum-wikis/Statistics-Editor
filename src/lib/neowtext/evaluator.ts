@@ -1,9 +1,9 @@
-import { settingsStore } from "$lib/stores/settings.svelte";
+import { settingsStore } from "#lib/stores/settings.svelte.js";
 import {
 	toNumericValue,
 	stripRefs,
 	normalizeColumnKey,
-} from "$lib/utils/format";
+} from "#lib/utils/format.js";
 import { transpileExpr } from "mediawiki-expr";
 
 const ARITHMETIC_ALLOWED = /^[\w\s+\-*/%.(),<>=!&|?:;{}[\]"']+$/;

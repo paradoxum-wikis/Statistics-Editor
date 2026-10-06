@@ -1,5 +1,5 @@
-import { formatCellHold } from "$lib/cellInspect";
-import { isCellFormulaSource } from "$lib/utils/format";
+import { formatCellHold } from "#lib/cellInspect.js";
+import { isCellFormulaSource } from "#lib/utils/format.js";
 import { createVariableReplacer, parseTable, type TableData } from "./parser";
 import { serializeTable } from "./serializer";
 

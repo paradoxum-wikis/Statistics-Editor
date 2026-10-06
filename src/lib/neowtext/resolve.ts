@@ -1,4 +1,4 @@
-import { evaluateFormula } from "$lib/neowtext/evaluator";
+import { evaluateFormula } from "#lib/neowtext/evaluator.js";
 import {
 	stripRefs,
 	formatReadOnly,
@@ -9,14 +9,17 @@ import {
 	columnKeysEqual,
 	parseNumeric,
 	toNumericValue,
-} from "$lib/utils/format";
-import { settingsStore } from "$lib/stores/settings.svelte";
+} from "#lib/utils/format.js";
+import { settingsStore } from "#lib/stores/settings.svelte.js";
 import {
 	getTableCacheRowAt,
 	type TableRowCache,
-} from "$lib/neowtext/tableCache";
-import { isNumericArrayBody, resolveFNC } from "$lib/neowtext/functions/total";
-import { getFncValue } from "$lib/neowtext/functions/keys";
+} from "#lib/neowtext/tableCache.js";
+import {
+	isNumericArrayBody,
+	resolveFNC,
+} from "#lib/neowtext/functions/total.js";
+import { getFncValue } from "#lib/neowtext/functions/keys.js";
 import {
 	buildBranchMap,
 	getSchemaIndex,
@@ -24,7 +27,7 @@ import {
 	parseLevelNumber,
 	parseSchema,
 	resolveBranchSpec,
-} from "$lib/neowtext/functions/schema";
+} from "#lib/neowtext/functions/schema.js";
 
 export type TableCache = Record<string, TableRowCache>;
 

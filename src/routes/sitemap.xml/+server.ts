@@ -1,4 +1,4 @@
-import { towerNames } from "$lib/towerComponents/towers";
+import { towerNames } from "#lib/towerComponents/towers/index.js";
 
 export const prerender = true;
 

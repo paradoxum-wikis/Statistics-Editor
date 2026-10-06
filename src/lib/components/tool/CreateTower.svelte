@@ -3,8 +3,8 @@
 	import { FilePlus } from "@lucide/svelte";
 	import IconBtn from "../smol/IconBtn.svelte";
 	import TextInput from "../smol/TextInput.svelte";
-	import { towerStore } from "$lib/stores/tower.svelte";
-	import { toast } from "$lib/toast";
+	import { towerStore } from "#lib/stores/tower.svelte.js";
+	import { toast } from "#lib/toast.js";
 
 	let {
 		variant = "icon",

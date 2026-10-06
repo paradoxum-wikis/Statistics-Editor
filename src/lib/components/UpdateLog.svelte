@@ -1,5 +1,5 @@
 <script lang="ts" module>
-	import { settingsStore } from "$lib/stores/settings.svelte";
+	import { settingsStore } from "#lib/stores/settings.svelte.js";
 
 	type Entry = {
 		sha: string;

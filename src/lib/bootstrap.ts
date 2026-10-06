@@ -1,9 +1,9 @@
-import { authStore } from "$lib/stores/auth.svelte";
-import { announcementsStore } from "$lib/stores/announcements.svelte";
-import { inboxStore } from "$lib/stores/inbox.svelte";
-import { profileStore } from "$lib/stores/profile.svelte";
-import { settingsStore } from "$lib/stores/settings.svelte";
-import { towerStore } from "$lib/stores/tower.svelte";
+import { authStore } from "#lib/stores/auth.svelte.js";
+import { announcementsStore } from "#lib/stores/announcements.svelte.js";
+import { inboxStore } from "#lib/stores/inbox.svelte.js";
+import { profileStore } from "#lib/stores/profile.svelte.js";
+import { settingsStore } from "#lib/stores/settings.svelte.js";
+import { towerStore } from "#lib/stores/tower.svelte.js";
 
 let ready: Promise<void> | null = null;
 

@@ -3,13 +3,13 @@
 	import { fly } from "svelte/transition";
 	import { Tabs } from "bits-ui";
 	import type { Picture } from "@sveltejs/enhanced-img";
-	import { stripRefs } from "$lib/utils/format";
-	import { renderCellHtml } from "$lib/neowtext/render";
+	import { stripRefs } from "#lib/utils/format.js";
+	import { renderCellHtml } from "#lib/neowtext/render.js";
 	import RenderedHtml from "./table/RenderedHtml.svelte";
-	import { towerStore } from "$lib/stores/tower.svelte";
-	import { imageLoader } from "$lib/services/imageLoader";
-	import { settingsStore } from "$lib/stores/settings.svelte";
-	import { tabPill } from "$lib/utils/tabPill.svelte";
+	import { towerStore } from "#lib/stores/tower.svelte.js";
+	import { imageLoader } from "#lib/services/imageLoader.js";
+	import { settingsStore } from "#lib/stores/settings.svelte.js";
+	import { tabPill } from "#lib/utils/tabPill.svelte.js";
 
 	let {
 		upgradeNames = {},

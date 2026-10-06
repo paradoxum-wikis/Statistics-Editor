@@ -1,5 +1,5 @@
-import { stripRefs, normalizeColumnKey } from "$lib/utils/format";
-import { wikiTemplateKey, wikiTemplateRe } from "$lib/wikiTemplates";
+import { stripRefs, normalizeColumnKey } from "#lib/utils/format.js";
+import { wikiTemplateKey, wikiTemplateRe } from "#lib/wikiTemplates/index.js";
 import { stripDirectives } from "./directives";
 
 export interface TableData {

@@ -1,8 +1,8 @@
-import { api } from "$lib/services/api";
+import { api } from "#lib/services/api.js";
 import {
 	type WorkshopListing,
 	type WorkshopListingTag,
-} from "$lib/services/workshop";
+} from "#lib/services/workshop.js";
 
 export function isAdminUser(
 	user: { fandom_userid: number } | null | undefined,

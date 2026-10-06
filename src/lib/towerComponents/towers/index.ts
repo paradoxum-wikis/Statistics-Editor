@@ -1,5 +1,5 @@
-import { listWikiOverrides } from "$lib/neowtext/wikiSource";
-import { parseTowerMeta, type TowerMeta } from "$lib/plugins/towers/parse";
+import { listWikiOverrides } from "#lib/neowtext/wikiSource.js";
+import { parseTowerMeta, type TowerMeta } from "#lib/plugins/towers/parse.js";
 import { metaEntries, towerNames } from "virtual:towers";
 
 // $FSE-META$

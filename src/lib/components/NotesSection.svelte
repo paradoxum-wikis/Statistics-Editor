@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { renderCellHtml } from "$lib/neowtext/render";
+	import { renderCellHtml } from "#lib/neowtext/render.js";
 	import RenderedHtml from "./table/RenderedHtml.svelte";
 	import CollaspibleMain from "./smol/CollaspibleMain.svelte";
-	import type { SkinNote } from "$lib/towerTable";
+	import type { SkinNote } from "#lib/towerTable.js";
 
 	let { notes }: { notes: SkinNote[] } = $props();
 
