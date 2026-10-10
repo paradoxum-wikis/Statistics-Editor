@@ -14,9 +14,8 @@ $FSE-UPGRADEICON$ = 116572141213630; 84772480553742; 73779458293742; 71327152036
 $FSE-META$ = Hardcore; File:HackerIcon.png
 $R$ = $FNC-RECURSION$
 </var>
-<div class="mobile-tabber"><tabber>
+<tabber>
 |-|Regular =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="17" |Neutral Stats
 |-
@@ -32,9 +31,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$ || 22 || 0.3 || 3 || 16 || 0.675 || 10% || 25% || 25 || 20% || 1,000 || $DPS$ || $MDPS$ || {{Money|$CE$}} || {{Money|$MCE$}}
 |}
-</div>
 
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="17" |Top Path Stats
 |-
@@ -42,9 +39,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 25 || 0.1 || 3 || 18.5 || 0.75 || 10% || 20% || 30 || 20% || 1,000 || $DPS$ || $MDPS$ || {{Money|$CE$}} || {{Money|$MCE$}}
 |}
-</div>
 
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="17" |Bottom Path Stats
 |-
@@ -52,9 +47,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 22 || 0.3 || 4 || 21 || 0.675 || 12.5% || 75% || 120 || 25% || 1,000 || $DPS$ || $MDPS$ || {{Money|$CE$}} || {{Money|$MCE$}}
 |}
-</div>
 |-|PVP =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="18" |Neutral Stats
 |-
@@ -70,9 +63,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$ || 18 || 0.3 || 2 || 16 || 0.825 || 20% || 30% || 75 || 12.5% || 1,000 || 0.1 || $DPS$ || $MDPS$ || {{Money|$CE$}} || {{Money|$MCE$}}
 |}
-</div>
 
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="18" |Top Path Stats
 |-
@@ -80,9 +71,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || {{Money|$PVP-COST$}}$R$ || {{Money|$TP$}}$R$ || 15 || 0.1 || 4 || 18.5 || 0.9 || 15% || 30% || 75 || 12.5% || 1,000 || 0.1 || $DPS$ || $MDPS$ || {{Money|$CE$}} || {{Money|$MCE$}}
 |}
-</div>
 
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="18" |Bottom Path Stats
 |-
@@ -90,5 +79,4 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || {{Money|$PVP-COST$}}$R$ || {{Money|$TP$}}$R$ || 18 || 0.3 || 3 || 21 || 0.825 || 25% || 25% || 120 || 20% || 1,000 || 0.1 || $DPS$ || $MDPS$ || {{Money|$CE$}} || {{Money|$MCE$}}
 |}
-</div>
-</tabber></div>
+</tabber>

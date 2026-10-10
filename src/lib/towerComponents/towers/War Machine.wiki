@@ -16,7 +16,6 @@ $SREF$ = <ref>Number is the damage dealt in the inner explosion sphere. Splash d
 $DREF$ = <ref>Total DPS is calculated as Normal DPS + Missile DPS.<br/>Missile DPS assumes only one enemy is hit with all missiles and it receives full splash damage.</ref>
 $R$ = $FNC-RECURSION$
 </var>
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="17" |War Machine Stats
 |-
@@ -34,9 +33,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || $R$ || $R$ || 70 || 75 || 4 || 0.09 || 2.5 || 1.75 || 26 || 7 || 15% || 15% || 15% || 3 || $TDPS$<ref>$DPS$ Normal DPS + $MDPS$ Missile DPS</ref> || {{Money|$CE$}}
 |}
-</div>
 
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="7" |[[Railgun Tank]] Stats
 |-
@@ -44,4 +41,3 @@ $R$ = $FNC-RECURSION$
 |-
 | 1,600 || 22 || 75 || 2 || 0.175 || 30 || $RTDPS$<ref>$RDPS$ Normal DPS + $RCDPS$ Missile DPS</ref>
 |}
-</div>

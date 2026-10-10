@@ -16,9 +16,8 @@ $DREF$ = <ref name=dps>Calculated as ((Damage × 2) + Critical Damage) ÷ 3 ÷ S
 $TREF$ = <ref name=thirdhit>Only happens every third hit.</ref>
 $R$ = $FNC-RECURSION$
 </var>
-<div class="mobile-tabber"><tabber>
+<tabber>
 |-|Regular =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="11" | Warden Stats
 |-
@@ -34,9 +33,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$ || 80 || 3 || $CDMG$ || 0.45 || 8.5 || 1.25 || $DPS$ || {{Money|$CE$}}
 |}
-</div>
 
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="6" | Parry Stats
 |-
@@ -44,9 +41,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $PDMG$ || $PCDMG$ || $DPS$ || {{Money|$CE$}}
 |}
-</div>
 |-|PVP =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Critical Hit Multiplier !! Critical Damage$CREF$ !! Swingrate !! Range !! Stun Time !! DPS$DREF$ !! Cost Efficiency
 |-
@@ -60,5 +55,4 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$ || 80 || 1.5 || $CDMG$ || 0.5 || 7.5 || 1.75 || $DPS$ || {{Money|$CE$}}
 |}
-</div>
-</tabber></div>
+</tabber>

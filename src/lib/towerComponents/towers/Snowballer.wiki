@@ -9,7 +9,6 @@ $FSE-UPGRADEICON$ = 15686418975; 15686418835; 15686418748
 $FSE-META$ = Exclusive; File:SnowballerIcon.png
 $R$ = $FNC-RECURSION$
 </var>
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Firerate !! Range !! Explosion Range !! Max Slowdown !! Slowdown per Hit !! Slowdown Time !! Freeze Time !! Max Hits !! Projectile Speed !! DPS<ref>DPS does not consider projectile travel time.<br/>DPS assumes that only one enemy is hit and it receives full damage.</ref> !! Cost Efficiency
 |-
@@ -21,4 +20,3 @@ $R$ = $FNC-RECURSION$
 |-
 | 3 || $R$ || $R$ || 28 || 1.25 || 20 || 5 || 30% || 15% || 3 || 0.6 || 3 || 20 || $DPS$ || {{Money|$CE$}}
 |}
-</div>

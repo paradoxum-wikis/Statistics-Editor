@@ -12,7 +12,6 @@ $FSE-META$ = Intermediate; File:AcePilotNewIcon.png
 $TREF$ = <ref>Calculated as Gun DPS + Bomb DPS.</ref>
 $R$ = $FNC-RECURSION$
 </var>
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Normal Damage !! Splash Damage !! Firerate !! Bomb Cooldown !! Range !! Explosion Range !! Hidden Detection Range !! Speed Multiplier !! DPS$TREF$ !! Cost Efficiency
 |-
@@ -28,4 +27,3 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || $R$ || $R$ || 14 || 45 || 0.12 || 1.5 || 10 || 4 || 10 || 1.35 || $TDPS$<ref>$GDPS$ Gun DPS + $BDPS$ Bomb DPS</ref> || {{Money|$CE$}}
 |}
-</div>

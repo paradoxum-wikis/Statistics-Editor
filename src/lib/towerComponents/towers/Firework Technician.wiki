@@ -22,7 +22,6 @@ $TREF$ = <ref>Total Elapsed Damage is calculated as Burn Damage × (Burn Time ÷
 $FREF$ = <ref>Does not account for towers with a penalty applied to them which divides the chance and assumes each enemy only hits an enemy once. Both of these factors will affect the chances, either making it more likely or less likely to fire them.</ref>
 $R$ = $FNC-RECURSION$
 </var>
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="12" | Firework Technician Stats
 |-
@@ -38,9 +37,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$ || 45 || 12 || 20 || 3 || 1 || 7 || 0.25 || 5 || $TED$
 |}
-</div>
 
-<div class="overflow-box">
 {| class="wikitable stats-table mw-collapsible mw-collapsed"
 ! colspan="12" | Firework Chance$FREF$
 |-
@@ -56,4 +53,3 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $CHANCE1$% || $CHANCE2$% || $CHANCE3$% || $CHANCE4$% || $CHANCE5$% || $CHANCE6$% || $CHANCE7$% || $CHANCE8$% || $CHANCE9$% || $CHANCE10$% || $CHANCE11$%
 |}
-</div>

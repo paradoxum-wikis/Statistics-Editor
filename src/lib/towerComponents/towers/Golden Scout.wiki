@@ -9,7 +9,6 @@ $FSE-DETECTION$ = 2; 3;
 $FSE-META$ = Golden Perks; File:GoldenScout3.png
 $R$ = $FNC-RECURSION$
 </var>
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Firerate !! Range !! DPS !! Cost Efficiency
 |-
@@ -23,4 +22,3 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$ || 36 || 0.6 || 18 || $DPS$ || {{Money|$CE$}}
 |}
-</div>

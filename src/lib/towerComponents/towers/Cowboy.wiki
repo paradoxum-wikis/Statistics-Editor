@@ -16,9 +16,8 @@ $IREF$ = <ref name=ips>This is calculated as Income ÷ (Spin Time + (Firerate ×
 $IEREF$ = <ref name=ie>Money generated per 1 damage is calculated as (Income + Cash Shot × Damage) ÷ (Cash Shot × Damage).</ref>
 $R$ = $FNC-RECURSION$
 </var>
-<div class="mobile-tabber"><tabber>
+<tabber>
 |-|Regular =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Firerate !! Spin Time !! Cash Shot !! Income !! Range !! DPS$DREF$ !! Cost Efficiency !! Income Per Second$IREF$ !! Income Efficiency$IEREF$
 |-
@@ -34,9 +33,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || $R$ || $R$ || 24 || 0.35 || 1 || 12 || {{Money|185}} || 20 || $DPS$ || {{Money|$CE$}} || {{Money|$IPS$}} || {{Money|$IE$}}
 |}
-</div>
 |-|PVP =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Firerate !! Spin Time !! Cash Shot !! Income !! Range !! DPS$DREF$ !! Cost Efficiency !! Income Per Second$IREF$ !! Income Efficiency$IEREF$
 |-
@@ -52,5 +49,4 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || $R$ || $R$ || 16 || 0.25 || 0.75 || 12 || {{Money|300}} || 20 || $DPS$ || {{Money|$CE$}} || {{Money|$IPS$}} || {{Money|$IE$}}
 |}
-</div>
-</tabber></div>
+</tabber>

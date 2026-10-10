@@ -17,9 +17,8 @@ $FSE-META$ = Advanced; File:DefaultMercenaryBaseIcon.png
 $RREF$ = <ref name="rifledps">DPS is calculated as (Damage × Burst Count) ÷ (Cooldown + Aim Time + (Firerate × Burst Count)).</ref>
 $R$ = $FNC-RECURSION$
 </var>
-<div class="mobile-tabber"><tabber>
+<tabber>
 |-|Regular =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="8" |Mercenary Base Stats
 |-
@@ -39,7 +38,6 @@ $R$ = $FNC-RECURSION$
 |-
 | 6 || $R$ || $R$ || 10 || 3 || 15%
 |}
-</div>
 
 {| class="wikitable stats-table"
 ! colspan="13" |[[Rifleman]] Stats
@@ -85,7 +83,6 @@ $R$ = $FNC-RECURSION$
 | 6 || 600 || 30 || 20 || 10 || 0.2 || 150 || 35 || 15 || N/A || $HPS$ || $RAM$
 |}
 |-|PVP =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="8" |Mercenary Base Stats
 |-
@@ -105,7 +102,6 @@ $R$ = $FNC-RECURSION$
 |-
 | 6 || $R$ || $R$ || 10 || 3 || 20%
 |}
-</div>
 
 {| class="wikitable stats-table"
 ! colspan="14" |[[Rifleman]] Stats
@@ -150,4 +146,4 @@ $R$ = $FNC-RECURSION$
 |-
 | 6 || 600 || 30 || 20 || 10 || 0.2 || 150 || 3 || 35 || 15 || N/A || $HPS$ || $RAM$
 |}
-</tabber></div>
+</tabber>

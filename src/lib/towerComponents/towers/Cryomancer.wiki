@@ -14,7 +14,6 @@ $TREF$ = <ref>At Level 2+ Total Elapsed Damage is calculated as Chill Damage × 
 $DREF$ = <ref>DPS assumes the ice flames only hit one enemy.<br>At Level 2+, Ice DPS is calculated as Chill Damage ÷ Tick.<br>At Level 3+ DPS is calculated as (Damage × Ammo) ÷ (Reload Time + (Firerate × Ammo)) + Ice DPS.</ref>
 $R$ = $FNC-RECURSION$
 </var>
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Chill Damage !! Firerate !! Tick !! Max Hits !! Slowdown per Hit !! Max Slowdown !! Slowdown Time !! Defense Melt !! Freeze Time !! Ammo !! Reload Time !! Hitbox Width !! Turning Speed !! Total Elapsed Damage$TREF$ !! Range !! DPS$DREF$ !! Cost Efficiency
 |-
@@ -28,4 +27,3 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$ || 6 || 10 || 0.2 || 1 || 6 || 12.5% || 25% || 5 || 10% || 0.75 || 70 || 1.25 || 2.25 || 4 || $TED$ || 15 || $CDPS$<ref>$DPS$ Normal DPS + $IDPS$ Chill DPS</ref> || {{Money|$CE$}}
 |}
-</div>

@@ -11,9 +11,8 @@ $WREF$ = <ref name=recoup>Amount of waves it would take to regain the spent cash
 $TREF$ = <ref name=tpi>Parity of income gained to total upgrade cost.<br>Calculated as Total Cost ÷ Income.</ref>
 $R$ = $FNC-RECURSION$
 </var>
-<div class="mobile-tabber"><tabber>
+<tabber>
 |-|Regular =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Income !! Income Increase From Upgrading !! Thorn Power !! Waves To Recoup Upgrade$WREF$ !! Total Cost:Income$TREF$
 |-
@@ -29,9 +28,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || $R$ || $R$ || {{Money|1,500}} || {{Money|600}} || 100% || $RU$ || $TPI$:1
 |}
-</div>
 |-|PVP =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Income !! Income Increase From Upgrading !! Thorn Power !! Waves To Recoup Upgrade$WREF$ !! Total Cost:Income$TREF$
 |-
@@ -47,5 +44,4 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || $R$ || $R$ || {{Money|1,500}} || {{Money|750}} || 100% || $RU$ || $TPI$:1
 |}
-</div>
-</tabber></div>
+</tabber>

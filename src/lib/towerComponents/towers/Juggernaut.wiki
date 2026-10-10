@@ -17,9 +17,8 @@ $FSE-META$ = Evolved; File:EvolvedJuggernautIcon.png
 $DREF$ = <ref name=dps>DPS does not consider rev time.</ref>
 $RC$ = $FNC-RECURSION$
 </var>
-<div class="mobile-tabber"><tabber>
+<tabber>
 |-|Regular =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="9" |Neutral Stats
 |-
@@ -33,9 +32,7 @@ $RC$ = $FNC-RECURSION$
 |-
 | 3 || $RC$ || $RC$ || 30 || 0.12 || 1.8 || 22 || $DPS$ || {{Money|$CE$}}
 |}
-</div>
 
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="11" |Top Path Stats
 |-
@@ -49,9 +46,7 @@ $RC$ = $FNC-RECURSION$
 |-
 | 7 || $RC$ || $RC$ || 215 || 0.12 || 1 || 26 || 16 || 50% || $DPS$ || {{Money|$CE$}}
 |}
-</div>
 
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="13" |Bottom Path Stats
 |-
@@ -65,10 +60,8 @@ $RC$ = $FNC-RECURSION$
 |-
 | 7 || $RC$ || $RC$ || 165 || 1.5 || $BOSS$ || 0.09 || 1.6 || 26 || $DPS$ || $BDPS$ || {{Money|$CE$}} || {{Money|$BCE$}}
 |}
-</div>
 <!-- @se-ignore -->
 |-|Levels =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="12" |Levels
 |-
@@ -116,6 +109,5 @@ $RC$ = $FNC-RECURSION$
 |-
 | 20 || $RC$ || $RC$
 |}
-</div>
 <!-- @/se-ignore -->
-</tabber></div>
+</tabber>

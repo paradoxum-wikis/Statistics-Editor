@@ -18,9 +18,8 @@ $DREF$ = <ref name=damage>The first two enemies damaged by the same bullet are d
 $DPREF$ = <ref name=dps>DPS assumes all bullets hit only one enemy.</ref>
 $R$ = $FNC-RECURSION$
 </var>
-<div class="mobile-tabber"><tabber>
+<tabber>
 |-|Regular =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage$DREF$ !! Bullet Count !! Firerate !! Range !! Spread !! Max Hits !! DPS$DPREF$ !! Max DPS !! Cost Efficiency !! Max Cost Efficiency
 |-
@@ -34,9 +33,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$ || 14 || 12 || 0.8 || 13.5 || 40 || 3 || $DPS$ || $MDPS$ || {{Money|$CE$}} || {{Money|$MCE$}}
 |}
-</div>
 |-|PVP =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage$DREF$ !! Bullet Count !! Firerate !! Range !! Spread !! Max Hits !! DPS$DPREF$ !! Max DPS !! Cost Efficiency !! Max Cost Efficiency
 |-
@@ -50,10 +47,8 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$ || 8 || 12 || 1 || 11 || 30 || 3 || $DPS$ || $MDPS$ || {{Money|$CE$}} || {{Money|$MCE$}}
 |}
-</div>
 <!-- @se-ignore -->
 |-|Levels =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="12" |Levels
 |-
@@ -101,6 +96,5 @@ $R$ = $FNC-RECURSION$
 |-
 | 20 || $R$ || $R$
 |}
-</div>
 <!-- @/se-ignore -->
-</tabber></div>
+</tabber>

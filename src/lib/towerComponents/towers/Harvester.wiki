@@ -14,7 +14,6 @@ $TREF$ = <ref>Assuming the enemy stays inside the Thorns' full duration.<br/>Tot
 $DREF$ = <ref>DPS assumes thorns only hit one enemy.</ref>
 $R$ = $FNC-RECURSION$
 </var>
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="9" |Harvester Stats
 |-
@@ -32,9 +31,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || $R$ || $R$ || 420 || 1.75 || 30 || 75 || $DPS$ || {{Money|$CE$}}
 |}
-</div>
 
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="11" |Thorns Stats
 |-
@@ -52,4 +49,3 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || $R$ || $R$ || 14 || 18 || 15 || 30% || 0.2 || $TED$ || $TDPS$ || {{Money|$TCE$}}
 |}
-</div>

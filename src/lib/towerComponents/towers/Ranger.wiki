@@ -13,9 +13,8 @@ $FSE-UPGRADEICON$ = 3280081327; 3381734408; 3381735232; 3381735846
 $FSE-META$ = Advanced; File:Newranger.png
 $R$ = $FNC-RECURSION$
 </var>
-<div class="mobile-tabber"><tabber>
+<tabber>
 |-|Regular =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Splash Damage !! Firerate !! Range !! Buff Range !! Explosion Range !! Max Hits !! Range Buff !! Buff Time !! DPS !! Cost Efficiency
 |-
@@ -29,9 +28,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$ || 875 || 375 || 8 || 70 || 12 || 5 || 3 || 10% || 20 || $TDPS$<ref>$DPS$ Normal DPS + $SDPS$ Splash DPS.<br/>DPS assumes only one enemy is hit.</ref> || {{Money|$CE$}}
 |}
-</div>
 |-|PVP =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Splash Damage !! Firerate !! Range !! Buff Range !! Explosion Range !! Range Buff !! Buff Time !! DPS !! Cost Efficiency
 |-
@@ -45,5 +42,4 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$ || 272 || 25 || 2 || 50 || 12 || 5 || 15% || 120 || $TDPS$<ref>$DPS$ Normal DPS + $SDPS$ Splash DPS.<br/>DPS assumes only one enemy is hit.</ref> || {{Money|$CE$}}
 |}
-</div>
-</tabber></div>
+</tabber>

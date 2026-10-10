@@ -19,9 +19,8 @@ $CCUREF$ = <ref name="cdps">DPS does not include collision damage and assumes on
 $SSREF$ = <ref name="unitstats">Skeletons are not affected by any buffs or debuffs.</ref>
 $R$ = $FNC-RECURSION$
 </var>
-<div class="mobile-tabber"><tabber>
+<tabber>
 |-|Regular =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="17" |Necromancer Stats
 |-
@@ -71,9 +70,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$ || 1x [[Executioner Skeleton]]<br/>5x [[Skeleton Knight]]<br/>3x [[Hallow Guard (Unit)|Hallow Guard]] || 12,001 || 746.45
 |}
-</div>
 |-|PVP =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="17" |Necromancer Stats
 |-
@@ -123,5 +120,4 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$ || 1x [[Executioner Skeleton]]<br/>6x [[Skeleton Knight]]<br/>2x [[Hallow Guard (Unit)|Hallow Guard]] || 9,850 || 955.76
 |}
-</div>
-</tabber></div>
+</tabber>

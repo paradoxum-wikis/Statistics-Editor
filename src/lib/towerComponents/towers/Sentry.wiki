@@ -17,7 +17,6 @@ $HDREF$ = <ref>Minimum DPS uses highest firerate.</ref>
 $LDREF$ = <ref>Maximum DPS uses lowest firerate.</ref>
 $R$ = $FNC-RECURSION$
 </var>
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Highest Firerate$HFREF$ !! Lowest Firerate$LFREF$ !! Spool-Up Time !! Range !! Min DPS$HDREF$ !! Max DPS$LDREF$ !! Min Cost Efficiency !! Max Cost Efficiency
 |-
@@ -33,4 +32,3 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || $R$ || $R$ || 9 || 0.2 || $LFR$ || 5 || 23 || $HDPS$ || $LDPS$ || {{Money|$HCE$}} || {{Money|$LCE$}}
 |}
-</div>

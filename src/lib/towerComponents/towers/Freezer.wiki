@@ -16,9 +16,8 @@ $FSE-META$ = Intermediate; File:ReworkedFreezerIcon.png
 $DREF$ = <ref name=dps>Calculated as (Damage × Burst Count) ÷ (Cooldown + (Firerate × Burst Count)) at Level 3+.</ref>
 $R$ = $FNC-RECURSION$
 </var>
-<div class="mobile-tabber"><tabber>
+<tabber>
 |-|Regular =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Chill Damage !! Firerate !! Tick !! Max Slowdown !! Slowdown Per Hit !! Slowdown Time !! Defense Melting !! Burst Count !! Cooldown !! Range !! Freeze Time !! Total Elapsed Damage !! DPS$DREF$ !! Cost Efficiency
 |-
@@ -32,9 +31,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$ || 9 || 5 || 0.15 || 1 || 25% || 12.5% || 3 || 10% || 8 || 0.6 || 16 || 0.75 || $TED$ || $TDPS$<ref>$DPS$ Normal DPS + $CDPS$ Chill DPS</ref> || {{Money|$CE$}}
 |}
-</div>
 |-|PVP =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Firerate !! Tick !! Max Slowdown !! Slowdown Per Hit !! Slowdown Time !! Defense Melting !! Burst Count !! Cooldown !! Range !! Freeze Time !! DPS$DREF$ !! Cost Efficiency
 |-
@@ -48,5 +45,4 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$ || 5 || 0.15 || 0.25 || 60% || 20% || 5 || 10% || 7 || 0.8 || 16 || 3 || $DPS$ || {{Money|$CE$}}
 |}
-</div>
-</tabber></div>
+</tabber>

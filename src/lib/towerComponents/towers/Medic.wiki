@@ -6,7 +6,6 @@ $FSE-UPGRADEICON$ = 117008581932706; 71546954858462; 130592941614779; 1125045489
 $FSE-META$ = Intermediate; File:DefaultMedicIconAug25.png
 $R$ = $FNC-RECURSION$
 </var>
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Firerate Buff !! Damage Buff !! Range !! Healing !! Overheal Limit !! Max Targets !! Shield Recharge Speed !! Tower Selection Cooldown !! Ubercharge Duration
 |-
@@ -22,4 +21,3 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || $R$ || $R$ || 15% || 35% || 20 || 20 || 100 || 5 || 4.5 || 0.5 || 10
 |}
-</div>

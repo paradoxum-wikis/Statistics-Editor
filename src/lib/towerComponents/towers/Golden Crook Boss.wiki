@@ -15,9 +15,8 @@ $CREF$ = <ref>Does not account for unit DPS.</ref>
 $GREF$ = <ref>Goons are not affected by any buffs or debuffs.</ref>
 $R$ = $FNC-RECURSION$
 </var>
-<div class="mobile-tabber"><tabber>
+<tabber>
 |-|Regular =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="8" | Crook Boss Stats
 |-
@@ -45,10 +44,8 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || [[Golden Tommy Goon 2]] || 300 || 6 || 31 || 0.12 || 150 || 3 || 24 || Hidden, Flying || $DPS$ || $RDPS$ || $TDPS$
 |}
-</div>
 <!-- @se-ignore -->
 |-|Levels =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="12" |Levels
 |-
@@ -96,6 +93,5 @@ $R$ = $FNC-RECURSION$
 |-
 | 20 || $R$ || $R$
 |}
-</div>
 <!-- @/se-ignore -->
-</tabber></div>
+</tabber>

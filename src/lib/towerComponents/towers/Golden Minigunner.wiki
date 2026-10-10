@@ -10,7 +10,6 @@ $FSE-META$ = Golden Perks; File:Goldenminigunner.png
 $DREF$ = <ref name=dps>DPS does not consider rev-up time.</ref>
 $R$ = $FNC-RECURSION$
 </var>
-<div class="overflow-box">
 {|class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Firerate !! Rev-Up Time !! Range !! DPS$DREF$ !! Cost Efficiency
 |-
@@ -24,4 +23,3 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$ || 20 || 0.1 || 0.6 || 22 || $R$ || $R$
 |}
-</div>

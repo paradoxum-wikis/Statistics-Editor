@@ -24,9 +24,8 @@ $RREF$ = <ref name="ref">Rev-up time of 1.5 seconds is not considered into the D
 $LREF$ = <ref name="lead">Through War Machine Sentry splash damage.</ref>
 $R$ = $FNC-RECURSION$
 </var>
-<div class="mobile-tabber"><tabber>
+<tabber>
 |-|Regular =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="12" |Engineer Stats
 |-
@@ -46,9 +45,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 6 || $R$ || $R$ || 90 || 0.6 || 22.5 || 1.5 || 2 || 4 || $DPS$ || $CDPS$ || {{Money|$CE$}}
 |}
-</div>
 
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="15" |Sentry Stats$SREF$
 |-
@@ -62,9 +59,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 6 || [[War Machine Sentry]] || 1,000 || 3 || 60 || 2 || 0.125 || 4 || 24 || 5 || 60s || 1.75 || 340 || Hidden, Lead$LREF$ || $SDPS$<ref>$DPS$ Gun DPS + $MDPS$ Rocket DPS.<br>Rev-up time of 1.5 seconds is not considered into the DPS.<br/>Rocket DPS assumes only one enemy is hit and receives full splash damage.</ref>
 |}
-</div>
 |-|PVP = 
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="12" |Engineer Stats
 |-
@@ -84,9 +79,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 6 || $R$ || $R$ || 50 || 0.6 || 22 || 0.5 || 4 || 3 || $DPS$ || $CDPS$ || {{Money|$CE$}}
 |}
-</div>
 
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="15" |Sentry Stats<ref name="sentry"/>
 |-
@@ -100,5 +93,4 @@ $R$ = $FNC-RECURSION$
 |-
 | 6 || [[War Machine Sentry]] || 250 || 8 || 28 || 2 || 0.1 || 4 || 24 || 5 || 60s || 1.75 || 250 || Hidden, Lead$LREF$ || $SDPS$<ref>$DPS$ Gun DPS + $MDPS$ Rocket DPS.<br>Rev-up time of 1.5 seconds is not considered into the DPS.<br/>Rocket DPS assumes only one enemy is hit and receives full splash damage.</ref>
 |}
-</div>
-</tabber></div>
+</tabber>

@@ -14,7 +14,6 @@ $FSE-DETECTION$ = 1; 2;
 $FSE-META$ = Exclusive; File:HexscapeSlasherIcon.png
 $R$ = $FNC-RECURSION$
 </var>
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Normal Damage !! Crit Multiplier !! Crit Damage !! Base Bleed Damage !! Swingrate !! Crit Swing$CREF$ !! Bleed Stack !! EV !! Max Stack !! Range !! DPS$DREF$ !! Cost Efficiency
 |-
@@ -28,9 +27,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$ || 38 || 4 || $CDMG$ || 4 || 0.5 || 3 || 45 || 0.2 || 450 || 5 || $DPS$ || {{Money|$CE$}}
 |}
-</div>
 
-<div class="overflow-box">
 {| class="wikitable stats-table mw-collapsible mw-collapsed"
 ! colspan="3" | Bleed Damage
 |-
@@ -56,4 +53,3 @@ $R$ = $FNC-RECURSION$
 |-
 | 5,000,000 || $BTDMG$ || $BCDMG$
 |}
-</div>

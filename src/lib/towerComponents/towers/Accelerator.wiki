@@ -13,9 +13,8 @@ $CREF$ = <ref name="cooldown">The Cooldown happens when the Overcharge occurs. T
 $DREF$ = <ref name="dps">DPS is calculated as Overcharge ÷ (Charge-Up + Cooldown + [Overcharge ÷ Damage x Tick]).</ref>
 $R$ = $FNC-RECURSION$
 </var>
-<div class="mobile-tabber"><tabber>
+<tabber>
 |-|Regular =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Tick !! Charge-Up$CUREF$ !! Cooldown$CREF$ !! Overcharge !! Range !! DPS$DREF$ !! Cost Efficiency
 |-
@@ -31,9 +30,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || $R$ ||$R$ || 60 || 0.125 || 1.5 || 1 || 100,000 || 24 || $DPS$ || {{Money|$CE$}}
 |}
-</div>
 |-|PVP =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost || Total Cost !! Damage !! Tick !! Charge-Up$CUREF$ !! Cooldown$CREF$ !! Overcharge !! Range !! DPS$DREF$ !! Cost Efficiency
 |-
@@ -49,5 +46,4 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || $R$ || $R$ || 72 || 0.1 || 1.5 || 2 || 2,400 || 23 || $DPS$ || {{Money|$CE$}}
 |}
-</div>
-</tabber></div>
+</tabber>

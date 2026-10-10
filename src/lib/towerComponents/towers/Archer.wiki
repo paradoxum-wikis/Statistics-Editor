@@ -26,7 +26,6 @@ $R$ = $FNC-RECURSION$
 </var>
 <tabber>
 |-|Flame Arrow =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="15" |Flame Arrows
 |-
@@ -44,9 +43,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || $R$ || $R$ || 40 || 14 || 1 || 1 || 4 || 24 || 8 || $TED$ || $CDPS1$<ref>$DPS$ Normal DPS + $BDPS$ Burn DPS</ref> || $MCDPS1$<ref>$MDPS$ Normal DPS + $MBDPS$ Burn DPS</ref> || {{Money|$CE$}} || {{Money|$MCE$}}
 |}
-</div>
 |-|Explosive Arrow =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="11" |Explosive Arrows
 |-
@@ -56,9 +53,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || $R$ || $R$ || 40 || 45 || 1 || 24 || 2.5 || 1 || $CDPS2$<ref>$DPS$ Normal DPS + $SDPS$ Splash DPS</ref> || {{Money|$CE$}}
 |}
-</div>
 |-|Shock Arrow =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="12" |Shock Arrows
 |-
@@ -66,5 +61,4 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 40 || 1 || 24 || 5 || 0.15 || $DPS$ || $MDPS$ || {{Money|$CE$}} || {{Money|$MCE$}}
 |}
-</div>
 </tabber>

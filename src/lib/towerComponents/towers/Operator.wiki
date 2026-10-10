@@ -34,9 +34,8 @@ $FSE-META$ = Evolved; File:DefaultOperator0.png
 $R$ = $FNC-RECURSION$
 $DREF$ = <ref name=dps>Calculated as (Damage × Burst Count) ÷ (Cooldown + (Firerate × Burst Count)).</ref>
 </var>
-<div class="mobile-tabber"><tabber>
+<tabber>
 |-|Regular =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="12" |Operator Stats
 |-
@@ -56,9 +55,7 @@ $DREF$ = <ref name=dps>Calculated as (Damage × Burst Count) ÷ (Cooldown + (Fir
 |-
 | 6 || $R$ || $R$ || 10 || N/A || 0.16 || 0 || 17 || 10% || 5.5 || $DPS2$ || {{Money|$CE$}}
 |}
-</div>
 
-<div class="overflow-box">
 {| class="wikitable stats-table mw-collapsible mw-collapsed"
 ! colspan="13" |Coordination Stats
 |-
@@ -74,10 +71,8 @@ $DREF$ = <ref name=dps>Calculated as (Damage × Burst Count) ÷ (Cooldown + (Fir
 |-
 | 6 || $1BP$% || $1BD$ || $1BDPS2$ || $2BP$% || $2BD$ || $2BDPS2$ || $3BP$% || $3BD$ || $3BDPS2$ || $4BP$% || $4BD$ || $4BDPS2$
 |}
-</div>
 <!-- @se-ignore -->
 |-|Levels =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="12" |Levels
 |-
@@ -125,6 +120,5 @@ $DREF$ = <ref name=dps>Calculated as (Damage × Burst Count) ÷ (Cooldown + (Fir
 |-
 | 20 || $R$ || $R$
 |}
-</div>
 <!-- @/se-ignore -->
-</tabber></div>
+</tabber>

@@ -22,11 +22,10 @@ $TREF$ = <ref name="TED">Total Elapsed Damage is calculated as Burn Damage × (B
 $MDREF$ = <ref name="MineDPS">DPS assumes only one enemy is hit by a single trap and receives full damage.<br/>DPS is calculated as Landmine DPS + Burn DPS.<br/>Burn DPS is calculated as Burn Damage ÷ Firerate for burn times shorter or equal to one second, while for burn times longer than one second it is calculated as Burn Damage ÷ Tick.</ref>
 $R$ = $FNC-RECURSION$
 </var>
-<div class="mobile-tabber">{{Tabber
+{{Tabber
 |Regular
 |<tabber>
 |-|Spike =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="14" |Spikes
 |-
@@ -42,9 +41,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$ || 65 || 325 || 2.5 || 10 || 13 || 25 || $MDBU$ || $MHBU$ || $DPS$ || {{Money|$CE$}}
 |}
-</div>
 |-|Landmine =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="16" |Landmine
 |-
@@ -56,9 +53,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$ || 160 || 4 || 2.5 || 5 || 0.25 || 10 || 6 || $TED$ || $TRAP$ || 25 || $MDBU$ || $CDPS$<ref>$DPS$ Landmine DPS + $BDPS$ Burn DPS</ref> || {{Money|$CE$}}
 |}
-</div>
 |-|Bear Trap =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="13" |Bear Trap
 |-
@@ -66,12 +61,10 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 325 || 2.5 || 10 || 3 || $TRAP$ || 25 || $MDBU$ || $DPS$ || {{Money|$CE$}}
 |}
-</div>
 </tabber>
 |PVP
 |<tabber>
 |-|Spike =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="14" |Spikes
 |-
@@ -87,9 +80,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$ || 60 || 600 || 4 || 10 || 9 || 75 || $MDBU$ || $MHBU$ || $DPS$ || {{Money|$CE$}}
 |}
-</div>
 |-|Landmine =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="16" |Landmine
 |-
@@ -101,9 +92,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$ || 130 || 7 || 2.25 || 5 || 0.25 || 10 || 5 || 140 || $TRAP$ || 75 || $MDBU$ || $CDPS$<ref>$DPS$ Landmine DPS + $BDPS$ Burn DPS</ref> || {{Money|$CE$}}
 |}
-</div>
 |-|Bear Trap =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="12" |Bear Trap
 |-
@@ -111,6 +100,5 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 350 || 2.75 || 10 || 3 || $TRAP$ || 75 || $MDBU$ || $DPS$ || {{Money|$CE$}}
 |}
-</div>
 </tabber>
 }}</div>

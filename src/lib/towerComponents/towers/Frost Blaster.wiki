@@ -12,7 +12,6 @@ $FSE-META$ = Exclusive; File:KRFrostBlasterIcon.png
 $DREF$ = <ref>DPS assumes its projectile only hits one enemy.</ref>
 $R$ = $FNC-RECURSION$
 </var>
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Firerate !! Tick !! Slowdown per Hit !! Max Slowdown !! Freeze Time !! Slowdown Time !! Defense Melt !! Max Hits !! Range !! Projectile Speed !! DPS$DREF$ !! Max DPS !! Cost Efficiency !! Max Cost Efficiency
 |-
@@ -26,4 +25,3 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || {{Money|$COST$}} || {{Money|$TP$}} || 53 || 0.9 || 0.25 || 25% || 25% || 0.6 || 0.6 || 35% || 4 || 22.5 || 90 || $DPS$ || $MDPS$ || {{Money|$CE$}} || {{Money|$MCE$}}
 |}
-</div>

@@ -26,7 +26,6 @@ $R$ = $FNC-RECURSION$
 </var>
 <tabber>
 |-|Fire Bomb =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="14" |Fire Bomb
 |-
@@ -42,9 +41,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$ || 48 || $FDMG$ || 0.6 || 0.25 || 0.25 || 16 || 6 || 4 || $TED$ || $CDPS$<ref>$DPS$ regular DPS + $BDPS$ Burn DPS</ref> || {{Money|$CE$}}
 |}
-</div>
 |-|Ice Bomb =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="14" |Ice Bomb
 |-
@@ -56,9 +53,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$ || $IDMG$ || 0.6 || 16 || 7 || 3 || 25% || 25% || 1% || 4 || $DPS$ || {{Money|$CE$}}
 |}
-</div>
 |-|Poison Bomb =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="10" |Poison Bomb
 |-
@@ -68,9 +63,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$ || $PDMG$ || 0.6 || 0.4 || 16 || 30 || $PDPS$ || {{Money|$CE$}}
 |}
-</div>
 |-|Confusion Bomb =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="12" |Confusion Bomb
 |-
@@ -78,5 +71,4 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || $CDMG$ || 0.6 || 16 || 6 || 2 || 6 || 4 || $DPS$ || {{Money|N/A}}
 |}
-</div>
 </tabber>

@@ -16,9 +16,8 @@ $SREF$ = <ref name="swingrate">Swingrate only applies to the first two hits in e
 $DREF$ = <ref name="dps">DPS is calculated as [(Damage × 2) + Final Hit Damage] ÷ [Cooldown + (Swingrate × (Hit Count - 1))] from Level 2+.</ref>
 $R$ = $FNC-RECURSION$
 </var>
-<div class="mobile-tabber"><tabber>
+<tabber>
 |-|Regular =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Final Hit Damage !! Reposition Damage !! Hit Count !! Swingrate$SREF$ !! Cooldown !! Knockback Force !! Range !! DPS$DREF$ !! Cost Efficiency
 |-
@@ -34,9 +33,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || $R$ || $R$ || 50 || 100 || 100 || 3 || 0.4 || 0.4 || 32 || 8 || $DPS2$ || {{Money|$CE$}}
 |}
-</div>
 |-|PVP =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Final Hit Damage !! Reposition Damage !! Hit Count !! Swingrate$SREF$ !! Cooldown !! Knockback Force !! Range !! DPS$DREF$ !! Cost Efficiency
 |-
@@ -52,5 +49,4 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || $R$ || $R$ || 70 || 143 || 150 || 3 || 0.5 || 0.5 || 30 || 7 || $DPS2$ || {{Money|$CE$}}
 |}
-</div>
-</tabber></div>
+</tabber>

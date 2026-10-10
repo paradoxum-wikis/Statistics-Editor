@@ -19,7 +19,6 @@ $BEREF$ = <ref>The [[Bomber Elf (Unit)|Bomber Elf]] only explodes upon death.</r
 $BDREF$ = <ref>For the [[Bomber Elf (Unit)|Bomber Elf]], the explosion on death damage is included in ram DPS as its health.</ref>
 $R$ = $FNC-RECURSION$
 </var>
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost
 |-
@@ -33,9 +32,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$
 |}
-</div>
 
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="11" |Melee Elves$UREF$
 |-
@@ -47,9 +44,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || [[Guardian Elf]] || 75 || 30% || 28 || 10 || 0.5 || 7 || 30 || $DPS$ || $RDPS$
 |}
-</div>
 
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="12" |Ranged Elves$UREF$
 |-
@@ -63,9 +58,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || [[Gunner Elf]]$GREF$ || 25 || 4 || 5 || 25 || 0.35 || 1 || 22 || 30 || $BDPS$ || $RDPS$
 |}
-</div>
 
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="11" |Splash Elves$UREF$
 |-
@@ -77,4 +70,3 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || [[Ripped Elf (Unit)|Ripped Elf]] || 1,000 || 375 || 100 || 7 || 60 || 4 || 3 || $SDPS$ || $RDPS$
 |}
-</div>

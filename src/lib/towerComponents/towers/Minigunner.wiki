@@ -14,9 +14,8 @@ $FSE-META$ = Advanced; File:NewMinigunner.png
 $DREF$ = <ref name=dps>DPS does not consider rev-up time.</ref>
 $R$ = $FNC-RECURSION$
 </var>
-<div class="mobile-tabber"><tabber>
+<tabber>
 |-|Regular =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Firerate !! Rev-Up Time !! Range !! DPS$DREF$ !! Cost Efficiency
 |-
@@ -30,9 +29,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$ || 16 || 0.1 || 1 || 21 || $DPS$ || {{Money|$CE$}}
 |}
-</div>
 |-|PVP =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Firerate !! Rev-Up Time !! Range !! DPS$DREF$ !! Cost Efficiency
 |-
@@ -46,10 +43,8 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$ || 20 || 0.1 || 1 || 20 || $DPS$ || {{Money|$CE$}}
 |}
-</div>
 <!-- @se-ignore -->
 |-|Levels =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="12" |Levels
 |-
@@ -97,6 +92,5 @@ $R$ = $FNC-RECURSION$
 |-
 | 20 || $R$ || $R$
 |}
-</div>
 <!-- @/se-ignore -->
-</tabber></div>
+</tabber>

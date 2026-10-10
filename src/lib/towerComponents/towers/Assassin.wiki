@@ -14,9 +14,8 @@ $FSE-META$ = Intermediate; File:Assassin.png
 $DREF$ = <ref name=dps>Calculated as (Damage × (Whirlwind Hit - 1) + Whirlwind Damage) ÷ (Swingrate × Whirlwind Hit) from Level 2+.<br>For Level 4, DPS is calculated as (Threshold + Knife Damage × Knife Count) ÷ (Threshold ÷ ((Damage × (Whirlwind Hit - 1) + Whirlwind Damage) ÷ Whirlwind Hit) × Swingrate + Knife Cooldown) assuming all knives hit one enemy.</ref>
 $R$ = $FNC-RECURSION$
 </var>
-<div class="mobile-tabber"><tabber>
+<tabber>
 |-|Regular =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Swingrate !! Range !! Whirlwind Hit !! Whirlwind Damage !! Whirlwind Range !! Damage Threshold !! Knife Damage !! Knife Count !! Knife Cooldown !! Knife Max Hits !! Knife Range !! DPS$DREF$ !! Cost Efficiency
 |-
@@ -30,9 +29,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$ || 35 || 0.35 || 6.5 || 3 || 35 || 6.5 || 500 || 60 || 3 || 0.5 || 3 || 10 || $DPS4$ || {{Money|$CE$}}
 |}
-</div>
 |-|PVP =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Swingrate !! Range !! Whirlwind Hit !! Whirlwind Damage !! Whirlwind Range !! Damage Threshold !! Knife Damage !! Knife Count !! Knife Cooldown !! Knife Max Hits !! Knife Range !! DPS$DREF$ !! Cost Efficiency
 |-
@@ -46,5 +43,4 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$ || 25 || 0.5 || 7 || 3 || 25 || 7 || 150 || 25 || 3 || 0.5 || 3 || 10 || $DPS4$ || {{Money|$CE$}}
 |}
-</div>
-</tabber></div>
+</tabber>

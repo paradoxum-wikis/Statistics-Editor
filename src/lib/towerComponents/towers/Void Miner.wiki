@@ -8,7 +8,6 @@ $FSE-META$ = Unavailable; File:VoidMinerIcon.png
 $WREF$ = <ref>Calculated as Upgrade Cost ÷ Corruption Gain.</ref>
 $R$ = $FNC-RECURSION$
 </var>
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Corruption !! Waves to recoup upgrade$WREF$ !! Total Cost:Corruption
 |-
@@ -24,4 +23,3 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || $R$ || $R$ || {{Corruption|15}} || 916.67 || $TPI$:1
 |}
-</div>

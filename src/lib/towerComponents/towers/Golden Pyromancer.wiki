@@ -16,7 +16,6 @@ $NREF$ = <ref>DPS assumes the flames only hit one enemy.<br/>Total DPS is calcul
 $MREF$ = <ref>Calculated as Total DPS × Max Hits.</ref>
 $R$ = $FNC-RECURSION$
 </var>
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Normal Damage !! Burn Damage !! Firerate !! Range !! Defense Melt !! Burn Time !! Tick !! Max Hits !! Hitbox !! Total Elapsed Damage$TREF$ !! DPS$NREF$ !! Max DPS$MREF$ !! Cost Efficiency
 |-
@@ -32,4 +31,3 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || $R$ || $R$ || 12 || 30 || 0.175 || 15 || 15% || 360 || 1 || 10 || 2.5 || $TED$ || $TDPS$<ref>$NDPS$ Normal DPS + $BDPS$ Burn DPS</ref> || $MDPS$ || {{Money|$CE$}}
 |}
-</div>

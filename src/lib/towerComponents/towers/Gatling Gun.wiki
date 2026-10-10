@@ -13,9 +13,8 @@ $DREF$ = <ref name=dps>Calculated as (Damage × Ammo) ÷ (Reload Time + (Firerat
 $CREF$ = <ref name=ce>Uses normal DPS.</ref>
 $R$ = $FNC-RECURSION$
 </var>
-<div class="mobile-tabber"><tabber>
+<tabber>
 |-|Regular =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Ammo !! Firerate !! Reload Time !! Range !! Angle !! Spread !! Recoil !! Max Hits !! DPS$DREF$ !! Max DPS !! Cost Efficiency$CREF$
 |-
@@ -33,9 +32,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 6 || $R$ || $R$ || 67 || 600 || 0.09 || 6 || 50 || 70 || 6.5 || 0.03 || 3 || $DPS$ || $MDPS$ || {{Money|$CE$}}
 |}
-</div>
 |-|PVP =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Ammo !! Firerate !! Reload Time !! Range !! Angle !! Spread !! Recoil !! Max Hits !! DPS$DREF$ !! Max DPS !! Cost Efficiency$CREF$
 |-
@@ -53,5 +50,4 @@ $R$ = $FNC-RECURSION$
 |-
 | 6 || $R$ || $R$ || 80 || 600 || 0.09 || 6 || 50 || 70 || 6.5 || 0.03 || 3 || $DPS$ || $MDPS$ || {{Money|$CE$}}
 |}
-</div>
-</tabber></div>
+</tabber>

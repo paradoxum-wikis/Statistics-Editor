@@ -14,9 +14,8 @@ $FREF$ = <ref name=firerate>Firerate only applies to the burst and is not the ti
 $DREF$ = <ref name=dps>Calculated as (Damage × Burst Count) ÷ (Cooldown + (Firerate × Burst Count)).</ref>
 $R$ = $FNC-RECURSION$
 </var>
-<div class="mobile-tabber"><tabber>
+<tabber>
 |-|Regular =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Burst Count !! Firerate$FREF$ !! Cooldown !! Range !! DPS$DREF$ !! Cost Efficiency
 |-
@@ -30,9 +29,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$ || 10 || 12 || 0.15 || 0.4 || 22 || $DPS$ || {{Money|$CE$}}
 |}
-</div>
 |-|PVP =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Burst Count !! Firerate$FREF$ !! Cooldown !! Range !! DPS$DREF$ !! Cost Efficiency
 |-
@@ -46,5 +43,4 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$ || 8 || 10 || 0.1 || 0.2 || 21 || $DPS$ || {{Money|$CE$}}
 |}
-</div>
-</tabber></div>
+</tabber>

@@ -15,7 +15,6 @@ $DREF$ = <ref>For Level 2+, the '''Smite Damage''' is also included, assuming it
 $MREF$ = <ref>Accounts for every enemy being hit.<br>Calculated as (Damage × Max Hits * [Smite Meter ÷ Max Hits] + Smite Damage) ÷ (Firerate × [Smite Meter ÷ Max Hits]) for Level 2+, where in both cases of Smite Meter ÷ Max Hits, the result of that (such as 3 divided by 8 resulting in 0.375) has to be rounded up (in the previous example, that turns 0.375 to 1).</ref>
 $R$ = $FNC-RECURSION$
 </var>
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Smite Damage !! Firerate !! Range !! Smite Radius !! Smite Meter !! Shock Time !! Chain Range !! Max Hits !! DPS$DREF$ !! Max DPS$MREF$ !! Cost Efficiency !! Max Cost Efficiency
 |-
@@ -29,4 +28,3 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$ || 125 || 650 || 1.4 || 20 || 7.5 || 15 || 0.85 || 20 || 3 || $DPS0$ || $MDPS2$ || {{Money|$CE$}} || {{Money|$MCE$}}
 |}
-</div>

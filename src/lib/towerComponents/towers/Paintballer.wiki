@@ -13,9 +13,8 @@ $MREF$ = <ref name=maxdps>Calculated as DPS × Max Hits.</ref>
 $CREF$ = <ref name=ce>Calculated with normal DPS.</ref>
 $R$ = $FNC-RECURSION$
 </var>
-<div class="mobile-tabber"><tabber>
+<tabber>
 |-|Regular =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Splash Damage !! Firerate !! Range !! Explosion Range !! Max Hits !! DPS !! Max DPS$MREF$ !! Cost Efficiency$CREF$
 |-
@@ -31,9 +30,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || $R$ || $R$ || 20 || 0.7 || 10.5 || 5 || 8 || $DPS$ || $MDPS$ || {{Money|$CE$}}
 |}
-</div>
 |-|PVP =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Splash Damage !! Firerate !! Range !! Explosion Range !! Max Hits !! DPS !! Max DPS$MREF$ !! Cost Efficiency$CREF$
 |-
@@ -49,5 +46,4 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || $R$ || $R$ || 18 || 0.6 || 13 || 4.5 || 8 || $DPS$ || $MDPS$ || {{Money|$CE$}}
 |}
-</div>
-</tabber></div>
+</tabber>

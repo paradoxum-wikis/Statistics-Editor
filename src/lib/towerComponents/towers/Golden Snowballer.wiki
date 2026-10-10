@@ -9,7 +9,6 @@ $FSE-UPGRADEICON$ = 139027030887404; 136854065383009; 16911190427
 $FSE-META$ = Golden Perks; File:GoldenSnowballer.png
 $R$ = $FNC-RECURSION$
 </var>
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Firerate !! Range !! Explosion Range !! Max Slowdown !! Slowdown per Hit !! Slowdown Time !! Freeze Time !! Max Hits !! Projectile Speed !! Placement Limit !! DPS<ref>DPS does not consider projectile travel time.<br/>DPS assumes that only one enemy is hit and it receives full damage.</ref> !! Cost Efficiency
 |-
@@ -21,4 +20,3 @@ $R$ = $FNC-RECURSION$
 |-
 | 3 || $R$ || $R$ || 3,267 || 0.1 || 19 || 8 || 67% || 67% || 4 || 15 || 4 || 20 || 21,432 || $DPS$ || {{Money|$CE$}}
 |}
-</div>

@@ -17,7 +17,6 @@ $DREF$ = <ref>DPS is calculated as (Damage + AOE Damage) ÷ Swingrate. DPS does 
 $MREF$ = <ref>Max DPS is calculated as (Damage + AOE Damage x Max Hits) ÷ Swingrate. Max DPS does not include bleed damage.</ref>
 $R$ = $FNC-RECURSION$
 </var>
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="9" |Ranged Attack
 |-
@@ -53,9 +52,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || $R$ || $R$ || 550 || $AOEDMG$ || 2 || 1.8 || 5 || 0.28 || 40 || 9 || 3 || $MDPS$ || $MaxDPS$ || {{Money|$CE$}}
 |}
-</div>
 
-<div class="overflow-box">
 {| class="wikitable stats-table mw-collapsible mw-collapsed"
 ! colspan="3" | Bleed Damage
 |-
@@ -81,4 +78,3 @@ $R$ = $FNC-RECURSION$
 |-
 | 5,000,000 || $BTDMG$ || $BCDMG$
 |}
-</div>

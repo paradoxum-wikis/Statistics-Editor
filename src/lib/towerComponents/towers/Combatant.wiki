@@ -14,9 +14,8 @@ $DREF$ = <ref>DPS assumes that only one enemy is hit per swing.<br />Ability is 
 $MDREF$ = <ref>DPS assumes that the maximum number of enemies are hit per swing.<br/>Ability is not taken into account.</ref>
 $R$ = $FNC-RECURSION$
 </var>
-<div class="mobile-tabber"><tabber>
+<tabber>
 |-|Brawler =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Swingrate !! Range !! DPS$DREF$ !! Cost Efficiency
 |-
@@ -32,9 +31,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || $R$ || $R$ || 40 || 0.5 || 6 || $DPS$ || {{Money|$CE$}}
 |}
-</div>
 |-|Combatant =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Swingrate !! Range !! DPS$DREF$ !! Cost Efficiency
 |-
@@ -50,5 +47,4 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || $R$ || $R$ || 40 || 0.5 || 6 || $DPS$ || {{Money|$CE$}}
 |}
-</div>
-</tabber></div>
+</tabber>

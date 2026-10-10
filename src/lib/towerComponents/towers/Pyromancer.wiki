@@ -16,9 +16,8 @@ $TREF$ = <ref>Total Elapsed Damage is calculated as Burn Damage × (Burn Time ÷
 $DREF$ = <ref>DPS assumes the flames only hit one enemy.<br/>Total DPS is calculated as Normal DPS + Burn DPS.<br/>Burn DPS is calculated as Burn Damage ÷ Tick.</ref>
 $R$ = $FNC-RECURSION$
 </var>
-<div class="mobile-tabber"><tabber>
+<tabber>
 |-|Regular =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Normal Damage !! Burn Damage !! Firerate !! Range !! Defense Melt !! Burn Time !! Tick !! Max Hits !! Hitbox !! Total Elapsed Damage$TREF$ !! DPS$DREF$ !! Max DPS !! Cost Efficiency
 |-
@@ -34,9 +33,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || $R$ || $R$ || 9 || 25 || 0.175 || 14 || 10% || 10 || 1 || 10 || 2.5 || $TED$ || $DPS$<ref>$NDPS$ Normal DPS + $BDPS$ Burn DPS</ref> || $MDPS$ || {{Money|$CE$}}
 |}
-</div>
 |-|PVP =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Normal Damage !! Burn Damage !! Firerate !! Range !! Defense Melt !! Burn Time !! Tick !! Max Hits !! Hitbox !! Total Elapsed Damage$TREF$ !! DPS$DREF$ !! Max DPS !! Cost Efficiency
 |-
@@ -52,5 +49,4 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || $R$ || $R$ || 6 || 8 || 0.25 || 12 || 10% || 10 || 0.5 || 8 || 2.5 || $TED$ || $DPS$<ref>$NDPS$ Normal DPS + $BDPS$ Burn DPS</ref> || $MDPS$ || {{Money|$CE$}}
 |}
-</div>
-</tabber></div>
+</tabber>

@@ -16,7 +16,6 @@ $RREF$ = <ref>DPS dealt with its collisions. It is calculated as Health ÷ Spawn
 $CREF$ = <ref>Cost efficiency accounts for both regular and ram DPS.</ref>
 $R$ = $FNC-RECURSION$
 </var>
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Health !! Defense !! Spawnrate !! Normal Damage !! Missile Damage !! Missile Count !! Firerate !! Missile Cooldown !! Range !! Explosion Range !! DPS$DREF$ !! Ram DPS$RREF$ !! Cost Efficiency$CREF$
 |-
@@ -32,4 +31,3 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || $R$ || $R$ || 10,000 || 30% || 30 || 34 || 50 || 4 || 0.1 || 2 || 50 || 5 || $NDPS$<ref>$GDPS$ Normal Ranged DPS + $MDPS$ Missile DPS</ref> || $RDPS$ || {{Money|$CE$}}
 |}
-</div>

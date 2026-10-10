@@ -17,7 +17,6 @@ $TREF$ = <ref name="TED">Total Elapsed Damage is calculated as Burn Damage × (B
 $DREF$ = <ref>Normal DPS assumes the flames only hit one enemy.</ref>
 $R$ = $FNC-RECURSION$
 </var>
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="14" |Fire Mode
 |-
@@ -33,9 +32,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$ || 16 || 10 || 7 || 0.125 || 0.4 || 0.25 || 17 || 4 || $TED$ || $TDPS$<ref>$NDPS$ Normal DPS + $BDPS$ Burn DPS</ref> || {{Money|$CE$}}
 |}
-</div>
 
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="13" |Frost Mode
 |-
@@ -51,9 +48,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$ || 16 || 7 || 0.125 || 0.4 || 17 || 5% || 20% || 2 || $NDPS$ || {{Money|$CE$}}
 |}
-</div>
 
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="10" |Heatwave
 |-
@@ -65,9 +60,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || 400 || 18 || 15 || 0.5 || 5 || 25 || 2 || $TED$ || $THDPS$<ref>$HDPS$ Normal DPS + $BDPS$ Burn DPS</ref>
 |}
-</div>
 
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="11" |Ice Turret
 |-
@@ -79,4 +72,3 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || 1,000 || 28 || 0.3 || 15 || 5% || 20% || 5 || 2 || 45 || $DPS$
 |}
-</div>

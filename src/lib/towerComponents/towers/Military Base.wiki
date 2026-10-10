@@ -16,9 +16,8 @@ $SREF$ = <ref name=splash>Damage dealt in the inner explosion sphere. Splash dam
 $RREF$ = <ref name=ram>DPS dealt with its collisions. It is calculated as Health ÷ Spawnrate.</ref>
 $R$ = $FNC-RECURSION$
 </var>
-<div class="mobile-tabber"><tabber>
+<tabber>
 |-|Regular =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Health !! Gunner Damage !! Cannon Splash Damage$SREF$ !! Cannon Firerate !! Airstrike Damage$SREF$ !! Spawnrate !! Firerate !! Range !! Ram DPS !! Gunner DPS !! Cannon DPS !! Total DPS !! Cost Efficiency
 |-
@@ -34,9 +33,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || $R$ || $R$ || 1,600 || 22 || 75 || 2 || 125x6 || 35 || 0.175 || 30 || $RDPS$ || $GDPS$ || $CDPS$ || $TDPS$ || {{Money|$CE$}}
 |}
-</div>
 |-|PVP =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Health !! Gunner Damage !! Cannon Splash Damage$SREF$ !! Cannon Firerate !! Airstrike Damage$SREF$ !! Spawnrate !! Firerate !! Range !! Ram DPS !! Gunner DPS !! Cannon DPS !! Total DPS !! Cost Efficiency
 |-
@@ -52,5 +49,4 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || $R$ || $R$ || 1,600 || 22 || 75 || 2 || 125x6 || 25 || 0.175 || 30 || $RDPS$ || $GDPS$ || $CDPS$ || $TDPS$ || {{Money|$CE$}}
 |}
-</div>
-</tabber></div>
+</tabber>

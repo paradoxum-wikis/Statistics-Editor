@@ -17,9 +17,8 @@ $FSE-META$ = Advanced; File:SaboteurIcon.png
 $DPREF$ = <ref name=dps>DPS assumes all bullets hit only one enemy.</ref>
 $R$ = $FNC-RECURSION$
 </var>
-<div class="mobile-tabber"><tabber>
+<tabber>
 |-|Regular =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Bullet Count !! Poison Damage !! Firerate !! Tick !! Poison Time !! Slowdown !! Range !! Base Spread !! Spread !! Max Hits !! Neuralyze Duration !! Neuralyze Grenade Radius !! Damage Taken Bonus !! Total Elapsed Damage !! DPS$DPREF$ !! Cost Efficiency
 |-
@@ -33,9 +32,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$ || 7 || 6 || 7 || 0.65 || 0.4 || 8 || 10% || 16.5 || 4 || 1 || 3 || 7.5 || 3.5 || 15% || $TED$ || $CDPS2$<ref>$DPS2$ Normal DPS + $PDPS$ Poison DPS</ref> || {{Money|$CE$}}
 |}
-</div>
 |-|PVP = 
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Bullet Count !! Poison Damage !! Firerate !! Tick !! Poison Time !! Slowdown !! Range !! Base Spread !! Spread !! Max Hits !! Neuralyze Duration !! Neuralyze Grenade Radius !! Damage Taken Bonus !! Total Elapsed Damage !! DPS$DPREF$ !! Cost Efficiency
 |-
@@ -49,5 +46,4 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$ || 7 || 5 || 7 || 0.65 || 0.4 || 7 || 15% || 14.5 || 4 || 1 || 3 || 9 || 3.5 || 25% || $TED$ || $CDPS2$<ref>$DPS2$ Normal DPS + $PDPS$ Poison DPS</ref> || {{Money|$CE$}}
 |}
-</div>
-</tabber></div>
+</tabber>

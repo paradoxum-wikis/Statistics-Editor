@@ -7,7 +7,6 @@ $FSE-UPGRADEICON$ = 95144637961093; 113548130163293; 101877307760287; 1231178019
 $FSE-META$ = Advanced; File:DefaultDJBoothIconAug2024.png
 $R$ = $FNC-RECURSION$
 </var>
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="4" | DJ Booth Stats
 |-
@@ -75,4 +74,3 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || 20% || 7.5% || 75 || 4 || 1.5 || 5% || 0.25% || 15%
 |}
-</div>

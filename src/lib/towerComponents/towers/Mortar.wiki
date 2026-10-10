@@ -15,9 +15,8 @@ $DREF$ = <ref name="DPS">DPS assumes only one enemy is hit and receives full spl
 $CREF$ = <ref name="ce">Accounts for both normal and cluster bomb DPS.</ref>
 $R$ = $FNC-RECURSION$
 </var>
-<div class="mobile-tabber"><tabber>
+<tabber>
 |-|Regular =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! [[Splash Damage]]$SREF$ !! Cluster Damage$SREF$ !! Cluster Count !! Firerate$FREF$ !! Range !! Explosion Radius !! Cluster Explosion Radius !! DPS$DREF$ !! Cluster DPS$DREF$ !! Cost Efficiency$CREF$
 |-
@@ -33,9 +32,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || $R$ || $R$ || 235 || 40 || 6 || 2.75 || 34 || 9 || 5 || $DPS$ || $CDPS$ || {{Money|$CE$}}
 |}
-</div>
 |-|PVP =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! [[Splash Damage]]$SREF$ !! Cluster Damage$SREF$ !! Cluster Count !! Firerate$FREF$ !! Range !! Explosion Radius !! Cluster Explosion Radius !! DPS$DREF$ !! Cluster DPS$DREF$ !! Cost Efficiency$CREF$
 |-
@@ -51,5 +48,4 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || $R$ || $R$ || 150 || 50 || 6 || 3.25 || 35 || 8.5 || 5 || $DPS$ || $CDPS$ || {{Money|$CE$}}
 |}
-</div>
-</tabber></div>
+</tabber>

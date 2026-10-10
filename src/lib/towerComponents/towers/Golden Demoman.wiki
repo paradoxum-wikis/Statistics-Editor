@@ -11,7 +11,6 @@ $AREF$ = <ref name=aim>Aim Time happens before the '''Demoman''' throws a grenad
 $DREF$ = <ref name=dps>DPS does not consider projectile travel time.<br/>DPS assumes that only one enemy is hit and it receives full splash damage.</ref>
 $R$ = $FNC-RECURSION$
 </var>
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! [[Splash Damage]] !! Firerate !! Aim Time$AREF$ !! Range !! Explosion Range !! DPS$DREF$ !! Cost Efficiency
 |-
@@ -25,4 +24,3 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$ || 25 || 0.45 || 0 || 17 || 5.5 || $DPS$ || {{Money|$CE$}}
 |}
-</div>

@@ -10,7 +10,6 @@ $FNC-ROFBUG$ = Firerate
 $FSE-META$ = Unavailable; File:DefaultTwitgunnerIcon.png
 $R$ = $FNC-RECURSION$
 </var>
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Firerate !! Range !! DPS !! Cost Efficiency
 |-
@@ -26,4 +25,3 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || $R$ || $R$ || 7 || 0.75 || 18 || $DPS$ || {{Money|$CE$}}
 |}
-</div>

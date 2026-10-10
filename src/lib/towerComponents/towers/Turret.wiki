@@ -12,9 +12,8 @@ $FSE-UPGRADEICON$ = 149177741; 149177741; 3584258139; 3584280869; 3584258608
 $FSE-META$ = Advanced; File:TurretIcon.png
 $R$ = $FNC-RECURSION$
 </var>
-<div class="mobile-tabber"><tabber>
+<tabber>
 |-|Regular =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Firerate !! Range !! DPS !! Cost Efficiency
 |-
@@ -30,9 +29,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || $R$ || $R$ || 68 || 0.12 || 27 || $DPS$ || {{Money|$CE$}}
 |}
-</div>
 |-|PVP =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Firerate !! Range !! DPS !! Cost Efficiency
 |-
@@ -48,5 +45,4 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || $R$ || $R$ || 44 || 0.12 || 26.5 || $DPS$ || {{Money|$CE$}}
 |}
-</div>
-</tabber></div>
+</tabber>

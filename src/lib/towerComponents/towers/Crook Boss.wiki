@@ -17,9 +17,8 @@ $CREF$ = <ref name=ce>Does not account for unit DPS.</ref>
 $GREF$ = <ref name=goon>Goons are not affected by any buffs or debuffs.</ref>
 $R$ = $FNC-RECURSION$
 </var>
-<div class="mobile-tabber"><tabber>
+<tabber>
 |-|Regular =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="8" | Crook Boss Stats
 |-
@@ -47,9 +46,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || [[Tommy Goon 2]] || 275 || 5 || 32.5 || 0.12 || 150 || 3 || 20 || Hidden || $DPS$ || $RDPS$ || $TDPS$
 |}
-</div>
 |-|PVP =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="8" | Crook Boss Stats
 |-
@@ -77,10 +74,8 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || [[Tommy Goon 2]] || 225 || 6 || 50 || 0.12 || 200 || 4 || 20 || Hidden || $DPS$ || $RDPS$ || $TDPS$
 |}
-</div>
 <!-- @se-ignore -->
 |-|Levels =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="12" |Levels
 |-
@@ -128,6 +123,5 @@ $R$ = $FNC-RECURSION$
 |-
 | 20 || $R$ || $R$
 |}
-</div>
 <!-- @/se-ignore -->
-</tabber></div>
+</tabber>

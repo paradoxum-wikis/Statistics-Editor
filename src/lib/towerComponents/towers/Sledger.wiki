@@ -20,7 +20,6 @@ $FSE-DETECTION$ = ; 0;
 $FSE-META$ = Exclusive; File:OICESledgerIcon.png
 $R$ = $FNC-RECURSION$
 </var>
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Frozen Damage$FREF$ !! Aftershock Damage !! Swingrate !! Aftershock Delay !! Range !! Max Hits !! Slowdown per Hit !! Max Slowdown !! Slowdown Time !! Freeze Time !! DPS$DREF$ !! Frozen DPS !! Max DPS$FDREF$ !! Cost Efficiency !! Max Cost Efficiency
 |-
@@ -36,4 +35,3 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || $R$ || $R$ || 150 || $FDMG$ || $ADMG$ || 1.2 || 0.4 || 7.5 || 8 || 35% || 35% || 5 || 1.2 || $DPS2$<ref>$DPS$ Normal DPS + $AFDPS$ Aftershock DPS</ref> || $FDPS2$<ref>$FDPS$ Normal DPS + $AFDPS$ Aftershock DPS</ref> || $MDPS2$ || {{Money|$CE$}} || {{Money|$MCE$}}
 |}
-</div>

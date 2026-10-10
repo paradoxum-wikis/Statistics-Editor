@@ -18,7 +18,6 @@ $TREF$ = <ref>Total Elapsed Damage is calculated as Poison Damage × (Poison Tim
 $DREF$ = <ref>DPS is calculated as (Damage × Burst Count) ÷ (Cooldown + (Firerate × Burst Count)) + (Poison Damage ÷ Tick).<br/>When the '''Toxic Gunner''' stops firing in bursts, it is calculated as Damage ÷ Firerate + Poison Damage ÷ Tick<br/>DPS assumes all shots poison the same enemy.</ref>
 $R$ = $FNC-RECURSION$
 </var>
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Poison Damage !! Burst Count !! Firerate$CREF$ !! Tick !! Cooldown !! Range !! Poison Time !! Defense Melting !! Max Defense Melting !! Total Elapsed Damage$TREF$ !! Slowdown !! DPS$DREF$ !! Cost Efficiency
 |-
@@ -32,4 +31,3 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$ || 8 || 10 || N/A || 0.12 || 1 || 0 || 18 || 10 || 3% || 50% || $TED$ || 30% || $DPS2$<ref>$DPS2GUN$ Gun DPS + $DPS2POISON$ Poison DPS</ref> || {{Money|$CE$}}
 |}
-</div>

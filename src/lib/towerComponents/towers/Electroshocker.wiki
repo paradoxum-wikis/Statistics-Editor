@@ -13,7 +13,6 @@ $DREF$ = <ref>Assumes that only one enemy is hit per shock.</ref>
 $MREF$ = <ref>Calculated as DPS × Max Hits.</ref>
 $R$ = $FNC-RECURSION$
 </var>
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Firerate !! Range !! Chain Range !! Max Hits !! Shock Time !! Defense Melt !! DPS$DREF$ !! Max DPS$MREF$ !! Cost Efficiency !! Max Cost Efficiency
 |-
@@ -29,4 +28,3 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || $R$ || $R$ || 90 || 2.5 || 15 || 15 || 6 || 0.25 || 20% || $DPS$ || $MDPS$ || {{Money|$CE$}} || {{Money|$MCE$}}
 |}
-</div>

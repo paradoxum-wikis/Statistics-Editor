@@ -18,9 +18,9 @@ $WCCE$ = $TP$ / DPS
 $MWCCE$ = $TP$ / Max DPS
 $TP$ = $FNC-TOTAL-COST$
 $FSE-UPGRADE$ = Arena Conditioning; Warrior's Call; Champion's Flame; Centurion; King of the Arena
-$FSE-UPGRADEICON$ = 3356186535; 141745478; 4118882122; 16620737; 16868189
+$FSE-UPGRADEICON$ = File:GladiatorUpgrade1.png; File:GladiatorUpgrade2.png; File:GladiatorUpgrade3.png; File:GladiatorUpgrade4.png; File:GladiatorUpgrade5.png
 $FSE-DETECTION$ = 0; 3;
-$FSE-META$ = Exclusive; File:GladiatorIconn.png
+$FSE-META$ = Exclusive; File:DefaultGladiatorRework0.png
 $DREF$ = <ref>DPS assumes that only one enemy is hit per swing and it is set on fire.<br/>Ability is not taken into account.<br/>Burn DPS is calculated as (Burn Damage * (Burn Duration / Burn Tick)) / Burn Cooldown.</ref>
 $D2REF$ = <ref>DPS assumes that only one enemy is hit per swing and it is set on fire.<br/>Burn DPS is calculated as (Burn Damage * (Burn Duration / Burn Tick)) / Burn Cooldown.</ref>
 $MDREF$ = <ref>DPS assumes that the maximum number of enemies are hit per swing. For burn, it only accounts for the number of enemies hit in a swing.<br/>Ability is not taken into account.<br/>Burn DPS is calculated as (Burn Damage * (Burn Duration / Burn Tick)) / Burn Cooldown.</ref>
@@ -28,7 +28,6 @@ $M2DREF$ = <ref>DPS assumes that the maximum number of enemies are hit per swing
 $TREF$ = <ref>Total Elapsed Damage is calculated as Burn Damage × (Burn Duration ÷ Burn Tick).</ref>
 $R$ = $FNC-RECURSION$
 </var>
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="16" | Gladiator Stats
 |-
@@ -46,9 +45,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || $R$ || $R$ || 77 || 0.55 || 10 || 6.5 || 7 || 0.15 || 1.5 || 2 || $TED$ || $CDPS$<ref>$DPS$ Normal DPS + $BDPS$ Burn DPS</ref> || $MDPS$<ref>$MNDPS$ Normal DPS + $MBDPS$ Burn DPS</ref> || {{Money|$CE$}} || {{Money|$MCE$}}
 |}
-</div>
 
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="6" | Ability Stats
 |-
@@ -62,4 +59,3 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || $WCFR$ || $WCBDPS$<ref>$WCDPS$ Normal DPS + $BDPS$ Burn DPS</ref> || $MWCDPS$<ref>$MWCNDPS$ Normal DPS + $MBDPS$ Burn DPS</ref> || {{Money|$WCCE$}} || {{Money|$MWCCE$}}
 |}
-</div>

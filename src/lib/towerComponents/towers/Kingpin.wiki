@@ -16,9 +16,8 @@ $FSE-UPGRADEICON$ = 115111916696325; 128115489998324; 72861050225989; 1146682377
 $FSE-META$ = Evolved; File:DefaultKingpin0.png
 $RC$ = $FNC-RECURSION$
 </var>
-<div class="mobile-tabber"><tabber>
+<tabber>
 |-|Regular =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="9" |Neutral Stats
 |-
@@ -32,9 +31,7 @@ $RC$ = $FNC-RECURSION$
 |-
 | 3 || $RC$ || $RC$ || 12 || 0.14 || 20 || 2 || $DPS$ || {{Money|$CE$}}
 |}
-</div>
 
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="11" |Top Path Stats
 |-
@@ -46,9 +43,7 @@ $RC$ = $FNC-RECURSION$
 |-
 | 6 || $RC$ || $RC$ || 225 || 0.8 || 21.5 || 2 || 100% || {{Money|50,000}} || $DPS$ || {{Money|$CE$}}
 |}
-</div>
 
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="9" |Bottom Path Stats
 |-
@@ -60,9 +55,7 @@ $RC$ = $FNC-RECURSION$
 |-
 | 6 || $RC$ || $RC$ || 46 || 0.1 || 23 || 3 || $DPS$ || {{Money|$CE$}}
 |}
-</div>
 
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="10" |[[Lackey]] Stats
 |-
@@ -78,9 +71,7 @@ $RC$ = $FNC-RECURSION$
 |-
 | 6B || 300 || 7 || 25 || 0.12 || 75 || 25 || Hidden || $DPS$ || $RDPS$
 |}
-</div>
 
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="6" |[[Money Runner]] Stats
 |-
@@ -96,9 +87,7 @@ $RC$ = $FNC-RECURSION$
 |-
 | 6A || 100 || {{Money|850}} || 25 || {{Money|$IPS$}} || $RDPS$
 |}
-</div>
 
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="11" |[[Bouncer]] Stats
 |-
@@ -110,9 +99,7 @@ $RC$ = $FNC-RECURSION$
 |-
 | 6B || 1,000 || 15% || 40 || 40 || 0.5 || 75 || 8.5 || Hidden, Lead || $DPS$ || $RDPS2$
 |}
-</div>
 
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="10" |[[Contractor]] Stats
 |-
@@ -120,10 +107,8 @@ $RC$ = $FNC-RECURSION$
 |-
 | 6B || 400 || 170 || 60 || 2 || 75 || 35 || Hidden, Flying, Lead || $DPS$ || $RDPS$
 |}
-</div>
 <!-- @se-ignore -->
 |-|Levels =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! colspan="12" |Levels
 |-
@@ -171,6 +156,5 @@ $RC$ = $FNC-RECURSION$
 |-
 | 20 || $RC$ || $RC$
 |}
-</div>
 <!-- @/se-ignore -->
-</tabber></div>
+</tabber>

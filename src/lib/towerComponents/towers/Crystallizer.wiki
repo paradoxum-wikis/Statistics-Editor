@@ -12,7 +12,6 @@ $FSE-META$ = Unavailable; File:Crystallizer.png
 $FNC-ROFBUG$ = Firerate
 $R$ = $FNC-RECURSION$
 </var>
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Firerate !! Range !! Crystal Limit !! Damage Vulnerability !! Vulnerability Time !! Max Build Up !! DPS !! Cost Efficiency
 |-
@@ -28,4 +27,3 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || $R$ || $R$ || 225 || 4.75 || 12 || 12 || 30% || 7 || $MBU$ || $DPS$ || {{Money|$CE$}}
 |}
-</div>

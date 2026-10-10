@@ -11,9 +11,8 @@ $FSE-UPGRADEICON$ = 3839040358; 3839041547; 3839042767; 3839043838
 $FSE-META$ = Intermediate; File:NewHunterIcon.png
 $R$ = $FNC-RECURSION$
 </var>
-<div class="mobile-tabber"><tabber>
+<tabber>
 |-|Regular =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Firerate !! Range !! DPS !! Cost Efficiency
 |-
@@ -27,9 +26,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$ || 225 || 1.8 || 27.5 || $DPS$ || {{Money|$CE$}}
 |}
-</div>
 |-|PVP =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Firerate !! Range !! DPS !! Cost Efficiency
 |-
@@ -43,5 +40,4 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$ || 162 || 1.2 || 24 || $DPS$ || {{Money|$CE$}}
 |}
-</div>
-</tabber></div>
+</tabber>

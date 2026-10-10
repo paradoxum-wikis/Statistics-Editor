@@ -10,7 +10,6 @@ $FSE-UPGRADEICON$ = 135644027404170; 111802725289728; 134734546148883; 135194593
 $FSE-META$ = Intermediate; File:DefaultPulseTrooperIconIG.png
 $R$ = $FNC-RECURSION$
 </var>
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Firerate !! Range !! Max Hits !! Pulse Speed !! Laser Damage !! Laser Duration !! DPS !! Sweeper DPS !! Cost Efficiency
 |-
@@ -26,4 +25,3 @@ $R$ = $FNC-RECURSION$
 |-
 | 5 || $R$ || $R$ || 50 || 0.55 || 10 || 1,000 || 20 || 300 || 6 || $DPS$ || $SDPS$ || {{Money|$CE$}}
 |}
-</div>

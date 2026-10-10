@@ -10,9 +10,8 @@ $FSE-DETECTION$ = 2; 3; 0
 $FSE-META$ = Starter; File:DefaultSniperIcon1.png
 $R$ = $FNC-RECURSION$
 </var>
-<div class="mobile-tabber"><tabber>
+<tabber>
 |-|Regular =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Firerate !! Range !! DPS !! Cost Efficiency
 |-
@@ -26,9 +25,7 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$ || 100 || 3.2 || 45 || $DPS$ || {{Money|$CE$}}
 |}
-</div>
 |-|PVP =
-<div class="overflow-box">
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Firerate !! Range !! DPS !! Cost Efficiency
 |-
@@ -42,5 +39,4 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$ || 30 || 0.5 || 30 || $DPS$ || {{Money|$CE$}}
 |}
-</div>
-</tabber></div>
+</tabber>
