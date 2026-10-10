@@ -18,6 +18,8 @@ export function normalizeColumnKey(s: unknown): string {
 	if (!/[<$[]/.test(t)) return t.trim();
 	return t
 		.replace(/<[^>]+>/g, "")
+		.replace(/</g, "")
+		.replace(/>/g, "")
 		.replace(/\[\[([^|\]]+)(?:\|[^\]]*)?\]\]/gi, (_, name: string) =>
 			/^(?:file|image)\s*:/i.test(name) ? "" : name,
 		)
