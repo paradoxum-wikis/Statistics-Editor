@@ -46,6 +46,7 @@
 
 	$effect(() => {
 		if (!isClient || !towerStore.selectedData) return;
+		if (wikiEditorModule) return;
 		wikiEditorLoadFailed = false;
 		void import("./WikiEditor.svelte")
 			.then((mod) => {
