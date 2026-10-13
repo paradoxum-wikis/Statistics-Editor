@@ -737,13 +737,21 @@ function renderPreviewTable(block: string): string {
 /**
  * Render a botched version of wikitext for table cells.
  */
+const cellHtmlCache = new Map<string, { html: string; slots: WikiTplSlot[] }>();
+
 export function renderCellHtml(
 	val: string | number | null | undefined,
 	readOnly: boolean,
 ) {
-	return collectHtml(() =>
+	const key = `${readOnly ? 1 : 0}|${settingsStore.fullPrecision ? 1 : 0}|${typeof val}:${String(val)}`;
+	const cached = cellHtmlCache.get(key);
+	if (cached) return cached;
+	const rendered = collectHtml(() =>
 		renderInlineWikitext(readOnly ? formatReadOnly(val) : formatValue(val)),
 	);
+	if (cellHtmlCache.size >= 2000) cellHtmlCache.clear();
+	cellHtmlCache.set(key, rendered);
+	return rendered;
 }
 
 /**
