@@ -11,6 +11,14 @@ const CONSENT_KEY = "analyticsConsent";
 const TRACKING_ID = "G-D48H2PL948";
 
 let initialized = false;
+let resizeTimer: ReturnType<typeof setTimeout> | null = null;
+
+function loadGtagScript() {
+	const script = document.createElement("script");
+	script.async = true;
+	script.src = `https://www.googletagmanager.com/gtag/js?id=${TRACKING_ID}`;
+	document.head.appendChild(script);
+}
 
 export const analytics = {
 	init() {
@@ -26,10 +34,11 @@ export const analytics = {
 			analytics_storage: "granted",
 		});
 
-		const script = document.createElement("script");
-		script.async = true;
-		script.src = `https://www.googletagmanager.com/gtag/js?id=${TRACKING_ID}`;
-		document.head.appendChild(script);
+		if (typeof requestIdleCallback !== "undefined") {
+			requestIdleCallback(() => loadGtagScript(), { timeout: 3000 });
+		} else {
+			setTimeout(loadGtagScript, 0);
+		}
 
 		window.gtag("js", new Date());
 		window.gtag("config", TRACKING_ID, {
@@ -40,7 +49,10 @@ export const analytics = {
 
 		analytics.setConsent(localStorage.getItem(CONSENT_KEY) !== "false");
 		analytics.setLayout();
-		window.addEventListener("resize", () => analytics.setLayout());
+		window.addEventListener("resize", () => {
+			if (resizeTimer) clearTimeout(resizeTimer);
+			resizeTimer = setTimeout(() => analytics.setLayout(), 200);
+		});
 	},
 
 	setConsent(granted: boolean) {
