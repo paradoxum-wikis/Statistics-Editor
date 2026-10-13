@@ -73,6 +73,19 @@
 
 	let hoveredCol = $state<number | null>(null);
 
+	function handleTableMouseOver(e: MouseEvent) {
+		const cell = (e.target as HTMLElement | null)?.closest?.(
+			"[data-col]",
+		) as HTMLElement | null;
+		const idx =
+			cell?.dataset.col === undefined ? null : Number(cell.dataset.col);
+		if (idx !== hoveredCol) hoveredCol = idx;
+	}
+
+	function handleTableMouseLeave() {
+		if (hoveredCol !== null) hoveredCol = null;
+	}
+
 	const fTokens = $derived(
 		(config.skinData?.formulaTokens ?? config.formulaTokens ?? {}) as Record<
 			string,
@@ -100,7 +113,11 @@
 		? 'extra-table-container'
 		: ''} {settingsStore.minTableWidth ? 'min-content' : ''}"
 >
-	<table class="table {settingsStore.minTableWidth ? 'min-content' : ''}">
+	<table
+		class="table {settingsStore.minTableWidth ? 'min-content' : ''}"
+		onpointerover={handleTableMouseOver}
+		onmouseleave={handleTableMouseLeave}
+	>
 		<thead class="table-head">
 			{#if config.tableName}
 				<tr>
@@ -120,6 +137,7 @@
 				{#each config.headers as header, hIdx (header)}
 					<th
 						scope="col"
+						data-col={hIdx}
 						class={header === "Level"
 							? "table-header-sticky px-2"
 							: [
@@ -127,8 +145,6 @@
 									!BLOCK_HEADER.test(headerDisplays[hIdx]) && "nowrap",
 								]}
 						class:hovered-col={hoveredCol === hIdx}
-						onmouseenter={() => (hoveredCol = hIdx)}
-						onmouseleave={() => (hoveredCol = null)}
 					>
 						<CellRefs
 							value={headerDisplays[hIdx] || header}
@@ -150,9 +166,8 @@
 						{#if header === "Level"}
 							<td
 								class="table-cell-sticky"
+								data-col={hIdx}
 								class:hovered-col={hoveredCol === hIdx}
-								onmouseenter={() => (hoveredCol = hIdx)}
-								onmouseleave={() => (hoveredCol = null)}
 							>
 								{row[header] ?? rowIdx}
 							</td>
@@ -191,6 +206,7 @@
 									)
 								: { delta: null, className: "", cellClass: "" }}
 							<td
+								data-col={hIdx}
 								class="table-data {deltaInfo.cellClass} {editable
 									? 'editable-cell'
 									: 'readonly-cell'} {formulaSource
@@ -199,8 +215,6 @@
 									? 'compact-cell'
 									: 'spacious-cell'}"
 								class:hovered-col={hoveredCol === hIdx}
-								onmouseenter={() => (hoveredCol = hIdx)}
-								onmouseleave={() => (hoveredCol = null)}
 							>
 								<TowerTableCell
 									value={displayCellValue(
