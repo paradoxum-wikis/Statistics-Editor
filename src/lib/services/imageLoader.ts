@@ -16,6 +16,8 @@ const RE_IMAGE_EXT = new RegExp(`\\.(${IMAGE_EXT})([/?#]|$)`, "i");
 
 const WIKI_IMAGE_BASE = "https://tds.wiki/images/";
 
+const wikiFileUrlCache = new Map<string, string | null>();
+
 export function isWikiImageUrl(url: string): boolean {
 	return url.trim().toLowerCase().startsWith(WIKI_IMAGE_BASE);
 }
@@ -53,19 +55,24 @@ export function isFandomCdnUrl(url: string): boolean {
 }
 
 export function resolveWikiFileUrl(imageIdStr: string): string | null {
-	const s = imageIdStr
-		.trim()
-		.replace(/^\[\[:?\s*(.+?)(?:\|.*)?\]\]$/, "$1")
-		.trim();
-	if (!s || !/^((File|Image)\s*:)/i.test(s)) return null;
+	const cacheKey = imageIdStr.trim();
+	const cached = wikiFileUrlCache.get(cacheKey);
+	if (cached !== undefined) return cached;
 
-	try {
-		return mwWikiFileUrl(s);
-	} catch (e) {
-		if (settingsStore.debugMode)
-			console.error("[imageLoader] wiki file url", e);
-		return null;
+	let url: string | null = null;
+	const s = cacheKey.replace(/^\[\[:?\s*(.+?)(?:\|.*)?\]\]$/, "$1").trim();
+	if (s && /^((File|Image)\s*:)/i.test(s)) {
+		try {
+			url = mwWikiFileUrl(s);
+		} catch (e) {
+			if (settingsStore.debugMode)
+				console.error("[imageLoader] wiki file url", e);
+		}
 	}
+
+	if (wikiFileUrlCache.size >= 2000) wikiFileUrlCache.clear();
+	wikiFileUrlCache.set(cacheKey, url);
+	return url;
 }
 
 export function isDirectImageUrl(url: string): boolean {
