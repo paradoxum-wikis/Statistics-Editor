@@ -113,6 +113,9 @@
 	<link rel="icon" href="/favicon.ico" />
 	<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
+	<link rel="preconnect" href="https://bin.t7ru.link" crossorigin="anonymous" />
+	<link rel="dns-prefetch" href="https://bin.t7ru.link" />
+	<link rel="preconnect" href="https://www.googletagmanager.com" />
 	<link
 		rel="stylesheet"
 		href="https://bin.t7ru.link/fol/unisans/index.css"
