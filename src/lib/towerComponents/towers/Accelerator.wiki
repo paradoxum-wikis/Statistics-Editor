@@ -2,7 +2,7 @@
 $DPS$ = Overcharge / (Charge-Up + Cooldown + (Overcharge / Damage * Tick))
 $CE$ = Total Cost / DPS
 $TP$ = $FNC-TOTAL-COST$
-$COST$ = 7500; 2000; 6000; 9999; 27500; 50000
+$COST$ = 7500; 2000; 6000; 9500; 24500; 43500
 $PVP-COST$ = 4250; 750; 2000; 4500; 12000; 28500
 $FSE-DETECTION$ = 1; 0; ;
 $FSE-UPGRADE$ = Extra Juice; Second Energy Canister; Powerhouse Armor; Supercharger; Vessel Of Infinite Destruction
@@ -18,11 +18,11 @@ $R$ = $FNC-RECURSION$
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Tick !! Charge-Up$CUREF$ !! Cooldown$CREF$ !! Overcharge !! Range !! DPS$DREF$ !! Cost Efficiency
 |-
-| 0 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 12 || 0.25 || 6.5 || 2.5 || 9,000 || 19 || $DPS$ || {{Money|$CE$}}
+| 0 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 12 || 0.25 || 5 || 2.5 || 9,000 || 19 || $DPS$ || {{Money|$CE$}}
 |-
-| 1 || $R$ || $R$ || 15 || 0.25 || 6.5 || 2.5 || 11,250 || 19 || $DPS$ || {{Money|$CE$}}
+| 1 || $R$ || $R$ || 15 || 0.25 || 5 || 2.5 || 11,250 || 19 || $DPS$ || {{Money|$CE$}}
 |-
-| 2 || $R$ || $R$ || 25 || 0.25 || 5.5 || 2.5 || 18,750 || 21 || $DPS$ || {{Money|$CE$}}
+| 2 || $R$ || $R$ || 25 || 0.25 || 4 || 2.5 || 18,750 || 21 || $DPS$ || {{Money|$CE$}}
 |-
 | 3 || $R$ || $R$ || 40 || 0.25 || 4 || 1 || 30,000 || 21 || $DPS$ || {{Money|$CE$}}
 |-

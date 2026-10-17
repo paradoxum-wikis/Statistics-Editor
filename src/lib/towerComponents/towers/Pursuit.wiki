@@ -41,9 +41,9 @@ $R$ = $FNC-RECURSION$
 |-
 ! Level !! Cost !! Total Cost !! Damage !! Splash Damage !! Missile Count !! Ammo !! Firerate !! Missile Cooldown !! Burst Time !! Reload Time !! Range !! Patrol Range !! Explosion Range !! Speed !! Missile Speed !! Gun DPS$DREF$ !! Missile DPS$MREF$ !! Total DPS !! Cost Efficiency
 |-
-| 4 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 18 || 35 || 4 || 200 || 0.15 || 4 || 0.5 || 3 || 11 || 20 || 3 || 60 || 20 || $DPS$ || $MDPS$ || $TDPS$ || {{Money|$CE$}}
+| 4 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 18 || 35 || 4 || 200 || 0.15 || 4 || 0.5 || 3 || 11 || 16 || 3 || 60 || 20 || $DPS$ || $MDPS$ || $TDPS$ || {{Money|$CE$}}
 |-
-| 5 || $R$ || $R$ || 46 || 35 || 4 || 200 || 0.15 || 4 || 0.5 || 3 || 11 || 22 || 4 || 60 || 20 || $DPS$ || $MDPS$ || $TDPS$ || {{Money|$CE$}}
+| 5 || $R$ || $R$ || 46 || 35 || 4 || 200 || 0.15 || 4 || 0.5 || 3 || 11 || 18 || 4 || 60 || 20 || $DPS$ || $MDPS$ || $TDPS$ || {{Money|$CE$}}
 |}
 
 {| class="wikitable stats-table"

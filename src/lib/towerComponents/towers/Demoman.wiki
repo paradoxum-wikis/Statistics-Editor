@@ -10,7 +10,7 @@ $FSE-UPGRADE$ = Faster Throwing; Ullapool Caber; Loch-n-Load; Expert's Ordnance
 $FSE-PVP-UPGRADE$ = Further Throwing; Steil Grenade; Chinalake; Collateral Damage
 $FSE-UPGRADEICON$ = 5523227714; 5523227714; 5523228733; 5523229364
 $FSE-PVP-UPGRADEICON$ = ; 5523227714; 5523228733; 5523229364
-$FSE-META$ = Starter; File:DefaultDemomanIcon2.png
+$FSE-META$ = Starter; File:DefaultDemoman0.png
 $AREF$ = <ref name=aim>Aim Time happens before the '''Demoman''' throws a grenade. This does not affect its firerate.</ref>
 $DREF$ = <ref name=dps>DPS does not consider projectile travel time.</ref>
 $R$ = $FNC-RECURSION$

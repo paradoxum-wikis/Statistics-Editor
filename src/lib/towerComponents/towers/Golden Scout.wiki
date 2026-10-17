@@ -6,7 +6,7 @@ $COST$ = 250; 150; 600; 1800; 4000
 $FSE-UPGRADE$ = Higher Caliber; Precise Aiming; Golden Deagle; Twin Sovereigns
 $FSE-UPGRADEICON$ = 3032133716; 115730014; 3278741672; 3279537687
 $FSE-DETECTION$ = 2; 3;
-$FSE-META$ = Golden Perks; File:GoldenScout3.png
+$FSE-META$ = Golden Perks; File:GoldenScout0.png
 $R$ = $FNC-RECURSION$
 </var>
 {| class="wikitable stats-table"
