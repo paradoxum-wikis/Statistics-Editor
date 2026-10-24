@@ -8,7 +8,7 @@ $FSE-DETECTION$ = 3; ; 0
 $FSE-UPGRADE$ = Quickscope; Survivalist's Kit; Sharp Shooter; Hunter In The Night
 $FSE-PVP-UPGRADE$ = Faster Hands; Experienced; Better Gear; Deadliest Hunter
 $FSE-UPGRADEICON$ = 3839040358; 3839041547; 3839042767; 3839043838
-$FSE-META$ = Intermediate; File:NewHunterIcon.png
+$FSE-META$ = Intermediate; File:DefaultHunter0.png
 $R$ = $FNC-RECURSION$
 </var>
 <tabber>

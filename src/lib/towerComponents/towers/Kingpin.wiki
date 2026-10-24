@@ -79,9 +79,9 @@ $RC$ = $FNC-RECURSION$
 |-
 | 0–2 || 40 || {{Money|200}} || 40 || {{Money|$IPS$}} || $RDPS$
 |-
-| 3-6B || 40 || {{Money|200}} || 30 || {{Money|$IPS$}} || $RDPS$
+| 3-5B || 40 || {{Money|200}} || 30 || {{Money|$IPS$}} || $RDPS$
 |-
-| 4A || 75 || {{Money|450}} || 30 || {{Money|$IPS$}} || $RDPS$
+| 4A/6B || 75 || {{Money|450}} || 30 || {{Money|$IPS$}} || $RDPS$
 |-
 | 5A || 75 || {{Money|600}} || 27.5 || {{Money|$IPS$}} || $RDPS$
 |-

@@ -1,9 +1,9 @@
 <var>
 $DPS$ = (Normal Damage * Crit Swing-- + Crit Damage) / (Crit Swing * Swingrate)
 $CDMG$ = {{#expr:Normal Damage * Crit Multiplier round 0}}
-$BTDMG$ = {{#expr:ceil((4 * (1^0.9)) * (Health^0.2))}}
-$BCDMG$ = {{formatnum:{{#expr:ceil((4 * (450^0.9)) * (Health^0.2))}}}}
-$COST$ = 2400; 1000; 4800; 11003; 40000
+$BTDMG$ = {{#expr:ceil((4 * (1^0.9)) * (Health^0.23))}}
+$BCDMG$ = {{formatnum:{{#expr:ceil((4 * (450^0.9)) * (Health^0.23))}}}}
+$COST$ = 2400; 1000; 5600; 11003; 32500
 $TP$ = $FNC-TOTAL-COST$
 $CE$ = Total Cost / DPS
 $CREF$ = <ref>Number listed is the required number of shots for it to deal a critical hit.</ref>
@@ -17,15 +17,15 @@ $R$ = $FNC-RECURSION$
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Normal Damage !! Crit Multiplier !! Crit Damage !! Base Bleed Damage !! Swingrate !! Crit Swing$CREF$ !! Bleed Stack !! EV !! Max Stack !! Range !! DPS$DREF$ !! Cost Efficiency
 |-
-| 0 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 10 || 2 || $CDMG$ || N/A || 0.4 || 3 || N/A || N/A || N/A || 5 || $DPS$ || {{Money|$CE$}}
+| 0 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 8 || 2 || $CDMG$ || N/A || 0.3 || 3 || N/A || N/A || N/A || 6 || $DPS$ || {{Money|$CE$}}
 |-
-| 1 || $R$ || $R$ || 14 || 2 || $CDMG$ || N/A || 0.4 || 3 || N/A || N/A || N/A || 5 || $DPS$ || {{Money|$CE$}}
+| 1 || $R$ || $R$ || 10 || 2 || $CDMG$ || N/A || 0.25 || 3 || N/A || N/A || N/A || 6 || $DPS$ || {{Money|$CE$}}
 |-
-| 2 || $R$ || $R$ || 14 || 2.1 || $CDMG$ || 4 || 0.6 || 3 || 13 || 0.2 || 450 || 5 || $DPS$ || {{Money|$CE$}}
+| 2 || $R$ || $R$ || 32 || 2.1 || $CDMG$ || 4 || 0.6 || 3 || 13 || 0.2 || 450 || 6 || $DPS$ || {{Money|$CE$}}
 |-
-| 3 || $R$ || $R$ || 24 || 2.5 || $CDMG$ || 4 || 0.55 || 3 || 20 || 0.2 || 450 || 5 || $DPS$ || {{Money|$CE$}}
+| 3 || $R$ || $R$ || 40 || 2.5 || $CDMG$ || 4 || 0.55 || 3 || 22 || 0.2 || 450 || 6 || $DPS$ || {{Money|$CE$}}
 |-
-| 4 || $R$ || $R$ || 38 || 4 || $CDMG$ || 4 || 0.5 || 3 || 45 || 0.2 || 450 || 5 || $DPS$ || {{Money|$CE$}}
+| 4 || $R$ || $R$ || 55 || 4 || $CDMG$ || 4 || 0.5 || 3 || 45 || 0.2 || 450 || 6 || $DPS$ || {{Money|$CE$}}
 |}
 
 {| class="wikitable stats-table mw-collapsible mw-collapsed"

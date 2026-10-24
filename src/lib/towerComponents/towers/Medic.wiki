@@ -3,7 +3,7 @@ $TP$ = $FNC-TOTAL-COST$
 $COST$ = 400; 425; 650; 2400; 5000; 12000
 $FSE-UPGRADE$ = Medical Precautions; Prescribed Vitamins; BIG BRAIN; Medical Pack; MD-PhD
 $FSE-UPGRADEICON$ = 117008581932706; 71546954858462; 130592941614779; 112504548905627; 112504548905627
-$FSE-META$ = Intermediate; File:DefaultMedicIconAug25.png
+$FSE-META$ = Intermediate; File:DefaultMedic0.png
 $R$ = $FNC-RECURSION$
 </var>
 {| class="wikitable stats-table"
