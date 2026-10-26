@@ -120,11 +120,17 @@ export function parseWikitext(content: string): ParsedWikitext {
 
 	const applyVariables = createVariableReplacer(variables);
 	const tabberMatch = text.match(
-		/<div[^>]*class=["'][^"']*mobile-tabber[^"']*["'][^>]*>\s*<tabber>([\s\S]*?)<\/tabber>/i,
+		/(?:<div[^>]*class=["'][^"']*mobile-tabber[^"']*["'][^>]*>\s*)?<tabber>([\s\S]*?)<\/tabber>/i,
 	);
 	const luaTabberMatch = extractLuaTabber(text);
 
-	if (tabberMatch) {
+	if (luaTabberMatch.length > 0) {
+		for (const { tabName, tabContent } of luaTabberMatch) {
+			const resolvedTabName = applyVariables(tabName.trim());
+			const tables = parseTables(tabContent.trim(), applyVariables);
+			if (tables.length > 0) tabs[resolvedTabName] = tables;
+		}
+	} else if (tabberMatch) {
 		for (const part of tabberMatch[1].split("|-|")) {
 			if (!part.trim()) continue;
 
@@ -137,12 +143,6 @@ export function parseWikitext(content: string): ParsedWikitext {
 				applyVariables,
 			);
 			if (tables.length > 0) tabs[tabName] = tables;
-		}
-	} else if (luaTabberMatch.length > 0) {
-		for (const { tabName, tabContent } of luaTabberMatch) {
-			const resolvedTabName = applyVariables(tabName.trim());
-			const tables = parseTables(tabContent.trim(), applyVariables);
-			if (tables.length > 0) tabs[resolvedTabName] = tables;
 		}
 	} else {
 		const tables = parseTables(text, applyVariables);
@@ -157,9 +157,9 @@ function extractLuaTabber(
 ): Array<{ tabName: string; tabContent: string }> {
 	const mobileMatch =
 		/<div[^>]*class=["'][^"']*mobile-tabber[^"']*["'][^>]*>/i.exec(text);
-	if (!mobileMatch || mobileMatch.index === undefined) return [];
-
-	const searchStart = mobileMatch.index + mobileMatch[0].length;
+	const searchStart = mobileMatch
+		? mobileMatch.index + mobileMatch[0].length
+		: 0;
 	const tabberStart = text.slice(searchStart).search(/\{\{\s*Tabber\b/i);
 	if (tabberStart === -1) return [];
 
