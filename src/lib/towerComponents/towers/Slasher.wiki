@@ -1,8 +1,8 @@
 <var>
 $DPS$ = (Normal Damage * Crit Swing-- + Crit Damage) / (Crit Swing * Swingrate)
 $CDMG$ = {{#expr:Normal Damage * Crit Multiplier round 0}}
-$BTDMG$ = {{#expr:ceil((4 * (1^0.9)) * (Health^0.23))}}
-$BCDMG$ = {{formatnum:{{#expr:ceil((4 * (450^0.9)) * (Health^0.23))}}}}
+$BTDMG$ = {{#expr:ceil((4 * (1^0.9)) * (Health^0.22))}}
+$BCDMG$ = {{formatnum:{{#expr:ceil((4 * (400^0.9)) * (Health^0.22))}}}}
 $COST$ = 2400; 1000; 5600; 11003; 32500
 $TP$ = $FNC-TOTAL-COST$
 $CE$ = Total Cost / DPS
@@ -21,11 +21,11 @@ $R$ = $FNC-RECURSION$
 |-
 | 1 || $R$ || $R$ || 10 || 2 || $CDMG$ || N/A || 0.25 || 3 || N/A || N/A || N/A || 6 || $DPS$ || {{Money|$CE$}}
 |-
-| 2 || $R$ || $R$ || 32 || 2.1 || $CDMG$ || 4 || 0.6 || 3 || 13 || 0.2 || 450 || 6 || $DPS$ || {{Money|$CE$}}
+| 2 || $R$ || $R$ || 32 || 3 || $CDMG$ || 4 || 0.6 || 3 || 10 || 0.22 || 400 || 6 || $DPS$ || {{Money|$CE$}}
 |-
-| 3 || $R$ || $R$ || 40 || 2.5 || $CDMG$ || 4 || 0.55 || 3 || 22 || 0.2 || 450 || 6 || $DPS$ || {{Money|$CE$}}
+| 3 || $R$ || $R$ || 40 || 4 || $CDMG$ || 4 || 0.55 || 3 || 18 || 0.22 || 400 || 6 || $DPS$ || {{Money|$CE$}}
 |-
-| 4 || $R$ || $R$ || 55 || 4 || $CDMG$ || 4 || 0.5 || 3 || 45 || 0.2 || 450 || 6 || $DPS$ || {{Money|$CE$}}
+| 4 || $R$ || $R$ || 55 || 4 || $CDMG$ || 4 || 0.5 || 3 || 40 || 0.22 || 400 || 6 || $DPS$ || {{Money|$CE$}}
 |}
 
 {| class="wikitable stats-table mw-collapsible mw-collapsed"

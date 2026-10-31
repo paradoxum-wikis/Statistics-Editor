@@ -27,21 +27,21 @@ $R$ = $FNC-RECURSION$
 |-
 ! Level !! Cost !! Total Cost !! Firework Damage !! Range !! Detection Buff Duration !! Explosion Range !! Firework Shot Chance Cap !! Burn Damage !! Burn Tick !! Burn Time !! Total Elapsed Damage$TREF$
 |-
-| 0 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 5 || 10 || 10 || 1 || 0.5 || 1 || 0.5 || 5 || $TED$
+| 0 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 6 || 10 || 10 || 1 || 0.5 || 2 || 0.5 || 5 || $TED$
 |-
-| 1 || $R$ || $R$ || 10 || 10 || 10 || 1 || 0.6 || 2 || 0.5 || 5 || $TED$
+| 1 || $R$ || $R$ || 12 || 10 || 20 || 1 || 0.6 || 3 || 0.5 || 5 || $TED$
 |-
-| 2 || $R$ || $R$ || 20 || 11 || 15 || 2 || 0.7 || 2 || 0.25 || 5 || $TED$
+| 2 || $R$ || $R$ || 24 || 11 || 30 || 2 || 0.7 || 3 || 0.25 || 5 || $TED$
 |-
-| 3 || $R$ || $R$ || 30 || 11 || 15 || 2 || 0.85 || 4 || 0.25 || 5 || $TED$
+| 3 || $R$ || $R$ || 35 || 11 || 30 || 2 || 0.8 || 5 || 0.25 || 5 || $TED$
 |-
-| 4 || $R$ || $R$ || 45 || 12 || 20 || 3 || 1 || 7 || 0.25 || 5 || $TED$
+| 4 || $R$ || $R$ || 55 || 12 || 60 || 3 || 1 || 9 || 0.25 || 5 || $TED$
 |}
 
 {| class="wikitable stats-table mw-collapsible mw-collapsed"
 ! colspan="12" | Firework Chance$FREF$
 |-
-! Level !! 0.1 Firerate !! 0.15 Firerate !! 0.2 Firerate !! 0.25 Firerate !! 0.5 Firerate !! 0.75 Firerate !! 1 Firerate !! 1.5 Firerate !! 2 Firerate !! 5 Firerate  !! 100 Firerate
+! Level !! 0.1 Firerate !! 0.15 Firerate !! 0.2 Firerate !! 0.25 Firerate !! 0.5 Firerate !! 0.75 Firerate !! 1 Firerate !! 1.5 Firerate !! 2 Firerate !! 5 Firerate  !! 30 Firerate
 |-
 | 0 || $CHANCE1$% || $CHANCE2$% || $CHANCE3$% || $CHANCE4$% || $CHANCE5$% || $CHANCE6$% || $CHANCE7$% || $CHANCE8$% || $CHANCE9$% || $CHANCE10$% || $CHANCE11$%
 |-
