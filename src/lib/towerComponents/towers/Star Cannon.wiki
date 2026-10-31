@@ -1,0 +1,101 @@
+<var>
+$MDPS$ = Damage / (Reboot Time + Firing Windup)
+$DPS$ = Max Damage / (Max Charge Time + Reboot Time + Firing Windup)
+$MCE$ = Total Cost / Min Single DPS
+$CE$ = Total Cost / Max Single DPS
+$STM$ = Star Cannon Stats.Max Charge Time * (Percentage * 0.01)
+$SDMG$ = {{#expr:floor(Star Cannon Stats.Damage + ((Star Cannon Stats.Max Damage - Star Cannon Stats.Damage) * (Time Spent / Star Cannon Stats.Max Charge Time)**2))}}
+$SDPS$ = Damage / ((Star Cannon Stats.Max Charge Time * (Percentage * 0.01)) + Star Cannon Stats.Reboot Time + Star Cannon Stats.Firing Windup)
+$SMDPS$ = Damage / ((Star Cannon Stats.Max Charge Time * (Percentage * 0.01)) + Star Cannon Stats.Reboot Time + Star Cannon Stats.Firing Windup) * Star Cannon Stats.Max Hits
+$TP$ = $FNC-TOTAL-COST$
+$COST$ = 20210; 9001; 29001; 80000; 240000
+$FSE-DETECTION$ = 3; 0; 0
+$FSE-UPGRADE$ = Solar-Flare Batteries; Eclipsed Crew; Lunar Charges; Shot of the Century
+$FSE-UPGRADEICON$ = 122903694877566; 103038997645888; 94543362177801; 135574089359027
+$FSE-META$ = Exclusive; File:DefaultStarCannon0.png
+$SCALE$ = <ref>Max damage is slowly reached over the span of the value max charge time is set to. It will start off increasing slowly with the damage added speeding up as time progresses.</ref>
+$DREF$ = <ref>DPS assumes that only one enemy is hit, dealing full damage and that the '''Star Cannon''' is fired the moment the ability cooldown is gone.<br/>DPS is calculated as Damage ÷ (Reboot Time + Firing Windup)</ref>
+$MDREF$ = <ref>DPS assumes that only enemy is hit, dealing full damage and that the '''Star Cannon''' is always fired the moment its charge meter is full.<br/> It also assumes no batteries were collected.<br/>DPS is calculated as Damage ÷ (Max Charge Time + Reboot Time + Firing Windup)</ref>
+$R$ = $FNC-RECURSION$
+</var>
+{| class="wikitable stats-table"
+! colspan="19" | Star Cannon Stats
+|-
+! Level !! Cost !! Total Cost !! Damage !! Max Damage$SCALE$ !! Max Charge Time !! Reboot Time !! Firing Windup !! Range !! Explosion Radius !! Max Hits !! Stun Time !! Boss Stun Time !! Battery Drop Chance !! Charge per Battery !! Min Single DPS$DREF$ !! Max Single DPS$MDREF$ !! Min Cost Efficiency !! Max Cost Efficiency
+|-
+| 0 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 200 || 4,000 || 30 || 7.5 || 1.5 || 90 || 2.5 || 3 || N/A || N/A || 10% || 2 || $MDPS$ || $DPS$ || {{Money|$MCE$}} || {{Money|$CE$}}
+|-
+| 1 || $R$ || $R$ || 300 || 5,500 || 30 || 7.5 || 1.5 || 90 || 2.5 || 3 || 1 || N/A || 10% || 2 || $MDPS$ || $DPS$ || {{Money|$MCE$}} || {{Money|$CE$}}
+|-
+| 2 || $R$ || $R$ || 500 || 15,000 || 45 || 10 || 1.5 || 90 || 3 || 3 || 2 || N/A || 15% || 2 || $MDPS$ || $DPS$ || {{Money|$MCE$}} || {{Money|$CE$}}
+|-
+| 3 || $R$ || $R$ || 2,000 || 45,000 || 60 || 7.5 || 1.5 || 90 || 3 || 3 || 4 || N/A || 15% || 2 || $MDPS$ || $DPS$ || {{Money|$MCE$}} || {{Money|$CE$}}
+|-
+| 4 || $R$ || $R$ || 5,000 || 140,000 || 70 || 10 || 1.5 || 90 || 5 || 6 || 4 || 4 || 15% || 2 || $MDPS$ || $DPS$ || {{Money|$MCE$}} || {{Money|$CE$}}
+|}
+
+{| class="wikitable stats-table mw-collapsible mw-collapsed" style="display: none;"
+! colspan="6" |Damage Scaling
+|-
+! Level !! Percentage !! Time Spent !! Damage !! DPS !! AOE DPS
+|-
+| 0 || 10% || $STM$ || $SDMG$ || $SDPS$ || $SMDPS$
+|-
+| 0 || 30% || $STM$ || $SDMG$ || $SDPS$ || $SMDPS$
+|-
+| 0 || 50% || $STM$ || $SDMG$ || $SDPS$ || $SMDPS$
+|-
+| 0 || 70% || $STM$ || $SDMG$ || $SDPS$ || $SMDPS$
+|-
+| 0 || 90% || $STM$ || $SDMG$ || $SDPS$ || $SMDPS$
+|-
+| 0 || 100% || $STM$ || $SDMG$ || $SDPS$ || $SMDPS$
+|-
+| 1 || 10% || $STM$ || $SDMG$ || $SDPS$ || $SMDPS$
+|-
+| 1 || 30% || $STM$ || $SDMG$ || $SDPS$ || $SMDPS$
+|-
+| 1 || 50% || $STM$ || $SDMG$ || $SDPS$ || $SMDPS$
+|-
+| 1 || 70% || $STM$ || $SDMG$ || $SDPS$ || $SMDPS$
+|-
+| 1 || 90% || $STM$ || $SDMG$ || $SDPS$ || $SMDPS$
+|-
+| 1 || 100% || $STM$ || $SDMG$ || $SDPS$ || $SMDPS$
+|-
+| 2 || 10% || $STM$ || $SDMG$ || $SDPS$ || $SMDPS$
+|-
+| 2 || 30% || $STM$ || $SDMG$ || $SDPS$ || $SMDPS$
+|-
+| 2 || 50% || $STM$ || $SDMG$ || $SDPS$ || $SMDPS$
+|-
+| 2 || 70% || $STM$ || $SDMG$ || $SDPS$ || $SMDPS$
+|-
+| 2 || 90% || $STM$ || $SDMG$ || $SDPS$ || $SMDPS$
+|-
+| 2 || 100% || $STM$ || $SDMG$ || $SDPS$ || $SMDPS$
+|-
+| 3 || 10% || $STM$ || $SDMG$ || $SDPS$ || $SMDPS$
+|-
+| 3 || 30% || $STM$ || $SDMG$ || $SDPS$ || $SMDPS$
+|-
+| 3 || 50% || $STM$ || $SDMG$ || $SDPS$ || $SMDPS$
+|-
+| 3 || 70% || $STM$ || $SDMG$ || $SDPS$ || $SMDPS$
+|-
+| 3 || 90% || $STM$ || $SDMG$ || $SDPS$ || $SMDPS$
+|-
+| 3 || 100% || $STM$ || $SDMG$ || $SDPS$ || $SMDPS$
+|-
+| 4 || 10% || $STM$ || $SDMG$ || $SDPS$ || $SMDPS$
+|-
+| 4 || 30% || $STM$ || $SDMG$ || $SDPS$ || $SMDPS$
+|-
+| 4 || 50% || $STM$ || $SDMG$ || $SDPS$ || $SMDPS$
+|-
+| 4 || 70% || $STM$ || $SDMG$ || $SDPS$ || $SMDPS$
+|-
+| 4 || 90% || $STM$ || $SDMG$ || $SDPS$ || $SMDPS$
+|-
+| 4 || 100% || $STM$ || $SDMG$ || $SDPS$ || $SMDPS$
+|}
