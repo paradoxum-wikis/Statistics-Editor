@@ -17,7 +17,11 @@
 	} from "#lib/cellInspect.js";
 	import { renderCellHtml } from "#lib/neowtext/render.js";
 	import type { GlobalModifier } from "#lib/utils/globalModifier.js";
-	import { stripRefs } from "#lib/utils/format.js";
+	import {
+		columnKeysEqual,
+		normalizeColumnKey,
+		stripRefs,
+	} from "#lib/utils/format.js";
 	import Modal from "../smol/Modal.svelte";
 	import Separator from "../smol/Separator.svelte";
 	import RenderedHtml from "./RenderedHtml.svelte";
@@ -113,8 +117,7 @@
 	);
 	const inputs = $derived(
 		(inspection?.inputs ?? []).filter(
-			(h) =>
-				isCellEditable(config, h, rowIdx) && stripRefs(h) !== stripRefs(header),
+			(h) => isCellEditable(config, h, rowIdx) && !columnKeysEqual(h, header),
 		),
 	);
 	const formulas = $derived(
@@ -176,7 +179,7 @@
 				</thead>
 				<tbody>
 					<tr>
-						<td>{stripRefs(header)}</td>
+						<td>{normalizeColumnKey(header)}</td>
 						<td>{displayRow.Level ?? rowIdx}</td>
 						<td>
 							<TowerTableCell

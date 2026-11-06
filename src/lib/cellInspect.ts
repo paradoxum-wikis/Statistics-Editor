@@ -15,7 +15,7 @@ import {
 	isNumericArrayBody,
 	seriesIndicesThroughLevel,
 } from "#lib/neowtext/functions/total.js";
-import { stripRefs } from "#lib/utils/format.js";
+import { normalizeColumnKey, stripRefs } from "#lib/utils/format.js";
 import { wikiTemplateKey, wikiTemplateRe } from "#lib/wikiTemplates/index.js";
 
 export type CellVarKind = "array" | "scalar" | "formula" | "ref";
@@ -294,7 +294,7 @@ export function collectInputs(text: string, headers: string[]): string[] {
 	const found = new Map<string, number>();
 
 	for (const header of headers) {
-		const name = stripRefs(header).trim();
+		const name = normalizeColumnKey(header);
 		if (!name || name.toLowerCase() === "level") continue;
 		const re = new RegExp(`\\b${escapeRe(name)}\\b`, "gi");
 		for (const m of cleaned.matchAll(re)) {

@@ -6,15 +6,14 @@ import {
 	getFncValue,
 	getCostValue,
 	resolveToken,
-	type TableCache,
 	DETECTION_TYPES,
 	getSchemaIndex,
 	getSchemaParent,
 	parseDetectionArray,
 } from "#lib/neowtext/functions/index.js";
 import {
-	indexRowsByLevelKeys,
-	type TableRowCache,
+	buildNamedTableCache,
+	parseIndexOverrides,
 } from "#lib/neowtext/tableCache.js";
 import {
 	parseWikitext,
@@ -35,11 +34,7 @@ import {
 	isCustomTower,
 	removeCustomTower,
 } from "./customTowers";
-import {
-	isEditableRefSuffixCell,
-	normalizeColumnKey,
-	stripRefs,
-} from "#lib/utils/format.js";
+import { isEditableRefSuffixCell, stripRefs } from "#lib/utils/format.js";
 import {
 	embedSeDirectives,
 	extractDirectives,
@@ -279,30 +274,6 @@ export default class TowerManager {
 
 			const towerJson: any = {};
 
-			function buildTableCache(
-				tables: TableData[],
-				indexOverrides: Record<string, string>,
-			): TableCache {
-				const cache: TableCache = {};
-				for (const table of tables) {
-					if (!table.name) continue;
-					const cleanName = normalizeColumnKey(table.name);
-					const indexCol =
-						indexOverrides[cleanName] ||
-						indexOverrides[table.name] ||
-						table.headers[0];
-					const tCache: TableRowCache = indexRowsByLevelKeys(
-						table.rows,
-						indexCol,
-						table.cellFormulaTokens,
-					);
-					cache[table.name] = tCache;
-					cache[cleanName] = tCache;
-					cache[cleanName.replace(/\s+/g, "")] = tCache;
-				}
-				return cache;
-			}
-
 			const inheritTableName = (index: number, name: string) => {
 				if (name) return name;
 				const base = Object.values(towerJson)[0] as {
@@ -362,15 +333,8 @@ export default class TowerManager {
 				const getArr = (val?: string) =>
 					val ? val.split(";").map((s) => s.trim()) : [];
 				const v = parsed.variables;
-				const indexOverrides: Record<string, string> = {};
-				const indexVal = getFncValue(v, "INDEX");
-				if (indexVal) {
-					for (const entry of indexVal.split(";")) {
-						const m = entry.trim().match(/^(.+)\.([^.]+)$/);
-						if (m) indexOverrides[m[1].trim()] = m[2].trim();
-					}
-				}
-				const tableCache = buildTableCache(
+				const indexOverrides = parseIndexOverrides(getFncValue(v, "INDEX"));
+				const tableCache = buildNamedTableCache(
 					[
 						{
 							...tableData,
@@ -683,7 +647,7 @@ export default class TowerManager {
 					}
 				}
 
-				const outCache = buildTableCache(
+				const outCache = buildNamedTableCache(
 					[
 						{
 							...tableData,

@@ -1,32 +1,14 @@
 import { settingsStore } from "#lib/stores/settings.svelte.js";
+import { normalizeColumnKey, stripRefs } from "./columnId.js";
 
-/**
- * Strips garbage ref tag for visual display.
- */
-export function stripRefs(s: unknown): string {
-	if (s === undefined || s === null) return "";
-	return String(s)
-		.replace(/<ref\b[^>]*>[\s\S]*?<\/ref>/gi, "")
-		.replace(/<ref\b[^>]*\/>/gi, "");
-}
-
-/**
- * Remove unwanted characters from a column key.
- */
-export function normalizeColumnKey(s: unknown): string {
-	const t = stripRefs(s);
-	if (!/[<$[]/.test(t)) return t.trim();
-	return t
-		.replace(/<[^>]+>/g, "")
-		.replace(/</g, "")
-		.replace(/>/g, "")
-		.replace(/\[\[([^|\]]+)(?:\|[^\]]*)?\]\]/gi, (_, name: string) =>
-			/^(?:file|image)\s*:/i.test(name) ? "" : name,
-		)
-		.replace(/\[\[|\]\]/g, "")
-		.replace(/\$[^$]+\$/g, "")
-		.trim();
-}
+export {
+	stripRefs,
+	normalizeColumnKey,
+	findColumnKey,
+	getColumn,
+	putColumn,
+	columnKeysEqual,
+} from "./columnId.js";
 
 /**
  * True if `rest` starts with <ref>...</ref> or a ref-only $VAR$.
@@ -163,13 +145,6 @@ export function applyRefSuffixEdit(
 	return { formula, head: refSuffixHead(formula, tokens) ?? newValue };
 }
 
-export function columnKeysEqual(a: string, b: string): boolean {
-	const na = normalizeColumnKey(a);
-	const nb = normalizeColumnKey(b);
-	if (na === nb) return true;
-	return na.replace(/\s+/g, "") === nb.replace(/\s+/g, "");
-}
-
 /**
  * Parses a string or number into a number.
  * Commas are stripped before conversion.
@@ -260,7 +235,7 @@ export function getRofBugVer(
 		cols: colsStr
 			? colsStr
 					.split(";")
-					.map((s) => s.trim())
+					.map((s) => normalizeColumnKey(s))
 					.filter(Boolean)
 			: [],
 	};

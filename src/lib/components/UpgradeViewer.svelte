@@ -3,7 +3,7 @@
 	import { fly } from "svelte/transition";
 	import { Tabs } from "bits-ui";
 	import type { Picture } from "@sveltejs/enhanced-img";
-	import { stripRefs } from "#lib/utils/format.js";
+	import { normalizeColumnKey } from "#lib/utils/format.js";
 	import { renderCellHtml } from "#lib/neowtext/render.js";
 	import RenderedHtml from "./table/RenderedHtml.svelte";
 	import { towerStore } from "#lib/stores/tower.svelte.js";
@@ -36,7 +36,7 @@
 	} = $props();
 
 	function isDetectionStat(stat: string): boolean {
-		const cleanStat = stripRefs(stat);
+		const cleanStat = normalizeColumnKey(stat);
 		return (
 			cleanStat === "Hidden" || cleanStat === "Flying" || cleanStat === "Lead"
 		);
@@ -214,7 +214,7 @@
 											{#if line.icon}
 												<enhanced:img
 													src={line.icon}
-													alt={stripRefs(line.stat)}
+													alt={normalizeColumnKey(line.stat)}
 													class="mt-[0.05em] block size-[1em] {isDetectionStat(
 														line.stat,
 													)

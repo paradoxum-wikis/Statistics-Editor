@@ -1,4 +1,4 @@
-import { stripRefs, normalizeColumnKey } from "#lib/utils/format.js";
+import { stripRefs, normalizeColumnKey } from "#lib/utils/columnId.js";
 import { wikiTemplateKey, wikiTemplateRe } from "#lib/wikiTemplates/index.js";
 import { stripDirectives } from "./directives";
 

@@ -21,14 +21,16 @@ import {
 	schemaBranches,
 	serializeDetectionFlags,
 } from "#lib/neowtext/functions/index.js";
-import { indexRowsByLevelKeys } from "#lib/neowtext/tableCache.js";
+import {
+	buildNamedTableCache,
+	parseIndexOverrides,
+} from "#lib/neowtext/tableCache.js";
 import type { TableData } from "#lib/neowtext/parser.js";
 import { settingsStore } from "#lib/stores/settings.svelte.js";
 import {
 	applyRefSuffixEdit,
 	isCellFormulaSource,
-	normalizeColumnKey,
-	stripRefs,
+	putColumn,
 } from "#lib/utils/format.js";
 
 type FormulaToken = string; // e.g. "$DPS$", "$DPS2$"
@@ -207,57 +209,29 @@ class SkinData {
 	}
 
 	private rebuildTableCache(): void {
-		const indexOverrides: Record<string, string> = {};
-		const indexVal = getFncValue(this.formulaTokens, "INDEX");
-		if (indexVal) {
-			for (const entry of indexVal.split(";")) {
-				const m = entry.trim().match(/^(.+)\.([^.]+)$/);
-				if (m) indexOverrides[m[1].trim()] = m[2].trim();
-			}
-		}
-
-		const buildCacheFor = (
-			tableName: string | undefined,
-			headers: string[],
-			rows: Record<string, string | number>[],
-			cellTokens?: Record<string, Record<string, string>>,
-		) => {
-			if (!tableName || !headers.length) return;
-
-			const cleanName = normalizeColumnKey(tableName);
-			const indexCol =
-				indexOverrides[cleanName] || indexOverrides[tableName] || headers[0];
-
-			this.tableCache[tableName] = indexRowsByLevelKeys(
-				rows,
-				indexCol,
-				cellTokens,
-			);
-			const tCache = this.tableCache[tableName];
-			this.tableCache[cleanName] = tCache;
-			this.tableCache[cleanName.replace(/\s+/g, "")] = tCache;
-		};
-
-		this.tableCache = {};
+		const indexOverrides = parseIndexOverrides(
+			getFncValue(this.formulaTokens, "INDEX"),
+		);
 		const skins = Object.values(this.tower.skins);
 		const base = skins[0] !== this ? skins[0] : undefined;
 		// untitled later tabs answer to the first tab's title at the same slot
-		buildCacheFor(
-			this.tableName || (base && base.tableName),
-			this.headers,
-			this.rawRows,
-			this.cellFormulaTokens,
+		this.tableCache = buildNamedTableCache(
+			[
+				{
+					name: this.tableName || (base && base.tableName) || "",
+					headers: this.headers,
+					rows: this.rawRows,
+					cellFormulaTokens: this.cellFormulaTokens,
+				},
+				...this.extraTables.map((table, i) => ({
+					name: table.name || (base && base.extraTables[i].name) || "",
+					headers: table.headers,
+					rows: table.rows,
+					cellFormulaTokens: table.cellFormulaTokens,
+				})),
+			],
+			indexOverrides,
 		);
-
-		for (let i = 0; i < this.extraTables.length; i++) {
-			const table = this.extraTables[i];
-			buildCacheFor(
-				table.name || (base && base.extraTables[i].name),
-				table.headers,
-				table.rows,
-				table.cellFormulaTokens,
-			);
-		}
 	}
 
 	refreshDerivedData(): void {
@@ -332,8 +306,7 @@ class SkinData {
 							);
 
 							if (result !== undefined) {
-								row[col] = result;
-								row[stripRefs(col)] = result;
+								putColumn(row, col, result);
 								extraTablesChanged = true;
 							}
 						}
@@ -379,7 +352,7 @@ class SkinData {
 					);
 
 					if (result !== undefined) {
-						row[col] = result;
+						putColumn(row, col, result);
 						if (typeof result === "number" && Number.isFinite(result)) {
 							this.setDerivedValueAtLevel(level, col, result);
 						} else if (typeof result === "string") {

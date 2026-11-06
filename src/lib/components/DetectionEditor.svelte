@@ -9,7 +9,7 @@
 	import CollapsibleSide from "./smol/CollapsibleSide.svelte";
 	import SubtleRow from "./smol/SubtleRow.svelte";
 	import Tip from "./smol/Tip.svelte";
-	import { stripRefs } from "#lib/utils/format.js";
+	import { columnKeysEqual } from "#lib/utils/format.js";
 	import { mkCellKey } from "#lib/neowtext/directives.js";
 	import {
 		DETECTION_TYPES,
@@ -107,7 +107,7 @@
 		const headers =
 			skin.headers.length > 0 ? skin.headers : skin.levels.attributes;
 		for (const type of DETECTION_TYPES) {
-			const header = headers.find((h) => stripRefs(h) === type);
+			const header = headers.find((h) => columnKeysEqual(h, type));
 			if (!header) continue;
 			for (let i = 0; i < skin.levels.levels.length; i++) {
 				towerStore.captureBaselineCell(

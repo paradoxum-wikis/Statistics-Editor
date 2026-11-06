@@ -5,7 +5,7 @@
 	import SubtleRow from "./smol/SubtleRow.svelte";
 	import Tip from "./smol/Tip.svelte";
 	import { CircleDollarSign } from "@lucide/svelte";
-	import { parseNumeric, stripRefs } from "#lib/utils/format.js";
+	import { columnKeysEqual, parseNumeric } from "#lib/utils/format.js";
 	import { getFncValue } from "#lib/neowtext/functions/index.js";
 	import { mkCellKey } from "#lib/neowtext/directives.js";
 	import type SkinData from "#lib/towerComponents/skinData.js";
@@ -80,10 +80,10 @@
 		for (const skin of getTargetSkins(tower, currentSkin)) {
 			const headers =
 				skin.headers.length > 0 ? skin.headers : skin.levels.attributes;
-			const totalHeader = headers.find((h) => {
-				const n = stripRefs(h);
-				return n === "Total Cost" || n === "Total Price";
-			});
+			const totalHeader = headers.find(
+				(h) =>
+					columnKeysEqual(h, "Total Cost") || columnKeysEqual(h, "Total Price"),
+			);
 			if (totalHeader) {
 				for (let i = level; i < skin.levels.levels.length; i++) {
 					towerStore.captureBaselineCell(

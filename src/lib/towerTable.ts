@@ -12,9 +12,12 @@ import {
 	applyRofBug,
 	formatNumber,
 	formatReadOnly,
+	getColumn,
+	putColumn,
 	getRofBugVer,
 	isCellFormulaSource,
 	isEditableRefSuffixCell,
+	normalizeColumnKey,
 	stripRefOnlyVarSuffix,
 	stripRefs,
 	toDisplayNumber,
@@ -223,19 +226,14 @@ export function buildDisplayRows(
 ): TableRow[] {
 	if (config.rows.length === 0) return [];
 
-	const keyMap = new Map<string, string>();
-	for (const k of Object.keys(config.rows[0])) keyMap.set(k, stripRefs(k));
-
 	return config.rows.map((r, rowIdx) => {
-		const cleanRow: TableRow = {};
+		const cleanRow: TableRow = { ...r };
 
-		for (const [k, v] of Object.entries(r)) {
-			const ck = keyMap.get(k)!;
-			if (applyDisplayRofBug && rofInfo.enabled && rofInfo.cols.has(ck)) {
+		if (applyDisplayRofBug && rofInfo.enabled) {
+			for (const [k, v] of Object.entries(cleanRow)) {
+				if (!rofInfo.cols.has(normalizeColumnKey(k))) continue;
 				const n = Number(v);
-				cleanRow[ck] = !isNaN(n) && n !== 0 ? applyRofBug(n, rofInfo.type) : v;
-			} else {
-				cleanRow[ck] = v;
+				if (!isNaN(n) && n !== 0) cleanRow[k] = applyRofBug(n, rofInfo.type);
 			}
 		}
 
@@ -268,18 +266,14 @@ export function buildDisplayRows(
 						fullPrecision,
 					);
 					if (res != null) {
-						const colKey = stripRefs(col);
-						cleanRow[colKey] = res;
-						evalContext[colKey] = res;
+						putColumn(cleanRow, col, res);
+						putColumn(evalContext, col, res);
 					}
 				}
 			}
 		}
 
-		const outRow = { ...r };
-		for (const k of Object.keys(r))
-			outRow[k] = cleanRow[keyMap.get(k)!] ?? r[k];
-		return outRow;
+		return cleanRow;
 	});
 }
 
@@ -457,15 +451,7 @@ function getCellFormulaToken(
 	header: string,
 ): string | undefined {
 	const tokens = cellFormulaTokens(config)?.[String(rowIdx)] ?? {};
-	let cellTok = tokens[header] ?? tokens[stripRefs(header)];
-	if (!cellTok) {
-		for (const [k, v] of Object.entries(tokens)) {
-			if (stripRefs(k) === stripRefs(header)) {
-				cellTok = v;
-				break;
-			}
-		}
-	}
+	const cellTok = getColumn(tokens, header);
 	return typeof cellTok === "string" ? cellTok : undefined;
 }
 
@@ -579,7 +565,7 @@ export function formatDelta(delta: number): string {
 
 function getDeltaClasses(header: string, delta: number) {
 	if (delta === 0) return { text: "", cell: "" };
-	const inv = INVERSE_STATS.has(stripRefs(header).trim().toLowerCase());
+	const inv = INVERSE_STATS.has(normalizeColumnKey(header).toLowerCase());
 	const isGood = inv ? delta < 0 : delta > 0;
 	return {
 		text: isGood ? "text-green-500" : "text-red-500",
@@ -754,7 +740,7 @@ function forEachSkinRefSource(
 		for (let r = 0; r < displayRows.length; r++) {
 			const row = displayRows[r];
 			for (const h of config.headers) {
-				register(cft[String(r)]?.[h] ?? cft[String(r)]?.[stripRefs(h)], r);
+				register(getColumn(cft[String(r)] ?? {}, h), r);
 				const rv = row[h];
 				if (typeof rv === "string" && rv.includes("<ref")) register(rv, r);
 			}
@@ -771,7 +757,7 @@ export function resolveRefContent(
 ): string {
 	const row: Record<string, string | number> = {};
 	for (const [k, v] of Object.entries(displayRow)) {
-		if (v !== undefined && v !== null) row[stripRefs(k)] = v;
+		if (v !== undefined && v !== null) row[k] = v;
 	}
 	const evalContext = applyGlobalModifierToRow(globalModifier, row);
 	const levelVal =

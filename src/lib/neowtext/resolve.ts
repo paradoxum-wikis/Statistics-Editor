@@ -6,14 +6,14 @@ import {
 	getRofBugVer,
 	applyRofBug,
 	normalizeColumnKey,
-	columnKeysEqual,
+	getColumn,
 	parseNumeric,
 	toNumericValue,
 } from "#lib/utils/format.js";
 import { settingsStore } from "#lib/stores/settings.svelte.js";
 import {
 	getTableCacheRowAt,
-	type TableRowCache,
+	type TableCache,
 } from "#lib/neowtext/tableCache.js";
 import {
 	isNumericArrayBody,
@@ -29,7 +29,7 @@ import {
 	resolveBranchSpec,
 } from "#lib/neowtext/functions/schema.js";
 
-export type TableCache = Record<string, TableRowCache>;
+export type { TableCache };
 
 function getCachedTableRow(
 	tableCache: TableCache | undefined,
@@ -38,33 +38,15 @@ function getCachedTableRow(
 	branch?: string,
 ): Record<string, string | number> | undefined {
 	if (!tableCache) return undefined;
-
-	const raw = stripRefs(tableName).trim();
-	const noSpace = raw.replace(/\s+/g, "");
-	const keys = [tableName.trim(), raw, noSpace];
-
-	for (const key of keys) {
-		const row = getTableCacheRowAt(tableCache[key], level, branch);
-		if (row) return row;
-	}
-	return undefined;
+	const tCache = getColumn(tableCache, tableName);
+	return getTableCacheRowAt(tCache, level, branch);
 }
 
 function getCachedColumnValue(
 	row: Record<string, string | number>,
 	columnName: string,
 ): string | number | undefined {
-	const norm = normalizeColumnKey(columnName);
-	const noSpace = norm.replace(/\s+/g, "");
-
-	if (row[columnName.trim()] !== undefined) return row[columnName.trim()];
-	if (row[norm] !== undefined) return row[norm];
-	if (row[noSpace] !== undefined) return row[noSpace];
-
-	for (const [k, v] of Object.entries(row)) {
-		if (columnKeysEqual(k, columnName)) return v;
-	}
-	return undefined;
+	return getColumn(row, columnName);
 }
 
 function maybeApplyRofToCachedRow(
@@ -77,12 +59,11 @@ function maybeApplyRofToCachedRow(
 	const rofInfo = getRofBugVer(tokens);
 	if (rofInfo.cols.length === 0) return row;
 
-	const rofCols = new Set(rofInfo.cols.map((c) => stripRefs(c).trim()));
+	const rofCols = new Set(rofInfo.cols);
 	const adjusted: Record<string, string | number> = {};
 
 	for (const [k, v] of Object.entries(row)) {
-		const cleanK = stripRefs(k).trim();
-		if (rofCols.has(cleanK)) {
+		if (rofCols.has(normalizeColumnKey(k))) {
 			const n = Number(v);
 			adjusted[k] = !isNaN(n) && n !== 0 ? applyRofBug(n, rofInfo.type) : v;
 		} else {
@@ -512,7 +493,7 @@ export function resolveToken(
 		});
 
 		const context = Object.fromEntries(
-			Object.entries(row).map(([k, v]) => [stripRefs(k), v]),
+			Object.entries(row).map(([k, v]) => [normalizeColumnKey(k) || k, v]),
 		);
 
 		const numLevel = parseLevelNumber(level);
