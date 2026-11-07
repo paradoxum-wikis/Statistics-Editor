@@ -41,7 +41,7 @@ $R$ = $FNC-RECURSION$
 {| class="wikitable stats-table mw-collapsible mw-collapsed"
 ! colspan="12" | Firework Chance$FREF$
 |-
-! Level !! 0.1 Firerate !! 0.15 Firerate !! 0.2 Firerate !! 0.25 Firerate !! 0.5 Firerate !! 0.75 Firerate !! 1 Firerate !! 1.5 Firerate !! 2 Firerate !! 5 Firerate  !! 30 Firerate
+! Level !! 0.1 Firerate !! 0.15 Firerate !! 0.2 Firerate !! 0.25 Firerate !! 0.5 Firerate !! 0.75 Firerate !! 1 Firerate !! 1.5 Firerate !! 2 Firerate !! 5 Firerate !! 100 Firerate
 |-
 | 0 || $CHANCE1$% || $CHANCE2$% || $CHANCE3$% || $CHANCE4$% || $CHANCE5$% || $CHANCE6$% || $CHANCE7$% || $CHANCE8$% || $CHANCE9$% || $CHANCE10$% || $CHANCE11$%
 |-

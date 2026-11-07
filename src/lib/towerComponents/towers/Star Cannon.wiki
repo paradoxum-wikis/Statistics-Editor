@@ -4,7 +4,7 @@ $DPS$ = Max Damage / (Max Charge Time + Reboot Time + Firing Windup)
 $MCE$ = Total Cost / Min Single DPS
 $CE$ = Total Cost / Max Single DPS
 $STM$ = Star Cannon Stats.Max Charge Time * (Percentage * 0.01)
-$SDMG$ = {{#expr:floor(Star Cannon Stats.Damage + ((Star Cannon Stats.Max Damage - Star Cannon Stats.Damage) * (Time Spent / Star Cannon Stats.Max Charge Time)**2))}}
+$SDMG$ = {{#expr:floor(Star Cannon Stats.Damage + ((Star Cannon Stats.Max Damage - Star Cannon Stats.Damage) * (Time Spent / Star Cannon Stats.Max Charge Time)^2))}}
 $SDPS$ = Damage / ((Star Cannon Stats.Max Charge Time * (Percentage * 0.01)) + Star Cannon Stats.Reboot Time + Star Cannon Stats.Firing Windup)
 $SMDPS$ = Damage / ((Star Cannon Stats.Max Charge Time * (Percentage * 0.01)) + Star Cannon Stats.Reboot Time + Star Cannon Stats.Firing Windup) * Star Cannon Stats.Max Hits
 $TP$ = $FNC-TOTAL-COST$
@@ -15,7 +15,7 @@ $FSE-UPGRADEICON$ = 122903694877566; 103038997645888; 94543362177801; 1355740893
 $FSE-META$ = Exclusive; File:DefaultStarCannon0.png
 $SCALE$ = <ref>Max damage is slowly reached over the span of the value max charge time is set to. It will start off increasing slowly with the damage added speeding up as time progresses.</ref>
 $DREF$ = <ref>DPS assumes that only one enemy is hit, dealing full damage and that the '''Star Cannon''' is fired the moment the ability cooldown is gone.<br/>DPS is calculated as Damage ÷ (Reboot Time + Firing Windup)</ref>
-$MDREF$ = <ref>DPS assumes that only enemy is hit, dealing full damage and that the '''Star Cannon''' is always fired the moment its charge meter is full.<br/> It also assumes no batteries were collected.<br/>DPS is calculated as Damage ÷ (Max Charge Time + Reboot Time + Firing Windup)</ref>
+$MDREF$ = <ref>DPS assumes that only one enemy is hit, dealing full damage and that the '''Star Cannon''' is always fired the moment its charge meter is full.<br/> It also assumes no batteries were collected.<br/>DPS is calculated as Damage ÷ (Max Charge Time + Reboot Time + Firing Windup)</ref>
 $R$ = $FNC-RECURSION$
 </var>
 {| class="wikitable stats-table"
@@ -34,7 +34,7 @@ $R$ = $FNC-RECURSION$
 | 4 || $R$ || $R$ || 5,000 || 140,000 || 70 || 10 || 1.5 || 90 || 5 || 6 || 4 || 4 || 15% || 2 || $MDPS$ || $DPS$ || {{Money|$MCE$}} || {{Money|$CE$}}
 |}
 
-{| class="wikitable stats-table mw-collapsible mw-collapsed" style="display: none;"
+{| class="wikitable stats-table mw-collapsible mw-collapsed"
 ! colspan="6" |Damage Scaling
 |-
 ! Level !! Percentage !! Time Spent !! Damage !! DPS !! AOE DPS

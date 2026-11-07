@@ -1,4 +1,5 @@
 <var>
+$TP$ = $FNC-TOTAL-COST$
 $COST$ = 4500; 4000; 6000; 13000; 17000; 25000
 $FSE-DETECTION$ = ; ;
 $FSE-UPGRADE$ = Active Time Battle; Paradox Limiters; Hourglass Stabilizers; Warp Drive; B.U.N.N.Y 
@@ -19,5 +20,5 @@ $R$ = $FNC-RECURSION$
 |-
 | 4 || $R$ || $R$ || 26 || 1.2 || 0.8 || 6 || 25
 |-
-| 5 || $R$ || $R$ || 26 || 1.3 || 0.7 || 3 || 25
+| 5 || $R$ || $R$ || 26 || 1.3 || 0.75 || 3 || 25
 |}

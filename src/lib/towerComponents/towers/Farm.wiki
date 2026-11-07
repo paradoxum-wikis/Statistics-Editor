@@ -6,7 +6,7 @@ $COST$ = 300; 200; 600; 1250; 2500; 4500
 $PVP-COST$ = 250; 200; 550; 1000; 2500; 5000
 $FSE-UPGRADE$ = Carrot Farm; Wheat Farm; Tree Farm; Apple Farm; Space Fruit Farm
 $FSE-UPGRADEICON$ = 3294497195; 3294496318; 3294498124; 3294499153; 3294500097
-$FSE-META$ = Intermediate; File:DefaultFarmIcon.png
+$FSE-META$ = Intermediate; File:DefaultFarm0.png
 $WREF$ = <ref name=recoup>Amount of waves it would take to regain the spent cash per upgrade via income.<br>Calculated as Cost ÷ Income Gain.</ref>
 $TREF$ = <ref name=tpi>Parity of income gained to total upgrade cost.<br>Calculated as Total Cost ÷ Income.</ref>
 $R$ = $FNC-RECURSION$
