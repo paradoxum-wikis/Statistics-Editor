@@ -4,9 +4,7 @@ import {
 	stripRefs,
 	normalizeColumnKey,
 } from "#lib/utils/format.js";
-import { transpileExpr } from "mediawiki-expr";
-
-const ARITHMETIC_ALLOWED = /^[\w\s+\-*/%.(),<>=!&|?:;{}[\]"']+$/;
+import { evaluateExpr } from "mediawiki-expr";
 
 const replacerCache = new Map<
 	string,
@@ -84,18 +82,7 @@ export function evaluateFormula(
 
 	try {
 		if (!expression.trim()) return NaN;
-		expression = transpileExpr(expression);
-
-		if (!ARITHMETIC_ALLOWED.test(expression)) {
-			if (settingsStore.debugMode) {
-				console.error(
-					`[Evaluator] Formula contains disallowed syntax: "${expression}"`,
-				);
-			}
-			return NaN;
-		}
-
-		const result = new Function(`return ${expression}`)();
+		const result = evaluateExpr(expression, { mediawikiErrors: false });
 
 		if (settingsStore.debugMode) {
 			console.log(`[Evaluator] "${formula}" -> "${expression}" -> ${result}`);
