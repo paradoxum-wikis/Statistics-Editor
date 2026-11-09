@@ -250,7 +250,7 @@
 			<IconBtn onclick={goBack} title="Back to Editor">
 				<ArrowLeft size={18} />
 			</IconBtn>
-			<h1 class="unisans truncate text-3xl font-black text-foreground">
+			<h1 class="sofiasans truncate text-3xl font-black text-foreground">
 				Workshop
 			</h1>
 		</div>

@@ -20,7 +20,7 @@
 			class="w-[min(22vw,11rem)] shrink-0 select-none"
 		/>
 		<p
-			class="unisans text-[min(22vw,11rem)] leading-none font-black text-destructive"
+			class="sofiasans text-[min(22vw,11rem)] leading-none font-black text-destructive"
 		>
 			{code}
 		</p>

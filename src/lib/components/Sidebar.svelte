@@ -305,7 +305,7 @@
 			<CostEditor />
 		{:else}
 			<div class="mb-3 flex items-baseline justify-between gap-2">
-				<h3 class="text-sm font-semibold">Recent Updates</h3>
+				<h3 class="text-sm font-bold">Recent Updates</h3>
 				<a
 					href="https://github.com/paradoxum-wikis/Statistics-Editor/commits/main/"
 					target="_blank"

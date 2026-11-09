@@ -38,7 +38,7 @@
 					loading="lazy"
 				/>
 			</a>
-			<p class="mt-1.5 text-sm unisans font-semibold">{data.profile.name}</p>
+			<p class="mt-1.5 text-sm sofiasans font-semibold">{data.profile.name}</p>
 			<a
 				href={data.profile.link}
 				target="_blank"
@@ -54,7 +54,7 @@
 		class="flex min-h-0 flex-1 flex-col rounded-(--radius) border border-border bg-card"
 	>
 		<div class="border-b border-border px-3 py-2">
-			<h3 class="text-sm font-semibold unisans">Supporters</h3>
+			<h3 class="text-sm font-bold sofiasans">Supporters</h3>
 		</div>
 
 		<ul class="min-h-0 flex-1 overflow-y-auto p-2">

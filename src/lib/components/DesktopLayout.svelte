@@ -229,7 +229,7 @@
 				class="sticky top-0 z-7 flex items-center justify-between gap-3 border-b bg-card p-2 px-3"
 			>
 				<div class="flex min-w-0 items-center gap-3">
-					<h1 class="unisans truncate text-3xl font-black text-foreground">
+					<h1 class="sofiasans truncate text-3xl font-black text-foreground">
 						{towerStore.selectedName || "TDS Statistics Editor"}
 					</h1>
 					{#if isClient}

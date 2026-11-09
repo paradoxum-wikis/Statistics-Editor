@@ -7,6 +7,7 @@
       "dependencies": {
         "@bhsd/codemirror-wikitext": "^0.12.2",
         "@fontsource-variable/montserrat": "^5.3.0",
+        "@fontsource-variable/sofia-sans-semi-condensed": "^5.3.0",
         "@lucide/svelte": "^1.70.0",
         "@replit/codemirror-vim": "^6.4.0",
         "codemirror": "^6.0.2",
@@ -97,6 +98,8 @@
     "@floating-ui/utils": ["@floating-ui/utils@0.2.12", "", {}, "sha512-HpCo8tmWzLVad5s2d19EhAz5zqrrQ6s69qd6moPMQvkOuSwDT1YgRfWSVuc4ennqrgv3OHppiOGMQ7oC13yIww=="],
 
     "@fontsource-variable/montserrat": ["@fontsource-variable/montserrat@5.3.0", "", {}, "sha512-7PaZoxaxrWLAyrhO46v65An9LhUhfkTExWLhfbywYZCnZEgg/W1rEHnlNmZKjNZ3nJTVYyicqxlJt10z/26yTA=="],
+
+    "@fontsource-variable/sofia-sans-semi-condensed": ["@fontsource-variable/sofia-sans-semi-condensed@5.3.0", "", {}, "sha512-qeDC2S6tUo5QLFmgxN3XWwQZaIyM6eN11rZWXR2J4KjXMw+0PaWUXNObgt85yEThwb7P76xAzgDkWXOIkrzyHw=="],
 
     "@img/colour": ["@img/colour@1.1.0", "", {}, "sha512-Td76q7j57o/tLVdgS746cYARfSyxk8iEfRxewL9h4OMzYhbW4TAcppl0mT4eyqXddh6L/jwoM75mo7ixa/pCeQ=="],
 

@@ -14,6 +14,7 @@
 	import InboxModal from "#lib/components/InboxModal.svelte";
 	import "./layout.css";
 	import "@fontsource-variable/montserrat/wght.css";
+	import '@fontsource-variable/sofia-sans-semi-condensed';
 
 	let { children } = $props();
 	let isClient = $state(false);
@@ -116,11 +117,6 @@
 	<link rel="preconnect" href="https://bin.t7ru.link" crossorigin="anonymous" />
 	<link rel="dns-prefetch" href="https://bin.t7ru.link" />
 	<link rel="preconnect" href="https://www.googletagmanager.com" />
-	<link
-		rel="stylesheet"
-		href="https://bin.t7ru.link/fol/unisans/index.css"
-		crossorigin="anonymous"
-	/>
 </svelte:head>
 
 <svelte:window

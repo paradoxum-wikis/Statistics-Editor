@@ -63,7 +63,7 @@
 	class="flex min-h-full flex-col gap-3 lg:h-full lg:min-h-0 lg:overflow-hidden"
 >
 	<div class="shrink-0 space-y-2">
-		<h2 class="unisans text-xl font-bold md:text-2xl">{greeting}</h2>
+		<h2 class="sofiasans text-xl font-extrabold md:text-2xl">{greeting}</h2>
 		<p class="text-xs text-muted-foreground md:text-sm">
 			The Statistics Editor is a community made tool for creating and editing
 			Tower Defense Simulator tower stats, duh.
@@ -72,7 +72,7 @@
 		<div class="grid grid-cols-2 gap-2 lg:grid-cols-4">
 			{#each steps as step, i (step.title)}
 				<SubtleRow class="p-2.5">
-					<p class="text-sm font-semibold unisans">
+					<p class="text-sm font-bold sofiasans">
 						<span class="text-muted-foreground">{i + 1}.</span>
 						{step.title}
 					</p>
