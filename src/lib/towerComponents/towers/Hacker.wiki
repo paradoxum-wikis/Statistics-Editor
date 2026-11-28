@@ -37,7 +37,7 @@ $R$ = $FNC-RECURSION$
 |-
 ! Level !! Cost !! Total Cost !! Damage !! Firerate !! Synapses !! Range !! Hologram EV !! Slowness !! Clone Cost !! Hologram Lifetime !! Wire Fraud !! Unit Limit !! DPS !! Max DPS !! Cost Efficiency !! Max Cost Efficiency
 |-
-| 5 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 25 || 0.1 || 3 || 18.5 || 0.75 || 10% || 20% || 30 || 20% || 1,000 || $DPS$ || $MDPS$ || {{Money|$CE$}} || {{Money|$MCE$}}
+| 5 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 25 || 0.1 || 3 || 18.5 || 0.75 || 10% || 25% || 30 || 20% || 1,000 || $DPS$ || $MDPS$ || {{Money|$CE$}} || {{Money|$MCE$}}
 |}
 
 {| class="wikitable stats-table"

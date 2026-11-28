@@ -6,7 +6,7 @@ $TDPS$ = Ram DPS + Gunner DPS + Cannon DPS
 $NDPS$ = Ram DPS + Gunner DPS
 $CE$ = Total Cost / Total DPS
 $TP$ = $FNC-TOTAL-COST$
-$COST$ = 400; 200; 400; 2000; 7500; 25000
+$COST$ = 1400; 750; 1100; 3500; 15000; 37500
 $PVP-COST$ = 400; 200; 400; 1750; 7500; 25000
 $FSE-DETECTION$ = 3; 0;
 $FSE-UPGRADE$ = Mechanics; Barbed Wire; Mounted Gunner; Tank; Railgun Tank
@@ -21,17 +21,17 @@ $R$ = $FNC-RECURSION$
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Health !! Gunner Damage !! Cannon Splash Damage$SREF$ !! Cannon Firerate !! Airstrike Damage$SREF$ !! Spawnrate !! Firerate !! Range !! Ram DPS !! Gunner DPS !! Cannon DPS !! Total DPS !! Cost Efficiency
 |-
-| 0 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 60 || N/A || N/A || N/A || N/A || 45 || N/A || 5 || $RDPS$ || N/A || N/A || $RDPS$ || {{Money|$CE$}}
+| 0 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 175 || N/A || N/A || N/A || N/A || 30 || N/A || 5 || $RDPS$ || N/A || N/A || $RDPS$ || {{Money|$CE$}}
 |-
-| 1 || $R$ || $R$ || 60 || N/A || N/A || N/A || N/A || 35 || N/A || 5 || $RDPS$ || N/A || N/A || $RDPS$ || {{Money|$CE$}}
+| 1 || $R$ || $R$ || 175 || N/A || N/A || N/A || N/A || 20 || N/A || 5 || $RDPS$ || N/A || N/A || $RDPS$ || {{Money|$CE$}}
 |-
-| 2 || $R$ || $R$ || 100 || N/A || N/A || N/A || N/A || 35 || N/A || 5 || $RDPS$ || N/A || N/A || $RDPS$ || {{Money|$CE$}}
+| 2 || $R$ || $R$ || 275 || N/A || N/A || N/A || N/A || 20 || N/A || 5 || $RDPS$ || N/A || N/A || $RDPS$ || {{Money|$CE$}}
 |-
-| 3 || $R$ || $R$ || 100 || 4 || N/A || N/A || N/A || 35 || 0.225 || 30 || $RDPS$ || $GDPS$ || N/A || $NDPS$ || {{Money|$CE$}}
+| 3 || $R$ || $R$ || 300 || 6 || N/A || N/A || N/A || 20 || 0.2 || 30 || $RDPS$ || $GDPS$ || N/A || $NDPS$ || {{Money|$CE$}}
 |-
-| 4 || $R$ || $R$ || 500 || 8 || 40 || 2 || 75x6 || 35 || 0.225 || 30 || $RDPS$ || $GDPS$ || $CDPS$ || $TDPS$ || {{Money|$CE$}}
+| 4 || $R$ || $R$ || 1,250 || 15 || 85 || 2 || 125x6 || 45 || 0.2 || 35 || $RDPS$ || $GDPS$ || $CDPS$ || $TDPS$ || {{Money|$CE$}}
 |-
-| 5 || $R$ || $R$ || 1,600 || 22 || 75 || 2 || 125x6 || 35 || 0.175 || 30 || $RDPS$ || $GDPS$ || $CDPS$ || $TDPS$ || {{Money|$CE$}}
+| 5 || $R$ || $R$ || 3,250 || 25 || 450 || 4 || 200x6 || 45 || 0.15 || 35 || $RDPS$ || $GDPS$ || $CDPS$ || $TDPS$ || {{Money|$CE$}}
 |}
 |-|PVP =
 {| class="wikitable stats-table"

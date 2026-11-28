@@ -2,7 +2,7 @@
 $DPS$ = Damage / Swingrate
 $FNC-ROFBUG$ = Swingrate
 $COST$ = 300; 250; 500; 1500; 2500; 6000
-$FNC-Combatant-COST$ = 100; 250; 500; 1500; 2500; 6000
+$Combatant-COST$ = 100; 250; 500; 1500; 2500; 6000
 $CE$ = Total Cost / DPS
 $MCE$ = Total Cost / $MDPS$
 $TP$ = $FNC-TOTAL-COST$
@@ -35,7 +35,7 @@ $R$ = $FNC-RECURSION$
 {| class="wikitable stats-table"
 ! Level !! Cost !! Total Cost !! Damage !! Swingrate !! Range !! DPS$DREF$ !! Cost Efficiency
 |-
-| 0 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || 2 || 0.85 || 5 || $DPS$ || {{Money|$CE$}}
+| 0 || {{Money|$Combatant-COST$}}$R$ || {{Money|$TP$}}$R$ || 2 || 0.85 || 5 || $DPS$ || {{Money|$CE$}}
 |-
 | 1 || $R$ || $R$ || 3 || 0.85 || 5 || $DPS$ || {{Money|$CE$}}
 |-
