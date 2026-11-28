@@ -1,0 +1,168 @@
+<var>
+$RDPS$ = Health / Spawnrate
+$BDPS$ = Bullet Damage / Bullet Firerate
+$MDPS$ = (Missile Damage * Missile Count) / (Missile Cooldown + Missile Count-- * Missile Burst Cooldown)
+$CDPS$ = $BDPS$ + $MDPS$
+$NDPS$ = Ram DPS + Gunner DPS
+$TDPS$ = DPS + Ram DPS
+$BOFG$ = Gatling Damage / Gatling Firerate * Gatling Guns
+$BOFM$ = (Missile Damage * Missile Count) / Missile Cooldown
+$BOFL$ = Laser Energy Damage * (Laser Duration / Laser Tick Rate) / Laser Cooldown
+$BOFT$ = $BOFG$ + $BOFL$ + $BOFM$
+$TSPD$ = Speed * Targeting Speed Multiplier
+$CE$ = Total Cost / Total DPS
+$CE2$ = Total Cost / DPS
+$TP$ = $FNC-TOTAL-COST$
+$EXP$ = {{#expr:floor(75 * 1.075^(Level - 1) * (Level > 0))}}
+$TE$ = $FNC-TOTAL-EXP$
+$FNC-SCHEMA$ = N; N; N; N; A; A; A; B; B; B;
+$FNC-BRANCH$ = Top Path Stats; Bottom Path Stats
+$COST$ = 12000; 1526; 8077; 12000; 15000; 21500; 70000; 28750; 37500; 82500
+$FSE-DETECTION$ = 3; 3; ; 3; 3; 6; 3; 3; ;
+$FSE-UPGRADE$ = Bunker Down; New Hardware; Stormbreaker Grid; Mass Production; Experimental R&D; B.O.F; Improved Facilities; Streamlined Factories; M.A.D
+$FSE-UPGRADEICON$ = 81850022566158; 115234511830033; 70879603673150; 87566511741776; 92441927834632; 85900402513558; 113909158042573; 97483329929562; 70864659541051
+$FSE-META$ = Evolved; File:DefaultMechaBase0.png
+$R$ = $FNC-RECURSION$
+$LREF$ = <ref name="lead1">Collision only.</ref>
+$LREF2$ = <ref name="lead2">Collision and [[Splash Damage]] only.</ref>
+</var>
+<tabber>
+|-|Regular =
+{| class="wikitable stats-table"
+! colspan="18" | Neutral Stats
+|-
+! Level !! Cost !! Total Cost !! Unit !! Health !! Speed !! Targeting Speed Multiplier !! Targeting Speed !! Targeting Slowdown Duration !! Bullet Damage !! Bullet Firerate !! Range !! Spawnrate !! Detections !! DPS !! Ram DPS !! Total DPS !! Cost Efficiency
+|-
+| 0 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || [[Mark I]] || 2,000 || 4 || 0.65 || $TSPD$ || 2 || 6 || 0.19 || 22 || 55 || Lead$LREF$ || $BDPS$ || $RDPS$ || $TDPS$ || {{Money|$CE$}}
+|-
+| 1 || $R$ || $R$ || [[Mark I]] || 2,000 || 4 || 0.65 || $TSPD$ || 2 || 6 || 0.19 || 22 || 45 || Lead$LREF$ || $BDPS$ || $RDPS$ || $TDPS$ || {{Money|$CE$}}
+|-
+| 2 || $R$ || $R$ || [[Mark II]] || 3,500 || 4 || 0.65 || $TSPD$ || 2 || 9 || 0.19 || 22 || 45 || Lead$LREF$ || $BDPS$ || $RDPS$ || $TDPS$ || {{Money|$CE$}}
+|-
+| 3 || $R$ || $R$ || [[Mark I]] || 2,000 || 4 || 0.65 || $TSPD$ || 2 || 6 || 0.19 || 22 || 40 || Lead$LREF$ || $BDPS$ || $RDPS$ || $TDPS$ || {{Money|$CE$}}
+|-
+| 3 || $R$ || $R$ || [[Mark II]] || 3,500 || 4 || 0.65 || $TSPD$ || 2 || 9 || 0.19 || 22 || 45 || Lead$LREF$ || $BDPS$ || $RDPS$ || $TDPS$ || {{Money|$CE$}}
+|}
+
+{| class="wikitable stats-table"
+! colspan="23" | Top Path Stats
+|-
+! Level !! Cost !! Total Cost !! Unit !! Health !! Speed !! Targeting Speed Multiplier !! Targeting Speed !! Targeting Slowdown Duration !! Bullet Damage !! Bullet Firerate !! Missile Damage !! Missile Count !! Missile Cooldown !! Missile Burst Cooldown !! Missile Radius !! Range !! Spawnrate !! Detections !! DPS !! Ram DPS !! Total DPS !! Cost Efficiency
+|-
+| 4 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || [[F.M.B. Mark II]] || 5,000 || 4 || 0.65 || $TSPD$ || 2 || 9 || 0.19 || 20 || 2 || 3 || 0.5 || 2 || 22 || 40 || Lead$LREF2$ || $CDPS$<ref>$BDPS$ Bullet DPS + $MDPS$ Missile DPS</ref> || $RDPS$ || $TDPS$ || {{Money|$CE$}}
+|-
+| 4 || $R$ || $R$ || [[Mark II]] || 3,500 || 4 || 0.65 || $TSPD$ || 2 || 9 || 0.19 || N/A || N/A || N/A || N/A || N/A || 22 || 35 || Lead$LREF$ || $BDPS$ || $RDPS$ || $TDPS$ || {{Money|$CE$}}
+|-
+| 5 || $R$ || $R$ || [[Mark III]] || 7,000 || 4 || 0.5 || $TSPD$ || 2 || 14 || 0.17 || 60 || 2 || 3 || 0.5 || 2 || 25 || 40 || Lead$LREF2$ || $CDPS$<ref>$BDPS$ Bullet DPS + $MDPS$ Missile DPS</ref> || $RDPS$ || $TDPS$ || {{Money|$CE$}}
+|-
+| 5 || $R$ || $R$ || [[F.M.B. Mark II]] || 5,000 || 4 || 0.65 || $TSPD$ || 2 || 9 || 0.19 || 20 || 2 || 3 || 0.5 || 2 || 22 || 35 || Lead$LREF2$ || $CDPS$<ref>$BDPS$ Bullet DPS + $MDPS$ Missile DPS</ref> || $RDPS$ || $TDPS$ || {{Money|$CE$}}
+|-
+| 6 || $R$ || $R$ || [[Rhino Mark III]] || 8,000 || 4 || 0.5 || $TSPD$ || 2 || 15 || 0.15 || 60 || 2 || 3 || 0.5 || 2 || 25 || 40 || Lead$LREF2$ || $CDPS$<ref>$BDPS$ Bullet DPS + $MDPS$ Missile DPS</ref> || $RDPS$ || $TDPS$ || {{Money|$CE$}}
+|-
+| 6 || $R$ || $R$ || [[F.M.B. Mark II]] || 5,000 || 4 || 0.65 || $TSPD$ || 2 || 9 || 0.19 || 20 || 2 || 3 || 0.5 || 2 || 22 || 35 || Lead$LREF2$ || $CDPS$<ref>$BDPS$ Bullet DPS + $MDPS$ Missile DPS</ref> || $RDPS$ || $TDPS$ || {{Money|$CE$}}
+|}
+
+{| class="wikitable stats-table"
+! colspan="23" | Bottom Path Stats
+|-
+! Level !! Cost !! Total Cost !! Unit !! Health !! Speed !! Targeting Speed Multiplier !! Targeting Speed !! Targeting Slowdown Duration !! Bullet Damage !! Bullet Firerate !! Missile Damage !! Missile Count !! Missile Cooldown !! Missile Burst Cooldown  !! Missile Radius !! Range !! Spawnrate !! Detections !! DPS !! Ram DPS !! Total DPS !! Cost Efficiency
+|-
+| 4 || {{Money|$COST$}}$R$ || {{Money|$TP$}}$R$ || [[Assault Mark III]] || 2,000 || 4 || 0.5 || $TSPD$ || 2 || 15 || 0.12 || 50 || 2 || 3 || 0.5 || 2 || 30 || 40 || Lead$LREF2$ || $CDPS$<ref>$BDPS$ Bullet DPS + $MDPS$ Missile DPS</ref> || $RDPS$ || $TDPS$ || {{Money|$CE$}}
+|-
+| 4 || $R$ || $R$ || [[Assault Mark III]] || 2,000 || 4 || 0.5 || $TSPD$ || 2 || 15 || 0.12 || 50 || 2 || 3 || 0.5 || 2 || 30 || 40 || Lead$LREF2$ || $CDPS$<ref>$BDPS$ Bullet DPS + $MDPS$ Missile DPS</ref> || $RDPS$ || $TDPS$ || {{Money|$CE$}}
+|-
+| 5 || $R$ || $R$ || [[Dawnmaker Mark III]] || 2,500 || 3 || 0.55 || $TSPD$ || 2 || 15 || 0.15 || 160 || 4 || 2 || 0.2 || 2 || 35 || 40 || Lead$LREF2$ || $CDPS$<ref>$BDPS$ Bullet DPS + $MDPS$ Missile DPS</ref> || $RDPS$ || $TDPS$ || {{Money|$CE$}}
+|-
+| 5 || $R$ || $R$ || [[Assault Mark III]] || 2,000 || 4 || 0.5 || $TSPD$ || 2 || 15 || 0.12 || 50 || 2 || 3 || 0.5 || 2 || 30 || 40 || Lead$LREF2$ || $CDPS$<ref>$BDPS$ Bullet DPS + $MDPS$ Missile DPS</ref> || $RDPS$ || $TDPS$ || {{Money|$CE$}}
+|-
+| 6 || $R$ || $R$ || [[Iron Storm Mark IV]] || 6,000 || 3 || 0.6 || $TSPD$ || 2 || 45 || 0.1 || 50 || 4 || 3 || 0.5 || 2 || 30 || 50 || Lead$LREF2$ || $CDPS$<ref>$BDPS$ Bullet DPS + $MDPS$ Missile DPS</ref> || $RDPS$ || $TDPS$ || {{Money|$CE$}}
+|-
+| 6 || $R$ || $R$ || [[Dawnmaker Mark III]] || 2,500 || 3 || 0.55 || $TSPD$ || 2 || 15 || 0.15 || 160 || 4 || 2 || 0.2 || 2 || 35 || 40 || Lead$LREF2$ || $CDPS$<ref>$BDPS$ Bullet DPS + $MDPS$ Missile DPS</ref> || $RDPS$ || $TDPS$ || {{Money|$CE$}}
+|}
+
+{| class="wikitable stats-table"
+! colspan="6" | Shock Barrier Stats
+|-
+! Level !! Energy Damage || Stun Time || Life Time || Radius || Cooldown
+|-
+| 3 || 50 || 0.25 || 20 || 3 || 60
+|-
+| 4A || 50 || 0.5 || 30 || 3 || 60
+|-
+| 5A || 50 || 0.75 || 45 || 3 || 60
+|-
+| 6A || 50 || 1 || 60 || 3 || 60
+|-
+| 4B || 100 || 0.1 || 10 || 3 || 30
+|-
+| 5B || 250 || 0.1 || 15 || 3 || 30
+|-
+| 6B || 400 || 0.1 || 20 || 3 || 30
+|}
+
+{| class="wikitable stats-table"
+! colspan="20" | [[Bliss of Finality]] Stats
+|-
+! Level !! Ability Duration !! Ability Cost !! Ability Cooldown !! Health !! Gatling Guns !! Gatling Damage !! Gatling Firerate !! Missile Damage !! Missile Count !! Missile Cooldown !! Missile Burst Cooldown !! Missile Radius !! Laser Energy Damage !! Laser Tick Rate !! Laser Cooldown !! Laser Radius !! Laser Duration !! Detections !! DPS
+|-
+| 6A || 60 || {{Money|60,000}} || 180 || 8,000,000 || 5 || 12 || 0.1 || 80 || 20 || 6 || 0.1 || 4 || 500 || 0.1 || 20 || 6 || 3.5 || Hidden, Flying, Lead<ref>Laser and missiles only.</ref> || $BOFT$<ref>$BOFG$ Gatling DPS + $BOFM$ Missile DPS +$BOFL$ Laser DPS</ref>
+|}
+
+{| class="wikitable stats-table"
+! colspan="34" | [[C.M.D.R. Mark V]] Stats
+|-
+! Level  !! Ability Cost !! Ability Cooldown!! Health !! Speed !! Targeting Speed Multiplier !! Targeting Speed !! Targeting Slowdown Duration !! Bullet Damage !! Bullet Firerate !! Missile Damage !! Missile Count !! Missile Cooldown !! Missile Burst Cooldown !! Missile Radius !! Range !! Shield Bash Damage !! Shield Bash Cooldown !! Shield Bash Range !! Shield Bash Knockback Force !! Heal Amount !! Heal Cooldown !! Heal Radius !! Mech Damage Bonus !! Weakness Duration !! Weakness Cooldown !! Weakness Radius !! M.A.D Damage !! M.A.D Radius !! Impact Damage !! Impact Radius !! Impact Knockback Force !! Detections !! DPS
+|-
+| 6B || {{Money|5,000}} || 90 || 7,000 || 4 || 0.5 || $TSPD$ || 3 || 15 || 0.1 || 125 || 4 || 5 || 0.2 || 2.5 || 35 || 1,111 || 1.25 || 8.5 || 35 || 3,000 || 8 || 6 || 15% || 5 || 20 || 4 || 1,250 || 20 || 1,000 || 20 || 40 || Hidden, Lead || $CDPS$<ref>$BDPS$ Bullet DPS + $MDPS$ Missile DPS</ref>
+|}
+<!-- @se-ignore -->
+|-|Levels =
+{| class="wikitable stats-table"
+! colspan="12" |Levels
+|-
+! Level !! Exp !! Total Exp
+|-
+| 0 || {{Exp|0}} || {{Exp|$TE$}}$R$
+|-
+| 1 || {{Exp|$EXP$}}$R$ || $R$
+|-
+| 2 || $R$ || $R$
+|-
+| 3 || $R$ || $R$
+|-
+| 4 || $R$ || $R$
+|-
+| 5 || $R$ || $R$
+|-
+| 6 || $R$ || $R$
+|-
+| 7 || $R$ || $R$
+|-
+| 8 || $R$ || $R$
+|-
+| 9 || $R$ || $R$
+|-
+| 10 || $R$ || $R$
+|-
+| 11 || $R$ || $R$
+|-
+| 12 || $R$ || $R$
+|-
+| 13 || $R$ || $R$
+|-
+| 14 || $R$ || $R$
+|-
+| 15 || $R$ || $R$
+|-
+| 16 || $R$ || $R$
+|-
+| 17 || $R$ || $R$
+|-
+| 18 || $R$ || $R$
+|-
+| 19 || $R$ || $R$
+|-
+| 20 || $R$ || $R$
+|}
+<!-- @/se-ignore -->
+</tabber>
